@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@abandonware/noble": "^1.9.2-10",
+    "node-switchbot": "^0.1.0",
     "wyze-node": "^2.0.2"
   },
   "devDependencies": {

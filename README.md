@@ -8,6 +8,7 @@ Using Ubuntu 20.04
 
 ```
 $ sudo apt-get update && sudo apt-get install nodejs npm -y
+$ sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev -y
 $ git clone https://github.com/metatooth/cannabis.git
 $ cd cannabis
 $ npm install
