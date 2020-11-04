@@ -14,7 +14,7 @@ function svp(T) {
  * @return {float} vapor pressure deficit in kilopascals
  */
 function vpd(T, RH) {
-  return svp(T) * (1 - RH) / 100;
+  return svp(T) * (1.0 - RH) / 100.0;
 }
 
 /**
@@ -24,7 +24,7 @@ function vpd(T, RH) {
  * @return {float} relative humidity as a ratio
  */
 function rh(VPD, T) {
-    return 1 - (100 * VPD / svp(T));
+  return 1.0 - (100.0 * VPD / svp(T));
 }
 
 module.exports = {vpd, rh};

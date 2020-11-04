@@ -44,16 +44,18 @@ async function on(name) {
   const devices = await wyze.getDeviceList();
   console.log(devices);
 
-    const setVPD = process.env.VPD; 
-    const setT = process.env.T;
-    const delta = process.env.DELTA;
+    const setVPD = parseFloat(process.env.VPD);
+    const setT = parseFloat(process.env.T);
+    const delta = parseFloat(process.env.DELTA);
     
-    const setRH = rh(setVPD, setT);
-
     console.log(`Set VPD ${setVPD}`);
     console.log(`Set T ${setT}`);
-    console.log(`Set RH ${setRH}`);
     console.log(`Set DELTA ${delta}`);
+
+    const setRH = rh(setVPD, setT);
+
+    console.log(`Set RH ${setRH}`);
+
 
     switchbot.discover({model: 'T', quick: false}).then((devices) => {
       const device = devices[0];
