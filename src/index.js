@@ -3,7 +3,7 @@ const switchbot = new Switchbot();
 
 const Wyze = require('wyze-node');
 
-const {vpd, rh} = require('./vpd');
+const {vpd, rh} = require('./utils');
 
 const options = {
   username: process.env.USERNAME,
