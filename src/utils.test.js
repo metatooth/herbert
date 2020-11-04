@@ -1,6 +1,6 @@
 const {vpd, rh} = require('./utils');
 
-test('vpd of 22*C & 65% humidity', () => {
+test('vapord pressure deficit at 22*C and 65% relative humidity', () => {
   expect(vpd(22.0, 0.65)).toBeCloseTo(9.2);
 });
 
