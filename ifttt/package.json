@@ -15,9 +15,12 @@
     "cookie-parser": "^1.4.5",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
-    "multer": "^1.4.2"
+    "js-yaml": "^3.14.0",
+    "multer": "^1.4.2",
+    "swagger-tools": "^0.10.4"
   },
   "devDependencies": {
+    "chokidar": "^3.4.3",
     "eslint": "^7.13.0"
   }
 }
