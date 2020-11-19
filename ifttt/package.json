@@ -5,8 +5,14 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint --fix ./index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node index.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
   },
   "author": "",
   "license": "ISC",
@@ -17,10 +23,13 @@
     "express": "^4.17.1",
     "js-yaml": "^3.14.0",
     "multer": "^1.4.2",
-    "swagger-tools": "^0.10.4"
+    "swagger-tools": "^0.10.4",
+    "wyze-node": "^2.0.3"
   },
   "devDependencies": {
     "chokidar": "^3.4.3",
-    "eslint": "^7.13.0"
+    "eslint": "^7.13.0",
+    "jest-cli": "^26.6.3",
+    "supertest": "^6.0.1"
   }
 }

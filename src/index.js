@@ -38,52 +38,86 @@ async function on(name) {
   console.log('Done.');
 }
 
-; (async () => {
-  console.log(wyze);
+let initialized = false;
+const names = ['blower', 'lamp'];
+const devices = new Map;
+let VPD; let T; let DELTA; let INTERVAL; let RH;
 
-  const devices = await wyze.getDeviceList();
+async function init() {
+  console.log('INIT ...');
+
+  return wyze.getDeviceList().then((dlist) => {
+    dlist.forEach((device) => {
+      names.forEach((name) => {
+        if (device.nickname.match(new RegExp(name, 'i'))) {
+          if (!devices.has(name)) {
+            devices.set(name, []);
+          }
+          devices.get(name).push(device.nickname);
+        }
+      });
+    });
+
+
+    VPD = parseFloat(process.env.VPD) || 1.0;
+    T = parseFloat(process.env.T) || 22.0;
+    DELTA = parseFloat(process.env.DELTA) || 1.0;
+    INTERVAL = parseInt(process.env.interval) || 30000;
+    console.log(`Set VPD ${VPD}`);
+    console.log(`Set T ${T}`);
+    console.log(`Set DELTA ${DELTA}`);
+    console.log(`Set INTERVAL ${INTERVAL}`);
+    RH = rh(VPD, T);
+    console.log(`Set RH ${RH}`);
+
+    return switchbot.discover().then((devices) => {
+console.log(devices);
+      const device = devices[0];
+      console.log('Found it!');
+      console.log(device);
+
+      initialized = true;
+console.log('Done.');
+    }).catch((error) => {
+      console.error(error);
+    });
+  });
+}
+
+async function app() {
+  if (!initialized) {
+    await init();
+  }
+
   console.log(devices);
-
-  const setVPD = parseFloat(process.env.VPD);
-  const setT = parseFloat(process.env.T);
-  const delta = parseFloat(process.env.DELTA);
-
-  console.log(`Set VPD ${setVPD}`);
-  console.log(`Set T ${setT}`);
-  console.log(`Set DELTA ${delta}`);
-
-  const setRH = rh(setVPD, setT);
-
-  console.log(`Set RH ${setRH}`);
 
   switchbot.discover({model: 'T', quick: false}).then((devices) => {
     const device = devices[0];
     console.log('Found it!');
     console.log(device);
-    const T = device.temperature.c;
-    const RH = device.humidity / 100;
-    console.log(`Reading ${T} and ${RH}`);
-    const VPD = vpd(T, RH);
+    const t = device.temperature.c;
+    const rh = device.humidity / 100;
+    console.log(`Reading ${t} and ${rh}`);
+    const vpd = vpd(t - DELTA, t, rh);
 
-    if (VPD < setVPD) {
-      if (T < setT) {
-        // blowers off
-        // heaters on
-        // AC unit heat
+    if (vpd < VPD) {
+      if (t < T) {
+        off('blower');
+        on('heater');
       }
 
-      if (RH > setRH) {
+      if (rh > RH) {
         // dehumidifiers on
         // AC unit dehumidify on
       }
     } else {
-      if (T > setT) {
+      if (t > T) {
         // blowers on
         // heaters off
         // AC unit cool
       }
 
-      if (RH < setRH) {
+      if (rh < RH) {
         // dehumidifiers off
         // AC unit dehumidify off
       }
@@ -91,4 +125,8 @@ async function on(name) {
   }).catch((error) => {
     console.error(error);
   });
-})();
+
+  setTimeout(app, INTERVAL);
+}
+
+setTimeout(app, 0);

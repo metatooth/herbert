@@ -3,6 +3,14 @@ const helpers = require('./helpers');
 
 const router = require('express').Router();
 
+const {off, on, state} = require('./wyze-plugs');
+
+console.log('Checking...');
+console.log(off);
+console.log(on);
+console.log(state);
+console.log('Done');
+
 // The status
 router.get('/ifttt/v1/status', middleware.serviceKeyCheck, (req, res) => {
   res.status(200).send();
@@ -95,6 +103,10 @@ router.post('/ifttt/v1/actions/temperature_overlimit',
     (req, res) => {
       console.log('temperature overlimit');
 
+      console.log(state());
+      off('heater');
+      console.log(state());
+
       if (req.body.actionFields !== undefined) {
         const content = req.body.actionFields.content;
 
@@ -125,6 +137,10 @@ router.post('/ifttt/v1/actions/temperature_overlimit',
 router.post('/ifttt/v1/actions/temperature_underlimit',
     middleware.serviceKeyCheck, (req, res) => {
       console.log('temperature underlimit');
+
+      console.log(state());
+      on('heater');
+      console.log(state());
 
       res.status(200).send({
         'data': [{

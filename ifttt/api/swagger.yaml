@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   version: "1.0.0"
   title: "hello_world_9d88af2e9c"
-host: "d4ea003ebedd.ngrok.io"
+host: "3a960b2a38ab.ngrok.io"
 basePath: "/ifttt/v1"
 tags:
 - name: "Triggers"

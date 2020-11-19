@@ -19,7 +19,6 @@ const listener = app.listen(process.env.PORT, function() {
   console.log('Your app is listening on port ' + listener.address().port);
 });
 
-
 // Only run this in development
 if (process.env.NODE_ENV !== 'production') {
   const chokidar = require('chokidar');
@@ -50,3 +49,5 @@ if (process.env.NODE_ENV !== 'production') {
     });
   });
 }
+
+module.exports = app;
