@@ -43,6 +43,9 @@ const names = ['blower', 'lamp'];
 const devices = new Map;
 let VPD; let T; let DELTA; let INTERVAL; let RH;
 
+/**
+ * Initialize
+ */
 async function init() {
   console.log('INIT ...');
 
@@ -58,7 +61,6 @@ async function init() {
       });
     });
 
-
     VPD = parseFloat(process.env.VPD) || 1.0;
     T = parseFloat(process.env.T) || 22.0;
     DELTA = parseFloat(process.env.DELTA) || 1.0;
@@ -70,20 +72,22 @@ async function init() {
     RH = rh(VPD, T);
     console.log(`Set RH ${RH}`);
 
-    return switchbot.discover().then((devices) => {
-console.log(devices);
-      const device = devices[0];
-      console.log('Found it!');
-      console.log(device);
+    return switchbot.discover({model: 'T', quick: true}).then((dlist) => {
+      console.log(dlist);
+      console.log(dlist[0]);
+      devices.set('meter', dlist[0]);
 
       initialized = true;
-console.log('Done.');
+      console.log('Done.');
     }).catch((error) => {
       console.error(error);
     });
   });
 }
 
+/**
+ * The application
+ */
 async function app() {
   if (!initialized) {
     await init();
@@ -91,41 +95,36 @@ async function app() {
 
   console.log(devices);
 
-  switchbot.discover({model: 'T', quick: false}).then((devices) => {
-    const device = devices[0];
-    console.log('Found it!');
-    console.log(device);
-    const t = device.temperature.c;
-    const rh = device.humidity / 100;
-    console.log(`Reading ${t} and ${rh}`);
-    const vpd = vpd(t - DELTA, t, rh);
+  const meter = devices.get('meter');
+  console.log(meter);
 
-    if (vpd < VPD) {
-      if (t < T) {
-        off('blower');
-        on('heater');
-      }
+  const t = meter.temperature.c;
+  const rh = meter.humidity / 100;
+  console.log(`Reading ${t} and ${rh}`);
+  const deficit = vpd(t - DELTA, t, rh);
 
-      if (rh > RH) {
-        // dehumidifiers on
-        // AC unit dehumidify on
-      }
-    } else {
-      if (t > T) {
-        // blowers on
-        // heaters off
-        // AC unit cool
-      }
+  if (deficit < VPD) {
+    if (t < T) {
+      off('blower');
+      on('heater');
+    }
 
-      if (rh < RH) {
-        // dehumidifiers off
-        // AC unit dehumidify off
-      }
-    };
-  }).catch((error) => {
-    console.error(error);
-  });
+    if (rh > RH) {
+      // dehumidifiers on
+      // AC unit dehumidify on
+    }
+  } else {
+    if (t > T) {
+      // blowers on
+      // heaters off
+      // AC unit cool
+    }
 
+    if (rh < RH) {
+      // dehumidifiers off
+      // AC unit dehumidify off
+    }
+  }
   setTimeout(app, INTERVAL);
 }
 
