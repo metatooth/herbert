@@ -86,6 +86,44 @@ async function init() {
 }
 
 /**
+ * Handler
+ * @param {Object} advertisement data
+ */
+async function handler(ad) {
+  console.log(JSON.stringify(ad, null, ' '));
+
+  if (ad.id === devices.get('meter').id) {
+    const t = ad.serviceData.temperature.c;
+    const rh = ad.serviceData.humidity / 100;
+    console.log(`Reading ${t} and ${rh}`);
+    const deficit = vpd(t - DELTA, t, rh);
+
+    if (deficit < VPD) {
+      if (t < T) {
+        off('blower');
+        on('heater');
+      }
+
+      if (rh > RH) {
+        // dehumidifiers on
+        // AC unit dehumidify on
+      }
+    } else {
+      if (t > T) {
+        // blowers on
+        // heaters off
+        // AC unit cool
+      }
+
+      if (rh < RH) {
+        // dehumidifiers off
+        // AC unit dehumidify off
+      }
+    }
+  }
+}
+
+/**
  * The application
  */
 async function app() {
@@ -100,39 +138,9 @@ async function app() {
 
   await switchbot.startScan();
 
-  switchbot.onadvertisement((ad) => {
-    console.log(JSON.stringify(ad, null, ' '));
+  switchbot.onadvertisement(handler);
 
-    if (ad.id == devices.get('meter').id) {
-      const t = ad.serviceData.temperature.c;
-      const rh = ad.serviceData.humidity / 100;
-      console.log(`Reading ${t} and ${rh}`);
-      const deficit = vpd(t - DELTA, t, rh);
-
-      if (deficit < VPD) {
-        if (t < T) {
-          off('blower');
-          on('heater');
-        }
-
-        if (rh > RH) {
-          // dehumidifiers on
-          // AC unit dehumidify on
-        }
-      } else {
-        if (t > T) {
-          // blowers on
-          // heaters off
-          // AC unit cool
-        }
-
-        if (rh < RH) {
-          // dehumidifiers off
-          // AC unit dehumidify off
-        }
-      }
-    }
-  });
+  await switchbot.wait(INTERVAL);
 
   await switchbot.stopScan();
 
