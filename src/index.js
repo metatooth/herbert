@@ -98,33 +98,44 @@ async function app() {
   const meter = devices.get('meter');
   console.log(meter);
 
-  const t = meter.temperature.c;
-  const rh = meter.humidity / 100;
-  console.log(`Reading ${t} and ${rh}`);
-  const deficit = vpd(t - DELTA, t, rh);
+  await switchbot.startScan();
 
-  if (deficit < VPD) {
-    if (t < T) {
-      off('blower');
-      on('heater');
-    }
+  switchbot.onadvertisement((ad) => {
+    console.log(JSON.stringify(ad, null, ' '));
 
-    if (rh > RH) {
-      // dehumidifiers on
-      // AC unit dehumidify on
-    }
-  } else {
-    if (t > T) {
-      // blowers on
-      // heaters off
-      // AC unit cool
-    }
+    if (ad.id == devices.get('meter').id) {
+      const t = ad.serviceData.temperature.c;
+      const rh = ad.serviceData.humidity / 100;
+      console.log(`Reading ${t} and ${rh}`);
+      const deficit = vpd(t - DELTA, t, rh);
 
-    if (rh < RH) {
-      // dehumidifiers off
-      // AC unit dehumidify off
+      if (deficit < VPD) {
+        if (t < T) {
+          off('blower');
+          on('heater');
+        }
+
+        if (rh > RH) {
+          // dehumidifiers on
+          // AC unit dehumidify on
+        }
+      } else {
+        if (t > T) {
+          // blowers on
+          // heaters off
+          // AC unit cool
+        }
+
+        if (rh < RH) {
+          // dehumidifiers off
+          // AC unit dehumidify off
+        }
+      }
     }
-  }
+  });
+
+  await switchbot.stopScan();
+
   setTimeout(app, INTERVAL);
 }
 
