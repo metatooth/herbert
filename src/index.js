@@ -1,9 +1,10 @@
+
 const Switchbot = require('node-switchbot');
 const switchbot = new Switchbot();
 
 const Wyze = require('wyze-node');
 
-const {vpd, rh} = require('./utils');
+const {vpair, vpsat, vpd, rh} = require('./utils');
 
 const options = {
   username: process.env.USERNAME,
@@ -18,11 +19,12 @@ const wyze = new Wyze(options);
 */
 async function off(name) {
   console.log(`Turn off ${name} ...`);
-
-  const device = await wyze.getDeviceByName(name);
-  const result = await wyze.turnOff(device);
-  console.log(result);
-  console.log('Done.');
+  types.get(name).forEach(async (name) => {
+    const device = await wyze.getDeviceByName(name);
+    const result = await wyze.turnOff(device);
+    console.log(result);
+    console.log('Done.');
+  });
 }
 
 /**
@@ -31,17 +33,26 @@ async function off(name) {
 */
 async function on(name) {
   console.log(`Turn on ${name} ...`);
-
-  const device = await wyze.getDeviceByName(name);
-  const result = await wyze.turnOn(device);
-  console.log(result);
-  console.log('Done.');
+  types.get(name).forEach(async (name) => {
+    const device = await wyze.getDeviceByName(name);
+    const result = await wyze.turnOn(device);
+    console.log(result);
+    console.log('Done.');
+  });
 }
 
 let initialized = false;
-const names = ['blower', 'lamp'];
-const devices = new Map;
-let VPD; let T; let DELTA; let INTERVAL; let RH;
+const types = new Map([
+  ['meter', null],
+  ['blower', []],
+  ['lamp', []],
+  ['heater', []],
+  ['humidifier', []],
+  ['dehumidifier', []],
+  ['AC', []],
+]);
+
+const targets = new Map();
 
 /**
  * Initialize
@@ -51,34 +62,39 @@ async function init() {
 
   return wyze.getDeviceList().then((dlist) => {
     dlist.forEach((device) => {
-      names.forEach((name) => {
-        if (device.nickname.match(new RegExp(name, 'i'))) {
-          if (!devices.has(name)) {
-            devices.set(name, []);
-          }
-          devices.get(name).push(device.nickname);
+      for (const key of types.keys()) {
+        if (device.nickname.match(new RegExp(key, 'i'))) {
+          const value = types.get(key);
+          value.push(device.nickname);
         }
-      });
+      }
     });
 
-    VPD = parseFloat(process.env.VPD) || 1.0;
-    T = parseFloat(process.env.T) || 22.0;
-    DELTA = parseFloat(process.env.DELTA) || 1.0;
-    INTERVAL = parseInt(process.env.interval) || 30000;
-    console.log(`Set VPD ${VPD}`);
-    console.log(`Set T ${T}`);
-    console.log(`Set DELTA ${DELTA}`);
-    console.log(`Set INTERVAL ${INTERVAL}`);
-    RH = rh(VPD, T);
-    console.log(`Set RH ${RH}`);
+    const vpd = parseFloat(process.env.VPD) || 9.2;
+    const t = parseFloat(process.env.T) || 22.0;
+    const delta = parseFloat(process.env.DELTA) || 1.0;
+    const interval = parseInt(process.env.INTERVAL) || 30000;
+    const lamps = parseInt(process.env.LAMPS) ||  20;
+
+    console.log(`VPD ${vpd}`);
+    console.log(`T ${t}`);
+    console.log(`DELTA ${delta}`);
+    console.log(`INTERVAL ${interval}`);
+    console.log(`RH ${rh(vpd, t)}`);
+    console.log(`LAMPS ${lamps}`);
+
+    targets.set('VPD', vpd);
+    targets.set('T', t);
+    targets.set('DELTA', delta);
+    targets.set('INTERVAL', interval);
+    targets.set('RH', rh(vpd, t));
+    targets.set('LAMPS', lamps);
 
     return switchbot.discover({model: 'T', quick: true}).then((dlist) => {
-      console.log(dlist);
-      console.log(dlist[0]);
-      devices.set('meter', dlist[0]);
+      types.set('meter', dlist[0]);
 
       initialized = true;
-      console.log('Done.');
+      console.log('INIT Done.');
     }).catch((error) => {
       console.error(error);
     });
@@ -87,35 +103,39 @@ async function init() {
 
 /**
  * Handler
- * @param {Object} advertisement data
+ * @param {Object} ad advertisement data
  */
 async function handler(ad) {
-  console.log(JSON.stringify(ad, null, ' '));
-
-  if (ad.id === devices.get('meter').id) {
+  if (ad.id === types.get('meter').id) {
     const t = ad.serviceData.temperature.c;
     const rh = ad.serviceData.humidity / 100;
-    console.log(`Reading ${t} and ${rh}`);
-    const deficit = vpd(t - DELTA, t, rh);
+    const sat = vpsat(t - targets.get('DELTA'));
+    const air = vpair(t, rh);
+    const deficit = vpd(t - targets.get('DELTA'), t, rh);
+    console.log(`TARGETS ${targets.get('T')}C ${targets.get('RH')} ${targets.get('VPD')}`);
+    console.log(`${(new Date()).toISOString()} - ${t}C ${rh} ${sat}kPa ${air}kPa ${deficit}kPa`);
 
-    if (deficit < VPD) {
-      if (t < T) {
+    if (deficit < targets.get('VPD')) {
+      if (t < targets.get('T')) {
+        // blower off
+        // heater on
         off('blower');
         on('heater');
       }
 
-      if (rh > RH) {
+      if (rh > targets.get('RH')) {
         // dehumidifiers on
         // AC unit dehumidify on
       }
     } else {
-      if (t > T) {
+      if (t > targets.get('T')) {
         // blowers on
         // heaters off
         // AC unit cool
+        on('blower');
       }
 
-      if (rh < RH) {
+      if (rh < targets.get('RH')) {
         // dehumidifiers off
         // AC unit dehumidify off
       }
@@ -131,15 +151,30 @@ async function app() {
     await init();
   }
 
+  console.log('Check lamps...');
+  const sec = (new Date()).getSeconds();
+  console.log(`AT ${sec} check ${targets.get('LAMPS')}`);
+
+  if (sec <= targets.get('LAMPS')) {
+    on('lamp');
+  } else {
+    off('lamp');
+  }
+
+  console.log('Done lamps.');
+
+  console.log('Start scan...');
+
   await switchbot.startScan();
 
-  switchbot.onadvertisement(handler);
+  switchbot.onadvertisement = handler;
 
-  await switchbot.wait(INTERVAL);
+  await switchbot.wait(5000);
 
   await switchbot.stopScan();
+  console.log('Done scan.');
 
-  setTimeout(app, INTERVAL);
+  setTimeout(app, targets.get('INTERVAL'));
 }
 
 setTimeout(app, 0);
