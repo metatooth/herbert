@@ -131,11 +131,6 @@ async function app() {
     await init();
   }
 
-  console.log(devices);
-
-  const meter = devices.get('meter');
-  console.log(meter);
-
   await switchbot.startScan();
 
   switchbot.onadvertisement(handler);
