@@ -14,7 +14,7 @@ function rh(VPD, T) {
  * @return {float} pressure in pascals
  */
 function svp(T) {
-    return 610.7 * Math.pow(10, 7.5 * T / (237.3 + T));
+  return 610.7 * Math.pow(10, 7.5 * T / (237.3 + T));
 }
 
 /**
@@ -33,7 +33,7 @@ function vpsat(T) {
  * @return {float} vapor pressure in kilopascals
  */
 function vpair(T, RH) {
-    return vpsat(T) * RH / 100.0;
+  return vpsat(T) * RH / 100.0;
 }
 
 /**
@@ -45,7 +45,7 @@ function vpair(T, RH) {
  * @return {float} vapor pressure in kilopascals
  */
 function vpd(L, A, RH) {
-    return vpsat(L) - vpair(A, RH);
+  return vpsat(L) - vpair(A, RH);
 }
 
 module.exports = {vpsat, vpair, vpd, rh};

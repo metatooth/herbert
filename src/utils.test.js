@@ -1,11 +1,11 @@
 const {vpd, vpsat, vpair, rh} = require('./utils');
 
 test('vapor pressure saturated at 21.7*C', () => {
-    expect(vpsat(21.7)).toBeCloseTo(2.595);
+  expect(vpsat(21.7)).toBeCloseTo(2.595);
 });
 
 test('vapor pressure at 22*C and 65% relative humidity', () => {
-    expect(vpair(22.0, 65.0)).toBeCloseTo(1.718);
+  expect(vpair(22.0, 65.0)).toBeCloseTo(1.718);
 });
 
 test('vapor pressure deficit at 21*C, 22*C, and 65% relative humidity', () => {

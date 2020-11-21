@@ -5,6 +5,7 @@ const switchbot = new Switchbot();
 const Wyze = require('wyze-node');
 
 const {vpair, vpsat, vpd, rh} = require('./utils');
+const Timer = require('./timer');
 
 const options = {
   username: process.env.USERNAME,
@@ -74,21 +75,24 @@ async function init() {
     const t = parseFloat(process.env.T) || 22.0;
     const delta = parseFloat(process.env.DELTA) || 1.0;
     const interval = parseInt(process.env.INTERVAL) || 30000;
-    const lamps = parseInt(process.env.LAMPS) ||  20;
+    const lamps_start = parseInt(process.env.LAMPS_START) || 12;
+    const lamps_duration = parseInt(process.env.LAMPS_DURATION) || 8;
 
     console.log(`VPD ${vpd}`);
     console.log(`T ${t}`);
     console.log(`DELTA ${delta}`);
     console.log(`INTERVAL ${interval}`);
     console.log(`RH ${rh(vpd, t)}`);
-    console.log(`LAMPS ${lamps}`);
+    console.log(`LAMPS START ${lamps_start}`);
+    console.log(`LAMPS DURATION ${lamps_duration}`);
 
     targets.set('VPD', vpd);
     targets.set('T', t);
     targets.set('DELTA', delta);
     targets.set('INTERVAL', interval);
     targets.set('RH', rh(vpd, t));
-    targets.set('LAMPS', lamps);
+
+    types.set('timer', new Timer(lamps_start, lamps_duration));
 
     return switchbot.discover({model: 'T', quick: true}).then((dlist) => {
       types.set('meter', dlist[0]);
@@ -126,6 +130,7 @@ async function handler(ad) {
       if (rh > targets.get('RH')) {
         // dehumidifiers on
         // AC unit dehumidify on
+        on('dehumidifier');
       }
     } else {
       if (t > targets.get('T')) {
@@ -133,11 +138,13 @@ async function handler(ad) {
         // heaters off
         // AC unit cool
         on('blower');
+        off('heater');
       }
 
       if (rh < targets.get('RH')) {
         // dehumidifiers off
         // AC unit dehumidify off
+        off('dehumidifier');
       }
     }
   }
@@ -152,10 +159,11 @@ async function app() {
   }
 
   console.log('Check lamps...');
-  const sec = (new Date()).getSeconds();
-  console.log(`AT ${sec} check ${targets.get('LAMPS')}`);
+  const hour = (new Date()).getHour();
+  console.log(`Check hour ${hour} ...`);
+  console.log(JSON.stringify(types.get('timer')));
 
-  if (sec <= targets.get('LAMPS')) {
+  if (types.get('timer').isOn(hour)) {
     on('lamp');
   } else {
     off('lamp');
@@ -163,7 +171,7 @@ async function app() {
 
   console.log('Done lamps.');
 
-  console.log('Start scan...');
+  console.log('Start scan ...');
 
   await switchbot.startScan();
 
