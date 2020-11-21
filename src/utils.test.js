@@ -1,6 +1,5 @@
 const {vpd, vpsat, vpair, rh} = require('./utils');
 
-<<<<<<< HEAD
 test('vapor pressure saturated at 21.7*C', () => {
     expect(vpsat(21.7)).toBeCloseTo(2.595);
 });
