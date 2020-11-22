@@ -1,11 +1,7 @@
-
 const Switchbot = require('node-switchbot');
 const switchbot = new Switchbot();
 
 const Wyze = require('wyze-node');
-
-const {vpair, vpsat, vpd, rh} = require('./utils');
-const Timer = require('./timer');
 
 const options = {
   username: process.env.USERNAME,
@@ -14,17 +10,28 @@ const options = {
 
 const wyze = new Wyze(options);
 
+const {vpair, vpsat, vpd, rh} = require('./utils');
+const Timer = require('./timer');
+
+const log4js = require('log4js');
+log4js.configure({
+  appenders: {cannabis: {type: 'file', filename: 'cannabis.log'}},
+  categories: {default: {appenders: ['cannabis'], level: 'trace'}},
+});
+
+const logger = log4js.getLogger('cannabis');
+
 /**
  * Turn off named device
 * @param {string} name
 */
 async function off(name) {
-  console.log(`Turn off ${name} ...`);
+  logger.trace(`Turn off ${name} ...`);
   types.get(name).forEach(async (name) => {
     const device = await wyze.getDeviceByName(name);
     const result = await wyze.turnOff(device);
-    console.log(result);
-    console.log('Done.');
+    logger.trace(result);
+    logger.trace('Done.');
   });
 }
 
@@ -33,12 +40,12 @@ async function off(name) {
 * @param {string} name
 */
 async function on(name) {
-  console.log(`Turn on ${name} ...`);
+  logger.trace(`Turn on ${name} ...`);
   types.get(name).forEach(async (name) => {
     const device = await wyze.getDeviceByName(name);
     const result = await wyze.turnOn(device);
-    console.log(result);
-    console.log('Done.');
+    logger.trace(result);
+    logger.trace('Done.');
   });
 }
 
@@ -59,7 +66,7 @@ const targets = new Map();
  * Initialize
  */
 async function init() {
-  console.log('INIT ...');
+  logger.trace('INIT ...');
 
   return wyze.getDeviceList().then((dlist) => {
     dlist.forEach((device) => {
@@ -75,16 +82,16 @@ async function init() {
     const t = parseFloat(process.env.T) || 22.0;
     const delta = parseFloat(process.env.DELTA) || 1.0;
     const interval = parseInt(process.env.INTERVAL) || 30000;
-    const lamps_start = parseInt(process.env.LAMPS_START) || 12;
-    const lamps_duration = parseInt(process.env.LAMPS_DURATION) || 8;
+    const start = parseInt(process.env.LAMPS_START) || 12;
+    const duration = parseInt(process.env.LAMPS_DURATION) || 8;
 
-    console.log(`VPD ${vpd}`);
-    console.log(`T ${t}`);
-    console.log(`DELTA ${delta}`);
-    console.log(`INTERVAL ${interval}`);
-    console.log(`RH ${rh(vpd, t)}`);
-    console.log(`LAMPS START ${lamps_start}`);
-    console.log(`LAMPS DURATION ${lamps_duration}`);
+    logger.info(`VPD ${vpd}kPa`);
+    logger.info(`T ${t}C`);
+    logger.info(`LEAF DELTA ${delta}C`);
+    logger.info(`INTERVAL ${interval}ms`);
+    logger.info(`RH ${rh(vpd, t).toFixed(2)}%`);
+    logger.info(`LAMPS START ${start}:00`);
+    logger.info(`LAMPS DURATION ${duration}hr`);
 
     targets.set('VPD', vpd);
     targets.set('T', t);
@@ -92,15 +99,15 @@ async function init() {
     targets.set('INTERVAL', interval);
     targets.set('RH', rh(vpd, t));
 
-    types.set('timer', new Timer(lamps_start, lamps_duration));
+    types.set('timer', new Timer(start, duration));
 
     return switchbot.discover({model: 'T', quick: true}).then((dlist) => {
       types.set('meter', dlist[0]);
 
       initialized = true;
-      console.log('INIT Done.');
+      logger.trace('INIT Done.');
     }).catch((error) => {
-      console.error(error);
+      logger.error(error);
     });
   });
 }
@@ -112,12 +119,12 @@ async function init() {
 async function handler(ad) {
   if (ad.id === types.get('meter').id) {
     const t = ad.serviceData.temperature.c;
-    const rh = ad.serviceData.humidity / 100;
+    const rh = ad.serviceData.humidity / 100.0;
     const sat = vpsat(t - targets.get('DELTA'));
     const air = vpair(t, rh);
     const deficit = vpd(t - targets.get('DELTA'), t, rh);
-    console.log(`TARGETS ${targets.get('T')}C ${targets.get('RH')} ${targets.get('VPD')}`);
-    console.log(`${(new Date()).toISOString()} - ${t}C ${rh} ${sat}kPa ${air}kPa ${deficit}kPa`);
+    logger.info(`TARGET ${targets.get('T').toFixed(1)}C ${targets.get('RH').toFixed(2)} ${targets.get('VPD').toFixed(2)}kPa`);
+    logger.info(`ACTUAL ${t.toFixed(1)}C ${rh.toFixed(2)} ${deficit.toFixed(2)}kPa`);
 
     if (deficit < targets.get('VPD')) {
       if (t < targets.get('T')) {
@@ -131,6 +138,7 @@ async function handler(ad) {
         // dehumidifiers on
         // AC unit dehumidify on
         on('dehumidifier');
+        off('humidifier');
       }
     } else {
       if (t > targets.get('T')) {
@@ -145,6 +153,7 @@ async function handler(ad) {
         // dehumidifiers off
         // AC unit dehumidify off
         off('dehumidifier');
+        on('humidifier');
       }
     }
   }
@@ -158,10 +167,10 @@ async function app() {
     await init();
   }
 
-  console.log('Check lamps...');
-  const hour = (new Date()).getHour();
-  console.log(`Check hour ${hour} ...`);
-  console.log(JSON.stringify(types.get('timer')));
+  logger.trace('Check lamps...');
+  const hour = (new Date()).getHours();
+  logger.trace(`Check hour ${hour} ...`);
+  logger.trace(JSON.stringify(types.get('timer')));
 
   if (types.get('timer').isOn(hour)) {
     on('lamp');
@@ -169,9 +178,9 @@ async function app() {
     off('lamp');
   }
 
-  console.log('Done lamps.');
+  logger.trace('Done lamps.');
 
-  console.log('Start scan ...');
+  logger.trace('Start scan ...');
 
   await switchbot.startScan();
 
@@ -180,7 +189,7 @@ async function app() {
   await switchbot.wait(5000);
 
   await switchbot.stopScan();
-  console.log('Done scan.');
+  logger.trace('Done scan.');
 
   setTimeout(app, targets.get('INTERVAL'));
 }

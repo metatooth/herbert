@@ -6,8 +6,8 @@
 function Timer(start, duration) {
   this.type = 'Timer';
 
-    this.start = start;
-this.duration = duration;
+  this.start = start;
+  this.duration = duration;
 }
 
 Object.assign( Timer.prototype, {
@@ -17,17 +17,24 @@ Object.assign( Timer.prototype, {
 
   isOn: function(hour) {
     let result = false;
-    if (hour >= this.start) {
-      result = true;
-    }
+    const limit = this.start + this.duration;
 
-    if (hour >= (this.start + this.duration)) {
-      result = false;
+    if (limit < 24) {
+      if (hour >= this.start && hour < limit) {
+        result = true;
+      }
+    } else {
+      if (hour >= this.start && hour < 24) {
+        result = true;
+      }
+
+      if (hour >= 0 && hour < (limit - 24)) {
+        result = true;
+      }
     }
 
     return result;
   },
-
 });
 
 module.exports = Timer;
