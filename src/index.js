@@ -25,7 +25,7 @@ try {
   require('fs').mkdirSync('./log');
 } catch (e) {
   if (e.code != 'EEXIST') {
-    console.error("Could not set up log directory, error was: ", e);
+    console.error('Could not set up log directory, error was: ', e);
     process.exit(1);
   }
 }
@@ -70,36 +70,42 @@ const types = new Map([
   ['AC', []],
 ]);
 
-const targets = new Map();
-
 /**
  * Initialize
  */
 async function init() {
-  logger.info('==============================================');
+  logger.info('====================================');
   logger.info('Starting up.');
 
   return wyze.getDeviceList().then((dlist) => {
     dlist.forEach((device) => {
       for (const key of types.keys()) {
-        if (device.nickname.match(new RegExp(key, 'i'))) {
-          const value = types.get(key);
-          value.push(device.nickname);
+        if (device.nickname.match(
+            new RegExp(`^${config.get('environment.prefix')}`),
+        )) {
+          if (device.nickname.match(new RegExp(key, 'i'))) {
+            const value = types.get(key);
+            value.push(device.nickname);
+          }
         }
       }
     });
 
     logger.info(config);
-      logger.info(types);
+    logger.info(types);
 
-    types.set('timer', new Timer(config.get('environment.lamps-start'),
-config.get('environment.lamps-duration')));
+    types.set('timer',
+        new Timer(
+            config.get('environment.lamps-start'),
+            config.get('environment.lamps-duration'),
+        ),
+    );
 
     return switchbot.discover({model: 'T', quick: true}).then((dlist) => {
       types.set('meter', dlist[0]);
 
       initialized = true;
-      logger.info('==============================================');
+      logger.info('====================================');
     }).catch((error) => {
       logger.error(error);
     });
@@ -113,17 +119,19 @@ config.get('environment.lamps-duration')));
 async function handler(ad) {
   if (ad.id === types.get('meter').id) {
     const t = ad.serviceData.temperature.c;
-    const rh = ad.serviceData.humidity / 100.0;
+    const h = ad.serviceData.humidity / 100.0;
     const sat = vpsat(t - config.get('environment.delta'));
-    const air = vpair(t, rh);
-    const deficit = vpd(t - config.get('environment.delta'), t, rh);
+    const air = vpair(t, h);
+    const deficit = vpd(t - config.get('environment.delta'), t, h);
     logger.info(`ACTUAL TEMP ${t.toFixed(1)}C`);
-logger.info(`ACTUAL RH ${rh.toFixed(2)}`);
-logger.info(`ACTUAL VPD ${deficit.toFixed(1)}kPa`);
+    logger.info(`ACTUAL RH ${h.toFixed(2)}`);
+    logger.info(`CALC VPsat ${sat.toFixed(2)}kPa`);
+    logger.info(`CALC VPair ${air.toFixed(2)}kPa`);
+    logger.info(`CALC VPD ${deficit.toFixed(1)}kPa`);
 
     const VPD = config.get('environment.vapor-pressure-deficit');
     const T = config.get('environment.temperature');
-    const RH = vpd(VPD - config.get('environment.delta'), VPD, T);
+    const RH = rh(VPD, T);
 
     if (deficit < VPD) {
       logger.debug(`${deficit.toFixed(1)} < ${VPD.toFixed(1)}`);
@@ -135,7 +143,7 @@ logger.info(`ACTUAL VPD ${deficit.toFixed(1)}kPa`);
         on('heater');
       }
 
-      if (rh > RH) {
+      if (h > RH) {
         logger.debug(`${rh.toFixed(2)} > ${RH.toFixed(2)}`);
         // dehumidifiers on
         // AC unit dehumidify on
