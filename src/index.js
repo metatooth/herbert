@@ -1,25 +1,39 @@
+
 const Switchbot = require('node-switchbot');
 const switchbot = new Switchbot();
 
 const Wyze = require('wyze-node');
 
+const config = require('config');
+
+console.log(config);
+
 const options = {
-  username: process.env.USERNAME,
-  password: process.env.PASSWORD,
+  username: config.get('wyze.username') || process.env.USERNAME,
+  password: config.get('wyze.password') || process.env.PASSWORD,
 };
+
+
+console.log(options);
 
 const wyze = new Wyze(options);
 
 const {vpair, vpsat, vpd, rh} = require('./utils');
 const Timer = require('./timer');
 
-const log4js = require('log4js');
-log4js.configure({
-  appenders: {cannabis: {type: 'file', filename: 'cannabis.log'}},
-  categories: {default: {appenders: ['cannabis'], level: 'info'}},
-});
+try {
+  require('fs').mkdirSync('./log');
+} catch (e) {
+  if (e.code != 'EEXIST') {
+    console.error("Could not set up log directory, error was: ", e);
+    process.exit(1);
+  }
+}
 
-const logger = log4js.getLogger('cannabis');
+const log4js = require('log4js');
+log4js.configure('./config/log4js.json');
+
+const logger = log4js.getLogger('app');
 
 /**
  * Turn off named device
@@ -62,7 +76,8 @@ const targets = new Map();
  * Initialize
  */
 async function init() {
-  logger.trace('INIT ...');
+  logger.info('==============================================');
+  logger.info('Starting up.');
 
   return wyze.getDeviceList().then((dlist) => {
     dlist.forEach((device) => {
@@ -74,34 +89,17 @@ async function init() {
       }
     });
 
-    const vpd = parseFloat(process.env.VPD) || 9.2;
-    const t = parseFloat(process.env.T) || 22.0;
-    const delta = parseFloat(process.env.DELTA) || 1.0;
-    const interval = parseInt(process.env.INTERVAL) || 30000;
-    const start = parseInt(process.env.LAMPS_START) || 12;
-    const duration = parseInt(process.env.LAMPS_DURATION) || 8;
+    logger.info(config);
+      logger.info(types);
 
-    logger.info(`VPD ${vpd}kPa`);
-    logger.info(`T ${t}C`);
-    logger.info(`LEAF DELTA ${delta}C`);
-    logger.info(`INTERVAL ${interval}ms`);
-    logger.info(`RH ${rh(vpd, t).toFixed(2)}`);
-    logger.info(`LAMPS START ${start}:00`);
-    logger.info(`LAMPS DURATION ${duration}hr`);
-
-    targets.set('VPD', vpd);
-    targets.set('T', t);
-    targets.set('DELTA', delta);
-    targets.set('INTERVAL', interval);
-    targets.set('RH', rh(vpd, t));
-
-    types.set('timer', new Timer(start, duration));
+    types.set('timer', new Timer(config.get('environment.lamps-start'),
+config.get('environment.lamps-duration')));
 
     return switchbot.discover({model: 'T', quick: true}).then((dlist) => {
       types.set('meter', dlist[0]);
 
       initialized = true;
-      logger.trace('INIT Done.');
+      logger.info('==============================================');
     }).catch((error) => {
       logger.error(error);
     });
@@ -116,27 +114,38 @@ async function handler(ad) {
   if (ad.id === types.get('meter').id) {
     const t = ad.serviceData.temperature.c;
     const rh = ad.serviceData.humidity / 100.0;
-    const sat = vpsat(t - targets.get('DELTA'));
+    const sat = vpsat(t - config.get('environment.delta'));
     const air = vpair(t, rh);
-    const deficit = vpd(t - targets.get('DELTA'), t, rh);
-    logger.info(`ACTUAL ${t.toFixed(1)}C ${rh.toFixed(2)} ${deficit.toFixed(2)}kPa`);
+    const deficit = vpd(t - config.get('environment.delta'), t, rh);
+    logger.info(`ACTUAL TEMP ${t.toFixed(1)}C`);
+logger.info(`ACTUAL RH ${rh.toFixed(2)}`);
+logger.info(`ACTUAL VPD ${deficit.toFixed(1)}kPa`);
 
-    if (deficit < targets.get('VPD')) {
-      if (t < targets.get('T')) {
+    const VPD = config.get('environment.vapor-pressure-deficit');
+    const T = config.get('environment.temperature');
+    const RH = vpd(VPD - config.get('environment.delta'), VPD, T);
+
+    if (deficit < VPD) {
+      logger.debug(`${deficit.toFixed(1)} < ${VPD.toFixed(1)}`);
+      if (t < T) {
+        logger.debug(`${t.toFixed(1)} < ${T.toFixed(1)}`);
         // blower off
         // heater on
         off('blower');
         on('heater');
       }
 
-      if (rh > targets.get('RH')) {
+      if (rh > RH) {
+        logger.debug(`${rh.toFixed(2)} > ${RH.toFixed(2)}`);
         // dehumidifiers on
         // AC unit dehumidify on
         on('dehumidifier');
         off('humidifier');
       }
     } else {
-      if (t > targets.get('T')) {
+      logger.debug(`${deficit.toFixed(1)} >= ${VPD.toFixed(1)}`);
+      if (t > T) {
+        logger.debug(`${t.toFixed(1)} > ${T.toFixed(1)}`);
         // blowers on
         // heaters off
         // AC unit cool
@@ -144,7 +153,8 @@ async function handler(ad) {
         off('heater');
       }
 
-      if (rh < targets.get('RH')) {
+      if (rh < RH) {
+        logger.debug(`${rh.toFixed(2)} < ${RH.toFixed(2)}`);
         // dehumidifiers off
         // AC unit dehumidify off
         off('dehumidifier');
@@ -160,13 +170,12 @@ async function handler(ad) {
 async function app() {
   if (!initialized) {
     await init();
-    logger.info(`TARGET ${targets.get('T').toFixed(1)}C ${targets.get('RH').toFixed(2)} ${targets.get('VPD').toFixed(2)}kPa`);
   }
 
-  logger.trace('Check lamps...');
+  logger.debug('Check lamps...');
   const hour = (new Date()).getHours();
-  logger.trace(`Check hour ${hour} ...`);
-  logger.trace(JSON.stringify(types.get('timer')));
+  logger.debug(`Check hour ${hour} ...`);
+  logger.debug(JSON.stringify(types.get('timer')));
 
   if (types.get('timer').isOn(hour)) {
     on('lamp');
@@ -174,20 +183,20 @@ async function app() {
     off('lamp');
   }
 
-  logger.trace('Done lamps.');
+  logger.debug('Done lamps.');
 
-  logger.trace('Start scan ...');
+  logger.debug('Start scan ...');
 
   await switchbot.startScan();
 
   switchbot.onadvertisement = handler;
 
-  await switchbot.wait(5000);
+  await switchbot.wait(config.get('app.polling'));
 
   await switchbot.stopScan();
-  logger.trace('Done scan.');
+  logger.debug('Done scan.');
 
-  setTimeout(app, targets.get('INTERVAL'));
+  setTimeout(app, config.get('environment.interval'));
 }
 
 setTimeout(app, 0);

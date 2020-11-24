@@ -1,0 +1,19 @@
+{
+  "app": {
+    "port": 4300,
+    "polling": 3000
+  },
+  "wyze": {
+    "username": null,
+    "password": null
+  },
+  "environment": {
+    "prefix": "C",
+    "temperature": 19.0,
+    "vapor-pressure-deficit": 2.0,
+    "lamps-start": 6,
+    "lamps-duration": 12,
+    "delta": 1.0,
+    "interval": 30000
+  }
+}
