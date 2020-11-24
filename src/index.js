@@ -16,7 +16,7 @@ const Timer = require('./timer');
 const log4js = require('log4js');
 log4js.configure({
   appenders: {cannabis: {type: 'file', filename: 'cannabis.log'}},
-  categories: {default: {appenders: ['cannabis'], level: 'trace'}},
+  categories: {default: {appenders: ['cannabis'], level: 'info'}},
 });
 
 const logger = log4js.getLogger('cannabis');
@@ -26,12 +26,10 @@ const logger = log4js.getLogger('cannabis');
 * @param {string} name
 */
 async function off(name) {
-  logger.trace(`Turn off ${name} ...`);
+  logger.info(`OFF ${name}`);
   types.get(name).forEach(async (name) => {
     const device = await wyze.getDeviceByName(name);
-    const result = await wyze.turnOff(device);
-    logger.trace(result);
-    logger.trace('Done.');
+    await wyze.turnOff(device);
   });
 }
 
@@ -40,12 +38,10 @@ async function off(name) {
 * @param {string} name
 */
 async function on(name) {
-  logger.trace(`Turn on ${name} ...`);
+  logger.info(`ON ${name}`);
   types.get(name).forEach(async (name) => {
     const device = await wyze.getDeviceByName(name);
-    const result = await wyze.turnOn(device);
-    logger.trace(result);
-    logger.trace('Done.');
+    await wyze.turnOn(device);
   });
 }
 
@@ -89,7 +85,7 @@ async function init() {
     logger.info(`T ${t}C`);
     logger.info(`LEAF DELTA ${delta}C`);
     logger.info(`INTERVAL ${interval}ms`);
-    logger.info(`RH ${rh(vpd, t).toFixed(2)}%`);
+    logger.info(`RH ${rh(vpd, t).toFixed(2)}`);
     logger.info(`LAMPS START ${start}:00`);
     logger.info(`LAMPS DURATION ${duration}hr`);
 
@@ -123,7 +119,6 @@ async function handler(ad) {
     const sat = vpsat(t - targets.get('DELTA'));
     const air = vpair(t, rh);
     const deficit = vpd(t - targets.get('DELTA'), t, rh);
-    logger.info(`TARGET ${targets.get('T').toFixed(1)}C ${targets.get('RH').toFixed(2)} ${targets.get('VPD').toFixed(2)}kPa`);
     logger.info(`ACTUAL ${t.toFixed(1)}C ${rh.toFixed(2)} ${deficit.toFixed(2)}kPa`);
 
     if (deficit < targets.get('VPD')) {
@@ -165,6 +160,7 @@ async function handler(ad) {
 async function app() {
   if (!initialized) {
     await init();
+    logger.info(`TARGET ${targets.get('T').toFixed(1)}C ${targets.get('RH').toFixed(2)} ${targets.get('VPD').toFixed(2)}kPa`);
   }
 
   logger.trace('Check lamps...');
