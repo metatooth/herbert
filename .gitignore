@@ -1,4 +1,7 @@
-node_modules/
-scratch/
+node_modules
+src/**/*.js
+src/**/*.map
+coverage
+scratch
+log
 *~
-log/

@@ -1,4 +1,4 @@
-const Timer = require('./timer');
+import { Timer } from './timer';
 
 test('12/12 starting at 6am', () => {
   const timer = new Timer(6, 12);
