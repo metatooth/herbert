@@ -18,6 +18,8 @@ const wyze = new Wyze(options);
 
 import * as utils from './utils';
 import { Timer } from './timer';
+import { GrowLog } from './grow-log';
+const growlog = new GrowLog('production.db');
 
 try {
   require('fs').mkdirSync('./log');
@@ -119,6 +121,9 @@ async function handler(ad: any) {
   if (ad.id === types.get('meter')[0].id) {
     const t = ad.serviceData.temperature.c;
     const h = ad.serviceData.humidity / 100.0;
+
+    growlog.track(t, h);
+      
     const sat = utils.SaturationVaporPressure(t - config.get('environment.delta'));
     const air = utils.VaporPressureAir(t, h);
     const deficit = utils.VaporPressureDeficit(t - config.get('environment.delta'), t, h);
