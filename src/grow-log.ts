@@ -11,22 +11,22 @@ export class GrowLog {
     }
 
     async init(): Promise<any> {
-	          this.db = new sqlite3.Database(this.path);
-	          const scope = this;
+	      this.db = new sqlite3.Database(this.path);
+	      const scope = this;
 	      return scope.db.get("SELECT id, created_at, temperature, relative_humidity FROM growlogs", function(err: any, row: any) {
-	              if (err) {
-		                scope.db.serialize(function() {
-		                    scope.db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
-		                });
-	              }
-                scope.initialized = true;                
-	          });
+	          if (err) {
+		            scope.db.serialize(function() {
+		                scope.db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
+		            });
+	          }
+            scope.initialized = true;                
+	      });
     }
 
-   async track(temp: number, humidity: number): Promise<any> {
-if (!this.initialized) {
-	      await this.init();
-}
+    async track(temp: number, humidity: number): Promise<any> {
+        if (!this.initialized) {
+	          await this.init();
+        }
 
         const db = this.db;
         db.serialize(function() {
@@ -36,9 +36,9 @@ if (!this.initialized) {
     }
 
     async log(pageno: number, pagesize: number): Promise<[unknown, unknown]> {
-if (!this.initialized) {
-	      await this.init();
-}
+        if (!this.initialized) {
+	          await this.init();
+        }
 
 	      let sql = "SELECT id, created_at, temperature, relative_humidity FROM growlogs ORDER BY id DESC";
 	      if (pageno !== 0) {
