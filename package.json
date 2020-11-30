@@ -17,7 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@abandonware/noble": "^1.9.2-10",
-    "config": "^3.3.2",
+    "config": "^3.3.3",
     "log4js": "^6.3.0",
     "node-switchbot": "^0.1.0",
     "sqlite3": "^5.0.0",

@@ -1,53 +1,55 @@
 const sqlite3 = require('sqlite3').verbose();
 
 export class GrowLog {
-  db: any;
+    db: any;
     initialized: boolean;
-  path: string;
+    path: string;
     
     constructor(path: string) {
-	this.path = path;
-	this.initialized = false;
-  }
+	      this.path = path;
+	      this.initialized = false;
+    }
 
-    init(): void {
-	if (!this.initialized) {
-	this.db = new sqlite3.Database(this.path);
-	const db = this.db;
-	db.get("SELECT id, created_at, temperature, relative_humidity FROM growlogs", function(err: any, row: any) {
-	    if (err) {
-		db.serialize(function() {
-		    db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
-		});
-	    }
-	});
-	    this.initialized = true;
-	}
-  }
+    async init(): Promise<any> {
+	          this.db = new sqlite3.Database(this.path);
+	          const scope = this;
+	      return scope.db.get("SELECT id, created_at, temperature, relative_humidity FROM growlogs", function(err: any, row: any) {
+	              if (err) {
+		                scope.db.serialize(function() {
+		                    scope.db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
+		                });
+	              }
+                scope.initialized = true;                
+	          });
+    }
 
-  track(temp: number, humidity: number): void {
-	  this.init();
+   async track(temp: number, humidity: number): Promise<any> {
+if (!this.initialized) {
+	      await this.init();
+}
 
-      const db = this.db;
-      db.serialize(function() {
-	  const stmt = db.prepare("INSERT INTO growlogs (temperature, relative_humidity) VALUES (?, ?)");
-	  stmt.run(temp, humidity);
-      });
-  }
+        const db = this.db;
+        db.serialize(function() {
+	          const stmt = db.prepare("INSERT INTO growlogs (temperature, relative_humidity) VALUES (?, ?)");
+	          stmt.run(temp, humidity);
+        });
+    }
 
-    log(pageno: number, pagesize: number): Promise<[unknown, unknown]> {
-	  this.init();
+    async log(pageno: number, pagesize: number): Promise<[unknown, unknown]> {
+if (!this.initialized) {
+	      await this.init();
+}
 
-	let sql = "SELECT id, created_at, temperature, relative_humidity FROM growlogs ORDER BY id DESC";
-	if (pageno !== 0) {
-	    sql += " LIMIT " + ((pageno-1)*pagesize) + ", " + pagesize;
-	}
-	
-	const sqlcount = "SELECT count(*) as count FROM growlogs";
+	      let sql = "SELECT id, created_at, temperature, relative_humidity FROM growlogs ORDER BY id DESC";
+	      if (pageno !== 0) {
+	          sql += " LIMIT " + ((pageno-1)*pagesize) + ", " + pagesize;
+	      }
+	      
+	      const sqlcount = "SELECT count(*) as count FROM growlogs";
 
-	const db = this.db;
-	
-	const p1 =  new Promise(function(resolve, reject) {
+	      const db = this.db;
+	      
+	      const p1 =  new Promise(function(resolve, reject) {
             db.all(sql, function(err: any, rows: any) {
                 if (err) {
                     reject(err);
@@ -55,9 +57,9 @@ export class GrowLog {
                     const data: Array<object> = [];
                     rows.forEach(function (row: any) {
                         data.push({id: row.id,
-				   created_at: row.created_at,
-				   temperature: row.temperature,
-				   relative_humidity: row.relative_humidity});
+				                           created_at: row.created_at,
+				                           temperature: row.temperature,
+				                           relative_humidity: row.relative_humidity});
                     });
                     resolve(data);
                 }

@@ -16,10 +16,10 @@ test('makes one entry', () => {
     grow.track(22, 0.65);
   
     return grow.log(1, 20).then((entries: [Array<any>, number]) => {
-	const a = entries[0].pop();
-	expect(a.temperature).toBeCloseTo(22,0);
-	expect(a.relative_humidity).toBeCloseTo(0.65);
-	expect(entries[1]).toBe(1);
+	      const a = entries[0].pop();
+	      expect(a.temperature).toBeCloseTo(22,0);
+	      expect(a.relative_humidity).toBeCloseTo(0.65);
+	      expect(entries[1]).toBe(1);
     });
 });
 

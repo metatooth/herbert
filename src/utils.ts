@@ -1,20 +1,20 @@
 /**
  * Calculates relative humidity for given vapor pressure deficit and temperature
- * @param {number} VPD vapor pressure deficit in pascals
+ * @param {number} VP vapor pressure in pascals
  * @param {number} T temperature in Celsius
  * @return {number} relative humidity as a ratio
  */
-export function RelativeHumidity(VPD: number, T: number) {
-  return 1 - (VPD / SaturationVaporPressure(T));
+export function RelativeHumidity(VP: number, T: number) {
+  return (VP / SaturatedVaporPressure(T));
 }
 
 /**
- * Calculates saturation vapor pressure
+ * Calculates saturated vapor pressure
  * @param {number} T temperature in Celsius
- * @return {number} pressure in pascals
+ * @return {number} pressure in millbars
  */
-export function SaturationVaporPressure(T: number) {
-  return 6.11 * Math.pow(10, (7.5 * T) / (237.7 + T));
+export function SaturatedVaporPressure(T: number) {
+  return 610.7 * Math.pow(10, 7.5 * T / (T + 237.3));
 }
 
 /**
@@ -24,7 +24,7 @@ export function SaturationVaporPressure(T: number) {
  * @return {number} vapor pressure in pascals
  */
 export function VaporPressureAir(T: number, RH: number) {
-  return RH * SaturationVaporPressure(T);
+  return RH * SaturatedVaporPressure(T);
 }
 
 /**
@@ -33,8 +33,8 @@ export function VaporPressureAir(T: number, RH: number) {
  * @param {number} L leaf temperature in Celsius
  * @param {number} A air temperature in Celsius
  * @param {number} RH relative humidity
- * @return {number} vapor pressure in pascals
+ * @return {number} vapor pressure deficit in millibars
  */
 export function VaporPressureDeficit(L: number, A: number, RH: number) {
-  return SaturationVaporPressure(L) - VaporPressureAir(A, RH);
+  return SaturatedVaporPressure(L) - VaporPressureAir(A, RH);
 }
