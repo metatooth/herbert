@@ -19,6 +19,8 @@ const wyze = new Wyze(options);
 import * as utils from './utils';
 import { Timer } from './timer';
 import { GrowLog } from './grow-log';
+import { Environment } from './environment';
+
 const growlog = new GrowLog('production.db');
 
 try {
@@ -69,7 +71,12 @@ const types = new Map([
     ['dehumidifier', []],
     ['AC', []],
 ]);
-let environ = null;
+const environ = new Environment(
+        config.get('environment.vapor-pressure-deficit'),
+        config.get('environment.temperature'),
+        config.get('environment.temperature') -
+            config.get('environment.delta')
+    );
 
 /**
  * Initialize
@@ -78,13 +85,6 @@ async function init() {
     logger.info('====================================');
     logger.info('Starting up.');
 
-    environ = new Environment(
-        config.get('environment.vapor-pressure-deficit'),
-        config.get('environment.temperature'),
-        config.get('environment.temperature') -
-            config.get('environment.delta')
-    );
-    
     console.log(environ);
 
     return wyze.getDeviceList().then((dlist: Array<any>) => {
@@ -134,7 +134,7 @@ async function handler(ad: any) {
 
         growlog.track(t, h);
         
-        const sat = utils.SaturationVaporPressure(t - config.get('environment.delta'));
+        const sat = utils.SaturatedVaporPressure(t - config.get('environment.delta'));
         const air = utils.VaporPressureAir(t, h);
         const deficit = utils.VaporPressureDeficit(t - config.get('environment.delta'), t, h);
         logger.info(`ACTUAL TEMP ${t.toFixed(1)}C`);
