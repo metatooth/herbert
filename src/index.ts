@@ -88,7 +88,8 @@ async function init() {
     console.log(environ);
 
     return wyze.getDeviceList().then((dlist: Array<any>) => {
-	      dlist.forEach((device: any) => {
+	dlist.forEach((device: any) => {
+	    logger.debug(device);
             if (device.nickname.match(
 		            new RegExp(`^${config.get('environment.prefix')}`),
             )) {
@@ -111,14 +112,16 @@ async function init() {
 		              )]
 		             );
 	      
-	      return switchbot.discover({model: 'T', quick: true})
-	          .then((dlist: Array<any>) => {
-		            types.set('meter', dlist[0]);
-		            
-		            initialized = true;
-		            logger.info('====================================');
-	          }).catch((error: string) => {
-	              logger.error(error);
+	return switchbot.discover({model: 'T', quick: true})
+	    .then((dlist: Array<any>) => {
+		logger.debug(dlist);
+		logger.debug(dlist[0]);
+		types.set('meter', dlist[0]);
+		
+		initialized = true;
+		logger.info('====================================');
+	    }).catch((error: string) => {
+	        logger.error(error);
             });
     });
 }
