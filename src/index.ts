@@ -94,14 +94,13 @@ async function init() {
 		new RegExp(`^${config.get('environment.prefix')}`),
             )) {
 		logger.debug('MATCHED!');
-		for (const key in types.keys()) {
+		types.forEach((value: any[], key: string, map: Map<string, any[]>) => {
 		    logger.debug(key);
 		    if (device.nickname.match(new RegExp(key, 'i'))) {
 			logger.debug('DOUBLE MATCHED!');
-			const value = types.get(key);
 			value.push(device.nickname);
 		    }
-		}
+		});
 	    }
 	});
 	
