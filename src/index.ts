@@ -102,9 +102,6 @@ async function init() {
 	    }
 	});
 	
-	logger.info(config);
-	logger.info(types);
-	
 	types.set('timer',
 		  [new Timer(
 		      config.get('environment.lamps-start'),
@@ -112,17 +109,12 @@ async function init() {
 		  )]
 		 );
 	
-	return switchbot.discover({model: 'T', quick: true})
-	    .then((dlist: Array<any>) => {
-		logger.debug(dlist);
-		logger.debug(dlist[0]);
-		types.set('meter', dlist[0]);
-		
+	logger.info(config);
+	logger.info(types);
+	
 		initialized = true;
 		logger.info('====================================');
-	    }).catch((error: string) => {
-	        logger.error(error);
-            });
+
     });
 }
 
@@ -131,11 +123,7 @@ async function init() {
  * @param {object} ad advertisement data
  */
 async function handler(ad: any) {
-    logger.debug(ad);
-    logger.debug('<<<>>>'));
-    logger.debug(types.get('meter')[0]);
-    
-    if (ad.id === types.get('meter')[0].id) {
+    if (ad.serviceData.model === 'T') {
         const t = ad.serviceData.temperature.c;
         const h = ad.serviceData.humidity / 100.0;
 
