@@ -72,11 +72,11 @@ const types = new Map([
     ['AC', []],
 ]);
 const environ = new Environment(
-        config.get('environment.vapor-pressure-deficit'),
-        config.get('environment.temperature'),
-        config.get('environment.temperature') -
-            config.get('environment.delta')
-    );
+    config.get('environment.vapor-pressure-deficit'),
+    config.get('environment.temperature'),
+    config.get('environment.temperature') -
+        config.get('environment.delta')
+);
 
 /**
  * Initialize
@@ -91,27 +91,27 @@ async function init() {
 	dlist.forEach((device: any) => {
 	    logger.debug(device);
             if (device.nickname.match(
-		            new RegExp(`^${config.get('environment.prefix')}`),
+		new RegExp(`^${config.get('environment.prefix')}`),
             )) {
-		            for (const key in types.keys()) {
-		                if (device.nickname.match(new RegExp(key, 'i'))) {
-			                  const value = types.get(key);
-			                  value.push(device.nickname);
-		                }
-		            }
-	          }
-	      });
-	      
-	      logger.info(config);
-	      logger.info(types);
-	      
-	      types.set('timer',
-		              [new Timer(
-		                  config.get('environment.lamps-start'),
-		                  config.get('environment.lamps-duration'),
-		              )]
-		             );
-	      
+		for (const key in types.keys()) {
+		    if (device.nickname.match(new RegExp(key, 'i'))) {
+			const value = types.get(key);
+			value.push(device.nickname);
+		    }
+		}
+	    }
+	});
+	
+	logger.info(config);
+	logger.info(types);
+	
+	types.set('timer',
+		  [new Timer(
+		      config.get('environment.lamps-start'),
+		      config.get('environment.lamps-duration'),
+		  )]
+		 );
+	
 	return switchbot.discover({model: 'T', quick: true})
 	    .then((dlist: Array<any>) => {
 		logger.debug(dlist);
@@ -131,6 +131,10 @@ async function init() {
  * @param {object} ad advertisement data
  */
 async function handler(ad: any) {
+    logger.debug(types);
+    logger.debug(types.get('meter'));
+    logger.debug(types.get('meter')[0]);
+    
     if (ad.id === types.get('meter')[0].id) {
         const t = ad.serviceData.temperature.c;
         const h = ad.serviceData.humidity / 100.0;
