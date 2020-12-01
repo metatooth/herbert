@@ -131,8 +131,8 @@ async function init() {
  * @param {object} ad advertisement data
  */
 async function handler(ad: any) {
-    logger.debug(types);
-    logger.debug(types.get('meter'));
+    logger.debug(ad);
+    logger.debug('<<<>>>'));
     logger.debug(types.get('meter')[0]);
     
     if (ad.id === types.get('meter')[0].id) {
