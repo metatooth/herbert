@@ -89,12 +89,15 @@ async function init() {
 
     return wyze.getDeviceList().then((dlist: Array<any>) => {
 	dlist.forEach((device: any) => {
-	    logger.debug(device);
+	    logger.debug(device.nickname);
             if (device.nickname.match(
 		new RegExp(`^${config.get('environment.prefix')}`),
             )) {
+		logger.debug('MATCHED!');
 		for (const key in types.keys()) {
+		    logger.debug(key);
 		    if (device.nickname.match(new RegExp(key, 'i'))) {
+			logger.debug('DOUBLE MATCHED!');
 			const value = types.get(key);
 			value.push(device.nickname);
 		    }
