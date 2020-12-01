@@ -11,9 +11,9 @@ beforeEach(() => {
 afterEach(() => {
 });
 
-test('makes one entry', () => {
+test('makes one entry', async () => {
     const grow = new GrowLog(file);
-    grow.track(22, 0.65);
+    await grow.track(22, 0.65);
   
     return grow.log(1, 20).then((entries: [Array<any>, number]) => {
 	      const a = entries[0].pop();
@@ -24,14 +24,15 @@ test('makes one entry', () => {
 });
 
 
-test('makes multiple entries', () => {
+test('makes multiple entries', async () => {
     const grow = new GrowLog(file);
     for (let i = 0; i < 5; i ++) {
-	grow.track(20+i, i/5);
+	await grow.track(20+i, i/5);
         wait(300);
     }
   
     return grow.log(1, 20).then((entries: [Array<any>, number]) => {
+	console.log(entries[0]);
 	for (let i = 0; i < 5; i ++) {
 	    const a = entries[0].pop();
 	    expect(a.temperature).toBeCloseTo(20+i,0);

@@ -12,22 +12,24 @@ export class GrowLog {
     
     async init(): Promise<boolean> {
 	const scope = this;
-	return new Promise(function(resolve, reject) {
-	    scope.db.get("SELECT id, created_at, temperature, relative_humidity FROM growlogs", function(err: any, row: any) {
+	return new Promise((resolve, reject) => {
+	    scope.db.get("SELECT id, created_at, temperature, relative_humidity FROM growlogs", (err: any, row: any) => {
 		if (err) {
-		    scope.db.serialize(function() {
+		    scope.db.serialize(() => {
 			scope.db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
 		    });
 		}
 		resolve(true);
+	    });
 	});
     }
 
     async track(temp: number, humidity: number): Promise<boolean> {
 	await this.init();
 
-        return new Promise((resolve, reject) {
-            const db = this.db;
+	const db = this.db;
+
+        return new Promise((resolve, reject) => {
 	    db.serialize(function() {
 		const stmt = db.prepare("INSERT INTO growlogs (temperature, relative_humidity) VALUES (?, ?)");
 		stmt.run(temp, humidity);
@@ -47,8 +49,9 @@ export class GrowLog {
 	
 	const sqlcount = "SELECT count(*) as count FROM growlogs";
 
+	const db = this.db;
+	
 	const p1 =  new Promise(function(resolve, reject) {
-	    const db = this.db;
             db.all(sql, function(err: any, rows: any) {
                 if (err) {
                     reject(err);
@@ -66,7 +69,6 @@ export class GrowLog {
         });
 
         const p2 = new Promise(function(resolve, reject) {
-	    const db = this.db;
             db.each(sqlcount, function(err: any, row: any) {
                 if (err) {
                     reject(err);
