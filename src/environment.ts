@@ -25,9 +25,9 @@ export class Environment {
         const deficit = utils.VaporPressureDeficit(temperature - delta, temperature, humidity);
         logger.info(`ACTUAL TEMP ${temperature.toFixed(1)}C`);
         logger.info(`ACTUAL RH ${humidity.toFixed(2)}`);
-        logger.info(`CALC VPsat ${sat.toFixed(2)}kPa`);
-        logger.info(`CALC VPair ${air.toFixed(2)}kPa`);
-        logger.info(`CALC VPD ${deficit.toFixed(1)}kPa`);
+        logger.info(`CALC VPsat ${sat.toFixed(0)} pascals`);
+        logger.info(`CALC VPair ${air.toFixed(0)} pascals`);
+        logger.info(`CALC VPD ${deficit.toFixed(0)} pascals`);
 
         const systems = new Map;
         systems.set('heat', false);

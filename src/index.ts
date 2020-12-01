@@ -90,18 +90,14 @@ async function init() {
     return wyze.getDeviceList().then((dlist: Array<any>) => {
 	dlist.forEach((device: any) => {
 	    logger.debug(device.nickname);
-            if (device.nickname.match(
-		new RegExp(`^${config.get('environment.prefix')}`),
-            )) {
-		logger.debug('MATCHED!');
-		types.forEach((value: any[], key: string, map: Map<string, any[]>) => {
-		    logger.debug(key);
-		    if (device.nickname.match(new RegExp(key, 'i'))) {
-			logger.debug('DOUBLE MATCHED!');
-			value.push(device.nickname);
-		    }
-		});
-	    }
+	    types.forEach((value: any[], key: string, map: Map<string, any[]>) => {
+		if (device.nickname.match(
+		    new RegExp(`^${config.get('environment.prefix')} ${key}`, 'i'),
+		)) {
+		    logger.debug('MATCHED!');
+		    value.push(device.nickname);
+		}
+	    });
 	});
 	
 	types.set('timer',
