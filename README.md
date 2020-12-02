@@ -13,8 +13,15 @@ $ git clone https://github.com/metatooth/cannabis.git
 $ cd cannabis
 $ npm install
 $ npm run build
-$ nano config/default.json
 $ sudo node src/index.js
+```
+
+## Deployment
+
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+
+```
+$ sudo /etc/init.d/cannabis status
 ```
 
 ## License
