@@ -35,7 +35,12 @@ export class Environment {
         systems.set('humidify', false);
         systems.set('dehumidify', false);
 
-        if (Math.abs(deficit - this.vpd) > 1) {
+        if (temperature < this.air) {
+            logger.debug(`${temperature.toFixed(1)} < ${this.air.toFixed(1)}`);
+            systems.set('heat', true);
+        }
+
+        if (Math.abs(deficit - this.vpd) > 100) {
             if (deficit < this.vpd) {
                 logger.debug(`${deficit.toFixed(1)} < ${this.vpd.toFixed(1)}`);
                 if (temperature < this.air) {

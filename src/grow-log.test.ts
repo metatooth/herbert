@@ -32,7 +32,6 @@ test('makes multiple entries', async () => {
     }
   
     return grow.log(1, 20).then((entries: [Array<any>, number]) => {
-	console.log(entries[0]);
 	for (let i = 0; i < 5; i ++) {
 	    const a = entries[0].pop();
 	    expect(a.temperature).toBeCloseTo(20+i,0);
