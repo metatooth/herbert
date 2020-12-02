@@ -132,9 +132,9 @@ async function handler(ad: any) {
         const deficit = utils.VaporPressureDeficit(t - config.get('environment.delta'), t, h);
         logger.info(`ACTUAL TEMP ${t.toFixed(1)}C`);
         logger.info(`ACTUAL RH ${h.toFixed(2)}`);
-        logger.info(`CALC VPsat ${sat.toFixed(2)}kPa`);
-        logger.info(`CALC VPair ${air.toFixed(2)}kPa`);
-        logger.info(`CALC VPD ${deficit.toFixed(1)}kPa`);
+        logger.info(`CALC VPsat ${sat.toFixed(0)}`);
+        logger.info(`CALC VPair ${air.toFixed(0)}`);
+        logger.info(`CALC VPD ${deficit.toFixed(0)}`);
 
         const systems = environ.check(t, h, config.get('environment.delta'));
         console.log(systems);
@@ -145,6 +145,9 @@ async function handler(ad: any) {
         } else if (systems.get('cool') === true) {
             on('blower');
             off('heater');
+        } else {
+            off('blower');
+            off('heater');
         }
 
         if (systems.get('humidify') === true) {
@@ -152,6 +155,9 @@ async function handler(ad: any) {
             on('humidifier');
         } else if (systems.get('dehumidify') === true) {
             on('dehumidifier');
+            off('humidifier');
+        } else {
+            off('dehumidifier');
             off('humidifier');
         }
 
