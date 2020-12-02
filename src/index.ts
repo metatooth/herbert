@@ -127,15 +127,6 @@ async function handler(ad: any) {
 
         growlog.track(t, h);
         
-        const sat = utils.SaturatedVaporPressure(t - config.get('environment.delta'));
-        const air = utils.VaporPressureAir(t, h);
-        const deficit = utils.VaporPressureDeficit(t - config.get('environment.delta'), t, h);
-        logger.info(`ACTUAL TEMP ${t.toFixed(1)}C`);
-        logger.info(`ACTUAL RH ${h.toFixed(2)}`);
-        logger.info(`CALC VPsat ${sat.toFixed(0)}`);
-        logger.info(`CALC VPair ${air.toFixed(0)}`);
-        logger.info(`CALC VPD ${deficit.toFixed(0)}`);
-
         const systems = environ.check(t, h, config.get('environment.delta'));
         console.log(systems);
 
