@@ -30,11 +30,11 @@ export function VaporPressureAir(T: number, RH: number) {
 /**
  * Calculates vapor pressure deficit for leaf temp, air temp, and
  * relative humidity
- * @param {number} L leaf temperature in Celsius
  * @param {number} A air temperature in Celsius
+ * @param {number} D on leaf temperature difference in Celsius
  * @param {number} RH relative humidity
- * @return {number} vapor pressure deficit in millibars
+ * @return {number} vapor pressure deficit in pascals
  */
-export function VaporPressureDeficit(L: number, A: number, RH: number) {
-  return SaturatedVaporPressure(L) - VaporPressureAir(A, RH);
+export function VaporPressureDeficit(A: number, D: number, RH: number) {
+  return SaturatedVaporPressure(A-D) - VaporPressureAir(A, RH);
 }

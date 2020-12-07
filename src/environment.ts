@@ -5,29 +5,43 @@ const logger = log4js.getLogger('app');
 import * as utils from './utils';
 
 export class Environment {
-    vpd: number;
-    air: number;
-    leaf: number;
+    temp: number;
     humidity: number;
+    vpd: number;
+    tolerance: number;
 
-    constructor(vpd: number, air: number, leaf: number) {
-        this.vpd = vpd;
-        this.air = air;
-        this.leaf = leaf;
-
-        const sat = utils.SaturatedVaporPressure(this.leaf);
-        this.humidity = utils.RelativeHumidity(sat - vpd, this.air);
+    /**
+     * @constructor
+     * @param {number} temp the ambient temperature
+     * @param {number} delta on leaf temperature difference 
+     * @param {number} humidity relative humidity (0.0)
+     * @param {number} tolerance for control of vapor pressure deficit 
+     */
+    constructor(temp: number,
+                delta: number,
+                humidity: number,
+                tolerance: number) {
+        this.temp = temp;
+        this.humidity = humidity;
+        this.vpd = utils.VaporPressureDeficit(temp, delta, humidity);
+        this.tolerance = tolerance;
     }
 
-    check(temperature: number, humidity: number, delta: number): any {
+    check(temperature: number, delta: number, humidity: number): any {
         const sat = utils.SaturatedVaporPressure(temperature - delta);
         const air = utils.VaporPressureAir(temperature, humidity);
-        const deficit = utils.VaporPressureDeficit(temperature - delta, temperature, humidity);
-        logger.info(`ACTUAL TEMP ${temperature.toFixed(1)}C`);
+        const deficit = utils.VaporPressureDeficit(temperature,
+                                                   delta,
+                                                   humidity);
+
+        logger.info(`TARGET TEMP ${this.temp}.toFixed(1)} C`);
+        logger.info(`ACTUAL TEMP ${temperature.toFixed(1)} C`);
+        logger.info(`TARGET RH ${this.humidity.toFixed(2)}`);
         logger.info(`ACTUAL RH ${humidity.toFixed(2)}`);
         logger.info(`CALC VPsat ${sat.toFixed(0)} pascals`);
         logger.info(`CALC VPair ${air.toFixed(0)} pascals`);
-        logger.info(`CALC VPD ${deficit.toFixed(0)} pascals`);
+        logger.info(`TARGET VPd ${this.vpd.toFixed(0)} pascals`);
+        logger.info(`CALC VPd ${deficit.toFixed(0)} pascals`);
 
         const systems = new Map;
         systems.set('heat', false);
@@ -35,32 +49,25 @@ export class Environment {
         systems.set('humidify', false);
         systems.set('dehumidify', false);
 
-        if (temperature < this.air) {
-            logger.debug(`${temperature.toFixed(1)} < ${this.air.toFixed(1)}`);
+        if (temperature < 15.6) {
             systems.set('heat', true);
         }
 
-        if (Math.abs(deficit - this.vpd) > 100) {
+        if (Math.abs(deficit - this.vpd) > this.tolerance) {
             if (deficit < this.vpd) {
-                logger.debug(`${deficit.toFixed(1)} < ${this.vpd.toFixed(1)}`);
-                if (temperature < this.air) {
-                    logger.debug(`${temperature.toFixed(1)} < ${this.air.toFixed(1)}`);
+                if (temperature < this.temp) {
                     systems.set('heat', true);
                 }
 
                 if (humidity > this.humidity) {
-                    logger.debug(`${humidity.toFixed(2)} > ${this.humidity.toFixed(2)}`);
                     systems.set('dehumidify', true);
                 }
             } else {
-                logger.debug(`${deficit.toFixed(1)} >= ${this.vpd.toFixed(1)}`);
-                if (temperature > this.air) {
-                    logger.debug(`${temperature.toFixed(1)} > ${this.air.toFixed(1)}`);
+                if (temperature > this.temp) {
                     systems.set('cool', true);
                 }
 
                 if (humidity < this.humidity) {
-                    logger.debug(`${humidity.toFixed(2)} < ${this.humidity.toFixed(2)}`);
                     systems.set('humidify', true);
                 }
             }

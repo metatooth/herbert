@@ -5,7 +5,7 @@
   },
   "interval": 30000,
   "min-temp": 15.6,
-  "vpd-tolerance": 100,
+  "vpd-tolerance": 1,
   "environment": {
     "lamp-start": 6,
     "lamp-duration": 12,
@@ -25,6 +25,6 @@
   "wyze": {
       "username": null,
       "password": null,
-      "device-prefix": "E1"
+      "device-prefix": "CX"
     }
 }
