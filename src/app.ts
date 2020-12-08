@@ -1,22 +1,28 @@
-const SwitchBot = require('node-switchbot');
-const switchbot = new SwitchBot();
-const Wyze = require('wyze-node');
-const config = require('config');
+import * as fs from 'fs';
+
+import * as config from 'config';
+
+
+import * as Switchbot from 'node-switchbot';
+const switchbot = new Switchbot;
+
+import * as Wyze from 'wyze-node';
+
 const options = {
     username: config.get('wyze.username') || process.env.USERNAME,
     password: config.get('wyze.password') || process.env.PASSWORD,
 };
+
 const wyze = new Wyze(options);
 
-import * as utils from './utils';
 import { Timer } from './timer';
 import { GrowLog } from './grow-log';
 import { Environment } from './environment';
 
-const growlog = new GrowLog('production.db');
+const growlog: GrowLog = new GrowLog(process.env.NODE_ENV + '.db');
 
 try {
-    require('fs').mkdirSync('./log');
+    fs.mkdirSync('./log');
 } catch (e) {
     if (e.code != 'EEXIST') {
         console.error('Could not set up log directory, error was: ', e);
@@ -24,16 +30,17 @@ try {
     }
 }
 
-const log4js = require('log4js');
+import * as log4js from 'log4js';
 log4js.configure('./config/log4js.json');
 
 const logger = log4js.getLogger('app');
 
 export class App {
     initialized: boolean;
-    types: Map<string, Array<any>>;
-    day: any;
-    night: any;
+    types: Map<string, Array<string>>;
+    day: Environment;
+    night: Environment;
+    timer: Timer;
 
     constructor() {
         this.initialized = false;
@@ -60,18 +67,20 @@ export class App {
             config.get('environment.lamp-off.humidity'),
             config.get('vpd-tolerance')
         );
+
+        this.timer = new Timer(
+            parseInt(config.get('environment.lamp-start')),
+            parseInt(config.get('environment.lamp-duration'))
+        );
     }
 
-    /**
-     * Handler
-     * @param {object} ad advertisement data
-     */
-    async handler(ad: any): any {
-        const handled: Map = { 
-            'heater': 'off',
-            'humidifier': 'off',
-            'dehumidifier': 'off'
-        };
+    async handler(ad: any): Promise<Map<string, boolean>> {
+        const result: Map<string, boolean> = new Map([
+            ['heater', false],
+            ['blower', false],
+            ['humidifier', false],
+            ['dehumidifier', false],
+        ]);
 
         if (ad.serviceData.model === 'T') {
             logger.debug(`id ${ad.id}`);
@@ -83,7 +92,7 @@ export class App {
             const hour = (new Date()).getHours();
             let systems = null;
 
-            if (this.types.get('timer')[0].isOn(hour)) {
+            if (this.timer.isOn(hour)) {
                 systems =
                     this.day.check(t,
                                    config.get('environment.lamp-on.delta'),
@@ -99,7 +108,11 @@ export class App {
             
             if (systems.get('heat') === true) {
                 this.on('heater');
-                handled.set('heater', 'on');
+                result.set('heater', true);
+            } else if (systems.get('cool') == true) {
+                this.off('heater');
+                this.on('blower');
+                result.set('blower', true);
             } else {
                 this.off('heater');
             }
@@ -107,21 +120,21 @@ export class App {
             if (systems.get('humidify') === true) {
                 this.off('dehumidifier');
                 this.on('humidifier');
-                handled.set('humidifier', 'on');
+                result.set('humidifier', true);
             } else if (systems.get('dehumidify') === true) {
                 this.on('dehumidifier');
                 this.off('humidifier');
-                handled.set('dehumidifier', 'on');
+                result.set('dehumidifier', true);
             } else {
                 this.off('dehumidifier');
                 this.off('humidifier');
             }
         }
 
-        return handled;
+        return result;
     }
 
-    async init(): Promise<any> {
+    async init(): Promise<Array<string>> {
         logger.info('====================================');
         logger.info('Starting up.');
 
@@ -130,37 +143,30 @@ export class App {
         logger.debug('NIGHT >>');
         logger.debug(this.night);
         
-        const promises: Array<any> = [];
-        const scope: any = this;
+        const promises: Array<string> = [];
+        const types: Map<string, Array<string>> = this.types;
 
-	      scope.types.set('timer',
-		                    [new Timer(
-		                        config.get('environment.lamp-start'),
-		                        config.get('environment.lamp-duration'),
-		                    )]
-		                   );
-	              
         wyze.getDeviceList().then((dlist: Array<any>) => {
-	          dlist.forEach((device: any) => {
-	              logger.debug(device.nickname);
-	              scope.types.forEach((value: any[], key: string, map: Map<string, any[]>) => {
-		                if (device.nickname.match(
-		                    new RegExp(`^${config.get('environment.prefix')} ${key}`, 'i'),
-		                )) {
-		                    logger.debug('MATCHED!');
+            dlist.forEach((device: any) => {
+                logger.debug(device.nickname);
+                const nick: string = device.nickname;
+                const prefix: string = config.get('environment.prefix');
+                types.forEach((value: Array<string>, key: string) => {
+                    if (nick.match(new RegExp(`^${prefix} ${key}`, 'i'))) {
+                        logger.debug('MATCHED!');
                         logger.debug(device);
-		                    value.push(device.nickname);
-		                }
+                        value.push(device.nickname);
+                    }
                     promises.push(device.nickname);
-	              });
-	          });
-	          
-	          logger.info(config);
-	          logger.info(scope.types);
-	          
-		        this.initialized = true;
-		        logger.info('====================================');
-            promises.push(this.initialized);            
+                });
+            });
+
+            logger.info(config);
+            logger.info(types);
+
+            this.initialized = true;
+            logger.info('====================================');
+            promises.push("initialized");
         });
 
         return Promise.all(promises);
@@ -170,15 +176,19 @@ export class App {
      * Turn off named device
      * @param {string} name
      */
-    async off(name: string): any {
+    async off(name: string): Promise<[string, string]> {
         logger.info(`OFF ${name}`);
         const promises: Array<any> = [];
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
-            promises.push(wyze.turnOff(device));
+            wyze.turnOff(device).then((result: any) => {
+                promises.push(result);
+            });
         });
         return Promise.all(promises).then(() => {
-            return {name: "off"};
+            return new Promise((resolve) => {
+                resolve([name, "off"]);
+            });
         });
     }
 
@@ -186,58 +196,72 @@ export class App {
      * Turn on named device
      * @param {string} name
      */
-    async on(name: string): any {
+    async on(name: string): Promise<[string, string]> {
         logger.info(`ON ${name}`);
         const promises: Array<any> = [];
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
-            promises.push(wyze.turnOn(device));
+            wyze.turnOn(device).then((result: any) => {
+                promises.push(result);
+            });
         });
         return Promise.all(promises).then(() => {
-            return {name: "on"};
+            return new Promise((resolve) => {
+                resolve([name, "on"]);
+            });
         });
     }
 
-    async run(): Promise<any> { 
+    async run(): Promise<boolean> {
         if (!this.initialized) {
             await this.init();
         }
 
-        const hour = (new Date()).getHours(); 
-       
-        if (this.types.get('timer')[0].isOn(hour)) {
+        const now: Date = new Date();
+
+        logger.debug(`time now is ${now}`);
+
+        const hour: number = now.getHours();
+
+        if (this.timer.isOn(hour)) {
             this.on('lamp');
         } else {
             this.off('lamp');
         }
 
-        const scope = this;        
+        const min: number = now.getMinutes();
+        const sec: number = now.getSeconds();
+
+        const remainder: number = (min * 60 + sec) %
+            parseInt(config.get('blower.cycle'));
+
+        logger.debug(`${(min * 60 + sec)} ${config.get('blower.cycle')} ${remainder}`);
+
         this.types.get('blower').forEach(async (value: string) => {
-            const device = await wyze.getDeviceByName(value);
-            const state = await wyze.getDeviceState(device);
-            console.log(`${device.nickname} is ${state}`); 
-            if (state === 'on') {
-                scope.off(value);
+            if (remainder > parseInt(config.get('blower.active'))) {
+                this.off(value);
             } else {
-                scope.on(value);
+                this.on(value);
             }
         });
 
         logger.debug('Start scan ...');
-
         await switchbot.startScan();
 
         switchbot.onadvertisement = this.handler;
 
-        await switchbot.wait(config.get('app.polling'));
-
+        const polling: number = 1000 * parseInt(config.get('app.polling'));
+        await switchbot.wait(polling);
         await switchbot.stopScan();
-
         logger.debug('Done scan.');
         
-        let dwell: number;
-        dwell = config.get('environment.interval') - config.get('app.polling');
+        const interval: number = 1000 *
+            parseInt(config.get('environment.interval'));
 
-        setTimeout(this.run, dwell);
+        setTimeout(this.run, interval - polling);
+
+        return new Promise(() => {
+            return true;
+        });
     }
 }

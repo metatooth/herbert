@@ -1,5 +1,8 @@
 {
   "appenders": {
+    "console": {
+      "type": "console"
+    },
     "app": {
       "type": "file",
       "filename": "log/app.log",

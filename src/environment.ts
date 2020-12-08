@@ -1,4 +1,4 @@
-const log4js = require('log4js');
+import * as log4js from 'log4js';
 log4js.configure('./config/log4js.json');
 const logger = log4js.getLogger('app');
 
@@ -27,7 +27,7 @@ export class Environment {
         this.tolerance = tolerance;
     }
 
-    check(temperature: number, delta: number, humidity: number): any {
+    check(temperature: number, delta: number, humidity: number): Map<string, boolean> {
         const sat = utils.SaturatedVaporPressure(temperature - delta);
         const air = utils.VaporPressureAir(temperature, humidity);
         const deficit = utils.VaporPressureDeficit(temperature,
@@ -43,11 +43,12 @@ export class Environment {
         logger.info(`TARGET VPd ${this.vpd.toFixed(0)} pascals`);
         logger.info(`CALC VPd ${deficit.toFixed(0)} pascals`);
 
-        const systems = new Map;
-        systems.set('heat', false);
-        systems.set('cool', false);
-        systems.set('humidify', false);
-        systems.set('dehumidify', false);
+        const systems = new Map([
+            ['heat', false],
+            ['cool', false],
+            ['humidify', false],
+            ['dehumidify', false],
+        ]);
 
         if (temperature < 15.6) {
             systems.set('heat', true);

@@ -1,11 +1,17 @@
 {
   "app": {
     "port": 4300,
-    "polling": 3000
+    "polling": 3
   },
-  "interval": 30000,
+  "interval": 30,
   "min-temp": 15.6,
-  "vpd-tolerance": 100,
+  "vpd-tolerance": 1,
+  "blower": {
+      "cycle": 180,
+      "active": 45
+  },
+  "intake-meter": "aaaaaaaaaaaa",
+  "main-meter": "bbbbbbbbbbbb",
   "environment": {
     "lamp-start": 6,
     "lamp-duration": 12,
@@ -20,8 +26,6 @@
        "humidity": 0.55
     }
   },
-  "intake-meter": "aaaaaaaaaaaa",
-  "main-meter": "bbbbbbbbbbbb",
   "wyze": {
       "username": null,
       "password": null,
