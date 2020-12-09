@@ -1,11 +1,11 @@
 /**
  * Set a timer for a start hour [0-23] and duration (in hours).
  */
-export class Timer {
+export class LampTimer {
     start: number;
     duration: number;
 
-constructor(start: number, duration: number) {
+    constructor(start: number, duration: number) {
         this.start = start;
         this.duration = duration;
     }

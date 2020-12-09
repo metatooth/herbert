@@ -1,7 +1,5 @@
 import * as fs from 'fs';
-
 import * as config from 'config';
-
 
 import * as Switchbot from 'node-switchbot';
 const switchbot = new Switchbot;
@@ -15,7 +13,8 @@ const options = {
 
 const wyze = new Wyze(options);
 
-import { Timer } from './timer';
+import { BlowerTimer } from './blower-timer';
+import { LampTimer } from './lamp-timer';
 import { GrowLog } from './grow-log';
 import { Environment } from './environment';
 
@@ -36,13 +35,15 @@ log4js.configure('./config/log4js.json');
 const logger = log4js.getLogger('app');
 
 export class App {
+    private static _instance: App;
     initialized: boolean;
     types: Map<string, Array<string>>;
     day: Environment;
     night: Environment;
-    timer: Timer;
+    lamps: LampTimer;
+    blowers: BlowerTimer;
 
-    constructor() {
+    private constructor() {
         this.initialized = false;
         this.types = new Map([
             ['meter', []],
@@ -68,13 +69,18 @@ export class App {
             config.get('vpd-tolerance')
         );
 
-        this.timer = new Timer(
+        this.lamps = new LampTimer(
             parseInt(config.get('environment.lamp-start')),
             parseInt(config.get('environment.lamp-duration'))
         );
+
+        this.blowers = new BlowerTimer(
+            parseInt(config.get('blower.active')),
+            parseInt(config.get('blower.cycle'))
+        );
     }
 
-    async handler(ad: any): Promise<Map<string, boolean>> {
+    async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
         const result: Map<string, boolean> = new Map([
             ['heater', false],
             ['blower', false],
@@ -92,7 +98,7 @@ export class App {
             const hour = (new Date()).getHours();
             let systems = null;
 
-            if (this.timer.isOn(hour)) {
+            if (this.lamps.isOn(hour)) {
                 systems =
                     this.day.check(t,
                                    config.get('environment.lamp-on.delta'),
@@ -134,7 +140,7 @@ export class App {
         return result;
     }
 
-    async init(): Promise<Array<string>> {
+    async init(): Promise<boolean> {
         logger.info('====================================');
         logger.info('Starting up.');
 
@@ -143,52 +149,54 @@ export class App {
         logger.debug('NIGHT >>');
         logger.debug(this.night);
         
-        const promises: Array<string> = [];
         const types: Map<string, Array<string>> = this.types;
 
-        wyze.getDeviceList().then((dlist: Array<any>) => {
-            dlist.forEach((device: any) => {
-                logger.debug(device.nickname);
-                const nick: string = device.nickname;
-                const prefix: string = config.get('environment.prefix');
-                types.forEach((value: Array<string>, key: string) => {
-                    if (nick.match(new RegExp(`^${prefix} ${key}`, 'i'))) {
-                        logger.debug('MATCHED!');
-                        logger.debug(device);
-                        value.push(device.nickname);
-                    }
-                    promises.push(device.nickname);
+        return new Promise((resolve) => {
+            wyze.getDeviceList().then((dlist: Array<Device>) => {
+                dlist.forEach((device: Device) => {
+                    logger.debug(device.nickname);
+                    const nick: string = device.nickname;
+                    const prefix: string = config.get('environment.prefix');
+                    types.forEach((value: Array<string>, key: string) => {
+                        if (nick.match(new RegExp(`^${prefix} ${key}`, 'i'))) {
+                            logger.debug('MATCHED!');
+                            logger.debug(device);
+                            value.push(device.nickname);
+                        }
+                    });
                 });
+                
+                logger.info(config);
+                logger.info(types);
+                
+                this.initialized = true;
+                logger.info('====================================');
+                resolve(true);
             });
-
-            logger.info(config);
-            logger.info(types);
-
-            this.initialized = true;
-            logger.info('====================================');
-            promises.push("initialized");
         });
+    }
 
-        return Promise.all(promises);
+    public static instance(): App {
+        if (!App._instance) {
+            App._instance = new App();
+        }
+        return App._instance;
     }
 
     /**
      * Turn off named device
      * @param {string} name
      */
-    async off(name: string): Promise<[string, string]> {
+    async off(name: string): Promise<boolean> {
         logger.info(`OFF ${name}`);
-        const promises: Array<any> = [];
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
-            wyze.turnOff(device).then((result: any) => {
-                promises.push(result);
-            });
+            const result = wyze.turnOff(device);
+            logger.debug(result);
         });
-        return Promise.all(promises).then(() => {
-            return new Promise((resolve) => {
-                resolve([name, "off"]);
-            });
+
+        return new Promise((resolve) => {
+            resolve(true);
         });
     }
 
@@ -196,72 +204,62 @@ export class App {
      * Turn on named device
      * @param {string} name
      */
-    async on(name: string): Promise<[string, string]> {
+    async on(name: string): Promise<boolean> {
         logger.info(`ON ${name}`);
-        const promises: Array<any> = [];
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
-            wyze.turnOn(device).then((result: any) => {
-                promises.push(result);
-            });
+            const result = await wyze.turnOn(device);
+            logger.debug(result);
         });
-        return Promise.all(promises).then(() => {
-            return new Promise((resolve) => {
-                resolve([name, "on"]);
-            });
+
+        return new Promise((resolve) => {
+            resolve(true);
         });
     }
 
-    async run(): Promise<boolean> {
-        if (!this.initialized) {
-            await this.init();
+    public async run(): Promise<boolean> {
+        const app = App.instance();
+        if (app.initialized !== true) {
+            await app.init();
         }
 
         const now: Date = new Date();
-
-        logger.debug(`time now is ${now}`);
-
         const hour: number = now.getHours();
-
-        if (this.timer.isOn(hour)) {
-            this.on('lamp');
-        } else {
-            this.off('lamp');
-        }
-
         const min: number = now.getMinutes();
         const sec: number = now.getSeconds();
 
-        const remainder: number = (min * 60 + sec) %
-            parseInt(config.get('blower.cycle'));
+        if (app.lamps.isOn(hour)) {
+            app.on('lamp');
+        } else {
+            app.off('lamp');
+        }
 
-        logger.debug(`${(min * 60 + sec)} ${config.get('blower.cycle')} ${remainder}`);
-
-        this.types.get('blower').forEach(async (value: string) => {
-            if (remainder > parseInt(config.get('blower.active'))) {
-                this.off(value);
-            } else {
-                this.on(value);
-            }
-        });
+        if (app.blowers.isOn(min * 60 + sec)) {
+            app.on('blower');
+        } else {
+            app.off('blower');
+        }
 
         logger.debug('Start scan ...');
         await switchbot.startScan();
-
-        switchbot.onadvertisement = this.handler;
-
+        logger.debug('step');
+        switchbot.onadvertisement = app.handler;
+        logger.debug('step');
         const polling: number = 1000 * parseInt(config.get('app.polling'));
+        logger.debug(`polling at ${polling}`);
         await switchbot.wait(polling);
         await switchbot.stopScan();
         logger.debug('Done scan.');
         
-        const interval: number = 1000 *
-            parseInt(config.get('environment.interval'));
+        const interval: number = 1000 * parseInt(config.get('interval'));
 
-        setTimeout(this.run, interval - polling);
+        const tid = setTimeout(app.run, interval - polling);
 
-        return new Promise(() => {
-            return true;
+        logger.debug(`timeout id ${tid}`);
+
+        return new Promise((resolve) => {
+            logger.debug('run resolved');
+            resolve(true);
         });
     }
 }

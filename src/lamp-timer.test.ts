@@ -1,7 +1,7 @@
-import { Timer } from './timer';
+import { LampTimer } from './lamp-timer';
 
-test('12/12 starting at 6am', () => {
-  const timer = new Timer(6, 12);
+test('Day-night cycle 12/12 starting at 6am', () => {
+  const timer = new LampTimer(6, 12);
   expect(timer.isOn(0)).toBe(false);
   expect(timer.isOn(2)).toBe(false);
   expect(timer.isOn(4)).toBe(false);
@@ -17,8 +17,8 @@ test('12/12 starting at 6am', () => {
 });
 
 
-test('12/12 starting at 8am', () => {
-  const timer = new Timer(8, 12);
+test('Day-night cycle 12/12 starting at 8am', () => {
+  const timer = new LampTimer(8, 12);
   expect(timer.isOn(0)).toBe(false);
   expect(timer.isOn(2)).toBe(false);
   expect(timer.isOn(4)).toBe(false);
@@ -33,8 +33,8 @@ test('12/12 starting at 8am', () => {
   expect(timer.isOn(22)).toBe(false);
 });
 
-test('12/12 starting at 8pm', () => {
-  const timer = new Timer(20, 12);
+test('Day-night cycle 12/12 starting at 8pm', () => {
+  const timer = new LampTimer(20, 12);
   expect(timer.isOn(0)).toBe(true);
   expect(timer.isOn(2)).toBe(true);
   expect(timer.isOn(4)).toBe(true);

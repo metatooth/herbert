@@ -1,7 +1,14 @@
 import { App } from './app';
 
+test('does run', () => {
+    const app = App.instance();
+    app.run().then((data: boolean) => {
+        expect(data).toBe(true);
+    });
+});
+
 test('handles an advertisement', () => {
-    const app = new App;
+    const app = App.instance();
 
     const ad = {
         id: 'aaaaaaaaaaaa',
@@ -29,3 +36,4 @@ test('handles an advertisement', () => {
         });
     });
 });
+

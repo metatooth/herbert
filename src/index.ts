@@ -1,6 +1,6 @@
 import { App } from './app';
 
 (async () => {
-    const app = new App;
+    const app = App.instance();
     app.run();
 })();
