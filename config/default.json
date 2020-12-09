@@ -13,6 +13,7 @@
   "intake-meter": "aaaaaaaaaaaa",
   "main-meter": "bbbbbbbbbbbb",
   "environment": {
+    "prefix": "E1",
     "lamp-start": 6,
     "lamp-duration": 12,
     "lamp-on": {
@@ -28,7 +29,6 @@
   },
   "wyze": {
       "username": "terry@aggalt.com",
-      "password": "L2KL2de4wv4bFc4",
-      "device-prefix": "E1"
+      "password": ""
     }
 }
