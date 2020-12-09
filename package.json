@@ -1,6 +1,6 @@
 {
   "name": "cannabis",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Environment Control System with Switch-Bot and WYZE",
   "main": "index.js",
   "scripts": {
