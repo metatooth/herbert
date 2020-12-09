@@ -193,8 +193,8 @@ export class App {
         logger.info(`OFF ${name}`);
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
-            const result = wyze.turnOff(device);
-            logger.debug(result);
+            const result = await wyze.turnOff(device);
+            logger.debug(`wyze turn off ${result.code}`);
         });
 
         return new Promise((resolve) => {
@@ -211,7 +211,7 @@ export class App {
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
             const result = await wyze.turnOn(device);
-            logger.debug(result);
+            logger.debug(`wyze turn on ${result.code}`);
         });
 
         return new Promise((resolve) => {
@@ -244,23 +244,17 @@ export class App {
 
         logger.debug('Start scan ...');
         await switchbot.startScan();
-        logger.debug('step');
         switchbot.onadvertisement = app.handler;
-        logger.debug('step');
         const polling: number = 1000 * parseInt(config.get('app.polling'));
-        logger.debug(`polling at ${polling}`);
         await switchbot.wait(polling);
         await switchbot.stopScan();
         logger.debug('Done scan.');
         
         const interval: number = 1000 * parseInt(config.get('interval'));
 
-        const tid = setTimeout(app.run, interval - polling);
-
-        logger.debug(`timeout id ${tid}`);
+        setTimeout(app.run, interval - polling);
 
         return new Promise((resolve) => {
-            logger.debug('run resolved');
             resolve(true);
         });
     }
