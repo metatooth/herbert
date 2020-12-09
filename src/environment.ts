@@ -34,14 +34,14 @@ export class Environment {
                                                    delta,
                                                    humidity);
 
-        logger.debug(`TARGET TEMP ${this.temp.toFixed(1)} C`);
-        logger.debug(`ACTUAL TEMP ${temperature.toFixed(1)} C`);
-        logger.debug(`TARGET RH ${this.humidity.toFixed(2)}`);
-        logger.debug(`ACTUAL RH ${humidity.toFixed(2)}`);
+        logger.info(`TARGET TEMP ${this.temp.toFixed(1)} C`);
+        logger.info(`ACTUAL TEMP ${temperature.toFixed(1)} C`);
+        logger.info(`TARGET RH ${this.humidity.toFixed(2)}`);
+        logger.info(`ACTUAL RH ${humidity.toFixed(2)}`);
         logger.debug(`CALC VPsat ${sat.toFixed(0)} pascals`);
         logger.debug(`CALC VPair ${air.toFixed(0)} pascals`);
-        logger.debug(`TARGET VPd ${this.vpd.toFixed(0)} pascals`);
-        logger.debug(`CALC VPd ${deficit.toFixed(0)} pascals`);
+        logger.info(`TARGET VPd ${this.vpd.toFixed(0)} pascals`);
+        logger.info(`ACTUAL VPd ${deficit.toFixed(0)} pascals`);
 
         const systems = new Map([
             ['heat', false],
