@@ -34,7 +34,7 @@ export class Environment {
                                                    delta,
                                                    humidity);
 
-        logger.debug(`TARGET TEMP ${this.temp}.toFixed(1)} C`);
+        logger.debug(`TARGET TEMP ${this.temp.toFixed(1)} C`);
         logger.debug(`ACTUAL TEMP ${temperature.toFixed(1)} C`);
         logger.debug(`TARGET RH ${this.humidity.toFixed(2)}`);
         logger.debug(`ACTUAL RH ${humidity.toFixed(2)}`);
