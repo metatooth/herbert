@@ -98,14 +98,16 @@ export class App {
             const hour = (new Date()).getHours();
             let systems = null;
 
-            if (this.lamps.isOn(hour)) {
+            const app = App.instance();
+
+            if (app.lamps.isOn(hour)) {
                 systems =
-                    this.day.check(t,
+                    app.day.check(t,
                                    config.get('environment.lamp-on.delta'),
                                    h);
             } else {
                 systems =
-                    this.night.check(t,
+                    app.night.check(t,
                                      config.get('environment.lamp-off.delta'),
                                      h);
             }
@@ -113,27 +115,27 @@ export class App {
             logger.debug(systems);
             
             if (systems.get('heat') === true) {
-                this.on('heater');
+                app.on('heater');
                 result.set('heater', true);
             } else if (systems.get('cool') == true) {
-                this.off('heater');
-                this.on('blower');
+                app.off('heater');
+                app.on('blower');
                 result.set('blower', true);
             } else {
-                this.off('heater');
+                app.off('heater');
             }
 
             if (systems.get('humidify') === true) {
-                this.off('dehumidifier');
-                this.on('humidifier');
+                app.off('dehumidifier');
+                app.on('humidifier');
                 result.set('humidifier', true);
             } else if (systems.get('dehumidify') === true) {
-                this.on('dehumidifier');
-                this.off('humidifier');
+                app.on('dehumidifier');
+                app.off('humidifier');
                 result.set('dehumidifier', true);
             } else {
-                this.off('dehumidifier');
-                this.off('humidifier');
+                app.off('dehumidifier');
+                app.off('humidifier');
             }
         }
 
