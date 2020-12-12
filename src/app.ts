@@ -59,14 +59,16 @@ export class App {
             config.get('environment.lamp-on.temperature'),
             config.get('environment.lamp-on.delta'),
             config.get('environment.lamp-on.humidity'),
-            config.get('vpd-tolerance')
+            config.get('environment.vpd-tolerance'),
+            config.get('environment.temp-minimum')
         );
 
         this.night = new Environment(
             config.get('environment.lamp-off.temperature'),
             config.get('environment.lamp-off.delta'),
             config.get('environment.lamp-off.humidity'),
-            config.get('vpd-tolerance')
+            config.get('environment.vpd-tolerance'),
+            config.get('environment.temp-minimum')
         );
 
         this.lamps = new LampTimer(
@@ -75,8 +77,8 @@ export class App {
         );
 
         this.blowers = new BlowerTimer(
-            parseInt(config.get('blower.active')),
-            parseInt(config.get('blower.cycle'))
+            parseInt(config.get('environment.blower.active')),
+            parseInt(config.get('environment.blower.cycle'))
         );
     }
 
@@ -88,8 +90,9 @@ export class App {
             ['dehumidifier', false],
         ]);
 
-        if (ad.serviceData.model === 'T') {
-            logger.debug(`id ${ad.id}`);
+        if (ad.id === config.get('main-meter')) {
+            logger.debug(`main meter id ${ad.id}`);
+            
             const t = ad.serviceData.temperature.c;
             const h = ad.serviceData.humidity / 100.0;
 
@@ -137,6 +140,10 @@ export class App {
                 app.off('dehumidifier');
                 app.off('humidifier');
             }
+        } else {
+            logger.debug('XXX advertisement XXX');
+            logger.debug(ad);
+            logger.debug('XXX advertisement XXX');
         }
 
         return result;

@@ -1,15 +1,15 @@
 import { Environment } from './environment';
 
 test('target humidity', () => {
-    const e0 = new Environment(22.0, 0.6, 0.7, 1);
+    const e0 = new Environment(22.0, 0.6, 0.7, 1, 15.6);
     expect(e0.vpd).toBeCloseTo(698, 0);
 
-    const e1 = new Environment(21.2, 0.6, 0.765, 1);
+    const e1 = new Environment(21.2, 0.6, 0.765, 1, 15.6);
     expect(e1.vpd).toBeCloseTo(500, 0);
 });
 
 test('humidity is low', () => {
-    const environ = new Environment(22, 1, 0.65, 1);
+    const environ = new Environment(22, 1, 0.65, 1, 15.6);
     const systems = environ.check(22, 1, 0.4);
     expect(systems.get('heat')).toBe(false);
     expect(systems.get('cool')).toBe(false);
@@ -18,7 +18,7 @@ test('humidity is low', () => {
 });
 
 test('15.6 C is a hard limit', () => {
-    const environ = new Environment(22, 1, 0.48, 1);
+    const environ = new Environment(22, 1, 0.48, 1, 15.6);
     const systems = environ.check(15.5, 1, 0.2);
 
     expect(environ.vpd).toBeCloseTo(1218, 0);
@@ -29,7 +29,7 @@ test('15.6 C is a hard limit', () => {
 });
 
 test('heat if below set temp', () => {
-    const environ = new Environment(21, 0.6, 0.55, 1);
+    const environ = new Environment(21, 0.6, 0.55, 1, 15.6);
 
     const s0 = environ.check(20.1, 0.6, 0.55);
     expect(s0.get('heat')).toBe(true);

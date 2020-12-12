@@ -10,7 +10,7 @@ interface WoSensorTH {
             f: number;
         }
         humidity: number;
-        farenheit: number;
+        fahrenheit: boolean;
         battery: number;
     }
 }

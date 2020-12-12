@@ -9,6 +9,7 @@ export class Environment {
     humidity: number;
     vpd: number;
     tolerance: number;
+    mintemp: number;
 
     /**
      * @constructor
@@ -16,15 +17,18 @@ export class Environment {
      * @param {number} delta on leaf temperature difference 
      * @param {number} humidity relative humidity (0.0)
      * @param {number} tolerance for control of vapor pressure deficit 
+     * @param {number} mintemp the minimum allowed temperature
      */
     constructor(temp: number,
                 delta: number,
                 humidity: number,
-                tolerance: number) {
+                tolerance: number,
+                mintemp: number) {
         this.temp = temp;
         this.humidity = humidity;
         this.vpd = utils.VaporPressureDeficit(temp, delta, humidity);
         this.tolerance = tolerance;
+        this.mintemp = mintemp;
     }
 
     check(temperature: number, delta: number, humidity: number): Map<string, boolean> {
@@ -50,7 +54,7 @@ export class Environment {
             ['dehumidify', false],
         ]);
 
-        if (temperature < 15.6) {
+        if (temperature < this.mintemp) {
             systems.set('heat', true);
         }
 
