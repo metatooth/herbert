@@ -1,6 +1,6 @@
-# Cannabis
+# Herbert
 
-## TODO: Come up with better name.
+An environmental control system using BLE devices and Node.js
 
 ## Getting Started
 
