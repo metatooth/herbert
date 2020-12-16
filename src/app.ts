@@ -18,6 +18,13 @@ import { LampTimer } from './lamp-timer';
 import { GrowLog } from './grow-log';
 import { Environment } from './environment';
 
+import {Clime} from './clime';
+import {TargetTempHumidity} from './target-temp-humidity';
+import {ConstantVpd} from './constant-vpd';
+import {AirDirectives} from './air-directives';
+
+import * as utils from './utils';
+
 const growlog: GrowLog = new GrowLog(process.env.NODE_ENV + '.db');
 
 try {
@@ -38,8 +45,8 @@ export class App {
     private static _instance: App;
     initialized: boolean;
     types: Map<string, Array<string>>;
-    day: Environment;
-    night: Environment;
+    day: AirDirectives;
+    night: AirDirectives;
     lamps: LampTimer;
     blowers: BlowerTimer;
 
@@ -55,31 +62,46 @@ export class App {
             ['AC', []],
         ]);
 
-        this.day = new Environment(
-            config.get('environment.lamp-on.temperature'),
-            config.get('environment.lamp-on.delta'),
-            config.get('environment.lamp-on.humidity'),
-            config.get('environment.vpd-tolerance'),
-            config.get('environment.temp-minimum')
-        );
-
-        this.night = new Environment(
-            config.get('environment.lamp-off.temperature'),
-            config.get('environment.lamp-off.delta'),
-            config.get('environment.lamp-off.humidity'),
-            config.get('environment.vpd-tolerance'),
-            config.get('environment.temp-minimum')
-        );
-
         this.lamps = new LampTimer(
-            parseInt(config.get('environment.lamp-start')),
-            parseInt(config.get('environment.lamp-duration'))
+            parseInt(config.get('environment.lamp.start')),
+            parseInt(config.get('environment.lamp.duration'))
         );
 
         this.blowers = new BlowerTimer(
             parseInt(config.get('environment.blower.active')),
             parseInt(config.get('environment.blower.cycle'))
         );
+
+        if (config.get('environment.strategy') === 'constant-vpd') {
+            let vpd = utils.VaporPressureDeficit(
+                config.get('environment.lamp-on.temperature'),
+                config.get('environment.lamp-on.delta'),
+                config.get('environment.lamp-on.humidity'));
+
+            this.day = new AirDirectives(
+                new ConstantVpd(
+                    [vpd, config.get('environment.vpd-tolerance')]));
+
+            vpd = utils.VaporPressureDeficit(
+                config.get('environment.lamp-off.temperature'),
+                config.get('environment.lamp-off.delta'),
+                config.get('environment.lamp-off.humidity'));
+                
+            this.night = new AirDirectives(
+                new ConstantVpd(
+                    [vpd, config.get('environment.vpd-tolerance')]));
+
+        } else {
+            this.day = new AirDirectives(
+                new TargetTempHumidity([
+                    config.get('environment.lamp-on.temperature'),
+                    config.get('environment.lamp-on.humidity')]));
+            
+            this.night = new AirDirectives(
+                new TargetTempHumidity([
+                    config.get('environment.lamp-off.temperature'),
+                    config.get('environment.lamp-off.humidity')]));
+        }
     }
 
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
@@ -99,40 +121,39 @@ export class App {
             growlog.track(t, h);
             
             const hour = (new Date()).getHours();
-            let systems = null;
-
             const app = App.instance();
+            let directive: AirDirectives;
+            let d: number;
 
             if (app.lamps.isOn(hour)) {
-                systems =
-                    app.day.check(t,
-                                   config.get('environment.lamp-on.delta'),
-                                   h);
+                directive = app.day;
+                d = -0.6;
             } else {
-                systems =
-                    app.night.check(t,
-                                     config.get('environment.lamp-off.delta'),
-                                     h);
+                directive = app.night;
+                d = 0.6;
             }
-
-            logger.debug(systems);
             
-            if (systems.get('heat') === true) {
+            directive.clime = new Clime(t, d, h);
+            directive.monitor();
+
+            logger.debug(directive);
+
+            if (directive.temperature === 'heat') {
                 app.on('heater');
                 result.set('heater', true);
-            } else if (systems.get('cool') == true) {
+            } else if (directive.temperature === 'cool') {
                 app.off('heater');
                 app.on('blower');
-                result.set('blower', true);
+                result.set('blower', true);                
             } else {
                 app.off('heater');
             }
 
-            if (systems.get('humidify') === true) {
+            if (directive.humidity === 'humidify') {
                 app.off('dehumidifier');
                 app.on('humidifier');
                 result.set('humidifier', true);
-            } else if (systems.get('dehumidify') === true) {
+            } else if (directive.humidity === 'dehumidify') {
                 app.on('dehumidifier');
                 app.off('humidifier');
                 result.set('dehumidifier', true);

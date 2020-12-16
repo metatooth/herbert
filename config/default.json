@@ -8,6 +8,7 @@
   "main-meter": "bbbbbbbbbbbb",
   "environment": {
     "prefix": "E1",
+    "strategy": "constant-vpd",
     "lamp": {
       "start": 6,
       "duration": 18
@@ -31,6 +32,6 @@
   },
   "wyze": {
       "username": "terry@aggalt.com",
-      "password": "L2KL2de4wv4bFc4"
+      "password": "xtTHwmkqtxbeTM7"
     }
 }

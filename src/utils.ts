@@ -11,7 +11,7 @@ export function RelativeHumidity(VP: number, T: number): number {
 /**
  * Calculates saturated vapor pressure
  * @param {number} T temperature in Celsius
- * @return {number} pressure in millbars
+ * @return {number} vapor pressure in pascals
  */
 export function SaturatedVaporPressure(T: number): number {
   return 610.7 * Math.pow(10, 7.5 * T / (T + 237.3));
