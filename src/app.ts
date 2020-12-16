@@ -191,6 +191,10 @@ export class App {
                         if (nick.match(new RegExp(`^${prefix} ${key}`, 'i'))) {
                             logger.debug('MATCHED!');
                             logger.debug(device);
+                            wyze.getDeviceState(device)
+                                .then((state: DeviceState) => {
+                                    logger.debug(state);
+                                });
                             value.push(device.nickname);
                         }
                     });
@@ -214,7 +218,7 @@ export class App {
     }
 
     /**
-     * Turn off named device
+     * Turn off named devices
      * @param {string} name
      */
     async off(name: string): Promise<boolean> {
@@ -222,7 +226,9 @@ export class App {
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
             const result = await wyze.turnOff(device);
-            logger.debug(`wyze turn off ${result.code}`);
+            if (result.code !== 1) {
+                logger.error(`ERROR ${value} OFF - ${result.msg}`);
+            }
         });
 
         return new Promise((resolve) => {
@@ -231,7 +237,7 @@ export class App {
     }
 
     /**
-     * Turn on named device
+     * Turn on named devices
      * @param {string} name
      */
     async on(name: string): Promise<boolean> {
@@ -239,7 +245,9 @@ export class App {
         this.types.get(name).forEach(async (value: string) => {
             const device = await wyze.getDeviceByName(value);
             const result = await wyze.turnOn(device);
-            logger.debug(`wyze turn on ${result.code}`);
+            if (result.code !== 1) {
+                logger.error(`ERROR ${value} ON - ${result.msg}`);
+            }
         });
 
         return new Promise((resolve) => {

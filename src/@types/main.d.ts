@@ -18,3 +18,7 @@ interface WoSensorTH {
 interface Device {
     nickname: string;
 }
+
+interface DeviceState {
+
+}
