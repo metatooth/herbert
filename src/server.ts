@@ -1,20 +1,36 @@
 import WebSocket = require('ws');
-const server = new WebSocket.Server({
-    port: 8080
-});
+const http = require('http');
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 5000;
 
-let sockets: WebSocket[] = [];
-server.on('connection', function(socket: WebSocket) {
-  sockets.push(socket);
+app.use(express.static(__dirname + '/'));
 
-  // When you receive a message, send that message to every socket.
-  socket.on('message', function(msg: string) {
-    console.log(msg);
-    sockets.forEach(s => s.send(msg));
-  });
+const server = http.createServer(app);
+server.listen(port);
+console.log('http server listening on %d', port);
 
-  // When a socket closes, or disconnects, remove it from the array.
-  socket.on('close', function() {
-    sockets = sockets.filter(s => s !== socket);
-  });
+const wss = new WebSocket.Server({server: server});
+console.log('websocket server created');
+
+let sockets: any[] = [];
+wss.on('connection', function(socket: WebSocket) {
+    const id = setInterval(() => {
+        socket.send(JSON.stringify(new Date()), () => {});
+    }, 1000);
+
+    console.log('websocket connection open');
+    sockets.push(socket);
+
+    // When you receive a message, send that message to every socket.
+    socket.on('message', function(msg: string) {
+        console.log(msg);
+        sockets.forEach(s => s.send(msg));
+    });
+
+    // When a socket closes, or disconnects, remove it from the array.
+    socket.on('close', function() {
+        sockets = sockets.filter(s => s !== socket);
+        clearInterval(id);
+    });
 });
