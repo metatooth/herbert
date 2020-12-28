@@ -11,7 +11,7 @@ export class AirDirectives {
       this.controller = controller;
   }
 
-  monitor() {
+  monitor(): void {
       const message = this.controller.control(this.clime);
       this.temperature = message[0];
       this.humidity = message[1];

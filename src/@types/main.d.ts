@@ -20,5 +20,5 @@ interface Device {
 }
 
 interface DeviceState {
-
+    status: string;
 }

@@ -1,5 +1,19 @@
 import { App } from './app';
 
+import * as WebSocket from 'ws';
+let server: any;
+
+beforeEach(() => {
+    server = new WebSocket.Server({
+        port: 8080
+    });
+});
+
+afterEach(() => {
+    server.close();
+});
+
+
 test('does run', () => {
     const app = App.instance();
     app.run().then((data: boolean) => {
@@ -29,7 +43,7 @@ test('handles an advertisement', () => {
 
     return app.init().then(() => {
         app.handler(ad).then((data: Map<string, boolean>) => {
-            expect(data).toStrictEqual(new Map([['heater', true],
+            expect(data).toStrictEqual(new Map([['heater', false],
                                                 ['blower', false],
                                                 ['dehumidifier', false],
                                                 ['humidifier', false]]));

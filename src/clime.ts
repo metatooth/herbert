@@ -18,7 +18,7 @@ export class Clime {
         return utils.SaturatedVaporPressure(this.temperature);
     }
 
-    vpd() {
+    vpd(): number {
         return utils.VaporPressureDeficit(this.temperature,
                                           this.delta,
                                           this.humidity);

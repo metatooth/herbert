@@ -1,14 +1,21 @@
 {
-  "app": {
-    "port": 4300,
-    "polling": 3000
-  },
-  "interval": 30000,
-  "min-temp": 15.6,
-  "vpd-tolerance": 1,
+  "id": "CX",
+  "port": 4300,
+  "polling": 3,
+  "interval": 30,
+  "ws-url": "ws://localhost:8080",
+  "intake-meter": "aaaaaaaaaaaa",
+  "main-meter": "bbbbbbbbbbbb",
   "environment": {
-    "lamp-start": 6,
-    "lamp-duration": 12,
+    "strategy": "constant-vpd",
+    "lamp": {
+      "start": 6,
+      "duration": 18
+    },
+    "blower": {
+      "cycle": 180,
+      "active": 30
+    },
     "lamp-on": {
        "temperature": 25.3,
        "delta": 0.6,
@@ -18,13 +25,14 @@
        "temperature": 23.1,
        "delta": 0.0,
        "humidity": 0.55
-    }
+    },
+    "temp-tolerance": 0.1,
+    "humidity-tolerance": 1,
+    "vpd-tolerance": 1,
+    "temp-minimum": 15.6
   },
-  "intake-meter": "aaaaaaaaaaaa",
-  "main-meter": "bbbbbbbbbbbb",
   "wyze": {
-      "username": null,
-      "password": null,
-      "device-prefix": "CX"
+      "username": "terry@aggalt.com",
+      "password": ""
     }
 }

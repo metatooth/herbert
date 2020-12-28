@@ -1,31 +1,17 @@
-import * as fs from 'fs';
-import * as config from 'config';
-
 import * as Switchbot from 'node-switchbot';
-const switchbot = new Switchbot;
-
+import * as WebSocket from 'ws';
 import * as Wyze from 'wyze-node';
-
-const options = {
-    username: config.get('wyze.username') || process.env.USERNAME,
-    password: config.get('wyze.password') || process.env.PASSWORD,
-};
-
-const wyze = new Wyze(options);
-
-import { BlowerTimer } from './blower-timer';
-import { LampTimer } from './lamp-timer';
-import { GrowLog } from './grow-log';
-import { Environment } from './environment';
-
-import {Clime} from './clime';
-import {TargetTempHumidity} from './target-temp-humidity';
-import {ConstantVpd} from './constant-vpd';
-import {AirDirectives} from './air-directives';
+import * as config from 'config';
+import * as fs from 'fs';
 
 import * as utils from './utils';
-
-const growlog: GrowLog = new GrowLog(process.env.NODE_ENV + '.db');
+import { AirDirectives } from './air-directives';
+import { BlowerTimer } from './blower-timer';
+import { Clime } from './clime';
+import { ConstantVpd } from './constant-vpd';
+import { GrowLog } from './grow-log';
+import { LampTimer } from './lamp-timer';
+import { TargetTempHumidity } from './target-temp-humidity';
 
 try {
     fs.mkdirSync('./log');
@@ -49,6 +35,11 @@ export class App {
     night: AirDirectives;
     lamps: LampTimer;
     blowers: BlowerTimer;
+    last: [number, number];
+    socket: WebSocket;
+    systems: Map<string, boolean>;
+    growlog: GrowLog;
+    wyze: any;
 
     private constructor() {
         this.initialized = false;
@@ -102,64 +93,103 @@ export class App {
                     config.get('environment.lamp-off.temperature'),
                     config.get('environment.lamp-off.humidity')]));
         }
-    }
 
-    async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
-        const result: Map<string, boolean> = new Map([
+        this.socket = new WebSocket(config.get('ws-url'));
+
+        this.socket.on('open', () => {
+            const data = {
+                id: config.get('id'),
+                started_at: new Date()
+            };
+
+            this.socket.send(JSON.stringify(data));
+        });
+
+        this.systems = new Map([
             ['heater', false],
             ['blower', false],
             ['humidifier', false],
             ['dehumidifier', false],
         ]);
 
+        this.growlog = new GrowLog(process.env.NODE_ENV + '.db');
+
+        const options = {
+            username: config.get('wyze.username') || process.env.USERNAME,
+            password: config.get('wyze.password') || process.env.PASSWORD,
+        };
+
+        this.wyze = new Wyze(options);
+    }
+
+    async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
         if (ad.id === config.get('main-meter')) {
             logger.debug(`main meter id ${ad.id}`);
-            
+
+            this.systems.set('heater', false);
+            this.systems.set('blower', false);
+            this.systems.set('humidifier', false);
+            this.systems.set('dehumidifier', false);
+
             const t = ad.serviceData.temperature.c;
             const h = ad.serviceData.humidity / 100.0;
 
-            growlog.track(t, h);
+            if (this.last[0] !== t || this.last[1] !== h) {
+                this.growlog.track(t, h);
+               
+                const data = {
+                    id: config.get('id'),
+                    temperature: t,
+                    humidity: h,
+                    updated_at: new Date()
+                };
+
+                this.socket.send(JSON.stringify(data));
+
+                const hour = (new Date()).getHours();
+                const app = App.instance();
+                let directive: AirDirectives;
+                let d: number;
             
-            const hour = (new Date()).getHours();
-            const app = App.instance();
-            let directive: AirDirectives;
-            let d: number;
-
-            if (app.lamps.isOn(hour)) {
-                directive = app.day;
-                d = -0.6;
-            } else {
-                directive = app.night;
-                d = 0.6;
-            }
+                if (app.lamps.isOn(hour)) {
+                    directive = app.day;
+                    d = -0.6;
+                } else {
+                    directive = app.night;
+                    d = 0.6;
+                }
             
-            directive.clime = new Clime(t, d, h);
-            directive.monitor();
+                directive.clime = new Clime(t, d, h);
+                directive.monitor();
 
-            logger.debug(directive);
+                logger.debug(directive);
 
-            if (directive.temperature === 'heat') {
-                app.on('heater');
-                result.set('heater', true);
-            } else if (directive.temperature === 'cool') {
-                app.off('heater');
-                app.on('blower');
-                result.set('blower', true);                
-            } else {
-                app.off('heater');
-            }
+                if (directive.temperature === 'heat') {
+                    app.on('heater');
+                    this.systems.set('heater', true);
+                } else if (directive.temperature === 'cool') {
+                    app.off('heater');
+                    app.on('blower');
+                    this.systems.set('blower', true);                
+                } else {
+                    app.off('heater');
+                }
 
-            if (directive.humidity === 'humidify') {
-                app.off('dehumidifier');
-                app.on('humidifier');
-                result.set('humidifier', true);
-            } else if (directive.humidity === 'dehumidify') {
-                app.on('dehumidifier');
-                app.off('humidifier');
-                result.set('dehumidifier', true);
-            } else {
-                app.off('dehumidifier');
-                app.off('humidifier');
+                if (directive.humidity === 'humidify') {
+                    app.off('dehumidifier');
+                    app.on('humidifier');
+                    this.systems.set('humidifier', true);
+                } else if (directive.humidity === 'dehumidify') {
+                    app.on('dehumidifier');
+                    app.off('humidifier');
+                    this.systems.set('dehumidifier', true);
+                } else {
+                    app.off('dehumidifier');
+                    app.off('humidifier');
+                }
+
+                this.last[0] = t;
+                this.last[1] = h;
             }
         } else {
             logger.debug('XXX advertisement XXX');
@@ -167,7 +197,7 @@ export class App {
             logger.debug('XXX advertisement XXX');
         }
 
-        return result;
+        return this.systems;
     }
 
     async init(): Promise<boolean> {
@@ -182,16 +212,16 @@ export class App {
         const types: Map<string, Array<string>> = this.types;
 
         return new Promise((resolve) => {
-            wyze.getDeviceList().then((dlist: Array<Device>) => {
+            this.wyze.getDeviceList().then((dlist: Array<Device>) => {
                 dlist.forEach((device: Device) => {
                     logger.debug(device.nickname);
                     const nick: string = device.nickname;
-                    const prefix: string = config.get('environment.prefix');
+                    const id: string = config.get('id');
                     types.forEach((value: Array<string>, key: string) => {
-                        if (nick.match(new RegExp(`^${prefix} ${key}`, 'i'))) {
+                        if (nick.match(new RegExp(`^${id} ${key}`, 'i'))) {
                             logger.debug('MATCHED!');
                             logger.debug(device);
-                            wyze.getDeviceState(device)
+                            this.wyze.getDeviceState(device)
                                 .then((state: DeviceState) => {
                                     logger.debug(state);
                                 });
@@ -221,11 +251,11 @@ export class App {
      * Turn off named devices
      * @param {string} name
      */
-    async off(name: string): Promise<boolean> {
+    private async off(name: string): Promise<boolean> {
         logger.info(`OFF ${name}`);
         this.types.get(name).forEach(async (value: string) => {
-            const device = await wyze.getDeviceByName(value);
-            const result = await wyze.turnOff(device);
+            const device = await this.wyze.getDeviceByName(value);
+            const result = await this.wyze.turnOff(device);
             if (result.code !== 1) {
                 logger.error(`ERROR ${value} OFF - ${result.msg}`);
             }
@@ -240,11 +270,11 @@ export class App {
      * Turn on named devices
      * @param {string} name
      */
-    async on(name: string): Promise<boolean> {
+    private async on(name: string): Promise<boolean> {
         logger.info(`ON ${name}`);
         this.types.get(name).forEach(async (value: string) => {
-            const device = await wyze.getDeviceByName(value);
-            const result = await wyze.turnOn(device);
+            const device = await this.wyze.getDeviceByName(value);
+            const result = await this.wyze.turnOn(device);
             if (result.code !== 1) {
                 logger.error(`ERROR ${value} ON - ${result.msg}`);
             }
@@ -278,15 +308,19 @@ export class App {
             app.off('blower');
         }
 
+
+        const polling: number = 1000 * parseInt(config.get('polling'));
+        const interval: number = 1000 * parseInt(config.get('interval'));
+
+        const switchbot = new Switchbot();
+
         logger.debug('Start scan ...');
         await switchbot.startScan();
         switchbot.onadvertisement = app.handler;
-        const polling: number = 1000 * parseInt(config.get('app.polling'));
         await switchbot.wait(polling);
         await switchbot.stopScan();
         logger.debug('Done scan.');
         
-        const interval: number = 1000 * parseInt(config.get('interval'));
 
         setTimeout(app.run, interval - polling);
 
