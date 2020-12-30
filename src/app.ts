@@ -94,6 +94,8 @@ export class App {
                     config.get('environment.lamp-off.humidity')]));
         }
 
+        this.last = [-1, -1];
+
         this.socket = new WebSocket(config.get('ws-url'));
 
         this.socket.on('open', () => {
@@ -125,17 +127,30 @@ export class App {
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
         if (ad.id === config.get('main-meter')) {
             logger.debug(`main meter id ${ad.id}`);
+            logger.debug(ad);
 
-            this.systems.set('heater', false);
-            this.systems.set('blower', false);
-            this.systems.set('humidifier', false);
-            this.systems.set('dehumidifier', false);
+            const app = App.instance();
+
+            app.systems.set('heater', false);
+            app.systems.set('blower', false);
+            app.systems.set('humidifier', false);
+            app.systems.set('dehumidifier', false);
+
+            logger.debug(app.systems);
 
             const t = ad.serviceData.temperature.c;
             const h = ad.serviceData.humidity / 100.0;
 
-            if (this.last[0] !== t || this.last[1] !== h) {
-                this.growlog.track(t, h);
+            logger.debug('curr temp:', t);
+            logger.debug('curr humidity:', h);
+
+            logger.debug('last:', app.last);	
+
+            logger.debug('last temp:', app.last[0]);
+            logger.debug('last humidity:', app.last[1]);
+
+            if (app.last[0] !== t || app.last[1] !== h) {
+                app.growlog.track(t, h);
                
                 const data = {
                     id: config.get('id'),
@@ -144,10 +159,9 @@ export class App {
                     updated_at: new Date()
                 };
 
-                this.socket.send(JSON.stringify(data));
+                app.socket.send(JSON.stringify(data));
 
                 const hour = (new Date()).getHours();
-                const app = App.instance();
                 let directive: AirDirectives;
                 let d: number;
             
@@ -166,11 +180,11 @@ export class App {
 
                 if (directive.temperature === 'heat') {
                     app.on('heater');
-                    this.systems.set('heater', true);
+                    app.systems.set('heater', true);
                 } else if (directive.temperature === 'cool') {
                     app.off('heater');
                     app.on('blower');
-                    this.systems.set('blower', true);                
+                    app.systems.set('blower', true);                
                 } else {
                     app.off('heater');
                 }
@@ -178,18 +192,18 @@ export class App {
                 if (directive.humidity === 'humidify') {
                     app.off('dehumidifier');
                     app.on('humidifier');
-                    this.systems.set('humidifier', true);
+                    app.systems.set('humidifier', true);
                 } else if (directive.humidity === 'dehumidify') {
                     app.on('dehumidifier');
                     app.off('humidifier');
-                    this.systems.set('dehumidifier', true);
+                    app.systems.set('dehumidifier', true);
                 } else {
                     app.off('dehumidifier');
                     app.off('humidifier');
                 }
 
-                this.last[0] = t;
-                this.last[1] = h;
+                app.last[0] = t;
+                app.last[1] = h;
             }
         } else {
             logger.debug('XXX advertisement XXX');
