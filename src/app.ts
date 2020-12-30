@@ -141,7 +141,6 @@ export class App {
     }
 
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
-	console.log('HERE??');
         const app = App.instance();
 
 	console.log('ad id:', ad.id);
