@@ -1,11 +1,22 @@
 {
-  "id": "CX",
+  "id": "HERBERT",
   "port": 4300,
   "polling": 3,
   "interval": 30,
-  "ws-url": "ws://localhost:5000",
-  "intake-meter": "aaaaaaaaaaaa",
-  "main-meter": "bbbbbbbbbbbb",
+  "ws-url": "ws://localhost:8080",
+  "meters": [
+    { "type": "intake", "id": "aaaaaaaaaaaa" },
+    { "type": "main", "id": "mock" }
+  ],
+  "air-systems": [
+      { "type": "blower", "id": "cccccccccccc" },
+      { "type": "dehumidifier", "id": "dddddddddddd" },
+      { "type": "heater", "id": "eeeeeeeeeeee" },
+      { "type": "humidifier", "id": "ffffffffffff" }
+  ],
+  "lamps": [
+      "000000000000"	
+  ],
   "environment": {
     "strategy": "constant-vpd",
     "lamp": {
@@ -33,6 +44,6 @@
   },
   "wyze": {
       "username": "terry@aggalt.com",
-      "password": ""
+      "password": "xtTHwmkqtxbeTM7"
     }
 }

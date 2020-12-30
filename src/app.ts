@@ -1,4 +1,3 @@
-import * as Switchbot from 'node-switchbot';
 import * as WebSocket from 'ws';
 import * as Wyze from 'wyze-node';
 import * as config from 'config';
@@ -11,6 +10,7 @@ import { Clime } from './clime';
 import { ConstantVpd } from './constant-vpd';
 import { GrowLog } from './grow-log';
 import { LampTimer } from './lamp-timer';
+import { Meter } from './meter';
 import { TargetTempHumidity } from './target-temp-humidity';
 
 try {
@@ -40,6 +40,7 @@ export class App {
     systems: Map<string, boolean>;
     growlog: GrowLog;
     wyze: any;
+    mainMeter: Meter;
 
     private constructor() {
         this.initialized = false;
@@ -114,7 +115,7 @@ export class App {
             ['dehumidifier', false],
         ]);
 
-        this.growlog = new GrowLog(process.env.NODE_ENV + '.db');
+        this.growlog = new GrowLog('growlog.db');
 
         const options = {
             username: config.get('wyze.username') || process.env.USERNAME,
@@ -122,14 +123,33 @@ export class App {
         };
 
         this.wyze = new Wyze(options);
+
+	logger.debug(config.get('meters'));
+
+	const meters: any[] = config.get('meters');
+
+	logger.debug(meters);
+
+	const scope = this;
+	
+	meters.forEach((meter: any) => {
+	    logger.debug('METER', meter);
+	    if (meter.type === 'main') {
+		scope.mainMeter = new Meter(meter.id);
+	    }
+	});
     }
 
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
-        if (ad.id === config.get('main-meter')) {
+	console.log('HERE??');
+        const app = App.instance();
+
+	console.log('ad id:', ad.id);
+	console.log('meter id:', app.mainMeter.id);
+	
+        if (ad.id === app.mainMeter.id) {
             logger.debug(`main meter id ${ad.id}`);
             logger.debug(ad);
-
-            const app = App.instance();
 
             app.systems.set('heater', false);
             app.systems.set('blower', false);
@@ -150,6 +170,13 @@ export class App {
             logger.debug('last humidity:', app.last[1]);
 
             if (app.last[0] !== t || app.last[1] !== h) {
+                logger.debug('changed!');
+		
+		app.systems.set('heater', false);
+		app.systems.set('blower', false);
+		app.systems.set('humidifier', false);
+		app.systems.set('dehumidifier', false);
+
                 app.growlog.track(t, h);
                
                 const data = {
@@ -211,7 +238,9 @@ export class App {
             logger.debug('XXX advertisement XXX');
         }
 
-        return this.systems;
+	logger.debug(app.systems);
+	
+        return app.systems;
     }
 
     async init(): Promise<boolean> {
@@ -271,7 +300,7 @@ export class App {
             const device = await this.wyze.getDeviceByName(value);
             const result = await this.wyze.turnOff(device);
             if (result.code !== 1) {
-                logger.error(`ERROR ${value} OFF - ${result.msg}`);
+                logger.error(`ERROR ${result.code} ${value} OFF - ${result}`);
             }
         });
 
@@ -290,7 +319,7 @@ export class App {
             const device = await this.wyze.getDeviceByName(value);
             const result = await this.wyze.turnOn(device);
             if (result.code !== 1) {
-                logger.error(`ERROR ${value} ON - ${result.msg}`);
+                logger.error(`ERROR ${result.code} ${value} ON - ${result}`);
             }
         });
 
@@ -322,20 +351,18 @@ export class App {
             app.off('blower');
         }
 
-
         const polling: number = 1000 * parseInt(config.get('polling'));
         const interval: number = 1000 * parseInt(config.get('interval'));
 
-        const switchbot = new Switchbot();
-
-        logger.debug('Start scan ...');
-        await switchbot.startScan();
-        switchbot.onadvertisement = app.handler;
-        await switchbot.wait(polling);
-        await switchbot.stopScan();
+        logger.debug('Start scan for %dms ...', polling);
+	logger.debug(app.mainMeter);
+        await app.mainMeter.startScan();
+        app.mainMeter.bot.onadvertisement = app.handler;
+        await app.mainMeter.wait(polling);
+        await app.mainMeter.stopScan();
         logger.debug('Done scan.');
-        
 
+	logger.debug('Done all. Timeout in %dms.', interval - polling);
         setTimeout(app.run, interval - polling);
 
         return new Promise((resolve) => {
