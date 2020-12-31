@@ -43,6 +43,16 @@ export class App {
     mainMeter: Meter;
 
     private constructor() {
+        console.log('process.argv', process.argv);
+
+        if (process.argv.length > 2) {
+            const arg = process.argv[2];
+            console.log('arg', arg);
+            if (arg.match(/^-C/)) {
+                console.log('matched -C!');
+            }
+        }
+
         this.initialized = false;
         this.types = new Map([
             ['meter', []],
@@ -124,28 +134,26 @@ export class App {
 
         this.wyze = new Wyze(options);
 
-	logger.debug(config.get('meters'));
+        logger.debug(config.get('meters'));
 
-	const meters: any[] = config.get('meters');
+        const meters: Array<any> = config.get('meters');
 
-	logger.debug(meters);
+        logger.debug(meters);
 
-	const scope = this;
-	
-	meters.forEach((meter: any) => {
-	    logger.debug('METER', meter);
-	    if (meter.type === 'main') {
-		scope.mainMeter = new Meter(meter.id);
-	    }
-	});
+        meters.forEach((meter: any) => {
+            logger.debug('METER', meter);
+            if (meter.type === 'main') {
+                this.mainMeter = new Meter(meter.id);
+            }
+        });
     }
 
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
         const app = App.instance();
 
-	console.log('ad id:', ad.id);
-	console.log('meter id:', app.mainMeter.id);
-	
+        console.log('ad id:', ad.id);
+        console.log('meter id:', app.mainMeter.id);
+ 
         if (ad.id === app.mainMeter.id) {
             logger.debug(`main meter id ${ad.id}`);
             logger.debug(ad);
@@ -163,19 +171,19 @@ export class App {
             logger.debug('curr temp:', t);
             logger.debug('curr humidity:', h);
 
-            logger.debug('last:', app.last);	
+            logger.debug('last:', app.last);  
 
             logger.debug('last temp:', app.last[0]);
             logger.debug('last humidity:', app.last[1]);
 
             if (app.last[0] !== t || app.last[1] !== h) {
                 logger.debug('changed!');
-		
-		app.systems.set('heater', false);
-		app.systems.set('blower', false);
-		app.systems.set('humidifier', false);
-		app.systems.set('dehumidifier', false);
 
+                app.systems.set('heater', false);
+                app.systems.set('blower', false);
+                app.systems.set('humidifier', false);
+                app.systems.set('dehumidifier', false);
+                
                 app.growlog.track(t, h);
                
                 const data = {
@@ -237,8 +245,8 @@ export class App {
             logger.debug('XXX advertisement XXX');
         }
 
-	logger.debug(app.systems);
-	
+        logger.debug(app.systems);
+
         return app.systems;
     }
 
@@ -354,14 +362,14 @@ export class App {
         const interval: number = 1000 * parseInt(config.get('interval'));
 
         logger.debug('Start scan for %dms ...', polling);
-	logger.debug(app.mainMeter);
+        logger.debug(app.mainMeter);
         await app.mainMeter.startScan();
         app.mainMeter.bot.onadvertisement = app.handler;
         await app.mainMeter.wait(polling);
         await app.mainMeter.stopScan();
         logger.debug('Done scan.');
 
-	logger.debug('Done all. Timeout in %dms.', interval - polling);
+        logger.debug('Done all. Timeout in %dms.', interval - polling);
         setTimeout(app.run, interval - polling);
 
         return new Promise((resolve) => {

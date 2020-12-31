@@ -1,6 +1,7 @@
-import WebSocket = require('ws');
-const http = require('http');
-const express = require('express');
+import * as WebSocket from 'ws';
+import * as http from 'http';
+import * as express from 'express';
+
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -13,7 +14,7 @@ console.log('http server listening on %d', port);
 const wss = new WebSocket.Server({server: server});
 console.log('websocket server created');
 
-let sockets: any[] = [];
+let sockets: WebSocket[] = [];
 wss.on('connection', function(socket: WebSocket) {
     console.log('websocket connection open');
     sockets.push(socket);

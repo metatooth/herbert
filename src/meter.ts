@@ -4,28 +4,28 @@ import { Mockbot } from './mockbot';
 
 export class Meter {
     id: string;
-    bot: any;
+    bot;
     
     constructor(id: string) {
-	console.log('mockbot ctor', id);
-	this.id = id;
+        console.log('mockbot ctor', id);
+        this.id = id;
 
-	if (this.id === 'mock') {
-	    this.bot = new Mockbot();
-	} else {
-	    this.bot = new Switchbot();
-	}
+        if (this.id === 'mock') {
+            this.bot = new Mockbot();
+        } else {
+            this.bot = new Switchbot();
+        }
     }
 
-    public async startScan() {
-	return this.bot.startScan();
+    public async startScan(): Promise<boolean> {
+        return this.bot.startScan();
     }
 
-    public async wait(ms: number) {
-	return this.bot.wait(ms);
+    public async wait(ms: number): Promise<boolean> {
+        return this.bot.wait(ms);
     }
 
-    public async stopScan() {
-	return this.bot.stopScan();
+    public async stopScan(): Promise<boolean> {
+        return this.bot.stopScan();
     }
 }

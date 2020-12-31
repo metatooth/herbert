@@ -22,18 +22,7 @@
         <div class="column is-two-thirds">
           <h1 class="title">Environments</h1>
           <div class="columns">
-            <div class="column">
-              <div id="herbert" class="tile">
-                <h2>HERBERT</h2>
-                <div>
-                  <span class="icon"><i class="fas fa-thermometer-half"></i></span>
-                  <span><input class="display" type="text" id="temp" readonly>&#176;C</span>
-                </div>
-                <div>
-                  <span class="icon"><i class="fas fa-tint"></i></span>
-                  <span><input class="display" type="text" id="humidity" readonly>%</span>
-                </div>
-              </div>
+            <div id="displays" class="column">
             </div>
           </div>
         </div>
@@ -86,31 +75,92 @@
           return n;
       }
 
-      const t = observable(24.0);
-      const h = observable(53);
+      function createReadout(icon, name, text) {
+          const readout = document.createElement('div');
+          const span = document.createElement('span');
+          span.setAttribute('class', 'icon');
+          const i = document.createElement('i');
+          i.setAttribute('class', 'fas fa-'+icon);
+          span.appendChild(i);
+          readout.appendChild(span);
+          const display = document.createElement('span');
+          const input = document.createElement('input');
+          input.setAttribute('class', 'display');
+          input.setAttribute('type', 'text');
+          input.setAttribute('id', name);
+          display.appendChild(input);
+          display.appendChild(document.createTextNode(text));
+          readout.appendChild(display);
 
-      const ttext = document.getElementById('temp');
-      bindValue(ttext, t, 1);
+          return readout;
+      }
 
-      const htext = document.getElementById('humidity'); 
-      bindValue(htext, h, 0);
+      function createDisplay(data) {
+          const display = document.createElement('div');
+          display.setAttribute('id', data.id);
+          display.setAttribute('class', 'tile');
+
+          const title = document.createElement('h2');
+          title.appendChild(document.createTextNode(data.id));
+
+          display.appendChild(title);
+
+          const temp = createReadout('thermometer-half', data.id+'-temp', '°C');
+          display.appendChild(temp);
+
+          const humid = createReadout('tint', data.id+'-humidity', '%');
+          display.appendChild(humid);
+
+          return display;
+      }
+
+      function createPing(data) {
+          const date = new Date(data.updated_at);
+          const at = `${zeroes(date.getHours())}:${zeroes(date.getMinutes())}:${zeroes(date.getSeconds())}`;
+          let entry = `${at}&nbsp;`;
+          entry += `${data.id}&nbsp;`;
+          entry += `${data.temperature.toFixed(1)}&#176;C&nbsp;`;
+          entry += `${(100*data.humidity).toFixed(0)}%&nbsp;`;
+
+          const li = document.createElement('li');
+          li.innerHTML = entry;
+
+          return li;
+      }
+
+      const climes = new Map();
 
       const host = location.origin.replace(/^http/, 'ws')
       const ws = new WebSocket(host);
       ws.onmessage = function (event) {
-        const li = document.createElement('li');
         console.log(event.data);
         const data = JSON.parse(event.data);
-        t(data.temperature);
-        h(100*data.humidity);
-        const date = new Date(data.updated_at);
-        const at = `${zeroes(date.getHours())}:${zeroes(date.getMinutes())}`;
-        let entry = `${at}&nbsp;`; 
-        entry += `${data.id}&nbsp;`;
-        entry += `${data.temperature.toFixed(1)}&#176;C&nbsp;`;
-        entry += `${(100*data.humidity).toFixed(0)}%&nbsp;`;
-        li.innerHTML = entry;
-        document.querySelector('#pings').appendChild(li);
+
+        let display = document.querySelector('#' + data.id);
+        if (data.started_at !== null && display === null) {
+            display = createDisplay(data);
+            document.querySelector('#displays').appendChild(display);
+
+            climes.set(data.id, [0, 0]);
+            const clime = climes.get(data.id);
+
+            clime[0] = observable(data.temperature);
+            const ttext = document.getElementById(data.id+'-temp');
+            bindValue(ttext, clime[0], 1);
+
+            clime[1] = observable(data.humidity);
+            const htext = document.getElementById(data.id+'-humidity');
+            bindValue(htext, clime[1], 0);
+        }
+
+        const clime = climes.get(data.id);
+
+        clime[0](data.temperature);
+        clime[1](100*data.humidity);
+
+        const ping = createPing(data);
+        const pings = document.querySelector('#pings');
+        pings.insertBefore(ping, pings.childNodes[0]);
       };
     </script>
   </body>

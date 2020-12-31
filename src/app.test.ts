@@ -1,7 +1,7 @@
 import { App } from './app';
 
 import * as WebSocket from 'ws';
-let server: any;
+let server: WebSocket.Server;
 
 beforeEach(() => {
     server = new WebSocket.Server({
