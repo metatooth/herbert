@@ -3,7 +3,7 @@
   "port": 4300,
   "polling": 3,
   "interval": 30,
-  "ws-url": "ws://localhost:8080",
+  "ws-url": "ws://localhost:5000",
   "meters": [
     { "type": "intake", "id": "aaaaaaaaaaaa" },
     { "type": "main", "id": "mock" }

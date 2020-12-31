@@ -1,34 +1,108 @@
-<html>
+<!DOCTYPE html>
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Herbert!</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <script src="https://kit.fontawesome.com/f2e9d13f99.js" crossorigin="anonymous"></script>
     <style>
-      body {
-        font-family: "Helvetica Neue", helvetica, arial;
-        padding: 15px;
-      }
-
-      ul {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      ul li {
-        line-height: 1.4;
+      .display {
+          border: 0;
+          width: 30px;
       }
     </style>
-
+  </head>
+  <body>
+    <section class="section">
+      <h1 class="title"><img width="25" src="JD-15-512.png"/> Herbert</h1>
+      <h2 class="subtitle">Growing Cannabis</h2>
+    </section>
+    <section class="section">
+      <div class="columns">
+        <div class="column is-two-thirds">
+          <h1 class="title">Environments</h1>
+          <div class="columns">
+            <div id="herbert" class="column">
+              <h2>HERBERT</h2>
+              <div class="tile">
+                <span class="icon"><i class="fas fa-thermometer-half"></i></span>
+                <span><input class="display" type="text" id="temp" readonly>&#176;C</span>
+              </div>
+              <div class="tile"> 
+                <span class="icon"><i class="fas fa-tint"></i></span>
+                <span><input class="display" type="text" id="humidity" readonly>%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <h1 class="title">Pings</h1>
+          <ul id="pings"></ul>
+        </div>
+      </div>
+    </section>
     <script>
-      var host = location.origin.replace(/^http/, 'ws')
-      var ws = new WebSocket(host);
+      const _n = [24.1, 53], _nListeners = [];
+      function n(n) {
+          if (arguments.length && n !== _n) {
+              _n = n;
+              _nListeners.forEach((listener) => { listener(n); });
+          }
+          return _n;
+      }
+      n.subscribe = (listener) => { _nListeners.push(listener) };
+
+      function observable(value) {
+          const listeners = [];
+
+          function notify(newValue) {
+              listeners.forEach((listener) => { listener(newValue); });
+          }
+
+          function accessor(newValue) {
+              if (arguments.length && newValue !== value) {
+                  value = newValue;
+                  notify(newValue);
+              }
+              return value;
+          }
+
+          accessor.subscribe = (listener) => { listeners.push(listener); };
+
+          return accessor;
+      }
+
+      function bindValue(input, observable, precision) {
+          input.value = observable();
+          observable.subscribe(() => { input.value = observable().toFixed(precision); });
+      }
+
+      const t = observable(24.0);
+      const h = observable(53);
+
+      const ttext = document.getElementById('temp');
+      bindValue(ttext, t, 1);
+
+      const htext = document.getElementById('humidity'); 
+      bindValue(htext, h, 0);
+
+      const host = location.origin.replace(/^http/, 'ws')
+      const ws = new WebSocket(host);
       ws.onmessage = function (event) {
-        var li = document.createElement('li');
-        li.innerHTML = JSON.parse(event.data);
+        const li = document.createElement('li');
+        console.log(event.data);
+        const data = JSON.parse(event.data);
+        t(data.temperature);
+        h(100*data.humidity);
+        const date = new Date(data.updated_at);
+        const at = `${date.getHours()}:${date.getMinutes()}`;
+        let entry = `${at}&nbsp;`; 
+        entry += `${data.id}&nbsp;`;
+        entry += `${data.temperature.toFixed(1)}&nbsp;`;
+        entry += `${(100*data.humidity).toFixed(0)}&nbsp;`;
+        li.innerHTML = entry;
         document.querySelector('#pings').appendChild(li);
       };
     </script>
-  </head>
-  <body>
-    <h1>Pings</h1>
-    <ul id='pings'></ul>
   </body>
 </html>

@@ -15,10 +15,6 @@ console.log('websocket server created');
 
 let sockets: any[] = [];
 wss.on('connection', function(socket: WebSocket) {
-    const id = setInterval(() => {
-        socket.send(JSON.stringify(new Date()), () => {});
-    }, 1000);
-
     console.log('websocket connection open');
     sockets.push(socket);
 
@@ -31,6 +27,5 @@ wss.on('connection', function(socket: WebSocket) {
     // When a socket closes, or disconnects, remove it from the array.
     socket.on('close', function() {
         sockets = sockets.filter(s => s !== socket);
-        clearInterval(id);
     });
 });
