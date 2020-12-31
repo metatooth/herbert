@@ -14,7 +14,7 @@
   </head>
   <body>
     <section class="section">
-      <h1 class="title"><img width="25" src="JD-15-512.png"/> Herbert</h1>
+      <h1 class="title"><img width="40" src="JD-15-512.png"/> Herbert</h1>
       <h2 class="subtitle">Growing Cannabis</h2>
     </section>
     <section class="section">
@@ -22,15 +22,17 @@
         <div class="column is-two-thirds">
           <h1 class="title">Environments</h1>
           <div class="columns">
-            <div id="herbert" class="column">
-              <h2>HERBERT</h2>
-              <div class="tile">
-                <span class="icon"><i class="fas fa-thermometer-half"></i></span>
-                <span><input class="display" type="text" id="temp" readonly>&#176;C</span>
-              </div>
-              <div class="tile"> 
-                <span class="icon"><i class="fas fa-tint"></i></span>
-                <span><input class="display" type="text" id="humidity" readonly>%</span>
+            <div class="column">
+              <div id="herbert" class="tile">
+                <h2>HERBERT</h2>
+                <div>
+                  <span class="icon"><i class="fas fa-thermometer-half"></i></span>
+                  <span><input class="display" type="text" id="temp" readonly>&#176;C</span>
+                </div>
+                <div>
+                  <span class="icon"><i class="fas fa-tint"></i></span>
+                  <span><input class="display" type="text" id="humidity" readonly>%</span>
+                </div>
               </div>
             </div>
           </div>
@@ -77,6 +79,13 @@
           observable.subscribe(() => { input.value = observable().toFixed(precision); });
       }
 
+      function zeroes(n) {
+          if (n < 10) {
+              return '0' + n;
+          }
+          return n;
+      }
+
       const t = observable(24.0);
       const h = observable(53);
 
@@ -95,11 +104,11 @@
         t(data.temperature);
         h(100*data.humidity);
         const date = new Date(data.updated_at);
-        const at = `${date.getHours()}:${date.getMinutes()}`;
+        const at = `${zeroes(date.getHours())}:${zeroes(date.getMinutes())}`;
         let entry = `${at}&nbsp;`; 
         entry += `${data.id}&nbsp;`;
-        entry += `${data.temperature.toFixed(1)}&nbsp;`;
-        entry += `${(100*data.humidity).toFixed(0)}&nbsp;`;
+        entry += `${data.temperature.toFixed(1)}&#176;C&nbsp;`;
+        entry += `${(100*data.humidity).toFixed(0)}%&nbsp;`;
         li.innerHTML = entry;
         document.querySelector('#pings').appendChild(li);
       };
