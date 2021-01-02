@@ -110,13 +110,17 @@ export class App {
         this.socket = new WebSocket(config.get('ws-url'));
 
         this.socket.on('open', () => {
-            const data = {
+	    const data = {
                 id: config.get('id'),
                 started_at: new Date()
-            };
+	    };
 
-            this.socket.send(JSON.stringify(data));
+	    this.socket.send(JSON.stringify(data));
         });
+
+	this.socket.on('close', () => {
+	    logger.debug('THIS SOCKET IS CLOSED');
+	});
 
         this.systems = new Map([
             ['heater', false],
@@ -181,6 +185,14 @@ export class App {
 		logger.debug('checking app socket...');
 		logger.debug('ready state:', app.socket.readyState);
 		logger.debug('done.');
+
+		if (app.socket.readyState !== 1) {
+		    app.socket = new WebSocket(config.get('ws-url'));
+
+		    app.socket.on('close', () => {
+			logger.debug('THIS SOCKET IS CLOSED');
+		    });
+		}
 
                 app.socket.send(JSON.stringify(data));
 
@@ -293,8 +305,8 @@ export class App {
         this.types.get(name).forEach(async (value: string) => {
             const device = await this.wyze.getDeviceByName(value);
             const result = await this.wyze.turnOff(device);
-            if (result.code !== 1) {
-                logger.error(`ERROR ${result.code} ${value} OFF - ${result}`);
+            if (result.code !== '1') {
+                logger.error(`ERROR ${result.code} ${value} OFF - ${JSON.stringify(result)}`);
             }
         });
 
@@ -312,8 +324,8 @@ export class App {
         this.types.get(name).forEach(async (value: string) => {
             const device = await this.wyze.getDeviceByName(value);
             const result = await this.wyze.turnOn(device);
-            if (result.code !== 1) {
-                logger.error(`ERROR ${result.code} ${value} ON - ${result}`);
+            if (result.code !== '1') {
+                logger.error(`ERROR ${result.code} ${value} ON - ${JSON.stringify(result)}`);
             }
         });
 
