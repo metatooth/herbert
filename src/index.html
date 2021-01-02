@@ -33,16 +33,6 @@
       </div>
     </section>
     <script>
-      const _n = [24.1, 53], _nListeners = [];
-      function n(n) {
-          if (arguments.length && n !== _n) {
-              _n = n;
-              _nListeners.forEach((listener) => { listener(n); });
-          }
-          return _n;
-      }
-      n.subscribe = (listener) => { _nListeners.push(listener) };
-
       function observable(value) {
           const listeners = [];
 
@@ -151,16 +141,16 @@
             clime[1] = observable(data.humidity);
             const htext = document.getElementById(data.id+'-humidity');
             bindValue(htext, clime[1], 0);
-        }
+        } else {
+            const clime = climes.get(data.id);
 
-        const clime = climes.get(data.id);
+            clime[0](data.temperature);
+            clime[1](100*data.humidity);
 
-        clime[0](data.temperature);
-        clime[1](100*data.humidity);
-
-        const ping = createPing(data);
-        const pings = document.querySelector('#pings');
-        pings.insertBefore(ping, pings.childNodes[0]);
+            const ping = createPing(data);
+            const pings = document.querySelector('#pings');
+            pings.insertBefore(ping, pings.childNodes[0]);
+	}
       };
     </script>
   </body>

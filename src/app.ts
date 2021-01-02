@@ -134,11 +134,7 @@ export class App {
 
         this.wyze = new Wyze(options);
 
-        logger.debug(config.get('meters'));
-
         const meters: Array<any> = config.get('meters');
-
-        logger.debug(meters);
 
         meters.forEach((meter: any) => {
             logger.debug('METER', meter);
@@ -151,19 +147,8 @@ export class App {
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
         const app = App.instance();
 
-        console.log('ad id:', ad.id);
-        console.log('meter id:', app.mainMeter.id);
- 
         if (ad.id === app.mainMeter.id) {
             logger.debug(`main meter id ${ad.id}`);
-            logger.debug(ad);
-
-            app.systems.set('heater', false);
-            app.systems.set('blower', false);
-            app.systems.set('humidifier', false);
-            app.systems.set('dehumidifier', false);
-
-            logger.debug(app.systems);
 
             const t = ad.serviceData.temperature.c;
             const h = ad.serviceData.humidity / 100.0;
@@ -192,6 +177,10 @@ export class App {
                     humidity: h,
                     updated_at: new Date()
                 };
+
+		logger.debug('checking app socket...');
+		logger.debug('ready state:', app.socket.readyState);
+		logger.debug('done.');
 
                 app.socket.send(JSON.stringify(data));
 
@@ -240,9 +229,7 @@ export class App {
                 app.last[1] = h;
             }
         } else {
-            logger.debug('XXX advertisement XXX');
-            logger.debug(ad);
-            logger.debug('XXX advertisement XXX');
+            logger.debug(`XXX advertisement ${ad.id} XXX`);
         }
 
         logger.debug(app.systems);
@@ -362,7 +349,6 @@ export class App {
         const interval: number = 1000 * parseInt(config.get('interval'));
 
         logger.debug('Start scan for %dms ...', polling);
-        logger.debug(app.mainMeter);
         await app.mainMeter.startScan();
         app.mainMeter.bot.onadvertisement = app.handler;
         await app.mainMeter.wait(polling);
