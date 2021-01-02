@@ -144,7 +144,9 @@
 		  clime[1] = observable(data.humidity);
 		  const htext = document.getElementById(data.id+'-humidity');
 		  bindValue(htext, clime[1], 0);
-              } else {
+              }
+
+	      if (display) {
 		  const clime = climes.get(data.id);
 
 		  clime[0](data.temperature);
