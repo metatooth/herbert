@@ -121,36 +121,48 @@
       const climes = new Map();
 
       const host = location.origin.replace(/^http/, 'ws')
-      const ws = new WebSocket(host);
-      ws.onmessage = function (event) {
-        console.log(event.data);
-        const data = JSON.parse(event.data);
 
-        let display = document.querySelector('#' + data.id);
-        if (data.started_at !== null && display === null) {
-            display = createDisplay(data);
-            document.querySelector('#displays').appendChild(display);
+      function startWebSocket() {
+	  let ws = new WebSocket(host);
 
-            climes.set(data.id, [0, 0]);
-            const clime = climes.get(data.id);
+	  ws.onmessage = (event) => {
+              console.log(event.data);
+              const data = JSON.parse(event.data);
 
-            clime[0] = observable(data.temperature);
-            const ttext = document.getElementById(data.id+'-temp');
-            bindValue(ttext, clime[0], 1);
+              let display = document.querySelector('#' + data.id);
+              if (data.started_at !== null && display === null) {
+		  display = createDisplay(data);
+		  document.querySelector('#displays').appendChild(display);
 
-            clime[1] = observable(data.humidity);
-            const htext = document.getElementById(data.id+'-humidity');
-            bindValue(htext, clime[1], 0);
-        } else {
-            const clime = climes.get(data.id);
+		  climes.set(data.id, [0, 0]);
+		  const clime = climes.get(data.id);
 
-            clime[0](data.temperature);
-            clime[1](100*data.humidity);
+		  clime[0] = observable(data.temperature);
+		  const ttext = document.getElementById(data.id+'-temp');
+		  bindValue(ttext, clime[0], 1);
 
-            const ping = createPing(data);
-            const pings = document.querySelector('#pings');
-            pings.insertBefore(ping, pings.childNodes[0]);
-	}
+		  clime[1] = observable(data.humidity);
+		  const htext = document.getElementById(data.id+'-humidity');
+		  bindValue(htext, clime[1], 0);
+              } else {
+		  const clime = climes.get(data.id);
+
+		  clime[0](data.temperature);
+		  clime[1](100*data.humidity);
+
+		  const ping = createPing(data);
+		  const pings = document.querySelector('#pings');
+		  pings.insertBefore(ping, pings.childNodes[0]);
+	      }
+	  }
+
+	  ws.onclose = () => {
+	      console.log('websocket is closed! reconnecting...');
+	      ws = null;
+	      setTimeout(startWebSocket, 5000);
+	  }
+
+	  startWebSocket();
       };
     </script>
   </body>
