@@ -55,13 +55,11 @@ export class App {
 
         this.initialized = false;
         this.types = new Map([
-            ['meter', []],
             ['blower', []],
-            ['lamp', []],
+            ['dehumidifier', []],
             ['heater', []],
             ['humidifier', []],
-            ['dehumidifier', []],
-            ['AC', []],
+            ['lamp', []],
         ]);
 
         this.lamps = new LampTimer(
@@ -109,24 +107,12 @@ export class App {
 
         this.socket = new WebSocket(config.get('ws-url'));
 
-        this.socket.on('open', () => {
-	    const data = {
-                id: config.get('id'),
-                started_at: new Date()
-	    };
-
-	    this.socket.send(JSON.stringify(data));
-        });
-
-	this.socket.on('close', () => {
-	    logger.debug('THIS SOCKET IS CLOSED');
-	});
-
         this.systems = new Map([
-            ['heater', false],
             ['blower', false],
-            ['humidifier', false],
             ['dehumidifier', false],
+            ['heater', false],
+            ['humidifier', false],
+            ['lamp', false],
         ]);
 
         this.growlog = new GrowLog('growlog.db');
@@ -157,13 +143,8 @@ export class App {
             const t = ad.serviceData.temperature.c;
             const h = ad.serviceData.humidity / 100.0;
 
-            logger.debug('curr temp:', t);
-            logger.debug('curr humidity:', h);
-
+            logger.debug('curr:', [t, h]);
             logger.debug('last:', app.last);  
-
-            logger.debug('last temp:', app.last[0]);
-            logger.debug('last humidity:', app.last[1]);
 
             if (app.last[0] !== t || app.last[1] !== h) {
                 logger.debug('changed!');
@@ -175,27 +156,6 @@ export class App {
                 
                 app.growlog.track(t, h);
                
-                const data = {
-                    id: config.get('id'),
-                    temperature: t,
-                    humidity: h,
-                    updated_at: new Date()
-                };
-
-		logger.debug('checking app socket...');
-		logger.debug('ready state:', app.socket.readyState);
-		logger.debug('done.');
-
-		if (app.socket.readyState !== 1) {
-		    app.socket = new WebSocket(config.get('ws-url'));
-
-		    app.socket.on('close', () => {
-			logger.debug('THIS SOCKET IS CLOSED');
-		    });
-		}
-
-                app.socket.send(JSON.stringify(data));
-
                 const hour = (new Date()).getHours();
                 let directive: AirDirectives;
                 let d: number;
@@ -236,6 +196,32 @@ export class App {
                     app.off('dehumidifier');
                     app.off('humidifier');
                 }
+
+		const data = {
+		    id: config.get('id'),
+                    temperature: t,
+                    humidity: h,
+		    blower: app.systems.get('blower'),
+		    dehumidifier: app.systems.get('dehumidifier'),
+		    heater: app.systems.get('heater'),
+		    humidifier: app.systems.get('humidifier'),
+		    lamp: app.systems.get('lamp'),
+                    updated_at: new Date()
+                };
+
+		logger.debug('checking app socket...');
+		logger.debug('ready state:', app.socket.readyState);
+		logger.debug('done.');
+
+		if (app.socket.readyState !== 1) {
+		    app.socket = new WebSocket(config.get('ws-url'));
+
+		    app.socket.on('close', () => {
+			logger.debug('THIS SOCKET IS CLOSED');
+		    });
+		}
+
+                app.socket.send(JSON.stringify(data));
 
                 app.last[0] = t;
                 app.last[1] = h;
@@ -347,14 +333,18 @@ export class App {
 
         if (app.lamps.isOn(hour)) {
             app.on('lamp');
+	    app.systems.set('lamp', true);
         } else {
             app.off('lamp');
+	    app.systems.set('lamp', false);
         }
 
         if (app.blowers.isOn(min * 60 + sec)) {
             app.on('blower');
+	    app.systems.set('blower', true);
         } else {
             app.off('blower');
+	    app.systems.set('blower', false);
         }
 
         const polling: number = 1000 * parseInt(config.get('polling'));
