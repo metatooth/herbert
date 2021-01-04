@@ -7,7 +7,6 @@ export class Meter {
     bot;
     
     constructor(id: string) {
-        console.log('mockbot ctor', id);
         this.id = id;
 
         if (this.id === 'mock') {

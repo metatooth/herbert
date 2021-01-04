@@ -5,27 +5,36 @@
   "interval": 30,
   "ws-url": "ws://localhost:5000",
   "meters": [
-    { "type": "intake", "id": "aaaaaaaaaaaa" },
-    { "type": "main", "id": "mock" }
+    { "type": "main", "id": "mock" },
+    { "type": "intake", "id": "aaaaaaaaaaaa" }
   ],
   "air-systems": [
-      { "type": "blower", "id": "cccccccccccc" },
-      { "type": "dehumidifier", "id": "dddddddddddd" },
-      { "type": "heater", "id": "eeeeeeeeeeee" },
-      { "type": "humidifier", "id": "ffffffffffff" }
+      { "type": "blower", "id": "bbbbbbbbbbbb" },
+      { "type": "dehumidifier", "id": "cccccccccccc" },
+      { "type": "heater", "id": "dddddddddddd" },
+      { "type": "humidifier", "id": "eeeeeeeeeeee" } 
   ],
   "lamps": [
-      "000000000000"	
+      "ffffffffffff"
+  ],
+  "plugs": [
+      { 
+          "type": "wyze",
+          "prefix": "HERB",
+          "username": "terry@aggalt.com",
+          "password": ""
+      }
   ],
   "environment": {
-    "strategy": "constant-vpd",
+    "strategies": "temp-humidity|constant-vpd",
+    "strategy": "temp-humidity",
     "lamp": {
       "start": 6,
       "duration": 18
     },
     "blower": {
       "cycle": 180,
-      "active": 30
+      "active": 60
     },
     "lamp-on": {
        "temperature": 25.3,
@@ -41,9 +50,5 @@
     "humidity-tolerance": 1,
     "vpd-tolerance": 1,
     "temp-minimum": 15.6
-  },
-  "wyze": {
-      "username": "terry@aggalt.com",
-      "password": ""
-    }
+  }
 }

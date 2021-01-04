@@ -1,5 +1,4 @@
 import * as WebSocket from 'ws';
-import * as Wyze from 'wyze-node';
 import * as config from 'config';
 import * as fs from 'fs';
 
@@ -11,6 +10,8 @@ import { ConstantVpd } from './constant-vpd';
 import { GrowLog } from './grow-log';
 import { LampTimer } from './lamp-timer';
 import { Meter } from './meter';
+import { Plug } from './plug';
+import { PlugFactory } from './plug-factory';
 import { TargetTempHumidity } from './target-temp-humidity';
 
 try {
@@ -30,7 +31,6 @@ const logger = log4js.getLogger('app');
 export class App {
     private static _instance: App;
     initialized: boolean;
-    types: Map<string, Array<string>>;
     day: AirDirectives;
     night: AirDirectives;
     lamps: LampTimer;
@@ -39,8 +39,8 @@ export class App {
     socket: WebSocket;
     systems: Map<string, boolean>;
     growlog: GrowLog;
-    wyze: any;
     mainMeter: Meter;
+    plugs: Map<string, Array<Plug>>;
 
     private constructor() {
         console.log('process.argv', process.argv);
@@ -52,15 +52,6 @@ export class App {
                 console.log('matched -C!');
             }
         }
-
-        this.initialized = false;
-        this.types = new Map([
-            ['blower', []],
-            ['dehumidifier', []],
-            ['heater', []],
-            ['humidifier', []],
-            ['lamp', []],
-        ]);
 
         this.lamps = new LampTimer(
             parseInt(config.get('environment.lamp.start')),
@@ -114,15 +105,8 @@ export class App {
             ['humidifier', false],
             ['lamp', false],
         ]);
-
+        
         this.growlog = new GrowLog('growlog.db');
-
-        const options = {
-            username: config.get('wyze.username') || process.env.USERNAME,
-            password: config.get('wyze.password') || process.env.PASSWORD,
-        };
-
-        this.wyze = new Wyze(options);
 
         const meters: Array<any> = config.get('meters');
 
@@ -132,6 +116,8 @@ export class App {
                 this.mainMeter = new Meter(meter.id);
             }
         });
+
+        this.initialized = false;
     }
 
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
@@ -165,7 +151,7 @@ export class App {
                     d = -0.6;
                 } else {
                     directive = app.night;
-                    d = 0.6;
+                    d = 0.3;
                 }
 
                 directive.clime = new Clime(t, d, h);
@@ -174,54 +160,21 @@ export class App {
                 logger.debug(directive);
 
                 if (directive.temperature === 'heat') {
-                    app.on('heater');
                     app.systems.set('heater', true);
                 } else if (directive.temperature === 'cool') {
-                    app.off('heater');
-                    app.on('blower');
                     app.systems.set('blower', true);                
                 } else {
-                    app.off('heater');
+                    app.systems.set('heater', false);
                 }
 
                 if (directive.humidity === 'humidify') {
-                    app.off('dehumidifier');
-                    app.on('humidifier');
                     app.systems.set('humidifier', true);
                 } else if (directive.humidity === 'dehumidify') {
-                    app.on('dehumidifier');
-                    app.off('humidifier');
                     app.systems.set('dehumidifier', true);
                 } else {
-                    app.off('dehumidifier');
-                    app.off('humidifier');
+                    app.systems.set('dehumidifier', false);
+                    app.systems.set('humidifier', false);
                 }
-
-		            const data = {
-		                id: config.get('id'),
-                    temperature: t,
-                    humidity: h,
-		                blower: app.systems.get('blower'),
-		                dehumidifier: app.systems.get('dehumidifier'),
-		                heater: app.systems.get('heater'),
-		                humidifier: app.systems.get('humidifier'),
-		                lamp: app.systems.get('lamp'),
-                    updated_at: new Date()
-                };
-
-		            logger.debug('checking app socket...');
-		            logger.debug('ready state:', app.socket.readyState);
-		            logger.debug('done.');
-
-		            if (app.socket.readyState !== 1) {
-		                app.socket = new WebSocket(config.get('ws-url'));
-
-		                app.socket.on('close', () => {
-			                  logger.debug('THIS SOCKET IS CLOSED');
-		                });
-		            }
-
-                app.socket.send(JSON.stringify(data));
 
                 app.last[0] = t;
                 app.last[1] = h;
@@ -235,46 +188,6 @@ export class App {
         return app.systems;
     }
 
-    async init(): Promise<boolean> {
-        logger.info('====================================');
-        logger.info('Starting up.');
-
-        logger.debug('DAY >>');
-        logger.debug(this.day);
-        logger.debug('NIGHT >>');
-        logger.debug(this.night);
-        
-        const types: Map<string, Array<string>> = this.types;
-
-        return new Promise((resolve) => {
-            this.wyze.getDeviceList().then((dlist: Array<Device>) => {
-                dlist.forEach((device: Device) => {
-                    logger.debug(device.nickname);
-                    const nick: string = device.nickname;
-                    const id: string = config.get('id');
-                    types.forEach((value: Array<string>, key: string) => {
-                        if (nick.match(new RegExp(`^${id} ${key}`, 'i'))) {
-                            logger.debug('MATCHED!');
-                            logger.debug(device);
-                            this.wyze.getDeviceState(device)
-                                .then((state: DeviceState) => {
-                                    logger.debug(state);
-                                });
-                            value.push(device.nickname);
-                        }
-                    });
-                });
-                
-                logger.info(config);
-                logger.info(types);
-                
-                this.initialized = true;
-                logger.info('====================================');
-                resolve(true);
-            });
-        });
-    }
-
     public static instance(): App {
         if (!App._instance) {
             App._instance = new App();
@@ -282,76 +195,34 @@ export class App {
         return App._instance;
     }
 
-    /**
-     * Turn off named devices
-     * @param {string} name
-     */
-    private async off(name: string): Promise<boolean> {
-        logger.info(`OFF ${name}`);
-        this.types.get(name).forEach(async (value: string) => {
-            const device = await this.wyze.getDeviceByName(value);
-            const result = await this.wyze.turnOff(device);
-            if (result.code !== '1') {
-                logger.error(`ERROR ${result.code} ${value} OFF - ${JSON.stringify(result)}`);
-            }
-        });
+    private async init(): Promise<boolean> {
+        logger.info('====================================');
+        logger.info('Starting up...');
 
+        const factory = new PlugFactory(this.systems);
+        await factory.build(config.get('plugs'));
+        this.plugs = factory.plugs;
+        
         return new Promise((resolve) => {
-            resolve(true);
-        });
-    }
-
-    /**
-     * Turn on named devices
-     * @param {string} name
-     */
-    private async on(name: string): Promise<boolean> {
-        logger.info(`ON ${name}`);
-        this.types.get(name).forEach(async (value: string) => {
-            const device = await this.wyze.getDeviceByName(value);
-            const result = await this.wyze.turnOn(device);
-            if (result.code !== '1') {
-                logger.error(`ERROR ${result.code} ${value} ON - ${JSON.stringify(result)}`);
-            }
-        });
-
-        return new Promise((resolve) => {
+            logger.info('DAY >>', this.day);
+            logger.info('NIGHT >>', this.night);
+            logger.info(config);
+            logger.info(this.mainMeter);
+            logger.info(this.plugs);
+            logger.info('====================================');
+            this.initialized = true;
             resolve(true);
         });
     }
 
     public async run(): Promise<boolean> {
         const app = App.instance();
-        if (app.initialized !== true) {
+        if (!app.initialized) {
             await app.init();
-        }
-
-        const now: Date = new Date();
-        const hour: number = now.getHours();
-        const min: number = now.getMinutes();
-        const sec: number = now.getSeconds();
-
-        if (app.lamps.isOn(hour)) {
-            app.on('lamp');
-	          app.systems.set('lamp', true);
-        } else {
-            app.off('lamp');
-	          app.systems.set('lamp', false);
-        }
-
-        if (app.blowers.isOn(min * 60 + sec)) {
-            app.on('blower');
-	          app.systems.set('blower', true);
-        } else {
-            app.off('blower');
-	          app.systems.set('blower', false);
         }
 
         const polling: number = 1000 * parseInt(config.get('polling'));
         const interval: number = 1000 * parseInt(config.get('interval'));
-
-        logger.debug('Check on socket...');
-        logger.debug('Done.');
 
         logger.debug('Start scan for %dms ...', polling);
         await app.mainMeter.startScan();
@@ -359,6 +230,66 @@ export class App {
         await app.mainMeter.wait(polling);
         await app.mainMeter.stopScan();
         logger.debug('Done scan.');
+
+        const now: Date = new Date();
+        const hour: number = now.getHours();
+        const min: number = now.getMinutes();
+        const sec: number = now.getSeconds();
+
+        if (app.lamps.isOn(hour)) {
+	          app.systems.set('lamp', true);
+        } else {
+	          app.systems.set('lamp', false);
+        }
+
+        if (app.blowers.isOn(min * 60 + sec)) {
+	          app.systems.set('blower', true);
+        } else {
+	          app.systems.set('blower', false);
+        }
+
+
+        logger.debug('Apply systems command to plugs...');
+        logger.debug('SYSTEMS', app.systems);
+        logger.debug('PLUGS', app.plugs);
+
+        app.plugs.forEach((value: Array<Plug>, key: string) => {
+            value.forEach((plug) => {
+                if (app.systems.get(key)) {
+                    plug.on();
+                } else {
+                    plug.off();
+                }
+            });
+        });
+
+        logger.debug('Done apply systems command.');
+
+		    const data = {
+		        id: config.get('id'),
+            temperature: app.last[0],
+            humidity: app.last[1],
+		        blower: app.systems.get('blower'),
+		        dehumidifier: app.systems.get('dehumidifier'),
+		        heater: app.systems.get('heater'),
+		        humidifier: app.systems.get('humidifier'),
+		        lamp: app.systems.get('lamp'),
+            updated_at: new Date()
+        };
+        
+		    logger.debug('Checking app socket...');
+		    logger.debug('Ready state:', app.socket.readyState);
+		    logger.debug('Done.');
+        
+		    if (app.socket.readyState !== 1) {
+		        app.socket = new WebSocket(config.get('ws-url'));
+            
+		        app.socket.on('close', () => {
+			          logger.debug('THIS SOCKET IS CLOSED');
+		        });
+		    }
+
+        app.socket.send(JSON.stringify(data));
 
         logger.debug('Done all. Timeout in %dms.', interval - polling);
         setTimeout(app.run, interval - polling);
