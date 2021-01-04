@@ -61,8 +61,24 @@
       }
 
       function bindValue(input, observable, precision) {
-          input.value = observable();
+          input.value = observable().toFixed(precision);
           observable.subscribe(() => { input.value = observable().toFixed(precision); });
+      }
+
+      function bindClass(input, observable) {
+	  let primaryString = 'button is-success';
+	  let warningString = 'button is-warning';
+
+	  input.setAttribute('class',
+			     observable() ? primaryString : warningString );
+
+	  observable.subscribe(() => {
+	      if (observable()) {
+		  input.setAttribute('class', primaryString);
+	      } else {
+		  input.setAttribute('class', warningString);
+	      }
+	  });
       }
 
       function zeroes(n) {
@@ -72,15 +88,11 @@
           return n;
       }
 
-      function createStatus(name, state) {
+      function createStatus(id, name) {
 	  const status = document.createElement('div');
 
-	  let mod = 'is-warning';
-	  if (state === true) {
-	      mod = 'is-success';
-	  }
-
-	  status.setAttribute('class', 'button ' + mod);
+	  status.setAttribute('id', id);
+	  status.setAttribute('class', 'button');
 	  status.appendChild(document.createTextNode(name));
 
 	  return status;
@@ -116,19 +128,20 @@
 
           display.appendChild(title);
 
-	  const blower = createStatus('blower', data.blower);
+	  const blower = createStatus(data.id+'-blower', 'blower');
 	  display.appendChild(blower);
 
-	  const dehumidifier = createStatus('dehumidifier', data.dehumidifier);
+	  const dehumidifier = createStatus(data.id+'-dehumidifier',
+					    'dehumidifier');
 	  display.appendChild(dehumidifier);
 
-	  const heater = createStatus('heater', data.heater);
+	  const heater = createStatus(data.id+'-heater', 'heater');
 	  display.appendChild(heater);
 
-	  const humidifier = createStatus('humidifier', data.humidifier);
+	  const humidifier = createStatus(data.id+'-humidifier', 'humidifier');
 	  display.appendChild(humidifier);
 
-	  const lamp = createStatus('lamp', data.lamp);
+	  const lamp = createStatus(data.id+'-lamp', 'lamp');
 	  display.appendChild(lamp);
 
           const temp = createReadout('thermometer-half', data.id+'-temp', '°C');
@@ -155,6 +168,7 @@
       }
 
       const climes = new Map();
+      const systems = new Map();
 
       const host = location.origin.replace(/^http/, 'ws')
 
@@ -180,12 +194,43 @@
 		  clime[1] = observable(data.humidity);
 		  const htext = document.getElementById(data.id+'-humidity');
 		  bindValue(htext, clime[1], 0);
+
+		  systems.set(data.id, [false, false, false, false, false]);
+		  const system = systems.get(data.id);
+
+		  system[0] = observable(data.blower);
+		  const bbutton = document.getElementById(data.id+'-blower');
+		  bindClass(bbutton, system[0]);
+
+		  system[1] = observable(data.dehumidifier);
+		  const dbutton = document.getElementById(data.id+'-dehumidifier');
+		  bindClass(dbutton, system[1]);
+
+		  system[2] = observable(data.heater);
+		  const hbutton = document.getElementById(data.id+'-heater');
+		  bindClass(hbutton, system[2]);
+
+		  system[3] = observable(data.humidifier);
+		  const hubutton = document.getElementById(data.id+'-humidifier');
+		  bindClass(hubutton, system[3]);
+
+		  system[4] = observable(data.lamp);
+		  const lbutton = document.getElementById(data.id+'-lamp');
+		  bindClass(lbutton, system[4]);
               }
 
 	      const clime = climes.get(data.id);
 
 	      clime[0](data.temperature);
 	      clime[1](100*data.humidity);
+
+	      const system = systems.get(data.id);
+
+	      system[0](data.blower);
+	      system[1](data.dehumidifier);
+	      system[2](data.heater);
+	      system[3](data.humidifier);
+	      system[4](data.lamp);
 
 	      const ping = createPing(data);
 	      const pings = document.querySelector('#pings');
