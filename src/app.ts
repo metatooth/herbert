@@ -158,11 +158,6 @@ export class App {
             logger.debug(`main meter id ${ad.id}`);
             logger.debug(ad);
 
-            app.systems.set('heater', false);
-            app.systems.set('blower', false);
-            app.systems.set('humidifier', false);
-            app.systems.set('dehumidifier', false);
-
             logger.debug(app.systems);
 
             const t = ad.serviceData.temperature.c;
@@ -306,8 +301,8 @@ export class App {
         this.types.get(name).forEach(async (value: string) => {
             const device = await this.wyze.getDeviceByName(value);
             const result = await this.wyze.turnOff(device);
-            if (result.code !== 1) {
-                logger.error(`ERROR ${result.code} ${value} OFF - ${result}`);
+            if (result.code !== '1') {
+                logger.error(`ERROR ${result.code} ${value} OFF - ${JSON.stringify(result)}`);
             }
         });
 
@@ -325,8 +320,8 @@ export class App {
         this.types.get(name).forEach(async (value: string) => {
             const device = await this.wyze.getDeviceByName(value);
             const result = await this.wyze.turnOn(device);
-            if (result.code !== 1) {
-                logger.error(`ERROR ${result.code} ${value} ON - ${result}`);
+            if (result.code !== '1') {
+                logger.error(`ERROR ${result.code} ${value} ON - ${JSON.stringify(result)}`);
             }
         });
 
@@ -360,6 +355,9 @@ export class App {
 
         const polling: number = 1000 * parseInt(config.get('polling'));
         const interval: number = 1000 * parseInt(config.get('interval'));
+
+        logger.debug('Check on socket...');
+        logger.debug('Done.');
 
         logger.debug('Start scan for %dms ...', polling);
         logger.debug(app.mainMeter);
