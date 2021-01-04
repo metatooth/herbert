@@ -13,7 +13,9 @@
     "clean": "rm -rf coverage src/**/*.js src/**/*.map",
     "start": "node src/index.js",
     "client": "node src/client.js",
-    "server": "node src/server.js"
+    "client:watch": "onchange 'src/**/*.js' -- npm run client",
+    "server": "node src/server.js",
+    "server:watch": "onchange 'src/**/*.js' -- npm run server"
   },
   "author": "",
   "license": "ISC",

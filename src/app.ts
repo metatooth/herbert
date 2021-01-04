@@ -55,13 +55,11 @@ export class App {
 
         this.initialized = false;
         this.types = new Map([
-            ['meter', []],
             ['blower', []],
-            ['lamp', []],
+            ['dehumidifier', []],
             ['heater', []],
             ['humidifier', []],
-            ['dehumidifier', []],
-            ['AC', []],
+            ['lamp', []],
         ]);
 
         this.lamps = new LampTimer(
@@ -88,7 +86,7 @@ export class App {
                 config.get('environment.lamp-off.temperature'),
                 config.get('environment.lamp-off.delta'),
                 config.get('environment.lamp-off.humidity'));
-                
+
             this.night = new AirDirectives(
                 new ConstantVpd(
                     [vpd, config.get('environment.vpd-tolerance')]));
@@ -98,7 +96,7 @@ export class App {
                 new TargetTempHumidity([
                     config.get('environment.lamp-on.temperature'),
                     config.get('environment.lamp-on.humidity')]));
-            
+
             this.night = new AirDirectives(
                 new TargetTempHumidity([
                     config.get('environment.lamp-off.temperature'),
@@ -109,20 +107,12 @@ export class App {
 
         this.socket = new WebSocket(config.get('ws-url'));
 
-        this.socket.on('open', () => {
-            const data = {
-                id: config.get('id'),
-                started_at: new Date()
-            };
-
-            this.socket.send(JSON.stringify(data));
-        });
-
         this.systems = new Map([
-            ['heater', false],
             ['blower', false],
-            ['humidifier', false],
             ['dehumidifier', false],
+            ['heater', false],
+            ['humidifier', false],
+            ['lamp', false],
         ]);
 
         this.growlog = new GrowLog('growlog.db');
@@ -134,11 +124,7 @@ export class App {
 
         this.wyze = new Wyze(options);
 
-        logger.debug(config.get('meters'));
-
         const meters: Array<any> = config.get('meters');
-
-        logger.debug(meters);
 
         meters.forEach((meter: any) => {
             logger.debug('METER', meter);
@@ -151,25 +137,14 @@ export class App {
     async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
         const app = App.instance();
 
-        console.log('ad id:', ad.id);
-        console.log('meter id:', app.mainMeter.id);
- 
         if (ad.id === app.mainMeter.id) {
             logger.debug(`main meter id ${ad.id}`);
-            logger.debug(ad);
-
-            logger.debug(app.systems);
 
             const t = ad.serviceData.temperature.c;
             const h = ad.serviceData.humidity / 100.0;
 
-            logger.debug('curr temp:', t);
-            logger.debug('curr humidity:', h);
-
+            logger.debug('curr:', [t, h]);
             logger.debug('last:', app.last);  
-
-            logger.debug('last temp:', app.last[0]);
-            logger.debug('last humidity:', app.last[1]);
 
             if (app.last[0] !== t || app.last[1] !== h) {
                 logger.debug('changed!');
@@ -180,20 +155,11 @@ export class App {
                 app.systems.set('dehumidifier', false);
                 
                 app.growlog.track(t, h);
-               
-                const data = {
-                    id: config.get('id'),
-                    temperature: t,
-                    humidity: h,
-                    updated_at: new Date()
-                };
-
-                app.socket.send(JSON.stringify(data));
 
                 const hour = (new Date()).getHours();
                 let directive: AirDirectives;
                 let d: number;
-            
+
                 if (app.lamps.isOn(hour)) {
                     directive = app.day;
                     d = -0.6;
@@ -201,7 +167,7 @@ export class App {
                     directive = app.night;
                     d = 0.6;
                 }
-            
+
                 directive.clime = new Clime(t, d, h);
                 directive.monitor();
 
@@ -231,13 +197,37 @@ export class App {
                     app.off('humidifier');
                 }
 
+		            const data = {
+		                id: config.get('id'),
+                    temperature: t,
+                    humidity: h,
+		                blower: app.systems.get('blower'),
+		                dehumidifier: app.systems.get('dehumidifier'),
+		                heater: app.systems.get('heater'),
+		                humidifier: app.systems.get('humidifier'),
+		                lamp: app.systems.get('lamp'),
+                    updated_at: new Date()
+                };
+
+		            logger.debug('checking app socket...');
+		            logger.debug('ready state:', app.socket.readyState);
+		            logger.debug('done.');
+
+		            if (app.socket.readyState !== 1) {
+		                app.socket = new WebSocket(config.get('ws-url'));
+
+		                app.socket.on('close', () => {
+			                  logger.debug('THIS SOCKET IS CLOSED');
+		                });
+		            }
+
+                app.socket.send(JSON.stringify(data));
+
                 app.last[0] = t;
                 app.last[1] = h;
             }
         } else {
-            logger.debug('XXX advertisement XXX');
-            logger.debug(ad);
-            logger.debug('XXX advertisement XXX');
+            logger.debug(`XXX advertisement ${ad.id} XXX`);
         }
 
         logger.debug(app.systems);
@@ -343,14 +333,18 @@ export class App {
 
         if (app.lamps.isOn(hour)) {
             app.on('lamp');
+	          app.systems.set('lamp', true);
         } else {
             app.off('lamp');
+	          app.systems.set('lamp', false);
         }
 
         if (app.blowers.isOn(min * 60 + sec)) {
             app.on('blower');
+	          app.systems.set('blower', true);
         } else {
             app.off('blower');
+	          app.systems.set('blower', false);
         }
 
         const polling: number = 1000 * parseInt(config.get('polling'));
@@ -360,7 +354,6 @@ export class App {
         logger.debug('Done.');
 
         logger.debug('Start scan for %dms ...', polling);
-        logger.debug(app.mainMeter);
         await app.mainMeter.startScan();
         app.mainMeter.bot.onadvertisement = app.handler;
         await app.mainMeter.wait(polling);
