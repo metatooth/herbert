@@ -1,7 +1,7 @@
 {
   "id": "HERBERT",
   "port": 4300,
-  "polling": 3,
+  "polling": 5,
   "interval": 30,
   "ws-url": "ws://localhost:5000",
   "meters": [
@@ -44,6 +44,6 @@
   },
   "wyze": {
       "username": "terry@aggalt.com",
-      "password": "xtTHwmkqtxbeTM7"
+      "password": ""
     }
 }
