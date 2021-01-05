@@ -282,14 +282,15 @@ export class App {
 		    logger.debug('Done.');
         
 		    if (app.socket.readyState !== 1) {
+            app.socket = null;
 		        app.socket = new WebSocket(config.get('ws-url'));
             
 		        app.socket.on('close', () => {
 			          logger.debug('THIS SOCKET IS CLOSED');
 		        });
-		    }
-
-        app.socket.send(JSON.stringify(data));
+		    } else {
+            app.socket.send(JSON.stringify(data));
+        }
 
         logger.debug('Done all. Timeout in %dms.', interval - polling);
         setTimeout(app.run, interval - polling);
