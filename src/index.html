@@ -13,34 +13,53 @@
   </style>
 </head>
 <body>
-  <section class="section">
-    <div>
-	    <div>
-	      <img width="40" src="JD-15-512.png"/>
-	    </div>
-	    <div>
-	      <h1 class="title">Herbert</h1>
-	      <h2 class="subtitle">Grow More</h2>
-	    </div>
-    </div>
-  </section>
-  <section class="section">
-    <div class="columns">
-      <div class="column is-two-thirds">
-        <h3 class="subtitle">Environments</h3>
-        <div class="columns">
-          <div id="displays" class="column">
+  <div class="container">
+    <section class="section">
+	    <nav class="navbar">
+        <div class="navbar-brand">
+          <a class="navbar-item" href="/">
+            <img src="logo.png"/>
+          </a>
+        </div>
+      </nav>
+
+      <form class="control">
+        <label class="radio">
+          <input type="radio" name="units" onclick="setUnits('C')" checked>
+          Celsius
+        </label>
+        <label class="radio">
+          <input type="radio" name="units" onclick="setUnits('F')">
+          Fahrenheit
+        </label>
+      </form>
+      <script>
+        let UNITS = 'C';
+        function setUnits(e) {
+            UNITS = e;
+        }
+      </script>
+
+      <div class="columns">
+        <div class="column is-two-thirds">
+          <h4 class="is-italic">Environments</h4>
+          <div class="columns">
+            <div id="displays" class="column">
+            </div>
           </div>
         </div>
+        <div class="column">
+          <h4 class="is-italic">Pings</h4>
+          <ul id="pings"></ul>
+        </div>
       </div>
-      <div class="column">
-        <h3 class="subtitle">Pings</h3>
-        <ul id="pings"></ul>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
   <script id="ping-template" type="x-tmpl-mustache">
-    {{at}} -- {{name}} -- {{temperature}}&#176;{{units}} | {{humidity}}%
+    {{hhmm}}<span class="is-size-7">:{{ss}}</span>
+    <span class="is-uppercase">{{name}}</span> &nbsp;
+    {{temperature}}&#176;{{units}} &nbsp;
+    {{humidity}}%
   </script>
   <script src="https://unpkg.com/mustache@latest"></script>
   <script>
@@ -95,8 +114,12 @@
     function timestamped(at) {
         const date = new Date(at);
         return zeroes(date.getHours()) + ':' +
-            zeroes(date.getMinutes()) + ':' +
-            zeroes(date.getSeconds());
+            zeroes(date.getMinutes());
+    }
+
+    function seconds(at) {
+        const date = new Date(at);
+        return zeroes(date.getSeconds());
     }
 
     function createStatus(id, name) {
@@ -166,11 +189,17 @@
 
     function createPing(data) {
         const template = document.getElementById('ping-template').innerHTML;
+        let temp = data.temperature.toFixed(1);
+        if (UNITS === 'F') {
+            temp = (data.temperature*9/5+32).toFixed(1);
+        }
+
         const ping = {
-            "at": timestamped(data.updated_at),
+            "hhmm": timestamped(data.updated_at),
+            "ss": seconds(data.updated_at),
             "name": data.id,
-            "temperature": data.temperature.toFixed(1),
-            "units": "C",
+            "temperature": temp,
+            "units": UNITS,
             "humidity": (100 * data.humidity).toFixed(0)
         }
         const rendered = Mustache.render(template, ping);
