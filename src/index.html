@@ -122,7 +122,16 @@
     }
     
     function spaces(text) {
-	const n = text.length;
+	const n = 8 - text.length;
+	if (n > 0) {
+	    for (let i = 0; i < n; i++) {
+		text += ' ';
+	    }
+	} else if (n < 0) {
+	    text = text.slice(0, 8);
+	}
+
+	return text;
     }
 
     function createStatus(id, name) {
@@ -200,7 +209,7 @@
         const ping = {
             "hhmm": timestamped(data.updated_at),
             "ss": seconds(data.updated_at),
-            "name": data.id,
+            "name": spaces(data.id),
             "temperature": temp,
             "units": UNITS,
             "humidity": (100 * data.humidity).toFixed(0)
