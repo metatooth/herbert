@@ -88,6 +88,10 @@
           return n;
       }
 
+      function spaces(text) {
+	  const n = text.length;
+      }
+
       function createStatus(id, name) {
 	  const status = document.createElement('div');
 
@@ -162,6 +166,7 @@
           entry += `${(100*data.humidity).toFixed(0)}%&nbsp;`;
 
           const li = document.createElement('li');
+          li.setAttribute('class', 'is-family-monospace');
           li.innerHTML = entry;
 
           return li;
