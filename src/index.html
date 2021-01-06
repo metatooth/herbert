@@ -14,26 +14,14 @@
 </head>
 <body>
   <div class="container">
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+          <img src="logo.png"/>
+        </a>
+      </div>
+    </nav>
     <section class="section">
-      <nav class="navbar">
-        <div class="navbar-brand">
-          <a class="navbar-item" href="/">
-            <img src="logo.png"/>
-          </a>
-        </div>
-      </nav>
-
-      <form class="control">
-        <label class="radio">
-          <input type="radio" name="units" onclick="setUnits('C')" checked>
-          Celsius
-        </label>
-        <label class="radio">
-          <input type="radio" name="units" onclick="setUnits('F')">
-          Fahrenheit
-        </label>
-      </form>
-
       <div class="columns">
         <div class="column is-two-thirds">
           <h4 class="is-italic">Environments</h4>
@@ -43,17 +31,29 @@
           </div>
         </div>
         <div class="column">
-          <h4 class="is-italic">Pings</h4>
+	  <form class="control">
+            <label class="radio">
+              <input type="radio" name="units" onclick="setUnits('C')" checked>
+              Celsius
+            </label>
+            <label class="radio">
+              <input type="radio" name="units" onclick="setUnits('F')">
+              Fahrenheit
+            </label>
+	  </form>
+	  <h4 class="is-italic">Pings</h4>
           <ul id="pings"></ul>
         </div>
       </div>
     </section>
   </div>
   <script id="ping-template" type="x-tmpl-mustache">
+    <span class="is-family-code">
     {{hhmm}}<span class="is-size-7">:{{ss}}</span>
     <span class="is-uppercase">{{name}}</span> &nbsp;
     {{temperature}}&#176;{{units}} &nbsp;
     {{humidity}}%
+    </span>
   </script>
   <script src="https://unpkg.com/mustache@latest"></script>
   <script>
@@ -125,7 +125,7 @@
 	const n = 8 - text.length;
 	if (n > 0) {
 	    for (let i = 0; i < n; i++) {
-		text += ' ';
+		text += '.';
 	    }
 	} else if (n < 0) {
 	    text = text.slice(0, 8);
