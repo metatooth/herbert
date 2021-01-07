@@ -108,9 +108,9 @@ export class App {
         
         this.growlog = new GrowLog('growlog.db');
 
-        const meters: Array<any> = config.get('meters');
+        const meters: Array<Meter> = config.get('meters');
 
-        meters.forEach((meter: any) => {
+        meters.forEach((meter: Meter) => {
             logger.debug('METER', meter);
             if (meter.type === 'main') {
                 this.mainMeter = new Meter(meter.id);
@@ -195,7 +195,7 @@ export class App {
         return App._instance;
     }
 
-    private async init(): Promise<boolean> {
+    public async init(): Promise<boolean> {
         logger.info('====================================');
         logger.info('Starting up...');
 
@@ -237,15 +237,15 @@ export class App {
         const sec: number = now.getSeconds();
 
         if (app.lamps.isOn(hour)) {
-	          app.systems.set('lamp', true);
+           app.systems.set('lamp', true);
         } else {
-	          app.systems.set('lamp', false);
+           app.systems.set('lamp', false);
         }
 
         if (app.blowers.isOn(min * 60 + sec)) {
-	          app.systems.set('blower', true);
+           app.systems.set('blower', true);
         } else {
-	          app.systems.set('blower', false);
+           app.systems.set('blower', false);
         }
 
 
@@ -265,30 +265,30 @@ export class App {
 
         logger.debug('Done apply systems command.');
 
-		    const data = {
-		        id: config.get('id'),
+      const data = {
+          id: config.get('id'),
             temperature: app.last[0],
             humidity: app.last[1],
-		        blower: app.systems.get('blower'),
-		        dehumidifier: app.systems.get('dehumidifier'),
-		        heater: app.systems.get('heater'),
-		        humidifier: app.systems.get('humidifier'),
-		        lamp: app.systems.get('lamp'),
+          blower: app.systems.get('blower'),
+          dehumidifier: app.systems.get('dehumidifier'),
+          heater: app.systems.get('heater'),
+          humidifier: app.systems.get('humidifier'),
+          lamp: app.systems.get('lamp'),
             updated_at: new Date()
         };
         
-		    logger.debug('Checking app socket...');
-		    logger.debug('Ready state:', app.socket.readyState);
-		    logger.debug('Done.');
+      logger.debug('Checking app socket...');
+      logger.debug('Ready state:', app.socket.readyState);
+      logger.debug('Done.');
         
-		    if (app.socket.readyState !== 1) {
+      if (app.socket.readyState !== 1) {
             app.socket = null;
-		        app.socket = new WebSocket(config.get('ws-url'));
+          app.socket = new WebSocket(config.get('ws-url'));
             
-		        app.socket.on('close', () => {
-			          logger.debug('THIS SOCKET IS CLOSED');
-		        });
-		    } else {
+          app.socket.on('close', () => {
+             logger.debug('THIS SOCKET IS CLOSED');
+          });
+      } else {
             app.socket.send(JSON.stringify(data));
         }
 

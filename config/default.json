@@ -12,7 +12,7 @@
       { "type": "blower", "id": "bbbbbbbbbbbb" },
       { "type": "dehumidifier", "id": "cccccccccccc" },
       { "type": "heater", "id": "dddddddddddd" },
-      { "type": "humidifier", "id": "eeeeeeeeeeee" } 
+      { "type": "humidifier", "id": "eeeeeeeeeeee" }
   ],
   "lamps": [
       "ffffffffffff"

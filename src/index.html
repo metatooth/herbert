@@ -9,8 +9,14 @@
     .display {
         border: 0;
         width: 30px;
+        background: #f5f5f5;
     }
-  </style>
+    .display-timestamp {
+        border: 0;
+        width: 50px;
+    } 
+ </style>
+  
 </head>
 <body>
   <div class="container">
@@ -21,17 +27,18 @@
         </a>
       </div>
     </nav>
+  </div>
+  <div class="container">
     <section class="section">
       <div class="columns">
         <div class="column is-two-thirds">
-          <h4 class="is-italic">Environments</h4>
           <div class="columns">
             <div id="displays" class="column">
             </div>
           </div>
         </div>
-        <div class="column">
-	  <form class="control">
+        <div class="column is-hidden">
+	        <form class="control">
             <label class="radio">
               <input type="radio" name="units" onclick="setUnits('C')" checked>
               Celsius
@@ -40,13 +47,21 @@
               <input type="radio" name="units" onclick="setUnits('F')">
               Fahrenheit
             </label>
-	  </form>
-	  <h4 class="is-italic">Pings</h4>
+	        </form>
+          <h4 class="is-italic">Pings</h4>
           <ul id="pings"></ul>
-        </div>
+          </div>
       </div>
     </section>
   </div>
+  
+  <script id="header-template" type="x-tmpl-mustach">
+    <p class="card-header-title">{{title}}</p>
+    <span class="card-header-icon">
+      <input class="display-timestamp is-family-monospace is-italic" type="text" id="{{id}}"/>
+    </span>
+  </script>
+
   <script id="ping-template" type="x-tmpl-mustache">
     <span class="is-family-code">
     {{hhmm}}<span class="is-size-7">:{{ss}}</span>
@@ -55,13 +70,34 @@
     {{humidity}}%
     </span>
   </script>
+
+  <script id="readout-template" type="x-tmpl-mustach">
+    <span class="icon"><i class="{{icon}}"></i></span>
+    <span><input class="display" type="text" id="{{id}}"/>{{units}}</span>
+  </script>
+
   <script src="https://unpkg.com/mustache@latest"></script>
   <script>
     let UNITS = 'C';
-    function setUnits(e) {
-        UNITS = e;
-    }
+
+    const SYSTEMS = [
+        "blower",
+        "dehumidifier",
+        "heater",
+        "humidifier",
+        "lamp"
+    ];
+
+    const TARGETS = [
+        [ "temperature", "thermometer-half", "°C", 1 ],
+        [ "humidity", "tint", "%", 0 ],
+        [ "vaporpressuredeficit", "hammer", "hPa", 1 ]
+    ];
     
+    const STATUSES = new Map();
+
+    const CLIMES = new Map();
+
     function observable(value) {
         const listeners = [];
 
@@ -82,125 +118,116 @@
         return accessor;
     }
 
-    function bindValue(input, observable, precision) {
-        input.value = observable().toFixed(precision);
-        observable.subscribe(() => { input.value = observable().toFixed(precision); });
-    }
-
     function bindClass(input, observable) {
-	let primaryString = 'button is-success';
-	let warningString = 'button is-warning';
+	      let onString = 'tag is-success';
+	      let offString = 'tag is-warning';
 
-	input.setAttribute('class',
-			   observable() ? primaryString : warningString );
+	      input.setAttribute('class', observable() ? onString : offString );
 
-	observable.subscribe(() => {
-	    if (observable()) {
-		input.setAttribute('class', primaryString);
-	    } else {
-		input.setAttribute('class', warningString);
-	    }
-	});
+	      observable.subscribe(() => {
+	          if (observable()) {
+		            input.setAttribute('class', onString);
+	          } else {
+		            input.setAttribute('class', offString);
+	          }
+	      });
     }
 
-    function zeroes(n) {
-        if (n < 10) {
-            return '0' + n;
-        }
-        return n;
+    function bindDecimalValue(input, observable, precision) {
+        input.value = observable().toFixed(precision);
+        observable.subscribe(() => {
+            input.value = observable().toFixed(precision);
+        });
     }
 
-    function timestamped(at) {
-        const date = new Date(at);
-        return zeroes(date.getHours()) + ':' +
-            zeroes(date.getMinutes());
+    function bindDisplay(data) {
+        CLIMES.set(data.id, new Map());
+        const clime = CLIMES.get(data.id);
+        TARGETS.forEach((target) => {
+	          clime.set(target[0], observable(data[target[0]]));
+            const text = document.getElementById(data.id+'-'+target[0]);
+            bindDecimalValue(text, clime.get(target[0]), target[3]);
+        });
+        
+        clime.set('timestamp', observable(timestamped(data.updated_at)));
+        const text = document.getElementById(data.id+'-timestamp');
+        bindTextValue(text, clime.get('timestamp'));
+
+        STATUSES.set(data.id, new Map());
+        const status = STATUSES.get(data.id);
+        SYSTEMS.forEach((system) => {
+            status.set(system, observable(data[system]));
+            const button = document.getElementById(data.id+'-'+system);
+            bindClass(button, status.get(system));
+        });
     }
 
-    function seconds(at) {
-        const date = new Date(at);
-        return zeroes(date.getSeconds());
-    }
-    
-    function spaces(text) {
-	const n = 8 - text.length;
-	if (n > 0) {
-	    for (let i = 0; i < n; i++) {
-		text += '.';
-	    }
-	} else if (n < 0) {
-	    text = text.slice(0, 8);
-	}
-
-	return text;
-    }
-
-    function createStatus(id, name) {
-	const status = document.createElement('div');
-
-	status.setAttribute('id', id);
-	status.setAttribute('class', 'button');
-	status.appendChild(document.createTextNode(name));
-
-	return status;
-    }
-
-    function createReadout(icon, name, text) {
-        const readout = document.createElement('div');
-        const span = document.createElement('span');
-        span.setAttribute('class', 'icon');
-        const i = document.createElement('i');
-        i.setAttribute('class', 'fas fa-'+icon);
-        span.appendChild(i);
-        readout.appendChild(span);
-        const display = document.createElement('span');
-        const input = document.createElement('input');
-        input.setAttribute('class', 'display');
-        input.setAttribute('type', 'text');
-        input.setAttribute('id', name);
-        display.appendChild(input);
-        display.appendChild(document.createTextNode(text));
-        readout.appendChild(display);
-
-        return readout;
+    function bindTextValue(input, observable) {
+        input.value = observable();
+        observable.subscribe(() => { input.value = observable(); });
     }
 
     function createDisplay(data) {
-        const display = document.createElement('div');
-        display.setAttribute('id', data.id);
-        display.setAttribute('class', 'tile');
+        const card = document.createElement('div');
+        card.setAttribute('id', data.id);
+        card.setAttribute('class', 'card');
 
-        const title = document.createElement('h2');
-        title.appendChild(document.createTextNode(data.id));
+        const header = document.createElement('header');
+        header.setAttribute('class', 'card-header');
 
-        display.appendChild(title);
-	
-	const blower = createStatus(data.id+'-blower', 'blower');
-	display.appendChild(blower);
-	
-	const dehumidifier = createStatus(data.id+'-dehumidifier',
-					  'dehumidifier');
-	display.appendChild(dehumidifier);
-	
-	const heater = createStatus(data.id+'-heater', 'heater');
-	display.appendChild(heater);
-	
-	const humidifier = createStatus(data.id+'-humidifier', 'humidifier');
-	display.appendChild(humidifier);
-	
-	const lamp = createStatus(data.id+'-lamp', 'lamp');
-	display.appendChild(lamp);
-	
-        const temp = createReadout('thermometer-half', data.id+'-temp', '°C');
-        display.appendChild(temp);
+        const templ = document.getElementById('header-template').innerHTML;
+        const params = { "id": `${data.id}-timestamp`, "title": data.id };
+        header.innerHTML = Mustache.render(templ, params);
+        
+        card.appendChild(header);
 
-        const humid = createReadout('tint', data.id+'-humidity', '%');
-        display.appendChild(humid);
+        const content = document.createElement('div');
+        content.setAttribute('class', 'card-content');
 
-        return display;
+        card.appendChild(content);
+
+        const readouts = document.createElement('div');
+        readouts.setAttribute('class', 'tags are-medium');
+
+	      TARGETS.forEach((target) => {
+            const templ = document.getElementById('readout-template').innerHTML;
+            const params = {
+                "id": `${data.id}-${target[0]}`,
+                "icon": `fas fa-${target[1]}`,
+                "units": target[2]
+            };
+            
+            const child = document.createElement('div');
+            child.setAttribute('class', 'tag');
+            child.innerHTML = Mustache.render(templ, params);
+            readouts.appendChild(child);
+        });
+
+        const systems = document.createElement('div');
+        systems.setAttribute('class', 'tags');
+
+	      SYSTEMS.forEach((system) => {
+            const child = document.createElement('div');
+            child.setAttribute('id', `${data.id}-${system}`); 
+            child.setAttribute('class', 'tag');
+            child.appendChild(document.createTextNode(system));
+
+            systems.appendChild(child);
+        });
+
+        content.appendChild(readouts);
+        content.appendChild(systems);
+        
+        const footer = document.createElement('footer');
+        footer.setAttribute('class', 'card-footer');
+
+        card.appendChild(footer);
+
+        return card;
     }
 
     function createPing(data) {
-	const template = document.getElementById('ping-template').innerHTML;
+	      const template = document.getElementById('ping-template').innerHTML;
         let temp = data.temperature.toFixed(1);
         if (UNITS === 'F') {
             temp = (data.temperature*9/5+32).toFixed(1);
@@ -220,81 +247,90 @@
         return li;
     }
 
-    const climes = new Map();
-    const systems = new Map();
+    function seconds(at) {
+        const date = new Date(at);
+        return zeroes(date.getSeconds());
+    }
+    
+    function setUnits(e) {
+        UNITS = e;
+    }
 
-    const host = location.origin.replace(/^http/, 'ws')
+    function spaces(text) {
+	      const n = 8 - text.length;
+	      if (n > 0) {
+	          for (let i = 0; i < n; i++) {
+		            text += '.';
+	          }
+	      } else if (n < 0) {
+	          text = text.slice(0, 8);
+	      }
+
+	      return text;
+    }
+
+    function timestamped(at) {
+        const date = new Date(at);
+        return zeroes(date.getHours()) + ':' +
+            zeroes(date.getMinutes());
+    }
+
+    function saturatedVaporPressure(temp) {
+        return 610.7 * Math.pow(10, 7.5 * temp / (temp + 237.3));
+    }
+
+    function vaporPressureDeficit(airTemp, leafDelta, relativeHumidity) {
+        return saturatedVaporPressure(airTemp - leafDelta) -
+            (relativeHumidity * saturatedVaporPressure(airTemp));
+    }
+
+    function zeroes(n) {
+        if (n < 10) {
+            return '0' + n;
+        }
+        return n;
+    }
+
+    const HOST = location.origin.replace(/^http/, 'ws')
 
     function startWebSocket() {
-	let ws = new WebSocket(host);
+	      let ws = new WebSocket(HOST);
 
-	ws.onmessage = (event) => {
+	      ws.onmessage = (event) => {
             console.log(event.data);
             const data = JSON.parse(event.data);
 
+            data.vaporpressuredeficit =
+                vaporPressureDeficit(data.temperature, 0.6, data.humidity)/100;
+            
             let display = document.querySelector('#' + data.id);
             if (display === null) {
-		display = createDisplay(data);
-		document.querySelector('#displays').appendChild(display);
+		            display = createDisplay(data);
+		            document.querySelector('#displays').appendChild(display);
+                bindDisplay(data);
+	          }
 
-		climes.set(data.id, [0, 0]);
-		const clime = climes.get(data.id);
+	          const clime = CLIMES.get(data.id);
+	          clime.get('temperature')(data.temperature);
+	          clime.get('humidity')(100*data.humidity);
+	          clime.get('vaporpressuredeficit')(data.vaporpressuredeficit);
+            clime.get('timestamp')(timestamped(data.updated_at));
 
-		clime[0] = observable(data.temperature);
-		const ttext = document.getElementById(data.id+'-temp');
-		bindValue(ttext, clime[0], 1);
+	          const status = STATUSES.get(data.id);
+            SYSTEMS.forEach((system) => {
+                status.get(system)(data[system]);
+            });
 
-		clime[1] = observable(data.humidity);
-		const htext = document.getElementById(data.id+'-humidity');
-		bindValue(htext, clime[1], 0);
+	          const ping = createPing(data);
+	          const pings = document.querySelector('#pings');
+	          pings.insertBefore(ping, pings.childNodes[0]);
+	      }
 
-		systems.set(data.id, [false, false, false, false, false]);
-		const system = systems.get(data.id);
-
-		system[0] = observable(data.blower);
-		const bbutton = document.getElementById(data.id+'-blower');
-		bindClass(bbutton, system[0]);
-
-		system[1] = observable(data.dehumidifier);
-		const dbutton = document.getElementById(data.id+'-dehumidifier');
-		bindClass(dbutton, system[1]);
-
-		system[2] = observable(data.heater);
-		const hbutton = document.getElementById(data.id+'-heater');
-		bindClass(hbutton, system[2]);
-
-		system[3] = observable(data.humidifier);
-		const hubutton = document.getElementById(data.id+'-humidifier');
-		bindClass(hubutton, system[3]);
-
-		system[4] = observable(data.lamp);
-		const lbutton = document.getElementById(data.id+'-lamp');
-		bindClass(lbutton, system[4]);
-	    }
-
-	    const clime = climes.get(data.id);
-
-	    clime[0](data.temperature);
-	    clime[1](100*data.humidity);
-
-	    const system = systems.get(data.id);
-
-	    system[0](data.blower);
-	    system[1](data.dehumidifier);
-	    system[2](data.heater);
-	    system[3](data.humidifier);
-	    system[4](data.lamp);
-
-	    const ping = createPing(data);
-	    const pings = document.querySelector('#pings');
-	    pings.insertBefore(ping, pings.childNodes[0]);
-	}
-
-	ws.onclose = () => {
-	    console.log('websocket is closed! reconnecting...');
-	    ws = null;
-	    setTimeout(startWebSocket, 5000);
-	}
+	      ws.onclose = () => {
+	          console.log('websocket is closed! reconnecting...');
+	          ws = null;
+	          setTimeout(startWebSocket, 5000);
+	      }
     }
 
     startWebSocket();
