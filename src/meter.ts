@@ -4,6 +4,7 @@ import { Mockbot } from './mockbot';
 
 export class Meter {
     id: string;
+    type: string;
     bot;
     
     constructor(id: string) {
@@ -11,8 +12,10 @@ export class Meter {
 
         if (this.id === 'mock') {
             this.bot = new Mockbot();
+            this.type = 'mockbot';
         } else {
             this.bot = new Switchbot();
+            this.type = 'switchbot';
         }
     }
 
