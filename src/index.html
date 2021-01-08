@@ -22,6 +22,9 @@
 	background: #ffffff;
 	align: left;
     }
+    .card {
+	margin: 20px;
+    }
   </style>
   
 </head>
@@ -39,7 +42,7 @@
     <section class="section">
       <div class="columns">
         <div class="column is-two-thirds">
-          <div id="displays" class="cards">
+          <div id="displays" class="tile is-ancestor">
           </div>
         </div>
         <div class="column is-hidden">
@@ -181,6 +184,9 @@
     }
 
     function createDisplay(data) {
+        const tile = document.createElement('div');
+        tile.setAttribute('class', 'tile is-6');
+
         const card = document.createElement('div');
         card.setAttribute('id', data.id);
         card.setAttribute('class', 'card');
@@ -247,7 +253,9 @@
 
         card.appendChild(footer);
 
-        return card;
+	tile.appendChild(card);
+
+        return tile;
     }
 
     function createPing(data) {
