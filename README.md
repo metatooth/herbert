@@ -13,7 +13,7 @@ $ git clone https://github.com/metatooth/herbert.git
 $ cd herbert
 $ npm install
 $ npm run build
-$ sudo node src/client.js
+$ sudo npm run client
 ```
 
 ## Deployment
