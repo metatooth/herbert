@@ -26,4 +26,4 @@ $ sudo /etc/init.d/herbert status
 
 ## License
 
-Copyright 2020 Metatooth LLC. See the [LICENSE](LICENSE).
+Copyright 2021 Metatooth LLC. See the [LICENSE](LICENSE).
