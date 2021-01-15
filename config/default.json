@@ -5,7 +5,7 @@
   "interval": 30,
   "ws-url": "ws://localhost:5000",
   "meters": [
-    { "type": "main", "id": "mock" },
+    { "type": "main", "id": "000000000000" },
     { "type": "intake", "id": "aaaaaaaaaaaa" }
   ],
   "air-systems": [
@@ -18,10 +18,10 @@
       "ffffffffffff"
   ],
   "plugs": [
-      { 
+      {
           "type": "wyze",
-          "prefix": "HERB",
-          "username": "terry@aggalt.com",
+          "prefix": "",
+          "username": "",
           "password": ""
       }
   ],

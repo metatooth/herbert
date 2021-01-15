@@ -3,8 +3,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Hello Herbert!</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
-  <script src="https://kit.fontawesome.com/f2e9d13f99.js" crossorigin="anonymous"></script>
   <style>
     .display {
         border: 0;
@@ -14,19 +12,20 @@
     .hhmm {
         border: 0;
         width: 60px;
-	background: #ffffff;
+	      background: #ffffff;
     } 
     .ss {
         border: 0;
         width: 60px;
-	background: #ffffff;
-	align: left;
+	      background: #ffffff;
+	      align: left;
     }
     .card {
-	margin: 20px;
+	      margin: 20px;
     }
   </style>
-  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+  <script src="https://kit.fontawesome.com/f2e9d13f99.js" crossorigin="anonymous"></script>  
 </head>
 <body>
   <div class="container">
@@ -40,13 +39,16 @@
   </div>
   <div class="container">
     <section class="section">
+      <div id="notifications"></div>
+    </section>
+    <section class="section">
       <div class="columns">
         <div class="column is-two-thirds">
           <div id="displays" class="tile is-ancestor">
           </div>
         </div>
         <div class="column is-hidden">
-	  <form class="control">
+	        <form class="control">
             <label class="radio">
               <input type="radio" name="units" onclick="setUnits('C')" checked>
               Celsius
@@ -55,7 +57,7 @@
               <input type="radio" name="units" onclick="setUnits('F')">
               Fahrenheit
             </label>
-	  </form>
+	        </form>
           <h4 class="is-italic">Pings</h4>
           <ul id="pings"></ul>
         </div>
@@ -84,11 +86,21 @@
   <script id="timestamp-template" type="x-tmpl-mustache">
     <input id="{{hhmm}}" type="text" class="hhmm" disabled>
     <span class="is-size-7">
-      <input id="{{ss}}" type="text" class="ss" disabled>
+    <input id="{{ss}}" type="text" class="ss" disabled>
     </span>
   </script>
 
+  <script id="notify-template" type="x-tmpl-mustache">
+    <button class="delete" onclick="this.parentNode.remove()"></button>
+    <span class="is-family-code">
+    {{hhmm}}<span class="is-size-7">:{{ss}}</span>
+    <span class="is-uppercase">{{id}}</span> &nbsp;
+    <span>{{device}}</span> &nbsp;
+    <span>{{message}}</span>
+</script>
+
   <script src="https://unpkg.com/mustache@latest"></script>
+
   <script>
     let UNITS = 'C';
 
@@ -131,18 +143,18 @@
     }
 
     function bindClass(input, observable) {
-	let onString = 'tag is-success';
-	let offString = 'tag is-warning';
+	      let onString = 'tag is-success';
+	      let offString = 'tag is-warning';
 
-	input.setAttribute('class', observable() ? onString : offString );
+	      input.setAttribute('class', observable() ? onString : offString );
 
-	observable.subscribe(() => {
-	    if (observable()) {
-		input.setAttribute('class', onString);
-	    } else {
-		input.setAttribute('class', offString);
-	    }
-	});
+	      observable.subscribe(() => {
+	          if (observable()) {
+		            input.setAttribute('class', onString);
+	          } else {
+		            input.setAttribute('class', offString);
+	          }
+	      });
     }
 
     function bindDecimalValue(input, observable, precision) {
@@ -156,7 +168,7 @@
         CLIMES.set(data.id, new Map());
         const clime = CLIMES.get(data.id);
         TARGETS.forEach((target) => {
-	    clime.set(target[0], observable(data[target[0]]));
+	          clime.set(target[0], observable(data[target[0]]));
             const text = document.getElementById(data.id+'-'+target[0]);
             bindDecimalValue(text, clime.get(target[0]), target[3]);
         });
@@ -165,7 +177,7 @@
         const htext = document.getElementById(data.id+'-timestamp-hhmm');
         bindTextValue(htext, clime.get('timestamp-hhmm'));
 
-	clime.set('timestamp-ss', observable(ss(data.updated_at)));
+	      clime.set('timestamp-ss', observable(ss(data.updated_at)));
         const stext = document.getElementById(data.id+'-timestamp-ss');
         bindTextValue(stext, clime.get('timestamp-ss'));
 
@@ -208,7 +220,7 @@
         const readouts = document.createElement('div');
         readouts.setAttribute('class', 'tags are-medium');
 
-	TARGETS.forEach((target) => {
+	      TARGETS.forEach((target) => {
             const templ = document.getElementById('readout-template').innerHTML;
             const params = {
                 "id": `${data.id}-${target[0]}`,
@@ -225,7 +237,7 @@
         const systems = document.createElement('div');
         systems.setAttribute('class', 'tags');
 
-	SYSTEMS.forEach((system) => {
+	      SYSTEMS.forEach((system) => {
             const child = document.createElement('div');
             child.setAttribute('id', `${data.id}-${system}`); 
             child.setAttribute('class', 'tag');
@@ -240,26 +252,42 @@
         const footer = document.createElement('footer');
         footer.setAttribute('class', 'card-footer');
 
-	templ = document.getElementById('timestamp-template').innerHTML;
-	params = {
-	    "hhmm": `${data.id}-timestamp-hhmm`,
-	    "ss": `${data.id}-timestamp-ss`
-	};
-	const item = document.createElement('div');
-	item.setAttribute('class', 'card-footer-item');
-	item.innerHTML = Mustache.render(templ, params);
+	      templ = document.getElementById('timestamp-template').innerHTML;
+	      params = {
+	          "hhmm": `${data.id}-timestamp-hhmm`,
+	          "ss": `${data.id}-timestamp-ss`
+	      };
+	      const item = document.createElement('div');
+	      item.setAttribute('class', 'card-footer-item');
+	      item.innerHTML = Mustache.render(templ, params);
 
-	footer.appendChild(item);
+	      footer.appendChild(item);
 
         card.appendChild(footer);
 
-	tile.appendChild(card);
+	      tile.appendChild(card);
 
         return tile;
     }
 
+    function createNotification(data) {
+	      const template = document.getElementById('notify-template').innerHTML;
+        const notify = {
+            "id": spaces(data.id),
+            "device": data.plug,
+            "message": data.message,
+            "hhmm": hhmm(data.timestamp),
+            "ss": ss(data.timestamp)
+        };
+        const div = document.createElement('div');
+        div.setAttribute('id', divid('notification', data.id, data.plug));
+        div.setAttribute('class', 'notification is-danger');
+        div.innerHTML = Mustache.render(template, notify);
+        return div;
+    }
+
     function createPing(data) {
-	const template = document.getElementById('ping-template').innerHTML;
+	      const template = document.getElementById('ping-template').innerHTML;
         let temp = data.temperature.toFixed(1);
         if (UNITS === 'F') {
             temp = (data.temperature*9/5+32).toFixed(1);
@@ -279,22 +307,31 @@
         return li;
     }
 
+    function remove(e) {
+        console.log('remove', e);
+    }
+
     function setUnits(e) {
         UNITS = e;
     }
 
     function spaces(text) {
-	const n = 8 - text.length;
-	if (n > 0) {
-	    for (let i = 0; i < n; i++) {
-		text += '.';
-	    }
-	} else if (n < 0) {
-	    text = text.slice(0, 8);
-	}
+	      const n = 8 - text.length;
+	      if (n > 0) {
+	          for (let i = 0; i < n; i++) {
+		            text += '.';
+	          }
+	      } else if (n < 0) {
+	          text = text.slice(0, 8);
+	      }
 
-	return text;
+	      return text;
     }
+
+    function divid(type, id, plug) {
+        const div = `${type}--${id}--${plug}`;        
+        return div.split(' ').join('-');
+    };
 
     function hhmm(at) {
         const date = new Date(at);
@@ -313,7 +350,7 @@
 
     function ss(at) {
         const date = new Date(at);
-        return ':' + zeroes(date.getSeconds());
+        return zeroes(date.getSeconds());
     }
 
     function saturatedVaporPressure(temp) {
@@ -335,44 +372,54 @@
     const HOST = location.origin.replace(/^http/, 'ws')
 
     function startWebSocket() {
-	let ws = new WebSocket(HOST);
+	      let ws = new WebSocket(HOST);
 
-	ws.onmessage = (event) => {
+	      ws.onmessage = (event) => {
             console.log(event.data);
             const data = JSON.parse(event.data);
 
-            data.vaporpressuredeficit =
-                vaporPressureDeficit(data.temperature, 0.6, data.humidity)/100;
+            if (data.temperature) {
+                data.vaporpressuredeficit =
+                    vaporPressureDeficit(data.temperature, 0.6, data.humidity)/100;
             
-            let display = document.querySelector('#' + data.id);
-            if (display === null) {
-		display = createDisplay(data);
-		document.querySelector('#displays').appendChild(display);
-                bindDisplay(data);
-	    }
+                let display = document.querySelector('#' + data.id);
+                if (display === null) {
+		                display = createDisplay(data);
+		                document.querySelector('#displays').appendChild(display);
+                    bindDisplay(data);
+	              }
 
-	    const clime = CLIMES.get(data.id);
-	    clime.get('temperature')(data.temperature);
-	    clime.get('humidity')(100*data.humidity);
-	    clime.get('vaporpressuredeficit')(data.vaporpressuredeficit);
-            clime.get('timestamp-hhmm')(hhmm(data.updated_at));
-            clime.get('timestamp-ss')(ss(data.updated_at));
+	              const clime = CLIMES.get(data.id);
+	              clime.get('temperature')(data.temperature);
+	              clime.get('humidity')(100*data.humidity);
+	              clime.get('vaporpressuredeficit')(data.vaporpressuredeficit);
+                clime.get('timestamp-hhmm')(hhmm(data.updated_at));
+                clime.get('timestamp-ss')(ss(data.updated_at));
+                
+	              const status = STATUSES.get(data.id);
+                SYSTEMS.forEach((system) => {
+                    status.get(system)(data[system]);
+                });
+                
+	              const ping = createPing(data);
+	              const pings = document.querySelector('#pings');
+	              pings.insertBefore(ping, pings.childNodes[0]);
+	          } else if (data.code) {
+                const id = `#${divid('notification', data.id, data.plug)}`;
+                const doomed = document.querySelector(id);
+                if (doomed) { doomed.remove(); }
 
-	    const status = STATUSES.get(data.id);
-            SYSTEMS.forEach((system) => {
-                status.get(system)(data[system]);
-            });
+                const notify = createNotification(data);
+                const notifications = document.querySelector('#notifications');
+                notifications.insertBefore(notify, notifications.childNodes[0]);
+            }
+        }
 
-	    const ping = createPing(data);
-	    const pings = document.querySelector('#pings');
-	    pings.insertBefore(ping, pings.childNodes[0]);
-	}
-
-	ws.onclose = () => {
-	    console.log('websocket is closed! reconnecting...');
-	    ws = null;
-	    setTimeout(startWebSocket, 5000);
-	}
+	      ws.onclose = () => {
+	          console.log('websocket is closed! reconnecting...');
+	          ws = null;
+	          setTimeout(startWebSocket, 5000);
+	      }
     }
 
     startWebSocket();

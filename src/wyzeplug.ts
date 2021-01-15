@@ -6,28 +6,24 @@ export class Wyzeplug {
         this.device = device;
     }
 
-    public async off(): Promise<boolean> {
-        console.log('OFF', this.device.nickname);
+    public async off(): Promise<any> {
         const result = await this.wyze.turnOff(this.device);
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             if (result.code !== '1') {
-                console.log('ERROR', JSON.stringify(result));
-                resolve(false);
+                reject(result);
             } else {
-                resolve(true);
+                resolve(result);
             }
         });
     }
 
-    public async on(): Promise<boolean> {
-        console.log('ON', this.device.nickname);
+    public async on(): Promise<any> {
         const result = await this.wyze.turnOn(this.device);
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             if (result.code !== '1') {
-                console.log('ERROR', JSON.stringify(result));
-                resolve(false);
+                reject(result);
             } else {
-                resolve(true);
+                resolve(result);
             }
         });
     }

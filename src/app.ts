@@ -183,8 +183,6 @@ export class App {
             logger.debug(`XXX advertisement ${ad.id} XXX`);
         }
 
-        logger.debug(app.systems);
-
         return app.systems;
     }
 
@@ -237,15 +235,15 @@ export class App {
         const sec: number = now.getSeconds();
 
         if (app.lamps.isOn(hour)) {
-           app.systems.set('lamp', true);
+            app.systems.set('lamp', true);
         } else {
-           app.systems.set('lamp', false);
+            app.systems.set('lamp', false);
         }
 
         if (app.blowers.isOn(min * 60 + sec)) {
-           app.systems.set('blower', true);
+            app.systems.set('blower', true);
         } else {
-           app.systems.set('blower', false);
+            app.systems.set('blower', false);
         }
 
 
@@ -254,41 +252,73 @@ export class App {
         logger.debug('PLUGS', app.plugs);
 
         app.plugs.forEach((value: Array<Plug>, key: string) => {
+            console.log('this key here', key);
             value.forEach((plug) => {
+                console.log('this plug here', plug);
                 if (app.systems.get(key)) {
-                    plug.on();
+                    plug.on().then(() => {
+                        logger.debug(plug.bot.device.nickname, 'plug on OK');
+                    }).catch((result) => {
+                        logger.error(plug.bot.device.nickname, 'plug on NOT OK', result);
+                        if (app.socket.readyState === 1) {
+                            const data = {
+                                id: config.get('id'),
+                                plug: plug.bot.device.nickname,
+                                action: 'on',
+                                code: result.code,
+                                message: result.msg,
+                                timestamp: new Date()
+                            };
+                            app.socket.send(JSON.stringify(data));
+                        }
+                    });
                 } else {
-                    plug.off();
+                    plug.off().then(() => {
+                        logger.debug(plug.bot.device.nickname, 'plug off OK');
+                    }).catch((result) => {
+                        logger.error(plug.bot.device.nickname, 'plug off NOT OK', result);
+                        if (app.socket.readyState === 1) {
+                            const data = {
+                                id: config.get('id'),
+                                plug: plug.bot.device.nickname,
+                                action: 'on',
+                                code: result.code,
+                                message: result.msg,
+                                timestamp: new Date()
+                            };
+                            app.socket.send(JSON.stringify(data));
+                        }
+                    });
                 }
             });
         });
 
         logger.debug('Done apply systems command.');
 
-      const data = {
-          id: config.get('id'),
+        const data = {
+            id: config.get('id'),
             temperature: app.last[0],
             humidity: app.last[1],
-          blower: app.systems.get('blower'),
-          dehumidifier: app.systems.get('dehumidifier'),
-          heater: app.systems.get('heater'),
-          humidifier: app.systems.get('humidifier'),
-          lamp: app.systems.get('lamp'),
+            blower: app.systems.get('blower'),
+            dehumidifier: app.systems.get('dehumidifier'),
+            heater: app.systems.get('heater'),
+            humidifier: app.systems.get('humidifier'),
+            lamp: app.systems.get('lamp'),
             updated_at: new Date()
         };
         
-      logger.debug('Checking app socket...');
-      logger.debug('Ready state:', app.socket.readyState);
-      logger.debug('Done.');
+        logger.debug('Checking app socket...');
+        logger.debug('Ready state:', app.socket.readyState);
+        logger.debug('Done.');
         
-      if (app.socket.readyState !== 1) {
+        if (app.socket.readyState !== 1) {
             app.socket = null;
-          app.socket = new WebSocket(config.get('ws-url'));
+            app.socket = new WebSocket(config.get('ws-url'));
             
-          app.socket.on('close', () => {
-             logger.debug('THIS SOCKET IS CLOSED');
-          });
-      } else {
+            app.socket.on('close', () => {
+                logger.debug('THIS SOCKET IS CLOSED');
+            });
+        } else {
             app.socket.send(JSON.stringify(data));
         }
 
