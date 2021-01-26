@@ -35,7 +35,7 @@ export class App {
     night: AirDirectives;
     lamps: LampTimer;
     blowers: BlowerTimer;
-    last: [number, number];
+    last: [number, number, Date];
     socket: WebSocket;
     systems: Map<string, boolean>;
     growlog: GrowLog;
@@ -94,7 +94,7 @@ export class App {
                     config.get('environment.lamp-off.humidity')]));
         }
 
-        this.last = [-1, -1];
+        this.last = [-1, -1, new Date()];
 
         this.socket = new WebSocket(config.get('ws-url'));
 
@@ -178,6 +178,7 @@ export class App {
 
                 app.last[0] = t;
                 app.last[1] = h;
+		app.last[2] = new Date();
             }
         } else {
             logger.debug(`XXX advertisement ${ad.id} XXX`);

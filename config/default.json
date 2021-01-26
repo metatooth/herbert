@@ -1,5 +1,5 @@
 {
-  "id": "HERBERT",
+  "id": "HERB",
   "port": 4300,
   "polling": 5,
   "interval": 30,
@@ -18,12 +18,6 @@
       "ffffffffffff"
   ],
   "plugs": [
-      {
-          "type": "wyze",
-          "prefix": "",
-          "username": "",
-          "password": ""
-      }
   ],
   "environment": {
     "strategies": "temp-humidity|constant-vpd",
