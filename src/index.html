@@ -155,11 +155,6 @@
 		  <input class="input" type="text" placeholder="humidity" value="1">
 		</div>
 	      </div>
-	      <div class="field">
-		<div class="control">
-		  <input class="input" type="text" placeholder="pressure" value="100">
-		</div>
-	      </div>
 	    </div>
 	  </div>
 	  <div class="field is-horizontal">
@@ -219,7 +214,9 @@
 
   <script id="readout-template" type="x-tmpl-mustach">
     <span class="icon"><i class="{{icon}}"></i></span>
-    <span><input class="display" type="text" id="{{id}}" disabled>{{units}}</span>
+    <span><input class="display" type="text" id="{{id}}" disabled>
+      {{units}}
+    </span>
   </script>
 
   <script id="timestamp-template" type="x-tmpl-mustache">

@@ -8,7 +8,6 @@ export class Mockbot {
     }
 
     public async wait(ms: number): Promise<boolean> {
-        console.log('milliseconds %d', ms);
         wait(ms/2);
 
         const now = new Date().getTime();
@@ -31,10 +30,6 @@ export class Mockbot {
                 battery: 100
             }
         };
-
-        console.log(this);
-        console.log(this.onadvertisement);
-        console.log(ad);
 
         await this.onadvertisement(ad);
 

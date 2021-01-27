@@ -35,11 +35,12 @@ export class App {
     night: AirDirectives;
     lamps: LampTimer;
     blowers: BlowerTimer;
-    last: [number, number, Date];
     socket: WebSocket;
     systems: Map<string, boolean>;
     growlog: GrowLog;
     mainMeter: Meter;
+    clime: Clime;
+    intakeMeter: Meter;
     plugs: Map<string, Array<Plug>>;
 
     private constructor() {
@@ -94,10 +95,10 @@ export class App {
                     config.get('environment.lamp-off.humidity')]));
         }
 
-        this.last = [-1, -1, new Date()];
-
         this.socket = new WebSocket(config.get('ws-url'));
 
+	this.clime = new Clime(-1, 0.6, -1);
+	
         this.systems = new Map([
             ['blower', false],
             ['dehumidifier', false],
@@ -106,7 +107,7 @@ export class App {
             ['lamp', false],
         ]);
         
-        this.growlog = new GrowLog('growlog.db');
+        this.growlog = new GrowLog('client.db');
 
         const meters: Array<Meter> = config.get('meters');
 
@@ -114,79 +115,95 @@ export class App {
             logger.debug('METER', meter);
             if (meter.type === 'main') {
                 this.mainMeter = new Meter(meter.id);
-            }
+            } else if (meter.type == 'intake') {
+		this.intakeMeter = new Meter(meter.id);
+	    }
+	    
         });
 
         this.initialized = false;
     }
 
-    async handler(ad: WoSensorTH): Promise<Map<string, boolean>> {
+    async check(): Promise<Map<string, boolean>> {
         const app = App.instance();
 
-        if (ad.id === app.mainMeter.id) {
-            logger.debug(`main meter id ${ad.id}`);
+        logger.debug('curr:', [app.mainMeter.clime.temperature,
+			       app.mainMeter.clime.humidity]);  
+        logger.debug('last:', [app.clime.temperature,
+			       app.clime.humidity]);  
 
-            const t = ad.serviceData.temperature.c;
-            const h = ad.serviceData.humidity / 100.0;
+        if (app.mainMeter.clime.temperature !== app.clime.temperature ||
+	    app.mainMeter.clime.humidity !== app.clime.humidity) {
+            logger.debug('changed!');
+            app.clime = app.mainMeter.clime;
 
-            logger.debug('curr:', [t, h]);
-            logger.debug('last:', app.last);  
-
-            if (app.last[0] !== t || app.last[1] !== h) {
-                logger.debug('changed!');
-
-                app.systems.set('heater', false);
-                app.systems.set('blower', false);
-                app.systems.set('humidifier', false);
-                app.systems.set('dehumidifier', false);
+            app.systems.set('heater', false);
+            app.systems.set('blower', false);
+            app.systems.set('humidifier', false);
+            app.systems.set('dehumidifier', false);
                 
-                app.growlog.track(t, h);
+            app.growlog.track(app.mainMeter.id,
+			      app.mainMeter.clime.temperature,
+			      app.mainMeter.clime.humidity);
+            app.growlog.track(app.intakeMeter.id,
+			      app.intakeMeter.clime.temperature,
+			      app.intakeMeter.clime.humidity);
 
-                const hour = (new Date()).getHours();
-                let directive: AirDirectives;
-                let d: number;
-
-                if (app.lamps.isOn(hour)) {
-                    directive = app.day;
-                    d = -0.6;
-                } else {
-                    directive = app.night;
-                    d = 0.3;
-                }
-
-                directive.clime = new Clime(t, d, h);
-                directive.monitor();
-
-                logger.debug(directive);
-
-                if (directive.temperature === 'heat') {
-                    app.systems.set('heater', true);
-                } else if (directive.temperature === 'cool') {
-                    app.systems.set('blower', true);                
-                } else {
-                    app.systems.set('heater', false);
-                }
-
-                if (directive.humidity === 'humidify') {
-                    app.systems.set('humidifier', true);
-                } else if (directive.humidity === 'dehumidify') {
-                    app.systems.set('dehumidifier', true);
-                } else {
-                    app.systems.set('dehumidifier', false);
-                    app.systems.set('humidifier', false);
-                }
-
-                app.last[0] = t;
-                app.last[1] = h;
-		app.last[2] = new Date();
+            const hour = (new Date()).getHours();
+            let directive: AirDirectives;
+            let d: number;
+	    
+            if (app.lamps.isOn(hour)) {
+                directive = app.day;
+                app.clime.delta = -0.6;
+            } else {
+                directive = app.night;
+                app.clime.delta = 0.3;
             }
-        } else {
-            logger.debug(`XXX advertisement ${ad.id} XXX`);
+	    
+            directive.clime = app.clime;
+            directive.monitor();
+	    
+            logger.debug(directive);
+	    
+            if (directive.temperature === 'heat') {
+                app.systems.set('heater', true);
+            } else if (directive.temperature === 'cool') {
+                app.systems.set('blower', true);                
+            } else {
+                app.systems.set('heater', false);
+            }
+	    
+            if (directive.humidity === 'humidify') {
+                app.systems.set('humidifier', true);
+            } else if (directive.humidity === 'dehumidify') {
+                app.systems.set('dehumidifier', true);
+            } else {
+                app.systems.set('dehumidifier', false);
+                app.systems.set('humidifier', false);
+            }	    
         }
 
         return app.systems;
     }
-
+    
+    public async handler(ad: WoSensorTH): Promise<boolean> {
+        const app = App.instance();
+	if (app.mainMeter.id === ad.id) {
+	    app.mainMeter.clime.temperature = ad.serviceData.temperature.c;
+	    app.mainMeter.clime.humidity = ad.serviceData.humidity / 100.0;
+	    app.mainMeter.clime.timestamp = new Date();
+	} else if (app.intakeMeter.id === ad.id) {
+	    app.intakeMeter.clime.temperature = ad.serviceData.temperature.c;
+	    app.intakeMeter.clime.humidity = ad.serviceData.humidity / 100.0;
+	    app.intakeMeter.clime.timestamp = new Date();
+	} else {
+	    logger.debug(`XXX unhandled advertisement -- ${ad.id} XXX`);
+	}
+	
+	return true;
+    }
+    
     public static instance(): App {
         if (!App._instance) {
             App._instance = new App();
@@ -201,12 +218,13 @@ export class App {
         const factory = new PlugFactory(this.systems);
         await factory.build(config.get('plugs'));
         this.plugs = factory.plugs;
-        
+
         return new Promise((resolve) => {
             logger.info('DAY >>', this.day);
             logger.info('NIGHT >>', this.night);
             logger.info(config);
             logger.info(this.mainMeter);
+            logger.info(this.intakeMeter);
             logger.info(this.plugs);
             logger.info('====================================');
             this.initialized = true;
@@ -223,13 +241,24 @@ export class App {
         const polling: number = 1000 * parseInt(config.get('polling'));
         const interval: number = 1000 * parseInt(config.get('interval'));
 
-        logger.debug('Start scan for %dms ...', polling);
+        logger.debug('Start main meter scan for %dms ...', polling);
+	app.mainMeter.bot.onadvertisement = app.handler;
         await app.mainMeter.startScan();
-        app.mainMeter.bot.onadvertisement = app.handler;
         await app.mainMeter.wait(polling);
         await app.mainMeter.stopScan();
+        logger.debug('Done main meter scan.');
+
+	logger.debug('Start intake meter scan for %dms ...', polling);
+	app.intakeMeter.bot.onadvertisement = app.handler;
+        await app.intakeMeter.startScan();
+        await app.intakeMeter.wait(polling);
+        await app.intakeMeter.stopScan();
         logger.debug('Done scan.');
 
+	logger.debug('Check if climate has changed...');
+	await app.check();
+	logger.debug('done.');
+	
         const now: Date = new Date();
         const hour: number = now.getHours();
         const min: number = now.getMinutes();
@@ -298,8 +327,10 @@ export class App {
 
         const data = {
             id: config.get('id'),
-            temperature: app.last[0],
-            humidity: app.last[1],
+            temperature: app.mainMeter.clime.temperature,
+            humidity: app.mainMeter.clime.humidity,
+	    intake_temperature: -1,
+	    intake_humidity: -1,
             blower: app.systems.get('blower'),
             dehumidifier: app.systems.get('dehumidifier'),
             heater: app.systems.get('heater'),
@@ -307,7 +338,12 @@ export class App {
             lamp: app.systems.get('lamp'),
             updated_at: new Date()
         };
-        
+	
+        if (app.intakeMeter) {
+	    data['intake_temperature'] = app.intakeMeter.clime.temperature; 
+	    data['intake_humidity'] = app.intakeMeter.clime.humidity; 
+	}
+
         logger.debug('Checking app socket...');
         logger.debug('Ready state:', app.socket.readyState);
         logger.debug('Done.');
@@ -323,8 +359,8 @@ export class App {
             app.socket.send(JSON.stringify(data));
         }
 
-        logger.debug('Done all. Timeout in %dms.', interval - polling);
-        setTimeout(app.run, interval - polling);
+        logger.debug('Done all. Timeout in %dms.', interval - 2 * polling);
+        setTimeout(app.run, interval - 2 * polling);
 
         return new Promise((resolve) => {
             resolve(true);

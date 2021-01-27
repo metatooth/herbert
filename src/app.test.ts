@@ -1,4 +1,6 @@
 import { App } from './app';
+import { Clime } from './clime';
+import { Mockbot } from './mockbot';
 
 import * as WebSocket from 'ws';
 let server: WebSocket.Server;
@@ -21,28 +23,15 @@ test('does run', () => {
     });
 });
 
-test('handles an advertisement', () => {
+test('checks to see if climate has changed, set system map if so', () => {
     const app = App.instance();
 
-    const ad = {
-        id: 'aaaaaaaaaaaa',
-        address: 'aa:aa:aa:aa:aa:aa',
-        rssi: -125,
-        serviceData: { 
-            model: 'T',
-            modelName: 'WoSensorTH',
-            temperature: {
-                c: 23.9,
-                f: 75.0
-            },
-            fahrenheit: false,
-            humidity: 55,
-            battery: 100
-        } 
-    };
-
+    app.clime = new Clime(-1, 0.6, -1);
+    app.mainMeter = new Mockbot();
+    app.mainMeter.clime = app.clime;
+    
     return app.init().then(() => {
-        app.handler(ad).then((data: Map<string, boolean>) => {
+        app.check().then((data: Map<string, boolean>) => {
             expect(data).toStrictEqual(new Map([['heater', false],
                                                 ['blower', false],
                                                 ['dehumidifier', false],

@@ -24,10 +24,11 @@ export class GrowLog {
     async init(): Promise<boolean> {
         const db: sqlite.Database = this.db;
         return new Promise((resolve) => {
-            db.get("SELECT id, created_at, temperature, relative_humidity FROM growlogs", (err: string) => {
+            db.get("SELECT id, created_at, meter, temperature, relative_humidity FROM growlogs", (err: string) => {
+		console.log('ERROR', err);
                 if (err) {
                     db.serialize(() => {
-                        db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
+                        db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, meter VARCHAR(255) NOT NULL, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
                     });
                 }
                 resolve(true);
@@ -35,15 +36,15 @@ export class GrowLog {
         });
     }
 
-    async track(temp: number, humidity: number): Promise<boolean> {
+    async track(meter: string, temp: number, humidity: number): Promise<boolean> {
         await this.init();
 
         const db = this.db;
 
         return new Promise((resolve) => {
             db.serialize(function() {
-                const stmt = db.prepare("INSERT INTO growlogs (temperature, relative_humidity) VALUES (?, ?)");
-                stmt.run(temp, humidity);
+                const stmt = db.prepare("INSERT INTO growlogs (meter, temperature, relative_humidity) VALUES (?, ?, ?)");
+                stmt.run(meter, temp, humidity);
                 resolve(true);
             });
 
@@ -53,7 +54,7 @@ export class GrowLog {
     async log(pageno: number, pagesize: number): Promise<[unknown, unknown]> {
         await this.init();
 
-        let sql = "SELECT id, created_at, temperature, relative_humidity FROM growlogs ORDER BY id DESC";
+        let sql = "SELECT id, created_at, meter, temperature, relative_humidity FROM growlogs ORDER BY id DESC";
         if (pageno !== 0) {
             sql += " LIMIT " + ((pageno-1)*pagesize) + ", " + pagesize;
         }

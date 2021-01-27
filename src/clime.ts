@@ -7,11 +7,13 @@ export class Clime {
     temperature: number;
     delta: number;
     humidity: number;
-
+    timestamp: Date;
+    
     constructor(temperature: number, delta: number, humidity: number) {
         this.temperature = temperature;
         this.delta = delta;
         this.humidity = humidity;
+	this.timestamp = new Date();
     }
 
     svp(): number {
