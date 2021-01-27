@@ -20,7 +20,14 @@ $ sudo npm run client
 
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
 
+- Add device configuration to ~/herbert/config/production.json
+- Install script and add to system defaults
+- Start and check status
+
 ```
+$ sudo cp scripts/herbert /etc/init.d/herbert
+$ sudo update-rc.d herbert defaults
+$ sudo /etc/init.d/herbert start
 $ sudo /etc/init.d/herbert status
 ```
 
