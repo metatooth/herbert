@@ -1,29 +1,30 @@
-# Herbert
+# herbert
 
-An environmental control system using BLE devices and Node.js
+> A Vue.js project for visualization a Herbert.gr installation.
 
-## Getting Started
+## Build Setup
 
-Using Ubuntu 20.04 or Raspberry Pi OS Lite 5.4 2020-08-09
+``` bash
+# install dependencies
+npm install
 
+# serve with hot reload at localhost:8080
+npm run dev
+
+# build for production with minification
+npm run build
+
+# build for production and view the bundle analyzer report
+npm run build --report
+
+# run unit tests
+npm run unit
+
+# run e2e tests
+npm run e2e
+
+# run all tests
+npm test
 ```
-$ sudo apt-get update && sudo apt-get install git nodejs npm -y
-$ sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev -y
-$ git clone https://github.com/metatooth/herbert.git
-$ cd herbert
-$ npm install
-$ npm run build
-$ sudo npm run client
-```
 
-## Deployment
-
-Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
-
-```
-$ sudo /etc/init.d/herbert status
-```
-
-## License
-
-Copyright 2021 Metatooth LLC. See the [LICENSE](LICENSE).
+For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

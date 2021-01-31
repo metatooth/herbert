@@ -3,6 +3,7 @@ const sqlite3 = sqlite.verbose();
 
 export interface LogEntry {
     id: number,
+    meter: string,
     created_at: string,
     temperature: number,
     relative_humidity: number
