@@ -47,6 +47,7 @@
 <script>
 import ClientCard from './components/ClientCard.vue'
 import Notification from './components/Notification.vue'
+import GrowLog from './grow-log.js'
 
 export default {
   name: 'App',
@@ -57,9 +58,10 @@ export default {
   data () {
     return {
       clients: [],
-      serverUrl: process.env.WS_URL || 'ws://localhost:5000',
+      growlog: new GrowLog('server.db'),
       notification: null,
       notify: false,
+      serverUrl: process.env.WS_URL || 'ws://localhost:5000',
       units: 'F',
       ws: null
     }
@@ -121,6 +123,9 @@ export default {
           data.humidity = 100 * data.humidity
           this.clients.push(data)
         }
+
+        this.growlog.track(data.id, data.temperature, data.humidity)
+        
       } else if (data.code) {
         this.notify = true
         this.notification = data
