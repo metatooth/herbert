@@ -50,7 +50,7 @@
       </div>
       <footer class="card-footer">
         <div class="card-footer-item">
-          {{hhmm}}<span class="is-size-7">:{{ss}}</span>
+          <timestamp v-bind:updated_at="updated_at" />
         </div>
       </footer>
     </div>
@@ -59,12 +59,14 @@
 
 <script>
 import Target from './Target.vue'
+import Timestamp from './Timestamp.vue'
 import System from './System.vue'
 
 export default {
   name: 'Display',
   components: {
     Target,
+    Timestamp,
     System
   },
   props: {
@@ -80,14 +82,6 @@ export default {
     updated_at: String
   },
   computed: {
-    hhmm () {
-      const date = new Date(this.updated_at)
-      return this.zeroes(date.getHours()) + ':' + this.zeroes(date.getMinutes())
-    },
-    ss () {
-      const date = new Date(this.updated_at)
-      return this.zeroes(date.getSeconds())
-    },
     temp () {
       if (this.units === 'C') {
         return this.temperature
@@ -101,19 +95,12 @@ export default {
     vaporPressureDeficit () {
       return (this.saturatedVaporPressure(this.temperature - 0.6) -
               (this.humidity / 100 *
-               this.saturatedVaporPressure(this.temperature)))
-        / 1000
+               this.saturatedVaporPressure(this.temperature))) / 1000
     }
   },
   methods: {
     saturatedVaporPressure (temp) {
       return 610.7 * Math.pow(10, 7.5 * temp / (temp + 237.3))
-    },
-    zeroes (n) {
-      if (n < 10) {
-        return '0' + n
-      }
-      return n
     }
   }
 }

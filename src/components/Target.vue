@@ -22,3 +22,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.tag {
+  width: 300px
+}
+<style>

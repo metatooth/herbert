@@ -8,11 +8,13 @@
           </a>
         </div>
       </nav>
-    </div>
-    <div class="container">
+      <notification
+        v-if="notify"
+        v-bind:onclose="closeNotification"
+        v-bind="notification" >
+      </notification>
       <section class="section">
         <span>{{ clients.length }} {{ clientsName }}</span>
-        <div id="notications"></div>
       </section>
       <section class="section">
         <form class="control">
@@ -44,16 +46,20 @@
 
 <script>
 import ClientCard from './components/ClientCard.vue'
+import Notification from './components/Notification.vue'
 
 export default {
   name: 'App',
   components: {
-    ClientCard
+    ClientCard,
+    Notification
   },
   data () {
     return {
       clients: [],
       serverUrl: process.env.WS_URL || 'ws://localhost:5000',
+      notification: null,
+      notify: false,
       units: 'F',
       ws: null
     }
@@ -71,6 +77,11 @@ export default {
     this.connectToWebSocket()
   },
   methods: {
+    closeNotification () {
+      console.log('close notification')
+      console.log(this.notification)
+      this.notify = false
+    },
     connectToWebSocket () {
       console.log('Starting connection to WebSocket server...')
       this.ws = new WebSocket(this.serverUrl)
@@ -98,10 +109,9 @@ export default {
             c.blower = data.blower
             c.dehumidifier = data.dehumidifier
             c.heater = data.heater
-            console.log(c)
-            console.log(data)
             c.humidifier = data.humidifier
             c.lamp = data.lamp
+            c.updated_at = data.updated_at
             found = true
           }
         })
@@ -112,7 +122,8 @@ export default {
           this.clients.push(data)
         }
       } else if (data.code) {
-        // do nothing
+        this.notify = true
+        this.notification = data
       }
     }
   }
