@@ -19,7 +19,7 @@
             units="%"
           />
           <target
-            icon="hammer"
+            icon="cloud"
             v-bind:value="vaporPressureDeficit"
             v-bind:precision="1"
             units="hPa"
@@ -35,7 +35,7 @@
       </div>
       <footer class="card-footer">
         <div class="card-footer-item">
-          <timestamp v-bind:updated_at="updated_at" />
+          <timestamp v-bind:timestamp="timestamp" />
         </div>
       </footer>
     </div>
@@ -61,7 +61,7 @@ const ClientCardProps = Vue.extend({
     heater: Boolean,
     humidifier: Boolean,
     lamp: Boolean,
-    timestamp: String
+    timestamp: Date
   }
 });
 

@@ -4,33 +4,37 @@
   </span>
 </template>
 
-<script>
-export default {
-  name: "Timestamp",
+<script lang="ts">
+import Vue from "vue";
+import Component from "vue-class-component";
+
+const TimestampProps = Vue.extend({
   props: {
-    timestamp: String
-  },
-  computed: {
-    hhmm() {
-      const date = new Date(this.timestamp);
-      return (
-        this.zeroes(date.getHours()) + ":" + this.zeroes(date.getMinutes())
-      );
-    },
-    ss() {
-      const date = new Date(this.timestamp);
-      return this.zeroes(date.getSeconds());
-    }
-  },
-  methods: {
-    zeroes(n) {
-      if (n < 10) {
-        return "0" + n;
-      }
-      return n;
-    }
+    timestamp: Date
   }
-};
+});
+
+@Component({})
+export default class Timestamp extends TimestampProps {
+  get hhmm(): string {
+    return (
+      this.zeroes(this.timestamp.getHours()) +
+      ":" +
+      this.zeroes(this.timestamp.getMinutes())
+    );
+  }
+
+  get ss(): string {
+    return this.zeroes(this.timestamp.getSeconds());
+  }
+
+  zeroes(n) {
+    if (n < 10) {
+      return "0" + n;
+    }
+    return n;
+  }
+}
 </script>
 
 <style></style>

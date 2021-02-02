@@ -11,7 +11,7 @@
       <notification
         v-for="notification in notifications"
         v-bind:key="notification.id"
-        v-bind:onclose="closeNotification"
+        v-on:delete-notification="deleteThisNotification(notification)"
         v-bind="notification"
       >
       </notification>
@@ -63,12 +63,16 @@ interface ClientData {
   heater: boolean;
   humidifier: boolean;
   lamp: boolean;
-  timestamp: string;
+  timestamp: date;
 }
 
 interface NotificationData {
   id: string;
+  plug: string;
+  action: string;
   code: string;
+  message: string;
+  timestamp: date;
 }
 
 @Component({
@@ -80,7 +84,6 @@ interface NotificationData {
 export default class App extends Vue {
   clients: Array<ClientData> = [];
   notifications: Array<NotificationData> = [];
-  notify = false;
   serverUrl = process.env.WS_URL || "ws://localhost:5000";
   units = "F";
 
@@ -103,10 +106,8 @@ export default class App extends Vue {
     }
   }
 
-  closeNotification(): void {
-    console.log("close notification");
-    console.log(this.notifications);
-    this.notify = false;
+  deleteThisNotification(notification): void {
+    this.notifications.splice(this.notifications.indexOf(notification), 1);
   }
 
   onWebsocketOpen(ev: Event): void {
@@ -129,9 +130,7 @@ export default class App extends Vue {
           c.heater = data.heater;
           c.humidifier = data.humidifier;
           c.lamp = data.lamp;
-          console.log("what of this?");
-          console.log(data);
-          //c.updated_at = data.updated_at;
+          c.timestamp = new Date();
           found = true;
         }
       });
@@ -139,11 +138,26 @@ export default class App extends Vue {
       if (!found) {
         data.units = this.units;
         data.humidity = 100 * data.humidity;
+        data.timestamp = new Date();
         this.clients.push(data);
       }
     } else if (data.code) {
-      this.notify = true;
-      this.notifications.push(data);
+      let found = false;
+      this.notifications.forEach((n: NotificationData) => {
+        if (n.id === data.id) {
+          n.plug = data.plug;
+          n.action = data.action;
+          n.code = data.code;
+          n.message = data.message;
+          n.timestamp = new Date();
+          found = true;
+        }
+      });
+
+      if (!found) {
+        data.timestamp = new Date();
+        this.notifications.push(data);
+      }
     }
   }
 }
@@ -151,11 +165,6 @@ export default class App extends Vue {
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 20px;
 }
 </style>
