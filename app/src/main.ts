@@ -11,11 +11,16 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
+import ClientCard from "./components/ClientCard.vue";
+import Notification from "./components/Notification.vue";
+
 library.add(faTint);
 library.add(faThermometerHalf);
 library.add(faCloud);
 
 Vue.component("font-awesome-icon", FontAwesomeIcon);
+Vue.component("client-card", ClientCard);
+Vue.component("notification", Notification);
 
 Vue.config.productionTip = false;
 

@@ -61,7 +61,7 @@ const ClientCardProps = Vue.extend({
     heater: Boolean,
     humidifier: Boolean,
     lamp: Boolean,
-    timestamp: Date
+    timestamp: String
   }
 });
 

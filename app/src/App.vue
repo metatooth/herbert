@@ -50,8 +50,6 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import ClientCard from "./components/ClientCard.vue";
-import Notification from "./components/Notification.vue";
 
 interface ClientData {
   id: string;
@@ -63,7 +61,7 @@ interface ClientData {
   heater: boolean;
   humidifier: boolean;
   lamp: boolean;
-  timestamp: date;
+  timestamp: string;
 }
 
 interface NotificationData {
@@ -72,15 +70,10 @@ interface NotificationData {
   action: string;
   code: string;
   message: string;
-  timestamp: date;
+  timestamp: string;
 }
 
-@Component({
-  components: {
-    ClientCard,
-    Notification
-  }
-})
+@Component
 export default class App extends Vue {
   clients: Array<ClientData> = [];
   notifications: Array<NotificationData> = [];
@@ -106,7 +99,7 @@ export default class App extends Vue {
     }
   }
 
-  deleteThisNotification(notification): void {
+  deleteThisNotification(notification: NotificationData): void {
     this.notifications.splice(this.notifications.indexOf(notification), 1);
   }
 
@@ -130,33 +123,51 @@ export default class App extends Vue {
           c.heater = data.heater;
           c.humidifier = data.humidifier;
           c.lamp = data.lamp;
-          c.timestamp = new Date();
+          c.timestamp = new Date().toString();
           found = true;
         }
       });
 
       if (!found) {
-        data.units = this.units;
-        data.humidity = 100 * data.humidity;
-        data.timestamp = new Date();
-        this.clients.push(data);
+        const cd: ClientData = {
+          id: data.id,
+          units: this.units,
+          temperature: data.temperature,
+          humidity: 100 * data.humidity,
+          blower: data.blower,
+          dehumidifier: data.dehumidifer,
+          heater: data.heater,
+          humidifier: data.humidifier,
+          lamp: data.lamp,
+          timestamp: new Date().toString()
+        };
+
+        this.clients.push(cd);
       }
     } else if (data.code) {
       let found = false;
-      this.notifications.forEach((n: NotificationData) => {
-        if (n.id === data.id) {
-          n.plug = data.plug;
-          n.action = data.action;
-          n.code = data.code;
-          n.message = data.message;
-          n.timestamp = new Date();
+      this.notifications.forEach((nd: NotificationData) => {
+        if (nd.id === data.id) {
+          nd.plug = data.plug;
+          nd.action = data.action;
+          nd.code = data.code;
+          nd.message = data.message;
+          nd.timestamp = new Date().toString();
           found = true;
         }
       });
 
       if (!found) {
-        data.timestamp = new Date();
-        this.notifications.push(data);
+        const nd: NotificationData = {
+          id: data.id,
+          plug: data.plug,
+          action: data.action,
+          code: data.code,
+          message: data.message,
+          timestamp: new Date().toString()
+        };
+
+        this.notifications.push(nd);
       }
     }
   }

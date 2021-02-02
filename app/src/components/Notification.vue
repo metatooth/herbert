@@ -18,8 +18,7 @@ const NotificationProps = Vue.extend({
     id: String,
     plug: String,
     message: String,
-    onclose: Function,
-    timestamp: Date
+    timestamp: String
   }
 });
 
@@ -28,8 +27,7 @@ const NotificationProps = Vue.extend({
     Timestamp
   }
 })
-export default class Notification extends NotificationProps {
-}
+export default class Notification extends NotificationProps {}
 </script>
 
 <style></style>

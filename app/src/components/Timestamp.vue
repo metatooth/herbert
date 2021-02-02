@@ -10,29 +10,27 @@ import Component from "vue-class-component";
 
 const TimestampProps = Vue.extend({
   props: {
-    timestamp: Date
+    timestamp: String
   }
 });
 
 @Component({})
 export default class Timestamp extends TimestampProps {
   get hhmm(): string {
-    return (
-      this.zeroes(this.timestamp.getHours()) +
-      ":" +
-      this.zeroes(this.timestamp.getMinutes())
-    );
+    const date = new Date(this.timestamp);
+    return this.zeroes(date.getHours()) + ":" + this.zeroes(date.getMinutes());
   }
 
   get ss(): string {
-    return this.zeroes(this.timestamp.getSeconds());
+    const date = new Date(this.timestamp);
+    return this.zeroes(date.getSeconds());
   }
 
-  zeroes(n) {
+  zeroes(n: number): string {
     if (n < 10) {
-      return "0" + n;
+      return `0${n}`;
     }
-    return n;
+    return n.toString();
   }
 }
 </script>
