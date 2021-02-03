@@ -9,6 +9,9 @@ export class AirDirectives {
   
   constructor(controller: ClimeControl) {
       this.controller = controller;
+      this.clime = new Clime();
+      this.temperature = "15.6";
+      this.humidity = "0.40";
   }
 
   monitor(): void {

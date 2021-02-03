@@ -1,34 +1,34 @@
-const sqlite3 = require('sqlite3').verbose();
+import { Database } from 'sqlite3';
 
 export interface LogEntry {
     id: number,
+    timestamp: string,
     meter: string,
-    created_at: string,
     temperature: number,
-    relative_humidity: number
+    humidity: number
 }
 
 /**
  * Log growing conditions
  */
 export class GrowLog {
-    db: sqlite3.Database;
+    db: Database;
     initialized: boolean;
     path: string;
     
     constructor(path: string) {
         this.path = path;
-        this.db = new sqlite3.Database(this.path);
+        this.db = new Database(this.path);
     }
     
     async init(): Promise<boolean> {
-        const db: sqlite3.Database = this.db;
+        const db: Database = this.db;
         return new Promise((resolve) => {
-            db.get("SELECT id, created_at, meter, temperature, relative_humidity FROM growlogs", (err: string) => {
+            db.get("SELECT id, timestamp, meter, temperature, humidity FROM growlogs", (err: string) => {
 		console.log('ERROR', err);
                 if (err) {
                     db.serialize(() => {
-                        db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, meter VARCHAR(255) NOT NULL, temperature NUMERIC NOT NULL, relative_humidity NUMERIC NOT NULL)");
+                        db.run("CREATE TABLE growlogs (id INTEGER PRIMARY KEY, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, meter VARCHAR(255) NOT NULL, temperature NUMERIC NOT NULL, humidity NUMERIC NOT NULL)");
                     });
                 }
                 resolve(true);
@@ -43,7 +43,7 @@ export class GrowLog {
 
         return new Promise((resolve) => {
             db.serialize(function() {
-                const stmt = db.prepare("INSERT INTO growlogs (meter, temperature, relative_humidity) VALUES (?, ?, ?)");
+                const stmt = db.prepare("INSERT INTO growlogs (meter, temperature, humidity) VALUES (?, ?, ?)");
                 stmt.run(meter, temp, humidity);
                 resolve(true);
             });
@@ -54,7 +54,7 @@ export class GrowLog {
     async log(pageno: number, pagesize: number): Promise<[any, any]> {
         await this.init();
 
-        let sql = "SELECT id, created_at, meter, temperature, relative_humidity FROM growlogs ORDER BY id DESC";
+        let sql = "SELECT id, timestamp, meter, temperature, humidity FROM growlogs ORDER BY id DESC";
         if (pageno !== 0) {
             sql += " LIMIT " + ((pageno-1)*pagesize) + ", " + pagesize;
         }

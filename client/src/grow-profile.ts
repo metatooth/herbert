@@ -19,11 +19,12 @@ export interface ProfileEntry {
  * A grow phase profile
  */
 export class GrowProfile {
-    db: sqlite.Database;
     initialized: boolean;
-    path: string;
+    path: string; 
+    db: sqlite.Database;
     
     constructor(path: string) {
+        this.initialized = false;
         this.path = path;
         this.db = new sqlite3.Database(this.path);
     }
