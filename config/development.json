@@ -1,0 +1,42 @@
+{
+  "id": "DEVBERT",
+    "meters": [
+	{ "type": "main", "id": "mock" },
+	{ "type": "intake", "id": "mock" }
+
+    ],
+    "plugs": [
+	{
+            "type": "wyze",
+            "prefix": "HERB",
+            "username": "terry@aggalt.com",
+            "password": "6oXGPl7Ft1YS"
+	}
+    ],
+    "environment": {
+	"strategies": "temp-humidity|constant-vpd",
+	"strategy": "temp-humidity",
+	"lamp": {
+	    "start": 6,
+	    "duration": 18
+	},
+	"blower": {
+	    "cycle": 180,
+	    "active": 60
+	},
+	"lamp-on": {
+	    "temperature": 20.9,
+	    "delta": 0.27,
+	    "humidity": 0.55
+	},
+	"lamp-off": {
+	    "temperature": 20.9,
+	    "delta": 0.0,
+	    "humidity": 0.27
+	},
+	"temp-tolerance": 0.1,
+	"humidity-tolerance": 1,
+	"vpd-tolerance": 1,
+	"temp-minimum": 15.6
+    }
+}

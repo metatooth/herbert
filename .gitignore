@@ -30,3 +30,4 @@ selenium-debug.log
 *.js
 *.map
 *.db
+*~

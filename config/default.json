@@ -1,0 +1,40 @@
+{
+  "id": "HERB",
+  "polling": 5,
+  "interval": 30,
+  "ws-url": "ws://localhost:3000",
+  "meters": [
+  ],
+  "air-systems": [
+  ],
+  "lamps": [
+  ],
+  "plugs": [
+  ],
+  "environment": {
+    "strategies": "temp-humidity|constant-vpd",
+    "strategy": "temp-humidity",
+    "lamp": {
+      "start": 6,
+      "duration": 18
+    },
+    "blower": {
+      "cycle": 180,
+      "active": 60
+    },
+    "lamp-on": {
+       "temperature": 25.3,
+       "delta": 0.6,
+       "humidity": 0.55
+    },
+    "lamp-off": {
+       "temperature": 23.1,
+       "delta": 0.0,
+       "humidity": 0.55
+    },
+    "temp-tolerance": 0.1,
+    "humidity-tolerance": 1,
+    "vpd-tolerance": 1,
+    "temp-minimum": 15.6
+  }
+}
