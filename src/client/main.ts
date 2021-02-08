@@ -18,5 +18,5 @@ Vue.component("FontAwesomeIcon", FontAwesomeIcon);
 Vue.config.productionTip = false;
 
 new Vue({
-  render: (h: any) => h(App)
+  render: h => h(App)
 }).$mount("#app");

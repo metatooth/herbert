@@ -4,7 +4,7 @@
       <nav class="navbar">
         <div class="navbar-brand">
           <a class="navbar-item" href="/">
-            <img src="../../assets/images/logo.png" />
+            <img src="./assets/images/logo.png" />
           </a>
         </div>
       </nav>
@@ -47,7 +47,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 import ClientCard from "@/components/ClientCard.vue";
 import Notification from "@/components/Notification.vue";
 
@@ -73,12 +72,20 @@ interface NotificationData {
   timestamp: string;
 }
 
-@Component({ components: [Notification, ClientCard] })
-export default class App extends Vue {
-  clients: Array<ClientData> = [];
-  notifications: Array<NotificationData> = [];
-  serverUrl = process.env.WS_URL || "ws://localhost:5000";
-  units = "F";
+const App = Vue.extend({
+  data() {
+    return {
+      clients: [] as ClientData[],
+      notifications: [] as NotificationData[],
+      serverUrl: process.env.WS_URL || "ws://localhost:5000",
+      units: "F"
+    };
+  },
+
+  components: {
+    ClientCard,
+    Notification
+  },
 
   mounted() {
     console.log("Starting connection to WebSocket server...");
@@ -89,89 +96,95 @@ export default class App extends Vue {
     ws.addEventListener("message", (ev: MessageEvent) => {
       this.onWebsocketMessage(ev);
     });
-  }
+  },
 
-  get clientsName(): string {
-    if (this.clients.length === 1) {
-      return "client";
-    } else {
-      return "clients";
-    }
-  }
-
-  deleteThisNotification(notification: NotificationData): void {
-    this.notifications.splice(this.notifications.indexOf(notification), 1);
-  }
-
-  onWebsocketOpen(ev: Event): void {
-    console.log(ev);
-    console.log("Connection open success!");
-  }
-
-  onWebsocketMessage(ev: MessageEvent): void {
-    const data = JSON.parse(ev.data);
-
-    if (data.temperature) {
-      let found = false;
-      this.clients.forEach((c: ClientData) => {
-        if (c.id === data.id) {
-          c.units = this.units;
-          c.temperature = data.temperature;
-          c.humidity = 100 * data.humidity;
-          c.blower = data.blower;
-          c.dehumidifier = data.dehumidifier;
-          c.heater = data.heater;
-          c.humidifier = data.humidifier;
-          c.lamp = data.lamp;
-          c.timestamp = new Date().toString();
-          found = true;
-        }
-      });
-
-      if (!found) {
-        const cd: ClientData = {
-          id: data.id,
-          units: this.units,
-          temperature: data.temperature,
-          humidity: 100 * data.humidity,
-          blower: data.blower,
-          dehumidifier: data.dehumidifer,
-          heater: data.heater,
-          humidifier: data.humidifier,
-          lamp: data.lamp,
-          timestamp: new Date().toString()
-        };
-
-        this.clients.push(cd);
-      }
-    } else if (data.code) {
-      let found = false;
-      this.notifications.forEach((nd: NotificationData) => {
-        if (nd.id === data.id) {
-          nd.plug = data.plug;
-          nd.action = data.action;
-          nd.code = data.code;
-          nd.message = data.message;
-          nd.timestamp = new Date().toString();
-          found = true;
-        }
-      });
-
-      if (!found) {
-        const nd: NotificationData = {
-          id: data.id,
-          plug: data.plug,
-          action: data.action,
-          code: data.code,
-          message: data.message,
-          timestamp: new Date().toString()
-        };
-
-        this.notifications.push(nd);
+  computed: {
+    clientsName(): string {
+      if (this.clients.length === 1) {
+        return "client";
+      } else {
+        return "clients";
       }
     }
+  },
+
+  methods: {
+    deleteThisNotification(notification: NotificationData): void {
+      this.notifications.splice(this.notifications.indexOf(notification), 1);
+    },
+
+    onWebsocketOpen(ev: Event): void {
+      console.log(ev);
+      console.log("Connection open success!");
+    },
+
+    onWebsocketMessage(ev: MessageEvent): void {
+      const data = JSON.parse(ev.data);
+
+      if (data.temperature) {
+        let found = false;
+        this.clients.forEach((c: ClientData) => {
+          if (c.id === data.id) {
+            c.units = this.units;
+            c.temperature = data.temperature;
+            c.humidity = 100 * data.humidity;
+            c.blower = data.blower;
+            c.dehumidifier = data.dehumidifier;
+            c.heater = data.heater;
+            c.humidifier = data.humidifier;
+            c.lamp = data.lamp;
+            c.timestamp = new Date().toString();
+            found = true;
+          }
+        });
+
+        if (!found) {
+          const cd: ClientData = {
+            id: data.id,
+            units: this.units,
+            temperature: data.temperature,
+            humidity: 100 * data.humidity,
+            blower: data.blower,
+            dehumidifier: data.dehumidifer,
+            heater: data.heater,
+            humidifier: data.humidifier,
+            lamp: data.lamp,
+            timestamp: new Date().toString()
+          };
+
+          this.clients.push(cd);
+        }
+      } else if (data.code) {
+        let found = false;
+        this.notifications.forEach((nd: NotificationData) => {
+          if (nd.id === data.id) {
+            nd.plug = data.plug;
+            nd.action = data.action;
+            nd.code = data.code;
+            nd.message = data.message;
+            nd.timestamp = new Date().toString();
+            found = true;
+          }
+        });
+
+        if (!found) {
+          const nd: NotificationData = {
+            id: data.id,
+            plug: data.plug,
+            action: data.action,
+            code: data.code,
+            message: data.message,
+            timestamp: new Date().toString()
+          };
+
+          this.notifications.push(nd);
+        }
+      }
+    }
   }
-}
+});
+
+export default App;
 </script>
 
 <style>

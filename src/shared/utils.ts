@@ -1,4 +1,13 @@
 /**
+ * Calculates saturated vapor pressure
+ * @param {number} T temperature in Celsius
+ * @return {number} vapor pressure in pascals
+ */
+export function saturatedVaporPressure(T: number): number {
+  return 610.7 * Math.pow(10, (7.5 * T) / (T + 237.3));
+}
+
+/**
  * Calculates relative humidity for given vapor pressure deficit and temperature
  * @param {number} VP vapor pressure in pascals
  * @param {number} T temperature in Celsius
@@ -6,15 +15,6 @@
  */
 export function relativeHumidity(VP: number, T: number): number {
   return VP / saturatedVaporPressure(T);
-}
-
-/**
- * Calculates saturated vapor pressure
- * @param {number} T temperature in Celsius
- * @return {number} vapor pressure in pascals
- */
-export function saturatedVaporPressure(T: number): number {
-  return 610.7 * Math.pow(10, (7.5 * T) / (T + 237.3));
 }
 
 /**

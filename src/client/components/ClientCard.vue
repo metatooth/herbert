@@ -40,14 +40,14 @@
 </template>
 
 <script lang="ts">
+import Vue from "vue";
+
 import Target from "@/components/Target.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import System from "@/components/System.vue";
+import { saturatedVaporPressure } from "../../shared/utils";
 
-import Vue from "vue";
-import Component from "vue-class-component";
-
-const ClientCardProps = Vue.extend({
+const ClientCard = Vue.extend({
   props: {
     id: {
       type: String,
@@ -74,41 +74,36 @@ const ClientCardProps = Vue.extend({
       type: String,
       default: new Date()
     }
-  }
-});
+  },
 
-@Component({
   components: {
     Target,
     Timestamp,
     System
-  }
-})
-export default class ClientCard extends ClientCardProps {
-  get temp(): number {
-    if (this.units === "C") {
-      return this.temperature;
-    } else {
-      return (this.temperature * 9) / 5 + 32;
+  },
+
+  computed: {
+    temp(): number {
+      if (this.units === "C") {
+        return this.temperature;
+      } else {
+        return (this.temperature * 9) / 5 + 32;
+      }
+    },
+
+    unitsWithDegree(): string {
+      return "°" + this.units;
+    },
+
+    vaporPressureDeficit(): number {
+      return (
+        (saturatedVaporPressure(this.temperature - 0.6) -
+          (this.humidity / 100) * saturatedVaporPressure(this.temperature)) /
+        1000
+      );
     }
   }
+});
 
-  get unitsWithDegree(): string {
-    return "°" + this.units;
-  }
-
-  get vaporPressureDeficit(): number {
-    return (
-      (this.saturatedVaporPressure(this.temperature - 0.6) -
-        (this.humidity / 100) * this.saturatedVaporPressure(this.temperature)) /
-      1000
-    );
-  }
-
-  saturatedVaporPressure(temp: number): number {
-    return 610.7 * Math.pow(10, (7.5 * temp) / (temp + 237.3));
-  }
-}
+export default ClientCard;
 </script>
-
-<style></style>
