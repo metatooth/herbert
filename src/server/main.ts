@@ -1,6 +1,7 @@
 import WebSocket from "ws";
 import http from "http";
 import express from "express";
+import { createMeterReading } from "../shared/db";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -22,6 +23,11 @@ wss.on("connection", function(socket: WebSocket) {
   // When you receive a message, send that message to every socket.
   socket.on("message", function(msg: string) {
     console.log(msg);
+    const data = JSON.parse(msg);
+    console.log(data.id, data.temperature, data.humidity);
+    if (data.temperature && data.humidity) {
+        createMeterReading(data.id, data.temperature, data.humidity);
+    }
     sockets.forEach(s => s.send(msg));
   });
 
