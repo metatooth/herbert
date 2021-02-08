@@ -2,7 +2,7 @@ import { Database } from "sqlite3";
 
 export interface IMeterReadingEntry {
   id: number;
-  timestamp: string;
+  timestamp: Date;
   meter: string;
   temperature: number;
   humidity: number;
@@ -88,7 +88,6 @@ export class MeterReading {
         if (err) {
           reject(err);
         } else {
-          console.log("row", row);
           resolve(row);
         }
       });

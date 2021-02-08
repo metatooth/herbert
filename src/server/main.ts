@@ -1,12 +1,38 @@
 import WebSocket from "ws";
 import http from "http";
 import express from "express";
-import { createMeterReading } from "../shared/db";
+import { createMeterReading, meterReadings } from "../shared/db";
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(express.static(__dirname + "/"));
+app.get('/', (req, res) => {
+  res.send('OK');
+});
+
+app.param('meter', (req, res, next, id) => {
+  console.log('2');
+  meterReadings(id).then((readings) => {
+    if (readings.length > 0) {
+      res.status(200).json(readings);
+      next();
+    } else {
+      next(new Error('failed to find meter'));
+    }   
+  });
+});
+
+app.get('/readings/:meter', (req, res, next) => {
+  next();
+});
+
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.render('error', {
+    message: err.message,
+    error: {}
+  });
+});
 
 const server = http.createServer(app);
 server.listen(port);
