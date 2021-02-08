@@ -3,11 +3,8 @@
     <div class="container">
       <nav class="navbar">
         <div class="navbar-brand">
-          <a
-            class="navbar-item"
-            href="/"
-          >
-            <img src="../../assets/images/logo.png">
+          <a class="navbar-item" href="/">
+            <img src="../../assets/images/logo.png" />
           </a>
         </div>
       </nav>
@@ -22,29 +19,13 @@
       </section>
       <section class="section">
         <form class="control">
-          <label
-            for="celsius"
-            class="radio"
-          >
-            <input
-              id="celsius"
-              v-model="units"
-              type="radio"
-              value="C"
-            >
+          <label for="celsius" class="radio">
+            <input id="celsius" v-model="units" type="radio" value="C" />
             Celsius
           </label>
           &nbsp;
-          <label
-            for="fahrenheit"
-            class="radio"
-          >
-            <input
-              id="fahrenheit"
-              v-model="units"
-              type="radio"
-              value="F"
-            >
+          <label for="fahrenheit" class="radio">
+            <input id="fahrenheit" v-model="units" type="radio" value="F" />
             Fahrenheit
           </label>
         </form>
@@ -67,8 +48,8 @@
 <script lang="ts">
 import Vue from "vue";
 import Component from "vue-class-component";
-import ClientCard from 'Components/ClientCard.vue';
-import Notification from 'Components/Notification.vue';
+import ClientCard from "@/components/ClientCard.vue";
+import Notification from "@/components/Notification.vue";
 
 interface ClientData {
   id: string;
@@ -92,11 +73,11 @@ interface NotificationData {
   timestamp: string;
 }
 
-@Component({ components: [ Notification, ClientCard ] })
+@Component({ components: [Notification, ClientCard] })
 export default class App extends Vue {
   clients: Array<ClientData> = [];
   notifications: Array<NotificationData> = [];
-  serverUrl = process.env.WS_URL || "ws://localhost:3000";
+  serverUrl = process.env.WS_URL || "ws://localhost:5000";
   units = "F";
 
   mounted() {
@@ -193,7 +174,7 @@ export default class App extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style>
 #app {
   margin-top: 20px;
 }

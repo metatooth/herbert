@@ -7,7 +7,7 @@ let server: WebSocket.Server;
 
 beforeEach(() => {
   server = new WebSocket.Server({
-    port: 8080,
+    port: 8080
   });
 });
 
@@ -36,7 +36,7 @@ test("checks to see if climate has changed, set system map if so", () => {
           ["heater", false],
           ["blower", false],
           ["dehumidifier", false],
-          ["humidifier", false],
+          ["humidifier", false]
         ])
       );
     });

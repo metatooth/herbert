@@ -12,10 +12,10 @@ import Component from "vue-class-component";
 
 const TargetProps = Vue.extend({
   props: {
-    icon: { type: String, default: '' },
+    icon: { type: String, default: "" },
     value: { type: Number, default: 0 },
-    precision: { type: Number, default: 0},
-    units: { type: String, default: 'C' }
+    precision: { type: Number, default: 0 },
+    units: { type: String, default: "C" }
   }
 });
 

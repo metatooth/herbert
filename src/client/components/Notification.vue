@@ -1,9 +1,6 @@
 <template>
   <div class="notification is-danger">
-    <button
-      class="delete"
-      @click="$emit('delete-notification')"
-    />
+    <button class="delete" @click="$emit('delete-notification')" />
     <timestamp :timestamp="timestamp" /> --&nbsp;
     <span>{{ plug }}</span> --&nbsp;
     <span>{{ message }}</span>
@@ -13,23 +10,22 @@
 <script>
 import Vue from "vue";
 import Component from "vue-class-component";
-import Timestamp from "Components/Timestamp.vue";
+import Timestamp from "@/components/Timestamp.vue";
 
 const NotificationProps = Vue.extend({
   props: {
-    id: { type: String, default: '' },
-    plug: { type: String, default: '' },
-    message: { type: String, default: '' },
+    id: { type: String, default: "" },
+    plug: { type: String, default: "" },
+    message: { type: String, default: "" },
     timestamp: { type: String, default: new Date() }
   },
-  emits: [ 'delete-notification' ]
+  emits: ["delete-notification"]
 });
 
 @Component({
   components: { Timestamp }
 })
-export default class Notification extends NotificationProps {
-}
+export default class Notification extends NotificationProps {}
 </script>
 
 <style></style>

@@ -23,7 +23,7 @@ export class MeterReading {
 
   async init(): Promise<boolean> {
     const db: Database = this.db;
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       db.get(
         "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings",
         (err: string) => {
@@ -45,8 +45,8 @@ export class MeterReading {
 
     const db = this.db;
 
-    return new Promise((resolve) => {
-      db.serialize(function () {
+    return new Promise(resolve => {
+      db.serialize(function() {
         const stmt = db.prepare(
           "INSERT INTO meter_readings (meter, temperature, humidity) VALUES (?, ?, ?)"
         );
@@ -69,8 +69,8 @@ export class MeterReading {
 
     const db = this.db;
 
-    const p1 = new Promise(function (resolve, reject) {
-      db.all(sql, function (err: Error, rows: IMeterReadingEntry[]) {
+    const p1 = new Promise(function(resolve, reject) {
+      db.all(sql, function(err: Error, rows: IMeterReadingEntry[]) {
         if (err) {
           reject(err);
         } else {
@@ -83,7 +83,7 @@ export class MeterReading {
       });
     });
 
-    const p2 = new Promise(function (resolve, reject) {
+    const p2 = new Promise(function(resolve, reject) {
       db.each(sqlcount, (err: string, row: [string, any]) => {
         if (err) {
           reject(err);

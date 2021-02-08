@@ -2,7 +2,7 @@ import { GrowLog, LogEntry } from "./grow-log";
 import * as sqlite from "sqlite3";
 const sqlite3 = sqlite.verbose();
 const file = "test.db";
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 beforeEach(() => {
   const db = new sqlite3.Database(file);

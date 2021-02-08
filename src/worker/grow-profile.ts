@@ -30,7 +30,7 @@ export class GrowProfile {
 
   async init(): Promise<boolean> {
     const db: Database = this.db;
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       db.get(
         "SELECT id, name, created_at, lamps_start, lamps_duration, day_time_temperature, day_time_humidity, night_time_temperature, night_time_humidity, temperature_tolerance, humidity_tolerance FROM grow_profiles",
         (err: string) => {
@@ -52,8 +52,8 @@ export class GrowProfile {
 
     const db = this.db;
 
-    return new Promise((resolve) => {
-      db.serialize(function () {
+    return new Promise(resolve => {
+      db.serialize(function() {
         const stmt = db.prepare(
           "INSERT INTO grow_profiles (name, lamps_start, lamps_duration, day_time_temperature, day_time_humidity, night_time_temperature, night_time_humidity, temperature_tolerance, humidity_tolerance) VALUES (?, ?, ?)"
         );
@@ -86,8 +86,8 @@ export class GrowProfile {
 
     const db = this.db;
 
-    const p1 = new Promise(function (resolve, reject) {
-      db.all(sql, function (err: Error, rows: IProfileEntry[]) {
+    const p1 = new Promise(function(resolve, reject) {
+      db.all(sql, function(err: Error, rows: IProfileEntry[]) {
         if (err) {
           reject(err);
         } else {
@@ -100,7 +100,7 @@ export class GrowProfile {
       });
     });
 
-    const p2 = new Promise(function (resolve, reject) {
+    const p2 = new Promise(function(resolve, reject) {
       db.each(sqlcount, (err: string, row: Record<string, unknown>) => {
         if (err) {
           reject(err);

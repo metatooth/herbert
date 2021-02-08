@@ -1,4 +1,4 @@
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class Mockbot {
   onadvertisement: any;
@@ -23,12 +23,12 @@ export class Mockbot {
         modelName: "WoSensorTH",
         temperature: {
           c: temp,
-          f: (temp * 9) / 5 + 32,
+          f: (temp * 9) / 5 + 32
         },
         fahrenheit: false,
         humidity: humidity,
-        battery: 100,
-      },
+        battery: 100
+      }
     };
 
     await this.onadvertisement(ad);

@@ -2,7 +2,7 @@
   "id": "HERB",
   "polling": 5,
   "interval": 30,
-  "ws-url": "ws://localhost:3000",
+  "ws-url": "ws://localhost:5000",
   "meters": [
   ],
   "air-systems": [

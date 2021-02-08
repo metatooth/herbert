@@ -14,12 +14,12 @@ export class PlugFactory {
   }
 
   public async build(configs: any[]): Promise<boolean> {
-    return new Promise((resolve) => {
-      configs.forEach((config) => {
+    return new Promise(resolve => {
+      configs.forEach(config => {
         if (config.type === "wyze") {
           const options = {
             username: config.username || process.env.USERNAME,
-            password: config.password || process.env.PASSWORD,
+            password: config.password || process.env.PASSWORD
           };
 
           const wyze = new Wyze(options);

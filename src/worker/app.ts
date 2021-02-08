@@ -87,14 +87,14 @@ export class App {
       this.day = new AirDirectives(
         new TargetTempHumidity([
           config.get("environment.lamp-on.temperature"),
-          config.get("environment.lamp-on.humidity"),
+          config.get("environment.lamp-on.humidity")
         ])
       );
 
       this.night = new AirDirectives(
         new TargetTempHumidity([
           config.get("environment.lamp-off.temperature"),
-          config.get("environment.lamp-off.humidity"),
+          config.get("environment.lamp-off.humidity")
         ])
       );
     }
@@ -108,7 +108,7 @@ export class App {
       ["dehumidifier", false],
       ["heater", false],
       ["humidifier", false],
-      ["lamp", false],
+      ["lamp", false]
     ]);
 
     const meters: Array<Meter> = config.get("meters");
@@ -130,7 +130,7 @@ export class App {
 
     logger.debug("curr:", [
       app.mainMeter.clime.temperature,
-      app.mainMeter.clime.humidity,
+      app.mainMeter.clime.humidity
     ]);
     logger.debug("last:", [app.clime.temperature, app.clime.humidity]);
 
@@ -227,7 +227,7 @@ export class App {
     await factory.build(config.get("plugs"));
     this.plugs = factory.plugs;
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       logger.info("DAY >>", this.day);
       logger.info("NIGHT >>", this.night);
       logger.info(config);
@@ -290,7 +290,7 @@ export class App {
 
     app.plugs.forEach((value: Array<Plug>, key: string) => {
       console.log("this key here", key);
-      value.forEach((plug) => {
+      value.forEach(plug => {
         console.log("this plug here", plug);
         if (app.systems.get(key)) {
           plug
@@ -298,7 +298,7 @@ export class App {
             .then(() => {
               logger.debug(plug.bot.device.nickname, "plug on OK");
             })
-            .catch((result) => {
+            .catch(result => {
               logger.error(plug.bot.device.nickname, "plug on NOT OK", result);
               if (app.socket.readyState === 1) {
                 const data = {
@@ -307,7 +307,7 @@ export class App {
                   action: "on",
                   code: result.code,
                   message: result.msg,
-                  timestamp: new Date(),
+                  timestamp: new Date()
                 };
                 app.socket.send(JSON.stringify(data));
               }
@@ -318,7 +318,7 @@ export class App {
             .then(() => {
               logger.debug(plug.bot.device.nickname, "plug off OK");
             })
-            .catch((result) => {
+            .catch(result => {
               logger.error(plug.bot.device.nickname, "plug off NOT OK", result);
               if (app.socket.readyState === 1) {
                 const data = {
@@ -327,7 +327,7 @@ export class App {
                   action: "on",
                   code: result.code,
                   message: result.msg,
-                  timestamp: new Date(),
+                  timestamp: new Date()
                 };
 
                 app.socket.send(JSON.stringify(data));
@@ -350,7 +350,7 @@ export class App {
       heater: app.systems.get("heater"),
       humidifier: app.systems.get("humidifier"),
       lamp: app.systems.get("lamp"),
-      updated_at: new Date(),
+      updated_at: new Date()
     };
 
     if (app.intakeMeter) {
@@ -376,7 +376,7 @@ export class App {
     logger.debug("Done all. Timeout in %dms.", interval - 2 * polling);
     setTimeout(app.run, interval - 2 * polling);
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       resolve(true);
     });
   }

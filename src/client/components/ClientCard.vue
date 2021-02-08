@@ -14,12 +14,7 @@
             :precision="1"
             :units="unitsWithDegree"
           />
-          <target
-            icon="tint"
-            :value="humidity"
-            :precision="0"
-            units="%"
-          />
+          <target icon="tint" :value="humidity" :precision="0" units="%" />
           <target
             icon="cloud"
             :value="vaporPressureDeficit"
@@ -28,26 +23,11 @@
           />
         </div>
         <div class="tags">
-          <system
-            name="blower"
-            :status="blower"
-          />
-          <system
-            name="dehumidifier"
-            :status="dehumidifier"
-          />
-          <system
-            name="heater"
-            :status="heater"
-          />
-          <system
-            name="humidifier"
-            :status="humidifier"
-          />
-          <system
-            name="lamp"
-            :status="lamp"
-          />
+          <system name="blower" :status="blower" />
+          <system name="dehumidifier" :status="dehumidifier" />
+          <system name="heater" :status="heater" />
+          <system name="humidifier" :status="humidifier" />
+          <system name="lamp" :status="lamp" />
         </div>
       </div>
       <footer class="card-footer">
@@ -60,9 +40,9 @@
 </template>
 
 <script lang="ts">
-import Target from "Components/Target.vue";
-import Timestamp from "Components/Timestamp.vue";
-import System from "Components/System.vue";
+import Target from "@/components/Target.vue";
+import Timestamp from "@/components/Timestamp.vue";
+import System from "@/components/System.vue";
 
 import Vue from "vue";
 import Component from "vue-class-component";
@@ -71,11 +51,11 @@ const ClientCardProps = Vue.extend({
   props: {
     id: {
       type: String,
-      default: ''
+      default: ""
     },
     units: {
       type: String,
-      default: ''
+      default: ""
     },
     temperature: {
       type: Number,
@@ -93,7 +73,7 @@ const ClientCardProps = Vue.extend({
     timestamp: {
       type: String,
       default: new Date()
-    },
+    }
   }
 });
 

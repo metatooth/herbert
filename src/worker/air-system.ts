@@ -3,7 +3,7 @@ import { Plug } from "./plug";
 
 enum AirSystemStatus {
   Off = 0,
-  On = 1,
+  On = 1
 }
 
 export class AirSystem {

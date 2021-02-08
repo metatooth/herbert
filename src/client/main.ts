@@ -1,12 +1,11 @@
 import Vue from "vue";
-import App from "Client/App.vue";
-
+import App from "./App.vue";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faTint,
   faThermometerHalf,
-  faCloud,
+  faCloud
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -19,5 +18,5 @@ Vue.component("FontAwesomeIcon", FontAwesomeIcon);
 Vue.config.productionTip = false;
 
 new Vue({
-  render: (h: any) => h(App),
+  render: (h: any) => h(App)
 }).$mount("#app");
