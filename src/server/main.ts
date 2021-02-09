@@ -11,7 +11,6 @@ app.get('/', (req, res) => {
 });
 
 app.param('meter', (req, res, next, id) => {
-  console.log('2');
   meterReadings(id).then((readings) => {
     if (readings.length > 0) {
       res.status(200).json(readings);
@@ -51,9 +50,16 @@ wss.on("connection", function(socket: WebSocket) {
     console.log(msg);
     const data = JSON.parse(msg);
     console.log(data.id, data.temperature, data.humidity);
-    if (data.temperature && data.humidity) {
-        createMeterReading(data.id, data.temperature, data.humidity);
+    if (data.main_meter) {
+        createMeterReading(data.main_meter, data.temperature, data.humidity);
     }
+
+    if (data.intake_meter) {
+        createMeterReading(data.intake_meter,
+                           data.intake_temperature,
+                           data.intake_humidity);
+    }
+
     sockets.forEach(s => s.send(msg));
   });
 

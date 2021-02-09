@@ -128,16 +128,12 @@ export class App {
   async check(): Promise<Map<string, boolean>> {
     const app = App.instance();
 
-    logger.debug("curr:", [
-      app.mainMeter.clime.temperature,
-      app.mainMeter.clime.humidity
-    ]);
+    logger.debug("curr:", [app.mainMeter.clime.temperature,
+                           app.mainMeter.clime.humidity]);
     logger.debug("last:", [app.clime.temperature, app.clime.humidity]);
 
-    if (
-      app.mainMeter.clime.temperature !== app.clime.temperature ||
-      app.mainMeter.clime.humidity !== app.clime.humidity
-    ) {
+    if (app.mainMeter.clime.temperature !== app.clime.temperature ||
+        app.mainMeter.clime.humidity !== app.clime.humidity) {
       logger.debug("changed!");
       app.clime = app.mainMeter.clime;
 
@@ -341,8 +337,10 @@ export class App {
 
     const data = {
       id: config.get("id"),
+      main_meter: app.mainMeter.id,
       temperature: app.mainMeter.clime.temperature,
       humidity: app.mainMeter.clime.humidity,
+      intake_meter: "",
       intake_temperature: -1,
       intake_humidity: -1,
       blower: app.systems.get("blower"),
@@ -354,6 +352,7 @@ export class App {
     };
 
     if (app.intakeMeter) {
+      data["intake_meter"] = app.intakeMeter.id;
       data["intake_temperature"] = app.intakeMeter.clime.temperature;
       data["intake_humidity"] = app.intakeMeter.clime.humidity;
     }
