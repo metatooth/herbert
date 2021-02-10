@@ -7,7 +7,9 @@ An environmental control system using BLE devices and Node.js
 Using Ubuntu 20.04 or Raspberry Pi OS Lite 5.4 2020-08-09
 
 ```
-$ sudo apt-get update && sudo apt-get install git nodejs npm -y
+$ sudo apt remove npm nodejs
+$ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+$ sudo apt-get install -y nodejs
 $ sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev -y
 $ git clone https://github.com/metatooth/herbert.git
 ```
@@ -18,20 +20,20 @@ $ git clone https://github.com/metatooth/herbert.git
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:8080
-npm run dev
+# compile and watch the server 
+npm run serve:server
 
-# build for production with minification
+# compile and watch the worker
+npm run serve:worker
+
+# serve with hot reload at localhost:8080
+npm run serve:client
+
+# build all
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
+# build for production with minification
+npm run build:client
 
 # run all tests
 npm test
