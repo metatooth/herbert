@@ -1,4 +1,4 @@
-import * as Switchbot from "node-switchbot";
+import Switchbot from "node-switchbot";
 
 import { Mockbot } from "./mockbot";
 import { Clime } from "./clime";
