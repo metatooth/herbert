@@ -32,6 +32,26 @@
       </div>
       <footer class="card-footer">
         <div class="card-footer-item">
+          <router-link
+            :to="{
+              name: 'readings',
+              params: { environment: id, name: 'Main', meter: main }
+            }"
+          >
+            MAIN
+          </router-link>
+        </div>
+        <div class="card-footer-item">
+          <router-link
+            :to="{
+              name: 'readings',
+              params: { environment: id, name: 'Intake', meter: intake }
+            }"
+          >
+            INTAKE
+          </router-link>
+        </div>
+        <div class="card-footer-item">
           <timestamp :timestamp="timestamp" />
         </div>
       </footer>
@@ -53,6 +73,14 @@ const ClientCard = Vue.extend({
       type: String,
       default: ""
     },
+    main: {
+      type: String,
+      default: ""
+    },
+    intake: {
+      type: String,
+      default: ""
+    },
     units: {
       type: String,
       default: ""
@@ -65,13 +93,13 @@ const ClientCard = Vue.extend({
       type: Number,
       default: -1
     },
-    blower: Boolean,
-    dehumidifier: Boolean,
-    heater: Boolean,
-    humidifier: Boolean,
-    lamp: Boolean,
+    blower: Number,
+    dehumidifier: Number,
+    heater: Number,
+    humidifier: Number,
+    lamp: Number,
     timestamp: {
-      type: String,
+      type: Date,
       default: new Date()
     }
   },

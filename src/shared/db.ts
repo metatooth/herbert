@@ -10,12 +10,14 @@ export function createMeterReading(
   mr.track(meter, temperature, humidity);
 }
 
-export async function meterReadings(meter: string): Promise<IMeterReadingEntry[]> {
+export async function meterReadings(
+  meter: string
+): Promise<IMeterReadingEntry[]> {
   const mr = new MeterReading(path);
 
   const result = await mr.log(1, 100);
 
   return new Promise((resolve, reject) => {
-    resolve(result[0]);   
+    resolve(result[0]);
   });
 }

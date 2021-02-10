@@ -2,7 +2,6 @@ import WebSocket from "ws";
 import config from "config";
 import fs from "fs";
 
-import { createMeterReading } from "../shared/db";
 import { vaporPressureDeficit } from "../shared/utils";
 
 import { AirDirectives } from "./air-directives";
@@ -128,12 +127,16 @@ export class App {
   async check(): Promise<Map<string, boolean>> {
     const app = App.instance();
 
-    logger.debug("curr:", [app.mainMeter.clime.temperature,
-                           app.mainMeter.clime.humidity]);
+    logger.debug("curr:", [
+      app.mainMeter.clime.temperature,
+      app.mainMeter.clime.humidity
+    ]);
     logger.debug("last:", [app.clime.temperature, app.clime.humidity]);
 
-    if (app.mainMeter.clime.temperature !== app.clime.temperature ||
-        app.mainMeter.clime.humidity !== app.clime.humidity) {
+    if (
+      app.mainMeter.clime.temperature !== app.clime.temperature ||
+      app.mainMeter.clime.humidity !== app.clime.humidity
+    ) {
       logger.debug("changed!");
       app.clime = app.mainMeter.clime;
 
@@ -142,12 +145,13 @@ export class App {
       app.systems.set("humidifier", false);
       app.systems.set("dehumidifier", false);
 
-      createMeterReading(
+      logger.info(
         app.mainMeter.id,
         app.mainMeter.clime.temperature,
         app.mainMeter.clime.humidity
       );
-      createMeterReading(
+
+      logger.info(
         app.intakeMeter.id,
         app.intakeMeter.clime.temperature,
         app.intakeMeter.clime.humidity
