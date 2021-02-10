@@ -2,7 +2,6 @@ import WebSocket from "ws";
 import config from "config";
 import fs from "fs";
 
-import { createMeterReading } from "../shared/db";
 import { vaporPressureDeficit } from "../shared/utils";
 
 import { AirDirectives } from "./air-directives";
@@ -146,12 +145,13 @@ export class App {
       app.systems.set("humidifier", false);
       app.systems.set("dehumidifier", false);
 
-      createMeterReading(
+      logger.info(
         app.mainMeter.id,
         app.mainMeter.clime.temperature,
         app.mainMeter.clime.humidity
       );
-      createMeterReading(
+
+      logger.info(
         app.intakeMeter.id,
         app.intakeMeter.clime.temperature,
         app.intakeMeter.clime.humidity
@@ -341,8 +341,10 @@ export class App {
 
     const data = {
       id: config.get("id"),
+      main_meter: app.mainMeter.id,
       temperature: app.mainMeter.clime.temperature,
       humidity: app.mainMeter.clime.humidity,
+      intake_meter: "",
       intake_temperature: -1,
       intake_humidity: -1,
       blower: app.systems.get("blower"),
@@ -354,6 +356,7 @@ export class App {
     };
 
     if (app.intakeMeter) {
+      data["intake_meter"] = app.intakeMeter.id;
       data["intake_temperature"] = app.intakeMeter.clime.temperature;
       data["intake_humidity"] = app.intakeMeter.clime.humidity;
     }

@@ -1,7 +1,12 @@
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class Mockbot {
+  id: string;
   onadvertisement: any;
+
+  constructor(id: string) {
+    this.id = id;
+  }
 
   public async startScan(): Promise<boolean> {
     return true;
@@ -15,7 +20,7 @@ export class Mockbot {
     const humidity = 55 + 2 * Math.cos((2 * 3.14 * now) / 360);
 
     const ad = {
-      id: "mock",
+      id: this.id,
       address: "mock",
       rssi: -125,
       serviceData: {

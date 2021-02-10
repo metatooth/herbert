@@ -13,8 +13,11 @@ export class Meter {
     this.id = id;
 
     if (this.id === "mock") {
+      this.id = Math.random()
+        .toString(16)
+        .substr(2, 12); // 6de5ccda
       this.type = "mockbot";
-      this.bot = new Mockbot();
+      this.bot = new Mockbot(this.id);
     } else {
       this.type = "switchbot";
       this.bot = new Switchbot();
