@@ -83,7 +83,7 @@ const Dashboard = Vue.extend({
 
   mounted() {
     console.log("Starting connection to WebSocket server...");
-    const ws = new WebSocket(process.env.WS_URL || "ws://localhost:5000");
+    const ws = new WebSocket(process.env.VUE_APP_WS_URL || "ws://localhost:5000");
     ws.addEventListener("open", (ev: Event) => {
       this.onWebsocketOpen(ev);
     });
