@@ -201,7 +201,7 @@ export class App {
       app.mainMeter.clime.temperature = ad.serviceData.temperature.c;
       app.mainMeter.clime.humidity = ad.serviceData.humidity / 100.0;
       app.mainMeter.clime.timestamp = new Date();
-    } else if (app.intakeMeter.id === ad.id) {
+    } else if (app.intakeMeter && app.intakeMeter.id === ad.id) {
       app.intakeMeter.clime.temperature = ad.serviceData.temperature.c;
       app.intakeMeter.clime.humidity = ad.serviceData.humidity / 100.0;
       app.intakeMeter.clime.timestamp = new Date();
