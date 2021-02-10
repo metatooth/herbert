@@ -256,12 +256,14 @@ export class App {
     await app.mainMeter.stopScan();
     logger.debug("Done main meter scan.");
 
-    logger.debug("Start intake meter scan for %dms ...", polling);
-    app.intakeMeter.bot.onadvertisement = app.handler;
-    await app.intakeMeter.startScan();
-    await app.intakeMeter.wait(polling);
-    await app.intakeMeter.stopScan();
-    logger.debug("Done scan.");
+    if (app.intakeMeter) {
+      logger.debug("Start intake meter scan for %dms ...", polling);
+      app.intakeMeter.bot.onadvertisement = app.handler;
+      await app.intakeMeter.startScan();
+      await app.intakeMeter.wait(polling);
+      await app.intakeMeter.stopScan();
+      logger.debug("Done scan.");
+    }
 
     logger.debug("Check if climate has changed...");
     await app.check();
