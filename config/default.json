@@ -4,6 +4,8 @@
   "interval": 30,
   "ws-url": "ws://localhost:5000",
   "meters": [
+      { "type": "main", "id": "mock" },
+      { "type": "intake", "id": "mock" }
   ],
   "air-systems": [
   ],

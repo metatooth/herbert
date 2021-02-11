@@ -11,7 +11,7 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "skipLibCheck": true,
-    "outDir": "../../dist/server",
+    "outDir": "../../server",
     "lib": ["ES2019"],
     "moduleResolution": "node",
     "types": ["node"],

@@ -1,1 +1,1 @@
-require("./dist/worker/main");
+require("./worker/main");

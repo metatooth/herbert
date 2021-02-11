@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
-    "outDir": "../../dist/shared",
+    "outDir": "../../shared",
     "lib": ["ES2019"],
     "composite": true
   },

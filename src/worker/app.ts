@@ -201,7 +201,7 @@ export class App {
       app.mainMeter.clime.temperature = ad.serviceData.temperature.c;
       app.mainMeter.clime.humidity = ad.serviceData.humidity / 100.0;
       app.mainMeter.clime.timestamp = new Date();
-    } else if (app.intakeMeter.id === ad.id) {
+    } else if (app.intakeMeter && app.intakeMeter.id === ad.id) {
       app.intakeMeter.clime.temperature = ad.serviceData.temperature.c;
       app.intakeMeter.clime.humidity = ad.serviceData.humidity / 100.0;
       app.intakeMeter.clime.timestamp = new Date();
@@ -256,12 +256,14 @@ export class App {
     await app.mainMeter.stopScan();
     logger.debug("Done main meter scan.");
 
-    logger.debug("Start intake meter scan for %dms ...", polling);
-    app.intakeMeter.bot.onadvertisement = app.handler;
-    await app.intakeMeter.startScan();
-    await app.intakeMeter.wait(polling);
-    await app.intakeMeter.stopScan();
-    logger.debug("Done scan.");
+    if (app.intakeMeter) {
+      logger.debug("Start intake meter scan for %dms ...", polling);
+      app.intakeMeter.bot.onadvertisement = app.handler;
+      await app.intakeMeter.startScan();
+      await app.intakeMeter.wait(polling);
+      await app.intakeMeter.stopScan();
+      logger.debug("Done scan.");
+    }
 
     logger.debug("Check if climate has changed...");
     await app.check();
