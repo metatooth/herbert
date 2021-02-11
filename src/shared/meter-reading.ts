@@ -56,16 +56,18 @@ export class MeterReading {
     });
   }
 
-  async log(pageno: number, pagesize: number): Promise<[any, any]> {
+  async log(meter:string, pageno: number, pagesize: number): Promise<[any, any]> {
     await this.init();
 
     let sql =
-      "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings ORDER BY id DESC";
+      "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings";
+    sql += " WHERE meter = '" + meter + "' ORDER BY id DESC";
     if (pageno !== 0) {
       sql += " LIMIT " + (pageno - 1) * pagesize + ", " + pagesize;
     }
 
-    const sqlcount = "SELECT count(*) as count FROM meter_readings";
+    let sqlcount = "SELECT count(*) as count FROM meter_readings";
+    sqlcount += " WHERE meter = '" + meter + "'";
 
     const db = this.db;
 
