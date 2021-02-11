@@ -15,7 +15,7 @@ export async function meterReadings(
 ): Promise<IMeterReadingEntry[]> {
   const mr = new MeterReading(path);
 
-  const result = await mr.log(1, 100);
+  const result = await mr.log(meter, 1, 100);
 
   return new Promise((resolve, reject) => {
     resolve(result[0]);
