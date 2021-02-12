@@ -1,4 +1,4 @@
-import { Database } from "sqlite3";
+import postgres from "postgres";
 
 export interface IMeterReadingEntry {
   id: number;
@@ -12,21 +12,39 @@ export interface IMeterReadingEntry {
  * Meter readings
  */
 export class MeterReading {
-  db: Database;
+  url: string;
   initialized: boolean;
-  path: string;
 
-  constructor(path: string) {
-    this.path = path;
-    this.db = new Database(this.path);
+  constructor(url: string) {
+    this.url = url;
   }
 
   async init(): Promise<boolean> {
-    const db: Database = this.db;
+    const sql = postgres(this.url);
+    console.log("sql", sql);
+    const readings = await sql`SELECT id, timestamp, meter, temperature, humidity FROM meter_readings`;
+    console.log("readings", readings);
+
     return new Promise(resolve => {
-      db.get(
-        "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings",
-        (err: string) => {
+      resolve(true);
+    });
+  }
+
+  async track(meter: string, temp: number, humidity: number): Promise<boolean> {
+    return new Promise(resolve => {
+      resolve(true);
+    });
+  }
+
+  async log(meter: string, length: number): Promise<boolean> {
+    return new Promise(resolve => {
+      resolve(true);
+    });
+  }
+}
+
+/**
+      (err: string) => {
           if (err) {
             db.serialize(() => {
               db.run(
@@ -96,3 +114,4 @@ export class MeterReading {
     return Promise.all([p1, p2]);
   }
 }
+*/

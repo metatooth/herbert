@@ -98,7 +98,11 @@ export class App {
       );
     }
 
-    this.socket = new WebSocket(config.get("ws-url"));
+    try {
+      this.socket = new WebSocket(process.env.WS_URL || config.get("ws-url"));
+    } catch (e) {
+      console.log("ERROR", e);
+    }
 
     this.clime = new Clime(-1, 0.6, -1);
 
@@ -369,7 +373,11 @@ export class App {
 
     if (app.socket.readyState !== 1) {
       app.socket = null;
-      app.socket = new WebSocket(config.get("ws-url"));
+      try {
+        app.socket = new WebSocket(process.env.WS_URL || config.get("ws-url"));
+      } catch (e) {
+        console.log("ERROR", e);
+      }
 
       app.socket.on("close", () => {
         logger.debug("THIS SOCKET IS CLOSED");

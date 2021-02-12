@@ -13,7 +13,7 @@
         <p>Powered by <img src="./assets/images/logo.png" /><br /></p>
       </div>
       <div class="copyright has-text-centered is-size-7">
-        <p>v0.7.0 &#169; <a href="https://metatooth.com">Metatooth</a> 2021</p>
+        <p>r0.8.0 &#169; <a href="https://metatooth.com">Metatooth</a> 2021</p>
       </div>
     </footer>
   </div>

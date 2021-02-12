@@ -25,12 +25,25 @@
       </form>
     </section>
     <section class="section">
-      <client-card
-        v-for="client in clients"
-        :key="client.id"
-        :units="units"
-        v-bind="client"
-      />
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Updated</th>
+            <th>Current Conditions</th>
+            <th>Systems</th>
+            <th colspan="2">History</th>
+          </tr>
+        </thead>
+        <tbody>
+          <client-row
+            v-for="client in clients"
+            :key="client.id"
+            :units="units"
+            v-bind="client"
+          />
+        </tbody>
+      </table>
     </section>
     <section class="section">
       <div id="configurations" />
@@ -40,7 +53,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ClientCard from "@/components/ClientCard.vue";
+import ClientRow from "@/components/ClientRow.vue";
 import Notification from "@/components/Notification.vue";
 
 interface ClientData {
@@ -77,13 +90,15 @@ const Dashboard = Vue.extend({
   },
 
   components: {
-    ClientCard,
+    ClientRow,
     Notification
   },
 
   mounted() {
     console.log("Starting connection to WebSocket server...");
-    const ws = new WebSocket(process.env.VUE_APP_WS_URL || "ws://localhost:5000");
+    const ws = new WebSocket(
+      process.env.VUE_APP_WS_URL || "ws://localhost:5000"
+    );
     ws.addEventListener("open", (ev: Event) => {
       this.onWebsocketOpen(ev);
     });

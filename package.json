@@ -1,6 +1,6 @@
 {
   "name": "herbert",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Control your grow environment.",
   "main": "index.js",
   "engines": {
@@ -41,7 +41,7 @@
     "express": "^4.17.1",
     "log4js": "^6.3.0",
     "node-switchbot": "^1.0.0",
-    "sqlite3": "^5.0.1",
+    "postgres": "^1.0.2",
     "tslib": "^2.1.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",

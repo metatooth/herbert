@@ -54,11 +54,8 @@ const Readings = Vue.extend({
   mounted() {
     const xhr = new XMLHttpRequest();
     const url = process.env.VUE_APP_API_URL || "ws://localhost:5000";
-    
-    xhr.open(
-      "GET",
-      `${url}/readings/${this.$route.params.meter}`
-    );
+
+    xhr.open("GET", `${url}/readings/${this.$route.params.meter}`);
 
     xhr.onload = () => {
       const data = JSON.parse(xhr.response);

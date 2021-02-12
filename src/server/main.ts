@@ -63,12 +63,14 @@ wss.on("connection", function(socket: WebSocket) {
   socket.on("message", function(msg: string) {
     console.log(msg);
     const data = JSON.parse(msg);
-    console.log(data.id, data.temperature, data.humidity);
+
     if (data.main_meter) {
+      console.log("data main meter...");
       createMeterReading(data.main_meter, data.temperature, data.humidity);
     }
 
     if (data.intake_meter) {
+      console.log("data intake meter...");
       createMeterReading(
         data.intake_meter,
         data.intake_temperature,
