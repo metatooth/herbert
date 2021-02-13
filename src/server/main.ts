@@ -22,6 +22,7 @@ app.use(function(req, res, next) {
 app.param("meter", (req, res, next, id) => {
   console.log("meter reading for", id);
   meterReadings(id).then(readings => {
+    console.log('readings', readings);
     if (readings.length > 0) {
       res.status(200).json(readings);
       next();
@@ -41,9 +42,9 @@ app.get("/readings/:meter", (req, res, next) => {
 
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render("error", {
+  res.json({
     message: err.message,
-    error: {}
+    error: err
   });
 });
 

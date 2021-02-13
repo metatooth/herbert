@@ -10,21 +10,6 @@
     </section>
     <section class="section">
       <span>{{ clients.length }} {{ clientsName }}</span>
-    </section>
-    <section class="section">
-      <form class="control">
-        <label for="celsius" class="radio">
-          <input id="celsius" v-model="units" type="radio" value="C" />
-          Celsius
-        </label>
-        &nbsp;
-        <label for="fahrenheit" class="radio">
-          <input id="fahrenheit" v-model="units" type="radio" value="F" />
-          Fahrenheit
-        </label>
-      </form>
-    </section>
-    <section class="section">
       <table class="table">
         <thead>
           <tr>
@@ -44,6 +29,19 @@
           />
         </tbody>
       </table>
+    </section>
+    <section class="section">
+      <form class="control">
+        <label for="celsius" class="radio">
+          <input id="celsius" v-model="units" type="radio" value="C" />
+          Celsius
+        </label>
+        &nbsp;
+        <label for="fahrenheit" class="radio">
+          <input id="fahrenheit" v-model="units" type="radio" value="F" />
+          Fahrenheit
+        </label>
+      </form>
     </section>
     <section class="section">
       <div id="configurations" />

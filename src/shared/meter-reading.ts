@@ -1,4 +1,4 @@
-import postgres from "postgres";
+import { Database } from "sqlite3";
 
 export interface IMeterReadingEntry {
   id: number;
@@ -12,39 +12,21 @@ export interface IMeterReadingEntry {
  * Meter readings
  */
 export class MeterReading {
-  url: string;
+  db: Database;
   initialized: boolean;
+  path: string;
 
-  constructor(url: string) {
-    this.url = url;
+  constructor(path: string) {
+    this.path = path;
+    this.db = new Database(this.path);
   }
 
   async init(): Promise<boolean> {
-    const sql = postgres(this.url);
-    console.log("sql", sql);
-    const readings = await sql`SELECT id, timestamp, meter, temperature, humidity FROM meter_readings`;
-    console.log("readings", readings);
-
+    const db: Database = this.db;
     return new Promise(resolve => {
-      resolve(true);
-    });
-  }
-
-  async track(meter: string, temp: number, humidity: number): Promise<boolean> {
-    return new Promise(resolve => {
-      resolve(true);
-    });
-  }
-
-  async log(meter: string, length: number): Promise<boolean> {
-    return new Promise(resolve => {
-      resolve(true);
-    });
-  }
-}
-
-/**
-      (err: string) => {
+      db.get(
+        "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings",
+        (err: string) => {
           if (err) {
             db.serialize(() => {
               db.run(
@@ -74,20 +56,22 @@ export class MeterReading {
     });
   }
 
-  async log(pageno: number, pagesize: number): Promise<[any, any]> {
+  async log(meter: string, span: number): Promise<any> {
     await this.init();
 
+    const now = Date.now();
+    console.log(now);
+    const limit = now - (span * 60 * 60);
+    console.log(limit);
+    
     let sql =
-      "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings ORDER BY id DESC";
-    if (pageno !== 0) {
-      sql += " LIMIT " + (pageno - 1) * pagesize + ", " + pagesize;
-    }
-
-    const sqlcount = "SELECT count(*) as count FROM meter_readings";
+      "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings";
+    sql += " WHERE meter = '" + meter + "' AND timestamp > " + limit;
+    sql += " ORDER BY id DESC";
 
     const db = this.db;
 
-    const p1 = new Promise(function(resolve, reject) {
+    return new Promise(function(resolve, reject) {
       db.all(sql, function(err: Error, rows: IMeterReadingEntry[]) {
         if (err) {
           reject(err);
@@ -100,18 +84,5 @@ export class MeterReading {
         }
       });
     });
-
-    const p2 = new Promise(function(resolve, reject) {
-      db.each(sqlcount, (err: string, row: [string, any]) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(row);
-        }
-      });
-    });
-
-    return Promise.all([p1, p2]);
   }
 }
-*/

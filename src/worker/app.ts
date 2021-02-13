@@ -315,7 +315,9 @@ export class App {
                   message: result.msg,
                   timestamp: new Date()
                 };
-                app.socket.send(JSON.stringify(data));
+                if (app.socket.readyState === 1) {
+                  app.socket.send(JSON.stringify(data));
+                }
               }
             });
         } else {

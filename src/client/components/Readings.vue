@@ -53,20 +53,20 @@ const Readings = Vue.extend({
 
   mounted() {
     const xhr = new XMLHttpRequest();
-    const url = process.env.VUE_APP_API_URL || "ws://localhost:5000";
+    const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
 
     xhr.open("GET", `${url}/readings/${this.$route.params.meter}`);
 
     xhr.onload = () => {
       const data = JSON.parse(xhr.response);
-      console.log("data has", data.length, "entries");
-      data.forEach(d => {
-        console.log(d.timestamp, d.temperature, d.humidity);
-        const output = convertToLocalTime(d.timestamp, { timeZone: "Etc/UTC" });
-        console.log(output);
-        this.temperatures.push({ x: output, y: d.temperature });
-        this.humidities.push({ x: output, y: 100 * d.humidity });
-      });
+      if (!data.error) {
+        data.forEach(d => {
+          console.log(d.timestamp, d.temperature, d.humidity);
+          const ts = convertToLocalTime(d.timestamp, { timeZone: "Etc/UTC" });
+          this.temperatures.push({ x: ts, y: d.temperature });
+          this.humidities.push({ x: ts, y: 100 * d.humidity });
+        });
+      }
     };
 
     xhr.send();
