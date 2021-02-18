@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import express from "express";
 import http from "http";
-import { createMeterReading, meterReadings } from "../shared/db";
+import { createReading, getReadingsByMeter } from "../shared/queries";
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,24 +20,15 @@ app.use(function(req, res, next) {
 });
 
 app.param("meter", (req, res, next, id) => {
-  console.log("meter reading for", id);
-  meterReadings(id).then(readings => {
-    if (readings.length > 0) {
-      res.status(200).json(readings);
-      next();
-    } else {
-      next(new Error("failed to find meter"));
-    }
-  });
+  req.params.meter = id;
+  next();
 });
 
 app.get("/", (req, res) => {
   res.send("OK");
 });
 
-app.get("/readings/:meter", (req, res, next) => {
-  next();
-});
+app.get("/readings/:meter", getReadingsByMeter);
 
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
@@ -65,11 +56,11 @@ wss.on("connection", function(socket: WebSocket) {
     const data = JSON.parse(msg);
     console.log(data.id, data.temperature, data.humidity);
     if (data.main_meter) {
-      createMeterReading(data.main_meter, data.temperature, data.humidity);
+      createReading(data.main_meter, data.temperature, data.humidity);
     }
 
     if (data.intake_meter) {
-      createMeterReading(
+      createReading(
         data.intake_meter,
         data.intake_temperature,
         data.intake_humidity
