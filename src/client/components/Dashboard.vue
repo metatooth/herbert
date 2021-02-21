@@ -30,19 +30,7 @@
         </tbody>
       </table>
     </section>
-    <section class="section">
-      <form class="control">
-        <label for="celsius" class="radio">
-          <input id="celsius" v-model="units" type="radio" value="C" />
-          Celsius
-        </label>
-        &nbsp;
-        <label for="fahrenheit" class="radio">
-          <input id="fahrenheit" v-model="units" type="radio" value="F" />
-          Fahrenheit
-        </label>
-      </form>
-    </section>
+    <units-selector :units="units" @change-units="changeUnits"/>
     <section class="section">
       <div id="configurations" />
     </section>
@@ -53,6 +41,7 @@
 import Vue from "vue";
 import ClientRow from "@/components/ClientRow.vue";
 import Notification from "@/components/Notification.vue";
+import UnitsSelector from "@/components/UnitsSelector.vue";
 
 interface ClientData {
   id: string;
@@ -89,7 +78,8 @@ const Dashboard = Vue.extend({
 
   components: {
     ClientRow,
-    Notification
+    Notification,
+    UnitsSelector
   },
 
   mounted() {
@@ -116,6 +106,11 @@ const Dashboard = Vue.extend({
   },
 
   methods: {
+    changeUnits(units) {
+      console.log("changeUnits", units);
+      this.units = units;
+    },
+    
     deleteThisNotification(notification: NotificationData): void {
       this.notifications.splice(this.notifications.indexOf(notification), 1);
     },

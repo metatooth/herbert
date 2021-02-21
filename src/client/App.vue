@@ -2,7 +2,7 @@
   <div class="container">
     <nav class="navbar">
       <div class="navbar-brand">
-        <router-link to="/dashboard" class="navbar-item">
+        <router-link :to="{ name: 'dashboard' }" class="navbar-item">
           <img src="./assets/images/milltownag.png" />
         </router-link>
       </div>
@@ -20,7 +20,23 @@
 </template>
 
 <script>
-export default {};
+import Vue from "vue";  
+const App = Vue.extend({
+  data() {
+    return {
+      units: { type: String, default: "F" }
+    }
+  },
+
+  methods: {
+    changeUnits(units) {
+      console.log("change units", units); 
+      this.units = units;
+    }
+  }
+
+});
+export default App;
 </script>
 
 <style scoped>
@@ -31,7 +47,7 @@ export default {};
   max-height: 7rem;
 }
 .content {
-  color: #00dd77;
+   color: #00dd77;
 }
 .content p img {
   height: 1rem;

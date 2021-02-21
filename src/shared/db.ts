@@ -11,15 +11,28 @@ export function createMeterReading(
 }
 
 export async function meterReadings(
-  meter: string
+  meter: string,
+  last: string
 ): Promise<IMeterReadingEntry[]> {
   const mr = new MeterReading(path);
 
-console.log('get ready for', meter, '1');
+  console.log('get ready for', meter, last);
 
-  const result = await mr.log(meter, 1);
+  let span = 1;
+  
+  if (last === 'day') {
+    span = 24;
+  } else if (last === 'week') {
+    span = 24 * 7;
+  } else if (last === 'month') {
+    span = 24 * 30;
+  } else if (last === 'year') {
+    span = 24 * 365;
+  }
+  
+  console.log('span is for', span);
 
-console.log(result);
+  const result = await mr.log(meter, span);
 
   return new Promise((resolve, reject) => {
     resolve(result);

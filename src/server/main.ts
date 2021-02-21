@@ -20,9 +20,7 @@ app.use(function(req, res, next) {
 });
 
 app.param("meter", (req, res, next, id) => {
-  console.log("meter reading for", id);
-  meterReadings(id).then(readings => {
-    console.log('readings', readings);
+  meterReadings(id, req.query.last as string).then(readings => {
     if (readings.length > 0) {
       res.status(200).json(readings);
       next();

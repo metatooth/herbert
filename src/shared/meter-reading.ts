@@ -60,15 +60,23 @@ export class MeterReading {
     await this.init();
 
     const now = Date.now();
-    console.log(now);
-    const limit = now - (span * 60 * 60);
-    console.log(limit);
+    console.log('now', now);
+    console.log('span', span);
+    const limit = now - (span * 60 * 60 * 1000);
+    console.log('limit', limit);
+
+    const startDate = new Date(limit);
+    const startString = startDate.toISOString().slice(0, 19).replace('T', ' ');
+    console.log('startDate', startString);
     
     let sql =
       "SELECT id, timestamp, meter, temperature, humidity FROM meter_readings";
-    sql += " WHERE meter = '" + meter + "' AND timestamp > " + limit;
+    sql += " WHERE meter = '" + meter + "'";
+    sql += " AND timestamp > DATETIME('" + startString + "')";
     sql += " ORDER BY id DESC";
 
+    console.log('SQL', sql);
+    
     const db = this.db;
 
     return new Promise(function(resolve, reject) {
@@ -77,6 +85,7 @@ export class MeterReading {
           reject(err);
         } else {
           const data: Array<IMeterReadingEntry> = [];
+          console.log('found', rows.length);
           rows.forEach((row: IMeterReadingEntry) => {
             data.push(row);
           });
