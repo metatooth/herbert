@@ -115,19 +115,19 @@ const Dashboard = Vue.extend({
 
     onWebsocketMessage(ev: MessageEvent): void {
       const data = JSON.parse(ev.data);
-
-      if (data.temperature) {
+        console.log('message with data', data);
+      if (data.type === "STATUS") {
         let found = false;
         this.clients.forEach((c: ClientData) => {
           if (c.id === data.id) {
             c.units = this.units;
-            c.temperature = data.temperature;
-            c.humidity = 100 * data.humidity;
-            c.blower = data.blower ? 1 : 0;
-            c.dehumidifier = data.dehumidifier ? 1 : 0;
-            c.heater = data.heater ? 1 : 0;
-            c.humidifier = data.humidifier ? 1 : 0;
-            c.lamp = data.lamp ? 1 : 0;
+            c.temperature = data.payload.temperature;
+            c.humidity = 100 * data.payload.humidity;
+            c.blower = data.payload.blower ? 1 : 0;
+            c.dehumidifier = data.payload.dehumidifier ? 1 : 0;
+            c.heater = data.payload.heater ? 1 : 0;
+            c.humidifier = data.payload.humidifier ? 1 : 0;
+            c.lamp = data.payload.lamp ? 1 : 0;
             c.timestamp = new Date();
             found = true;
           }
@@ -135,17 +135,17 @@ const Dashboard = Vue.extend({
 
         if (!found) {
           const cd: ClientData = {
-            id: data.id,
-            main: data.main_meter,
-            intake: data.intake_meter,
+            id: data.payload.id,
+            main: data.payload.main_meter,
+            intake: data.payload.intake_meter,
             units: this.units,
-            temperature: data.temperature,
-            humidity: 100 * data.humidity,
-            blower: data.blower ? 1 : 0,
-            dehumidifier: data.dehumidifer ? 1 : 0,
-            heater: data.heater ? 1 : 0,
-            humidifier: data.humidifier ? 1 : 0,
-            lamp: data.lamp ? 1 : 0,
+            temperature: data.payload.temperature,
+            humidity: 100 * data.payload.humidity,
+            blower: data.payload.blower ? 1 : 0,
+            dehumidifier: data.payload.dehumidifer ? 1 : 0,
+            heater: data.payload.heater ? 1 : 0,
+            humidifier: data.payload.humidifier ? 1 : 0,
+            lamp: data.payload.lamp ? 1 : 0,
             timestamp: new Date()
           };
 

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "jest",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist server worker",
     "lint": "vue-cli-service lint",
     "serve:client": "vue-cli-service serve src/client/main.ts",
     "serve:server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps server.js\"",
@@ -40,6 +40,7 @@
     "date-fns": "^2.17.0",
     "date-fns-timezone": "^0.1.4",
     "express": "^4.17.1",
+    "express-promise-router": "^4.0.1",
     "log4js": "^6.3.0",
     "node-switchbot": "^1.0.0",
     "pg": "^8.5.1",

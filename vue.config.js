@@ -13,7 +13,7 @@ module.exports = {
     config.plugin("html").tap(args => {
       args[0].title = "Grow More";
       args[0].template = "src/client/public/index.html";
-      args[0].favicon = "src/client/public/favicon.ico";
+      args[0].favicon = "src/client/public/favicon.png";
       return args;
     });
   }

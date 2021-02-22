@@ -1,9 +1,16 @@
 import WebSocket from "ws";
 import express from "express";
 import http from "http";
-import { createReading, getReadingsByMeter } from "../shared/queries";
+import mountRoutes from "./routes";
+import { register, status } from "./db";
 
 const app = express();
+console.log("== Herbert Worker == Starting Up ==");
+console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
+
+mountRoutes(app);
+console.log("routes added");
+
 const port = process.env.PORT || 5000;
 
 app.use(function(req, res, next) {
@@ -19,16 +26,9 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.param("meter", (req, res, next, id) => {
-  req.params.meter = id;
-  next();
-});
-
 app.get("/", (req, res) => {
   res.send("OK");
 });
-
-app.get("/readings/:meter", getReadingsByMeter);
 
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
@@ -38,6 +38,15 @@ app.use(function(err, req, res, next) {
   });
 });
 
+function sendError(ws: WebSocket, message: string) {
+  const messageObject = {
+    type: "ERROR",
+    payload: message
+  };
+
+  ws.send(JSON.stringify(messageObject));
+}
+
 const server = http.createServer(app);
 server.listen(port);
 console.log("http server listening on %d", port);
@@ -45,33 +54,41 @@ console.log("http server listening on %d", port);
 const wss = new WebSocket.Server({ server: server });
 console.log("websocket server created");
 
-let sockets: WebSocket[] = [];
-wss.on("connection", function(socket: WebSocket) {
+wss.on("connection", function(ws: WebSocket) {
   console.log("websocket connection open");
-  sockets.push(socket);
 
-  // When you receive a message, send that message to every socket.
-  socket.on("message", function(msg: string) {
-    console.log(msg);
-    const data = JSON.parse(msg);
-    console.log(data.id, data.temperature, data.humidity);
-    if (data.main_meter) {
-      createReading(data.main_meter, data.temperature, data.humidity);
+  ws.on("message", function(msg: string) {
+    console.log("msg", msg);
+    let data;
+    try {
+      data = JSON.parse(msg);
+    } catch (e) {
+      sendError(ws, e);
+      return;
     }
 
-    if (data.intake_meter) {
-      createReading(
-        data.intake_meter,
-        data.intake_temperature,
-        data.intake_humidity
-      );
+    if (!data.type || !data.payload) {
+      sendError(ws, "Message must specify type & payload.");
+      return;
     }
 
-    sockets.forEach(s => s.send(msg));
-  });
-
-  // When a socket closes, or disconnects, remove it from the array.
-  socket.on("close", function() {
-    sockets = sockets.filter(s => s !== socket);
+    if (data.type === "STATUS") {
+        register(data.payload.id,
+                 data.payload.main_meter,
+                 data.payload.intake_meter,
+                 "");
+        status(data.payload.main_meter,
+               data.payload.temperature,
+               data.payload.humidity);      
+        status(data.payload.intake_meter,
+               data.payload.intake_temperature,
+               data.payload.intake_humidity);      
+    }
+      
+    wss.clients.forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(msg);
+      }
+    });
   });
 });

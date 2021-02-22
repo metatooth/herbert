@@ -5,10 +5,6 @@
   "ws-url": "ws://localhost:5000",
   "meters": [
   ],
-  "air-systems": [
-  ],
-  "lamps": [
-  ],
   "plugs": [
   ],
   "environment": {

@@ -98,7 +98,7 @@ export class App {
       );
     }
 
-    this.socket = new WebSocket(config.get("ws-url"));
+    this.socket = null;
 
     this.clime = new Clime(-1, 0.6, -1);
 
@@ -300,7 +300,7 @@ export class App {
             })
             .catch(result => {
               logger.error(plug.bot.device.nickname, "plug on NOT OK", result);
-              if (app.socket.readyState === 1) {
+              if (app.socket && app.socket.readyState === 1) {
                 const data = {
                   id: config.get("id"),
                   plug: plug.bot.device.nickname,
@@ -320,7 +320,7 @@ export class App {
             })
             .catch(result => {
               logger.error(plug.bot.device.nickname, "plug off NOT OK", result);
-              if (app.socket.readyState === 1) {
+              if (app.socket && app.socket.readyState === 1) {
                 const data = {
                   id: config.get("id"),
                   plug: plug.bot.device.nickname,
@@ -339,40 +339,60 @@ export class App {
 
     logger.debug("Done apply systems command.");
 
-    const data = {
-      id: config.get("id"),
-      main_meter: app.mainMeter.id,
-      temperature: app.mainMeter.clime.temperature,
-      humidity: app.mainMeter.clime.humidity,
-      intake_meter: "",
-      intake_temperature: -1,
-      intake_humidity: -1,
-      blower: app.systems.get("blower"),
-      dehumidifier: app.systems.get("dehumidifier"),
-      heater: app.systems.get("heater"),
-      humidifier: app.systems.get("humidifier"),
-      lamp: app.systems.get("lamp"),
-      updated_at: new Date()
-    };
+    logger.debug("Checking app socket...");
 
-    if (app.intakeMeter) {
-      data["intake_meter"] = app.intakeMeter.id;
-      data["intake_temperature"] = app.intakeMeter.clime.temperature;
-      data["intake_humidity"] = app.intakeMeter.clime.humidity;
+    if (app.socket && app.socket.readyState !== 1) {
+      logger.debug("Ready state:", app.socket.readyState);
+      app.socket = null;
     }
 
-    logger.debug("Checking app socket...");
-    logger.debug("Ready state:", app.socket.readyState);
     logger.debug("Done.");
 
-    if (app.socket.readyState !== 1) {
-      app.socket = null;
-      app.socket = new WebSocket(config.get("ws-url"));
+    if (app.socket === null) {
+      try {
+        app.socket = new WebSocket(config.get("ws-url"));
 
-      app.socket.on("close", () => {
-        logger.debug("THIS SOCKET IS CLOSED");
-      });
+        app.socket.on("error", err => {
+          console.log("Caught", err);
+        });
+
+        app.socket.on("close", () => {
+          logger.debug("THIS SOCKET IS CLOSED");
+        });
+
+        app.socket.on("message", (msg: string) => {
+          console.log("A message!", msg);
+        });
+      } catch (e) {
+        console.log("Try again!", e);
+      }
     } else {
+      const data = {
+        type: "STATUS",
+        payload: {
+          id: config.get("id"),
+          main_meter: app.mainMeter.id,
+          temperature: app.mainMeter.clime.temperature,
+          humidity: app.mainMeter.clime.humidity,
+          intake_meter: "",
+          intake_temperature: -1,
+          intake_humidity: -1,
+          blower: app.systems.get("blower"),
+          dehumidifier: app.systems.get("dehumidifier"),
+          heater: app.systems.get("heater"),
+          humidifier: app.systems.get("humidifier"),
+          lamp: app.systems.get("lamp"),
+          updated_at: new Date()
+        }
+      };
+
+      if (app.intakeMeter) {
+        data["payload"]["intake_meter"] = app.intakeMeter.id;
+        data["payload"]["intake_temperature"] =
+          app.intakeMeter.clime.temperature;
+        data["payload"]["intake_humidity"] = app.intakeMeter.clime.humidity;
+      }
+
       app.socket.send(JSON.stringify(data));
     }
 

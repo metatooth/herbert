@@ -56,7 +56,7 @@ const Readings = Vue.extend({
 
     xhr.open(
       "GET",
-      `http://localhost:5000/readings/${this.$route.params.meter}`
+      `http://localhost:5000/readings/?meter=${this.$route.params.meter}`
     );
 
     xhr.onload = () => {
