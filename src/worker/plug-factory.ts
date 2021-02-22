@@ -18,14 +18,14 @@ export class PlugFactory {
       configs.forEach(config => {
         if (config.type === "wyze") {
           const options = {
-            username: config.username || process.env.USERNAME,
-            password: config.password || process.env.PASSWORD
+            username: config.username,
+            password: config.password
           };
 
           const wyze = new Wyze(options);
 
-          wyze.getDeviceList().then((dlist: Array<IDevice>) => {
-            dlist.forEach((device: IDevice) => {
+          wyze.getDeviceList().then((dlist: Array<Device>) => {
+            dlist.forEach((device) => {
               const nick: string = device.nickname;
               this.plugs.forEach((v: Array<Plug>, k: string) => {
                 const re = new RegExp(`^${config.prefix} ${k}`, "i");

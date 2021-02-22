@@ -110,14 +110,14 @@ export class App {
       ["lamp", false]
     ]);
 
-    const meters: Array<Meter> = config.get("meters");
+    const devices: Array<Device> = config.get("devices");
 
-    meters.forEach((meter: Meter) => {
-      logger.debug("METER", meter);
-      if (meter.type === "main") {
-        this.mainMeter = new Meter(meter.id);
-      } else if (meter.type == "intake") {
-        this.intakeMeter = new Meter(meter.id);
+    devices.forEach((device) => {
+      logger.debug("DEVICE", device);
+      if (device.type === "main") {
+        this.mainMeter = new Meter(device.id);
+      } else if (device.type == "intake") {
+        this.intakeMeter = new Meter(device.id);
       }
     });
 
@@ -195,7 +195,7 @@ export class App {
     return app.systems;
   }
 
-  public async handler(ad: IWoSensorTH): Promise<boolean> {
+  public async handler(ad: WoSensorTH): Promise<boolean> {
     const app = App.instance();
     if (app.mainMeter.id === ad.id) {
       app.mainMeter.clime.temperature = ad.serviceData.temperature.c;
@@ -224,7 +224,7 @@ export class App {
     logger.info("Starting up...");
 
     const factory = new PlugFactory(this.systems);
-    await factory.build(config.get("plugs"));
+    await factory.build(config.get("credentials"));
     this.plugs = factory.plugs;
 
     return new Promise(resolve => {

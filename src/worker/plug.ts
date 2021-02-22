@@ -4,7 +4,7 @@ import { Wyzeplug } from "./wyzeplug";
 export class Plug {
   bot: any;
 
-  constructor(options: IDevice) {
+  constructor(options: Device) {
     if (options.id === "mock") {
       this.bot = new Mockplug();
     } else {
