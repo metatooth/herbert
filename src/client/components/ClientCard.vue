@@ -35,7 +35,7 @@
           <router-link
             :to="{
               name: 'readings',
-              params: { environment: id, name: 'Main', meter: main }
+              params: { environment: id, name: 'Main', meter: main, units: units }
             }"
           >
             MAIN
@@ -45,7 +45,7 @@
           <router-link
             :to="{
               name: 'readings',
-              params: { environment: id, name: 'Intake', meter: intake }
+              params: { environment: id, name: 'Intake', meter: intake, units: units }
             }"
           >
             INTAKE

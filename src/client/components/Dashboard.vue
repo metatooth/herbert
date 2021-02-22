@@ -10,28 +10,27 @@
     </section>
     <section class="section">
       <span>{{ clients.length }} {{ clientsName }}</span>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Updated</th>
+            <th>Current Conditions</th>
+            <th>Systems</th>
+            <th colspan="2">History</th>
+          </tr>
+        </thead>
+        <tbody>
+          <client-row
+            v-for="client in clients"
+            :key="client.id"
+            :units="units"
+            v-bind="client"
+          />
+        </tbody>
+      </table>
     </section>
-    <section class="section">
-      <form class="control">
-        <label for="celsius" class="radio">
-          <input id="celsius" v-model="units" type="radio" value="C" />
-          Celsius
-        </label>
-        &nbsp;
-        <label for="fahrenheit" class="radio">
-          <input id="fahrenheit" v-model="units" type="radio" value="F" />
-          Fahrenheit
-        </label>
-      </form>
-    </section>
-    <section class="section">
-      <client-card
-        v-for="client in clients"
-        :key="client.id"
-        :units="units"
-        v-bind="client"
-      />
-    </section>
+    <units-selector :units="units" @change-units="changeUnits"/>
     <section class="section">
       <div id="configurations" />
     </section>
@@ -40,8 +39,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ClientCard from "@/components/ClientCard.vue";
+import ClientRow from "@/components/ClientRow.vue";
 import Notification from "@/components/Notification.vue";
+import UnitsSelector from "@/components/UnitsSelector.vue";
 
 interface ClientData {
   id: string;
@@ -72,19 +72,21 @@ const Dashboard = Vue.extend({
     return {
       clients: [] as ClientData[],
       notifications: [] as NotificationData[],
-      serverUrl: process.env.WS_URL || "ws://localhost:5000",
       units: "F"
     };
   },
 
   components: {
-    ClientCard,
-    Notification
+    ClientRow,
+    Notification,
+    UnitsSelector
   },
 
   mounted() {
     console.log("Starting connection to WebSocket server...");
-    const ws = new WebSocket(this.serverUrl);
+    const ws = new WebSocket(
+      process.env.VUE_APP_WS_URL || "ws://localhost:5000"
+    );
     ws.addEventListener("open", (ev: Event) => {
       this.onWebsocketOpen(ev);
     });
@@ -104,6 +106,11 @@ const Dashboard = Vue.extend({
   },
 
   methods: {
+    changeUnits(units) {
+      console.log("changeUnits", units);
+      this.units = units;
+    },
+    
     deleteThisNotification(notification: NotificationData): void {
       this.notifications.splice(this.notifications.indexOf(notification), 1);
     },
