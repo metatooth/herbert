@@ -73,20 +73,26 @@ wss.on("connection", function(ws: WebSocket) {
     }
 
     if (data.type === "STATUS") {
-        register(data.payload.id,
-                 data.payload.main_meter,
-                 data.payload.intake_meter,
-                 "");
-        status(data.payload.main_meter,
-               "main",
-               data.payload.temperature,
-               data.payload.humidity);      
-        status(data.payload.intake_meter,
-               "intake",
-               data.payload.intake_temperature,
-               data.payload.intake_humidity);      
+      register(
+        data.payload.id,
+        data.payload.main_meter,
+        data.payload.intake_meter,
+        ""
+      );
+      status(
+        data.payload.main_meter,
+        "main",
+        data.payload.temperature,
+        data.payload.humidity
+      );
+      status(
+        data.payload.intake_meter,
+        "intake",
+        data.payload.intake_temperature,
+        data.payload.intake_humidity
+      );
     }
-      
+
     wss.clients.forEach(client => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
         client.send(msg);
