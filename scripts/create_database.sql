@@ -63,11 +63,13 @@ create table clients (
 
 insert into manufacturers (manufacturer) values ('SwitchBot'), ('WYZE');
 
-insert into device_types (device_type) values ('meter'), ('lamp'), ('blower'),
-       ('humidifier'), ('dehumidifier'), ('heater');
+insert into device_types (device_type)
+       values ('main'), ('intake'),
+       ('lamp'), ('blower'), ('humidifier'), ('dehumidifier'), ('heater');
 
 insert into profiles (profile, lamp_start, lamp_duration, lamp_on_temperature,
-       lamp_on_humidity, lamp_off_temperature, lamp_off_humidity) values
+       lamp_on_humidity, lamp_off_temperature, lamp_off_humidity)
+       values
        ('Torello Clone', '00:00', '24 hours', 22.8, 68, 22.8, 68),
        ('Torello Veg', '13:00', '18 hours', 25.3, 55, 23.1, 55),
        ('Torello Flower 1', '13:00', '12 hours', 24.7, 55, 21.1, 43),

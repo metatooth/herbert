@@ -17,6 +17,7 @@ export async function register(client, main, intake, profile) {
   query("SELECT * FROM clients WHERE client = $1", [client])
         .then(res => {
             if (res.rowCount === 0) {
+                console.log("inserting", { client });
                 query("INSERT INTO clients (client) VALUES ($1)", [client]);
             } else {
                 if (main) {
@@ -34,12 +35,12 @@ export async function register(client, main, intake, profile) {
         });
 }
 
-export async function status(meter, temperature, humidity) {
+export async function status(meter, type, temperature, humidity) {
   if (meter) {
     query("SELECT * FROM devices WHERE device = $1", [meter])
       .then(res => {
         if (res.rowCount === 0) {
-            query("INSERT INTO devices (device, device_type, manufacturer, macaddr) VALUES ($1, 'meter', 'SwitchBot')", [meter, meter]);
+            query("INSERT INTO devices (device, device_type, manufacturer, macaddr) VALUES ($1, $2, 'SwitchBot', $3)", [meter, type, meter]);
         } else {
           query("INSERT INTO readings (meter, temperature, humidity) VALUES ($1, $2, $3)", [meter, temperature, humidity]);
         }

@@ -78,9 +78,11 @@ wss.on("connection", function(ws: WebSocket) {
                  data.payload.intake_meter,
                  "");
         status(data.payload.main_meter,
+               "main",
                data.payload.temperature,
                data.payload.humidity);      
         status(data.payload.intake_meter,
+               "intake",
                data.payload.intake_temperature,
                data.payload.intake_humidity);      
     }
