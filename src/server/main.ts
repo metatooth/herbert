@@ -1,5 +1,6 @@
 import WebSocket from "ws";
 import express from "express";
+import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import { register, status } from "./db";
@@ -8,23 +9,13 @@ const app = express();
 console.log("== Herbert Worker == Starting Up ==");
 console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
 
+app.use(cors());
+console.log("cors added");
+
 mountRoutes(app);
 console.log("routes added");
 
 const port = process.env.PORT || 5000;
-
-app.use(function(req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  next();
-});
 
 app.get("/", (req, res) => {
   res.send("OK");
