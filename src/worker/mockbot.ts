@@ -16,8 +16,8 @@ export class Mockbot {
     wait(ms / 2);
 
     const now = new Date().getTime();
-    const temp = 23.9 + Math.sin((2 * 3.14 * now) / 360);
-    const humidity = 55 + 2 * Math.cos((2 * 3.14 * now) / 360);
+    const temp = 23.9 + Math.sin((2 * 3.14 * now) / 180000);
+    const humidity = 55 + 2 * Math.cos((2 * 3.14 * now) / 180000);
 
     const ad = {
       id: this.id,
