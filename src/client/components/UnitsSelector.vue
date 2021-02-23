@@ -29,8 +29,8 @@ const UnitsSelector = Vue.extend({
   emits: ["change-units"],
 
   watch: {
-    selected(newVal) {
-      this.$emit("change-units", newVal);
+    selected(val) {
+      this.$emit("change-units", val);
     }
   }
 });

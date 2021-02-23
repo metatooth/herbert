@@ -93,6 +93,31 @@ const Dashboard = Vue.extend({
     ws.addEventListener("message", (ev: MessageEvent) => {
       this.onWebsocketMessage(ev);
     });
+
+    const xhr = new XMLHttpRequest();
+    const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+
+    xhr.open("GET", `${url}/clients`);
+
+    xhr.onload = () => {
+      const data = JSON.parse(xhr.response);
+      console.log("clients", data);
+      data.forEach((d) => {
+        console.log("client", d);
+
+        const cd: ClientData = {
+            id: d.client,
+            main: d.main,
+            intake: d.intake,
+            units: this.units,
+            timestamp: new Date(d.updated_at)
+          };
+
+        this.clients.push(cd);
+      });
+    };
+
+    xhr.send();
   },
 
   computed: {
@@ -106,8 +131,7 @@ const Dashboard = Vue.extend({
   },
 
   methods: {
-    changeUnits(units) {
-      console.log("changeUnits", units);
+    changeUnits(units: string) {
       this.units = units;
     },
 
@@ -126,7 +150,7 @@ const Dashboard = Vue.extend({
       if (data.type === "STATUS") {
         let found = false;
         this.clients.forEach((c: ClientData) => {
-          if (c.id === data.id) {
+          if (c.id === data.payload.id) {
             c.units = this.units;
             c.temperature = data.payload.temperature;
             c.humidity = 100 * data.payload.humidity;

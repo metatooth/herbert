@@ -52,6 +52,8 @@ const TemperatureChart = Vue.extend({
           y = d.y;
         }
 
+        console.log("check", d.y, y);
+        
         this.display.push({ x: x, y: y });
       });
     }

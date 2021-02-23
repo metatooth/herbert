@@ -66,8 +66,8 @@ const Readings = Vue.extend({
   data() {
     return {
       range: "hour",
-      temperatures: [],
-      humidities: [],
+      temperatures: [] as { x: Date; y: number }[],
+      humidities: [] as { x: Date; y: number }[],
       units: "F"
     };
   },
@@ -82,14 +82,13 @@ const Readings = Vue.extend({
   },
 
   watch: {
-    range(val, oldVal) {
-      console.log("range", oldVal, "to", val);
+    range() {
       this.refresh();
     }
   },
 
   methods: {
-    changeUnits(units) {
+    changeUnits(units: string) {
       this.units = units;
     },
 
@@ -99,19 +98,40 @@ const Readings = Vue.extend({
 
       xhr.open(
         "GET",
-        `${url}/readings/${this.$route.params.meter}?last=${this.range}`
+        `${url}/readings/?meter=${this.$route.params.meter}&last=${this.range}`
       );
 
       xhr.onload = () => {
+        console.log(" ON ON ON ON N ");
+        console.log(xhr.response);
         const data = JSON.parse(xhr.response);
         if (!data.error) {
           this.temperatures = [];
           this.humidities = [];
-          data.forEach(d => {
-            const ts = convertToLocalTime(d.timestamp, { timeZone: "Etc/UTC" });
-            this.temperatures.push({ x: ts, y: d.temperature });
-            this.humidities.push({ x: ts, y: 100 * d.humidity });
-          });
+          const timeZone = "America/New_York";
+          console.log(data);
+          data.forEach(
+            (d: {
+              created_at: Date;
+              temperature: number;
+              humidity: number;
+            }) => {
+              const temperature = {
+                x: convertToLocalTime(d.created_at, { timeZone }),
+                y: d.temperature as number
+              };
+              const humidity = {
+                x: convertToLocalTime(d.created_at, { timeZone }),
+                y: 100 * d.humidity
+              };
+
+              console.log("check", d.temperature, temperature.y);
+              console.log("check", d.humidity, humidity.y);
+
+              this.temperatures.push(temperature);
+              this.humidities.push(humidity);
+            }
+          );
         }
       };
 
