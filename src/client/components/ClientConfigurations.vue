@@ -4,9 +4,10 @@
     <div class="tile is-ancestor">
       <client-card
         v-for="client in clients"
+        v-bind="client"
         :key="client.id"
         :units="units"
-        v-bind="client"
+        :profiles="profiles"
       />
     </div>
   </section>
@@ -19,6 +20,7 @@ import ClientCard from "@/components/ClientCard.vue";
 const ClientConfigurations = Vue.extend({
   props: {
     clients: Array,
+    profiles: Array,
     units: String
   },
 

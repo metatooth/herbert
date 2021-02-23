@@ -2,11 +2,15 @@
   <div id="dashboard">
     <notifications
       v-bind:notifications="notifications"
-      @delete-notification="deleteThisNotification(notification)"
+      @delete-notification="deleteNotification"
     />
     <grow-environments v-bind:clients="clients" :units="units" />
     <grow-profiles v-bind:profiles="profiles" :units="units" />
-    <client-configurations v-bind:clients="clients" :units="units" />
+    <client-configurations
+      v-bind:clients="clients"
+      v-bind:profiles="profiles"
+      :units="units"
+    />
     <units-selector :units="units" @change-units="changeUnits" />
   </div>
 </template>
@@ -23,6 +27,7 @@ interface ClientData {
   id: string;
   main: string;
   intake: string;
+  profile: string;
   units: string;
   temperature: number;
   humidity: number;
@@ -106,8 +111,11 @@ const Dashboard = Vue.extend({
       this.units = units;
     },
 
-    deleteThisNotification(notification: NotificationData): void {
-      this.notifications.splice(this.notifications.indexOf(notification), 1);
+    deleteNotification(n): void {
+      console.log("we are here", n);
+      const found = this.notifications.findIndex(el => el.id === n.id);
+      console.log("found!", found);
+      this.notifications.splice(found, 1);
     },
 
     onWebsocketOpen(ev: Event): void {
@@ -141,6 +149,7 @@ const Dashboard = Vue.extend({
             id: data.payload.client,
             main: data.payload.main.meter,
             intake: data.payload.intake.meter,
+            profile: data.payload.profile,
             units: this.units,
             temperature: data.payload.main.temperature,
             humidity: 100 * data.payload.main.humidity,
@@ -154,6 +163,24 @@ const Dashboard = Vue.extend({
           };
 
           this.clients.push(cd);
+        }
+
+        if (data.payload.profile === null) {
+          const found = this.notifications.find(
+            el => el.id === data.payload.client
+          );
+          if (!found) {
+            const nd: NotificationData = {
+              id: data.payload.client,
+              plug: data.payload.client,
+              action: "",
+              code: "",
+              message: "No profile configured!",
+              timestamp: new Date()
+            };
+
+            this.notifications.push(nd);
+          }
         }
       } else if (data.type === "ERROR") {
         let found = false;
@@ -205,6 +232,7 @@ const Dashboard = Vue.extend({
             id: d.client,
             main: d.main,
             intake: d.intake,
+            profile: d.profile,
             temperature: 0,
             humidity: 0,
             pressure: 0,
@@ -218,6 +246,22 @@ const Dashboard = Vue.extend({
           };
 
           this.clients.push(cd);
+
+          if (cd.profile === null) {
+            const found = this.notifications.find(el => el.id === cd.id);
+            if (!found) {
+              const nd: NotificationData = {
+                id: cd.id,
+                plug: cd.id,
+                action: "",
+                code: "",
+                message: "No profile configured!",
+                timestamp: new Date()
+              };
+
+              this.notifications.push(nd);
+            }
+          }
         });
       };
 
@@ -238,9 +282,6 @@ const Dashboard = Vue.extend({
           console.log("profile", d);
 
           const start = d.lamp_start.split(":");
-          console.log("lamp start", start);
-          console.log("lamp duration", d.lamp_duration);
-          console.log("lamp duration hours", d.lamp_duration["hours"]);
 
           const pd: ProfileData = {
             id: parseInt(d.id),

@@ -1,8 +1,15 @@
 <template>
   <tr>
-    <td>{{ id }}</td>
+    <td>
+      <a :href="linkToConfig">{{ id }}</a>
+    </td>
     <td>
       <timestamp :timestamp="timestamp" />
+    </td>
+    <td>
+      <div>
+        <a :href="linkToConfig">{{ profile || "Config me!" }}</a>
+      </div>
     </td>
     <td>
       <div class="field is-grouped">
@@ -69,7 +76,7 @@ const ClientRow = Vue.extend({
       type: String,
       default: ""
     },
-    units: {
+    profile: {
       type: String,
       default: ""
     },
@@ -93,6 +100,10 @@ const ClientRow = Vue.extend({
     timestamp: {
       type: Date,
       default: new Date()
+    },
+    units: {
+      type: String,
+      default: ""
     }
   },
 
@@ -103,6 +114,10 @@ const ClientRow = Vue.extend({
   },
 
   computed: {
+    linkToConfig(): string {
+      return "#" + this.id + "config";
+    },
+
     temp(): number {
       if (this.units === "C") {
         return this.temperature;

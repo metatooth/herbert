@@ -4,7 +4,7 @@
       v-for="notification in notifications"
       :key="notification.id"
       v-bind="notification"
-      @delete-notification="deleteThisNotification(notification)"
+      @delete-notification="deleteNotification(notification)"
     />
   </section>
 </template>
@@ -21,7 +21,7 @@ const Notifications = Vue.extend({
   },
 
   methods: {
-    deleteThisNotification(notification: any): void {
+    deleteNotification(notification: any): void {
       this.$emit("delete-notification", notification);
     }
   }

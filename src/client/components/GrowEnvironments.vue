@@ -7,6 +7,7 @@
         <tr>
           <th>ID</th>
           <th>Updated</th>
+          <th>Profile</th>
           <th>Current Conditions</th>
           <th>Systems</th>
           <th colspan="2">History</th>

@@ -1,5 +1,5 @@
 <template>
-  <div class="tile is-6">
+  <div :id="anchor" class="tile is-6">
     <div class="card">
       <header class="card-header">
         <p class="card-header-title">
@@ -7,6 +7,22 @@
         </p>
       </header>
       <div class="card-content">
+        <div class="select">
+          <select v-model="selectedProfile">
+            <option
+              v-for="profile in profiles"
+              :key="profile.id"
+              :value="profile.profile"
+            >
+              {{ profile.profile }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="card-content">
+        <p class="card-header-subtitle">
+          Status
+        </p>
         <div class="field is-grouped">
           <target
             icon="thermometer-half"
@@ -85,7 +101,7 @@ const ClientCard = Vue.extend({
       type: String,
       default: ""
     },
-    units: {
+    profile: {
       type: String,
       default: ""
     },
@@ -106,10 +122,21 @@ const ClientCard = Vue.extend({
     heater: Number,
     humidifier: Number,
     lamp: Number,
+    units: {
+      type: String,
+      default: ""
+    },
     timestamp: {
       type: Date,
       default: new Date()
-    }
+    },
+    profiles: Array
+  },
+
+  data() {
+    return {
+      selectedProfile: this.profile
+    };
   },
 
   components: {
@@ -118,7 +145,28 @@ const ClientCard = Vue.extend({
     System
   },
 
+  watch: {
+    selectedProfile(val) {
+      const xhr = new XMLHttpRequest();
+      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+
+      const found = this.profiles.find(element => element.profile === val);
+
+      xhr.open("PUT", `${url}/clients/${this.id}/?profile_id=${found.id}`);
+
+      xhr.onload = () => {
+        console.log("RESPONSE", xhr.response);
+      };
+
+      xhr.send();
+    }
+  },
+
   computed: {
+    anchor(): string {
+      return this.id + "config";
+    },
+
     temp(): number {
       if (this.units === "C") {
         return this.temperature;
