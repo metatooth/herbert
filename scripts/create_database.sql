@@ -1,3 +1,5 @@
+begin;
+
 create table manufacturers (
   manufacturer varchar(255) primary key,
   created_at timestamp default current_timestamp,
@@ -31,11 +33,13 @@ create table readings (
   meter varchar(255) references devices(device),
   temperature numeric not null,
   humidity numeric not null,
+  pressure numeric not null,
   created_at timestamp default current_timestamp
 );
 
 create table profiles (
-  profile varchar(255) primary key,
+  id serial primary key,
+  profile varchar(255) unique,
   lamp_start time not null,
   lamp_duration interval hour to minute,
   lamp_on_temperature numeric,
@@ -52,7 +56,7 @@ create table clients (
   client varchar(255) primary key,
   main varchar(255) references devices(device),
   intake varchar(255) references devices(device),
-  profile varchar(255) references profiles(profile),
+  profile_id integer references profiles(id),
   inet inet,
   macaddr macaddr,
   created_at timestamp default current_timestamp,
@@ -76,3 +80,4 @@ insert into profiles (profile, lamp_start, lamp_duration, lamp_on_temperature,
        ('Torello Flower 2', '13:00', '12 hours', 22.2, 43, 19.7, 43),
        ('Torello Flower 3', '13:00', '12 hours', 19.2, 35, 16.4, 35);
        
+commit;

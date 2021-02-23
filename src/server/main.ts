@@ -81,13 +81,15 @@ wss.on("connection", function(ws: WebSocket) {
         data.payload.main.meter,
         "main",
         data.payload.main.temperature,
-        data.payload.main.humidity
+        data.payload.main.humidity,
+        data.payload.main.pressure
       );
       status(
         data.payload.intake.meter,
         "intake",
         data.payload.intake.temperature,
-        data.payload.intake.humidity
+        data.payload.intake.humidity,
+        data.payload.intake.pressure
       );
     }
 

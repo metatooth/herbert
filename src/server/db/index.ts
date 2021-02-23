@@ -42,7 +42,7 @@ export async function register(client, main, intake, profile) {
   });
 }
 
-export async function status(meter, type, temperature, humidity) {
+export async function status(meter, type, temperature, humidity, pressure) {
   if (meter) {
     query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
       if (res.rowCount === 0) {
@@ -52,8 +52,8 @@ export async function status(meter, type, temperature, humidity) {
         );
       } else {
         query(
-          "INSERT INTO readings (meter, temperature, humidity) VALUES ($1, $2, $3)",
-          [meter, temperature, humidity]
+          "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
+            [meter, temperature, humidity, pressure]
         );
       }
     });

@@ -394,7 +394,8 @@ export class App {
         data["payload"]["main"] = {
           meter: app.mainMeter.id,
           temperature: app.mainMeter.clime.temperature,
-          humidity: app.mainMeter.clime.humidity
+          humidity: app.mainMeter.clime.humidity,
+          pressure:  app.mainMeter.clime.vpd()
         };
       }
 
@@ -402,7 +403,8 @@ export class App {
         data["payload"]["intake"] = {
           meter: app.intakeMeter.id,
           temperature: app.intakeMeter.clime.temperature,
-          humidity: app.intakeMeter.clime.humidity
+          humidity: app.intakeMeter.clime.humidity,
+          pressure:  app.intakeMeter.clime.vpd()
         };
       }
 
