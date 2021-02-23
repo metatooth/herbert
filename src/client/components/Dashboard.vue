@@ -1,83 +1,23 @@
 <template>
   <div id="dashboard">
-    <section class="section">
-      <notification
-        v-for="notification in notifications"
-        :key="notification.id"
-        v-bind="notification"
-        @delete-notification="deleteThisNotification(notification)"
-      />
-    </section>
-    <section class="section">
-      <h2 class="subtitle">Grow Environments</h2>
-      <span>{{ clients.length }} {{ clientsName }}</span>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Updated</th>
-            <th>Current Conditions</th>
-            <th>Systems</th>
-            <th colspan="2">History</th>
-          </tr>
-        </thead>
-        <tbody>
-          <client-row
-            v-for="client in clients"
-            :key="client.id"
-            :units="units"
-            v-bind="client"
-          />
-        </tbody>
-      </table>
-    </section>
+    <notifications
+      v-bind:notifications="notifications"
+      @delete-notification="deleteThisNotification(notification)"
+    />
+    <grow-environments v-bind:clients="clients" :units="units" />
+    <grow-profiles v-bind:profiles="profiles" :units="units" />
+    <client-configurations v-bind:clients="clients" :units="units" />
     <units-selector :units="units" @change-units="changeUnits" />
-    <section class="section">
-      <h2 class="subtitle">Grow Profiles</h2>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Lamps</th>
-            <th colspan="3" class="has-background-warning-light">
-              <font-awesome-icon icon="sun" />
-            </th>
-            <th colspan="3" class="has-background-info-light">
-              <font-awesome-icon icon="moon" />
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <profile-row
-            v-for="profile in profiles"
-            :key="profile.id"
-            :units="units"
-            v-bind="profile"
-          />
-        </tbody>
-      </table>
-    </section>
-    <section class="section">
-      <h2 class="subtitle">Client Configurations</h2>
-      <div class="tile is-ancestor">
-        <client-card
-          v-for="client in clients"
-          :key="client.id"
-          :units="units"
-          v-bind="client"
-        />
-      </div>
-    </section>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ClientCard from "@/components/ClientCard.vue";
-import ClientRow from "@/components/ClientRow.vue";
-import Notification from "@/components/Notification.vue";
+import ClientConfigurations from "@/components/ClientConfigurations.vue";
+import GrowEnvironments from "@/components/GrowEnvironments.vue";
+import Notifications from "@/components/Notifications.vue";
 import UnitsSelector from "@/components/UnitsSelector.vue";
-import ProfileRow from "@/components/ProfileRow.vue";
+import GrowProfiles from "@/components/GrowProfiles.vue";
 
 interface ClientData {
   id: string;
@@ -128,10 +68,10 @@ const Dashboard = Vue.extend({
   },
 
   components: {
-    ClientCard,
-    ClientRow,
-    Notification,
-    ProfileRow,
+    ClientConfigurations,
+    GrowEnvironments,
+    GrowProfiles,
+    Notifications,
     UnitsSelector
   },
 
