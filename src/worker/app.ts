@@ -112,7 +112,7 @@ export class App {
 
     const devices: Array<Device> = config.get("devices");
 
-    devices.forEach((device) => {
+    devices.forEach(device => {
       logger.debug("DEVICE", device);
       if (device.type === "main") {
         this.mainMeter = new Meter(device.id);
@@ -159,7 +159,6 @@ export class App {
 
       const hour = new Date().getHours();
       let directive: AirDirectives;
-      let d: number;
 
       if (app.lamps.isOn(hour)) {
         directive = app.day;
@@ -304,16 +303,19 @@ export class App {
               logger.error(plug.bot.device.nickname, "plug on NOT OK", result);
               if (app.socket && app.socket.readyState === 1) {
                 const data = {
-                  id: config.get("id"),
-                  plug: plug.bot.device.nickname,
-                  action: "on",
-                  code: result.code,
-                  message: result.msg,
-                  timestamp: new Date()
+                  type: "ERROR",
+                  payload: {  
+                    client: config.get("id"),
+                    plug: plug.bot.device.nickname,
+                    action: "on",
+                    code: result.code,
+                    message: result.msg,
+                    timestamp: new Date()
+                  }
                 };
-                if (app.socket.readyState === 1) {
+
+        console.log("sending...", data);
                   app.socket.send(JSON.stringify(data));
-                }
               }
             });
         } else {
@@ -326,14 +328,18 @@ export class App {
               logger.error(plug.bot.device.nickname, "plug off NOT OK", result);
               if (app.socket && app.socket.readyState === 1) {
                 const data = {
-                  id: config.get("id"),
-                  plug: plug.bot.device.nickname,
-                  action: "on",
-                  code: result.code,
-                  message: result.msg,
-                  timestamp: new Date()
+                  type: "ERROR",
+                  payload: {  
+                    client: config.get("id"),
+                    plug: plug.bot.device.nickname,
+                    action: "on",
+                    code: result.code,
+                    message: result.msg,
+                    timestamp: new Date()
+                  }
                 };
 
+        console.log("sending...", data);
                 app.socket.send(JSON.stringify(data));
               }
             });
@@ -374,29 +380,33 @@ export class App {
       const data = {
         type: "STATUS",
         payload: {
-          id: config.get("id"),
-          main_meter: app.mainMeter.id,
-          temperature: app.mainMeter.clime.temperature,
-          humidity: app.mainMeter.clime.humidity,
-          intake_meter: "",
-          intake_temperature: -1,
-          intake_humidity: -1,
+          client: config.get("id"),
           blower: app.systems.get("blower"),
           dehumidifier: app.systems.get("dehumidifier"),
           heater: app.systems.get("heater"),
           humidifier: app.systems.get("humidifier"),
           lamp: app.systems.get("lamp"),
-          updated_at: new Date()
+          timestamp: new Date()
         }
       };
 
-      if (app.intakeMeter) {
-        data["payload"]["intake_meter"] = app.intakeMeter.id;
-        data["payload"]["intake_temperature"] =
-          app.intakeMeter.clime.temperature;
-        data["payload"]["intake_humidity"] = app.intakeMeter.clime.humidity;
+      if (app.mainMeter) {
+        data["payload"]["main"] = {
+          meter: app.mainMeter.id,
+          temperature: app.mainMeter.clime.temperature,
+          humidity: app.mainMeter.clime.humidity
+        };
       }
 
+      if (app.intakeMeter) {
+        data["payload"]["intake"] = {
+          meter: app.intakeMeter.id,
+          temperature: app.intakeMeter.clime.temperature,
+          humidity: app.intakeMeter.clime.humidity
+        };
+      }
+
+        console.log("sending...", data);
       app.socket.send(JSON.stringify(data));
     }
 

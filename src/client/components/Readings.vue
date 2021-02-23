@@ -34,10 +34,7 @@
 
       <div class="columns">
         <div class="column is-half">
-          <temperature-chart
-            id="tempchart"
-            v-bind:data="temperatures"
-          />
+          <temperature-chart id="tempchart" v-bind:data="temperatures" />
         </div>
         <div class="column is-half">
           <chart
@@ -63,12 +60,12 @@ import { convertToLocalTime } from "date-fns-timezone";
 
 const Readings = Vue.extend({
   props: {
-    name: { type: String, default: "" },
+    name: { type: String, default: "" }
   },
 
   data() {
     return {
-      range: 'hour',
+      range: "hour",
       temperatures: [],
       humidities: [],
       units: "F"
@@ -79,18 +76,18 @@ const Readings = Vue.extend({
     Chart,
     TemperatureChart
   },
-  
+
   mounted() {
     this.refresh();
   },
 
   watch: {
     range(val, oldVal) {
-      console.log('range', oldVal, 'to', val);
+      console.log("range", oldVal, "to", val);
       this.refresh();
     }
   },
-  
+
   methods: {
     changeUnits(units) {
       this.units = units;
@@ -99,15 +96,17 @@ const Readings = Vue.extend({
     refresh() {
       const xhr = new XMLHttpRequest();
       const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
-      
-      xhr.open("GET",
-               `${url}/readings/${this.$route.params.meter}?last=${this.range}`);
-      
+
+      xhr.open(
+        "GET",
+        `${url}/readings/${this.$route.params.meter}?last=${this.range}`
+      );
+
       xhr.onload = () => {
         const data = JSON.parse(xhr.response);
         if (!data.error) {
           this.temperatures = [];
-        this.humidities = [];
+          this.humidities = [];
           data.forEach(d => {
             const ts = convertToLocalTime(d.timestamp, { timeZone: "Etc/UTC" });
             this.temperatures.push({ x: ts, y: d.temperature });
@@ -115,7 +114,7 @@ const Readings = Vue.extend({
           });
         }
       };
-      
+
       xhr.send();
     }
   }

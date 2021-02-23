@@ -4,10 +4,15 @@ import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import { register, status } from "./db";
+import path from "path";
+import favicon from "serve-favicon";
 
 const app = express();
 console.log("== Herbert Worker == Starting Up ==");
 console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
+
+app.use(favicon(path.join(__dirname, "..", "src", "server", "favicon.ico")));
+console.log("favicon!");
 
 app.use(cors());
 console.log("cors added");
@@ -27,6 +32,7 @@ app.use(function(err, req, res, next) {
     message: err.message,
     error: err
   });
+  next();
 });
 
 function sendError(ws: WebSocket, message: string) {
@@ -49,7 +55,8 @@ wss.on("connection", function(ws: WebSocket) {
   console.log("websocket connection open");
 
   ws.on("message", function(msg: string) {
-    console.log("msg", msg);
+    console.log(msg);
+
     let data;
     try {
       data = JSON.parse(msg);
@@ -65,22 +72,22 @@ wss.on("connection", function(ws: WebSocket) {
 
     if (data.type === "STATUS") {
       register(
-        data.payload.id,
-        data.payload.main_meter,
-        data.payload.intake_meter,
+        data.payload.client,
+        data.payload.main.meter,
+        data.payload.intake.meter,
         ""
       );
       status(
-        data.payload.main_meter,
+        data.payload.main.meter,
         "main",
-        data.payload.temperature,
-        data.payload.humidity
+        data.payload.main.temperature,
+        data.payload.main.humidity
       );
       status(
-        data.payload.intake_meter,
+        data.payload.intake.meter,
         "intake",
-        data.payload.intake_temperature,
-        data.payload.intake_humidity
+        data.payload.intake.temperature,
+        data.payload.intake.humidity
       );
     }
 

@@ -5,21 +5,34 @@ import { query } from "../db";
 const router = Router();
 
 router.get("/", async (req, res) => {
-  let limit;
   const now = Date.now();
+  let limit = now - 180000;
+  console.log("NOW NOW NOW", now, "NOW NOW NOW");
+  console.log(new Date(now));
+  console.log(new Date(limit));
+  const bday = new Date(1974, 6, 21);
+  console.log(bday);
   if (req.query.last === "hour") {
-    limit = now - 60 * 60 * 1000;
+    limit = now - 3600000;
   } else if (req.query.last === "day") {
-    limit = now - 24 * 60 * 60 * 1000;
+    limit = now - 86400000;
   } else if (req.query.last === "week") {
-    limit = now - 7 * 24 * 60 * 60 * 1000;
+    limit = now - 7 * 86400000;
   } else if (req.query.last === "month") {
-    limit = now - 30 * 24 * 60 * 60 * 1000;
-  } else {
-    limit = now - 365 * 24 * 60 * 60 * 1000;
+    limit = now - 30 * 86400000;
+  } else if (req.query.last === "year") {
+    limit = now - 365 * 86400000;
+  } else if (req.query.last) {
+    limit = now - parseInt(req.query.last as string);
   }
 
-  const start = new Date(limit).toISOString();
+  const startDate = new Date(limit);
+  console.log("startDate", startDate);
+
+  const start = startDate
+    .toISOString()
+    .slice(0, 19)
+    .replace("T", " ");
   console.log(req.query.last, "gave us", limit, "and", start);
   if (req.query.meter) {
     const {

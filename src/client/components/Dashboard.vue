@@ -30,7 +30,7 @@
         </tbody>
       </table>
     </section>
-    <units-selector :units="units" @change-units="changeUnits"/>
+    <units-selector :units="units" @change-units="changeUnits" />
     <section class="section">
       <div id="configurations" />
     </section>
@@ -110,7 +110,7 @@ const Dashboard = Vue.extend({
       console.log("changeUnits", units);
       this.units = units;
     },
-    
+
     deleteThisNotification(notification: NotificationData): void {
       this.notifications.splice(this.notifications.indexOf(notification), 1);
     },
@@ -122,7 +122,7 @@ const Dashboard = Vue.extend({
 
     onWebsocketMessage(ev: MessageEvent): void {
       const data = JSON.parse(ev.data);
-        console.log('message with data', data);
+      console.log("message with data", data);
       if (data.type === "STATUS") {
         let found = false;
         this.clients.forEach((c: ClientData) => {

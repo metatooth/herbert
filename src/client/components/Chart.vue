@@ -3,7 +3,7 @@
 </template>
 
 <script>
-  import Vue from "vue";
+import Vue from "vue";
 import ChartJS from "chart.js";
 import "chartjs-adapter-date-fns";
 
@@ -15,13 +15,13 @@ const Chart = Vue.extend({
     label: { type: String },
     suggestedMin: { type: Number },
     suggestedMax: { type: Number },
-    range: { type: Number },
+    range: { type: Number }
   },
 
   data() {
     return {
       chart: ChartJS
-    }
+    };
   },
 
   mounted() {
@@ -81,8 +81,7 @@ const Chart = Vue.extend({
   },
 
   watch: {
-    label(val, oldVal) {
-      console.log('label to', val, 'from', oldVal);
+    label(val) {
       this.chart.options = {
         title: {
           display: true,
@@ -124,18 +123,18 @@ const Chart = Vue.extend({
 
       this.chart.update();
     },
-    
-    data(val, oldVal) {
+
+    data(val) {
       this.chart.data.datasets.pop();
 
-      console.log('new data', val);
-      
+      console.log("new data", val);
+
       this.chart.data.datasets.push({
         data: val,
         borderColor: "#00bbee",
         fill: false
       });
-      
+
       this.chart.options = {
         title: {
           display: true,
@@ -178,8 +177,6 @@ const Chart = Vue.extend({
       this.chart.update();
     }
   }
-  
-  
 });
 export default Chart;
 </script>

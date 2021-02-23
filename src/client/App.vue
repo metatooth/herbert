@@ -20,21 +20,20 @@
 </template>
 
 <script>
-import Vue from "vue";  
+import Vue from "vue";
 const App = Vue.extend({
   data() {
     return {
       units: { type: String, default: "F" }
-    }
+    };
   },
 
   methods: {
     changeUnits(units) {
-      console.log("change units", units); 
+      console.log("change units", units);
       this.units = units;
     }
   }
-
 });
 export default App;
 </script>
@@ -47,7 +46,7 @@ export default App;
   max-height: 7rem;
 }
 .content {
-   color: #00dd77;
+  color: #00dd77;
 }
 .content p img {
   height: 1rem;

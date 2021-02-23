@@ -25,7 +25,7 @@ export class PlugFactory {
           const wyze = new Wyze(options);
 
           wyze.getDeviceList().then((dlist: Array<Device>) => {
-            dlist.forEach((device) => {
+            dlist.forEach(device => {
               const nick: string = device.nickname;
               this.plugs.forEach((v: Array<Plug>, k: string) => {
                 const re = new RegExp(`^${config.prefix} ${k}`, "i");

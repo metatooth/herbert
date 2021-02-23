@@ -44,6 +44,7 @@
     "log4js": "^6.3.0",
     "node-switchbot": "^1.0.0",
     "pg": "^8.5.1",
+    "serve-favicon": "^2.5.0",
     "tslib": "^2.1.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",

@@ -1,16 +1,16 @@
 create table manufacturers (
   manufacturer varchar(255) primary key,
-  created_at timestamp not null default current_timestamp,
-  updated_at timestamp not null default current_timestamp,
-  deleted boolean not null default false,
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp,
+  deleted boolean default false,
   deleted_at timestamp
 );
 
 create table device_types (
   device_type varchar(255) primary key,
-  created_at timestamp not null default current_timestamp,
-  updated_at timestamp not null default current_timestamp,
-  deleted boolean not null default false,
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp,
+  deleted boolean default false,
   deleted_at timestamp
 );
 

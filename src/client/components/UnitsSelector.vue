@@ -19,17 +19,17 @@ const UnitsSelector = Vue.extend({
   props: {
     units: { type: String, default: "F" }
   },
-                                 
+
   data() {
     return {
       selected: this.units
-    }
+    };
   },
-  
+
   emits: ["change-units"],
 
   watch: {
-    selected(newVal, oldVal) {
+    selected(newVal) {
       this.$emit("change-units", newVal);
     }
   }
