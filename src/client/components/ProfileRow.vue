@@ -1,7 +1,7 @@
 <template>
   <tr>
-    <td>{{ profile }}</td>
-    <td>
+    <td class="has-background-primary-light">{{ profile }}</td>
+    <td class="has-background-light">
       <span class="is-family-code"> {{ lampOnHour }}:{{ lampOnMinute }} </span>
       /
       <span class="is-family-code">

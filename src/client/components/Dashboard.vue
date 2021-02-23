@@ -10,6 +10,7 @@
       v-bind:clients="clients"
       v-bind:profiles="profiles"
       :units="units"
+      @update-client="updateClient"
     />
     <units-selector :units="units" @change-units="changeUnits" />
   </div>
@@ -25,6 +26,7 @@ import GrowProfiles from "@/components/GrowProfiles.vue";
 
 interface ClientData {
   id: string;
+  nickname: string;
   main: string;
   intake: string;
   profile: string;
@@ -147,6 +149,7 @@ const Dashboard = Vue.extend({
         if (!found) {
           const cd: ClientData = {
             id: data.payload.client,
+            nickname: data.payload.nickname,
             main: data.payload.main.meter,
             intake: data.payload.intake.meter,
             profile: data.payload.profile,
@@ -230,6 +233,7 @@ const Dashboard = Vue.extend({
 
           const cd: ClientData = {
             id: d.client,
+            nickname: d.nickname,
             main: d.main,
             intake: d.intake,
             profile: d.profile,
@@ -301,6 +305,10 @@ const Dashboard = Vue.extend({
       };
 
       xhr.send();
+    },
+
+    updateClient(c) {
+      console.log("UPDATE CLIENT", c);
     }
   }
 });

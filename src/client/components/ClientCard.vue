@@ -1,24 +1,56 @@
 <template>
   <div :id="anchor" class="tile is-6">
     <div class="card">
-      <header class="card-header">
-        <p class="card-header-title">
-          {{ id }}
-        </p>
-      </header>
       <div class="card-content">
-        <div class="select">
-          <select v-model="selectedProfile">
-            <option
-              v-for="profile in profiles"
-              :key="profile.id"
-              :value="profile.profile"
-            >
-              {{ profile.profile }}
-            </option>
-          </select>
+        <div class="field">
+          <label class="label">Name</label>
+          <div class="control">
+            <input
+              class="input"
+              type="text"
+              v-model="selectedNickname"
+              placeHolder="change me"
+              :disabled="!editing"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Profile</label>
+          <div class="control">
+            <div class="select">
+              <select v-model="selectedProfile" :disabled="!editing">
+                <option
+                  v-for="profile in profiles"
+                  :key="profile.id"
+                  :value="profile.profile"
+                >
+                  {{ profile.profile }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-grouped is-grouped-right">
+          <div class="control" v-if="!editing">
+            <button class="button is-warning" @click="editing = true">
+              <font-awesome-icon icon="pencil-alt" />
+            </button>
+          </div>
+          <div class="control" v-if="editing">
+            <button class="button is-primary" @click="save()">
+              <font-awesome-icon icon="check-circle" />
+            </button>
+          </div>
+          <div class="control" v-if="editing">
+            <button class="button is-danger" @click="close()">
+              <font-awesome-icon icon="times-circle" />
+            </button>
+          </div>
         </div>
       </div>
+
       <div class="card-content">
         <p class="card-header-subtitle">
           Status
@@ -93,6 +125,10 @@ const ClientCard = Vue.extend({
       type: String,
       default: ""
     },
+    nickname: {
+      type: String,
+      default: ""
+    },
     main: {
       type: String,
       default: ""
@@ -135,7 +171,9 @@ const ClientCard = Vue.extend({
 
   data() {
     return {
-      selectedProfile: this.profile
+      selectedProfile: this.profile,
+      selectedNickname: this.nickname,
+      editing: false
     };
   },
 
@@ -143,23 +181,6 @@ const ClientCard = Vue.extend({
     Target,
     Timestamp,
     System
-  },
-
-  watch: {
-    selectedProfile(val) {
-      const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
-
-      const found = this.profiles.find(element => element.profile === val);
-
-      xhr.open("PUT", `${url}/clients/${this.id}/?profile_id=${found.id}`);
-
-      xhr.onload = () => {
-        console.log("RESPONSE", xhr.response);
-      };
-
-      xhr.send();
-    }
   },
 
   computed: {
@@ -177,6 +198,36 @@ const ClientCard = Vue.extend({
 
     unitsWithDegree(): string {
       return "°" + this.units;
+    }
+  },
+
+  methods: {
+    save() {
+      const xhr = new XMLHttpRequest();
+      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+
+      const found = this.profiles.find(
+        element => element.profile === this.selectedProfile
+      );
+
+      xhr.open(
+        "PUT",
+        `${url}/clients/${this.id}/?nickname=${this.selectedNickname}&profile_id=${found.id}`
+      );
+
+      xhr.onload = () => {
+        console.log("RESPONSE", xhr.response);
+      };
+
+      xhr.send();
+
+      this.editing = false;
+    },
+
+    close() {
+      this.selectedNickname = this.nickname;
+      this.selectedProfile = this.profile;
+      this.editing = false;
     }
   }
 });

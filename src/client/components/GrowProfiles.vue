@@ -4,12 +4,12 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Lamps</th>
-          <th colspan="3" class="has-background-warning-light">
+          <th class="has-background-primary">ID</th>
+          <th class="has-background-light">Lamps</th>
+          <th colspan="3" class="has-background-warning">
             <font-awesome-icon icon="sun" />
           </th>
-          <th colspan="3" class="has-background-info-light">
+          <th colspan="3" class="has-background-info">
             <font-awesome-icon icon="moon" />
           </th>
         </tr>

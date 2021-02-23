@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td>
-      <a :href="linkToConfig">{{ id }}</a>
+      <a :href="linkToConfig">{{ nickname || "Config me!" }}</a>
     </td>
     <td>
       <timestamp :timestamp="timestamp" />
@@ -65,6 +65,10 @@ import System from "@/components/System.vue";
 const ClientRow = Vue.extend({
   props: {
     id: {
+      type: String,
+      default: ""
+    },
+    nickname: {
       type: String,
       default: ""
     },
