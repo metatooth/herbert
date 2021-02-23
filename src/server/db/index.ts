@@ -5,7 +5,6 @@ const pool = new Pool({
 });
 
 export async function query(text, params): Promise<Result> {
-  console.log("HERE");
   const start = Date.now();
   const res = await pool.query(text, params);
   const duration = Date.now() - start;
