@@ -304,7 +304,7 @@ export class App {
               if (app.socket && app.socket.readyState === 1) {
                 const data = {
                   type: "ERROR",
-                  payload: {  
+                  payload: {
                     client: config.get("id"),
                     plug: plug.bot.device.nickname,
                     action: "on",
@@ -314,8 +314,8 @@ export class App {
                   }
                 };
 
-        console.log("sending...", data);
-                  app.socket.send(JSON.stringify(data));
+                console.log("sending...", data);
+                app.socket.send(JSON.stringify(data));
               }
             });
         } else {
@@ -329,7 +329,7 @@ export class App {
               if (app.socket && app.socket.readyState === 1) {
                 const data = {
                   type: "ERROR",
-                  payload: {  
+                  payload: {
                     client: config.get("id"),
                     plug: plug.bot.device.nickname,
                     action: "on",
@@ -339,7 +339,7 @@ export class App {
                   }
                 };
 
-        console.log("sending...", data);
+                console.log("sending...", data);
                 app.socket.send(JSON.stringify(data));
               }
             });
@@ -395,7 +395,7 @@ export class App {
           meter: app.mainMeter.id,
           temperature: app.mainMeter.clime.temperature,
           humidity: app.mainMeter.clime.humidity,
-          pressure:  app.mainMeter.clime.vpd()
+          pressure: app.mainMeter.clime.vpd()
         };
       }
 
@@ -404,11 +404,11 @@ export class App {
           meter: app.intakeMeter.id,
           temperature: app.intakeMeter.clime.temperature,
           humidity: app.intakeMeter.clime.humidity,
-          pressure:  app.intakeMeter.clime.vpd()
+          pressure: app.intakeMeter.clime.vpd()
         };
       }
 
-        console.log("sending...", data);
+      console.log("sending...", data);
       app.socket.send(JSON.stringify(data));
     }
 

@@ -52,8 +52,6 @@ const TemperatureChart = Vue.extend({
           y = d.y;
         }
 
-        console.log("check", d.y, y);
-        
         this.display.push({ x: x, y: y });
       });
     }
@@ -61,8 +59,6 @@ const TemperatureChart = Vue.extend({
 
   methods: {
     changeUnits(units) {
-      console.log("units change", units);
-
       this.units = units;
       if (this.units === "C") {
         this.label = "Celsius (°C)";
@@ -71,7 +67,6 @@ const TemperatureChart = Vue.extend({
 
         this.display = [];
         this.data.forEach(d => {
-          console.log(d.x, d.y);
           this.display.push({ x: d.x, y: d.y });
         });
       } else {
@@ -83,7 +78,6 @@ const TemperatureChart = Vue.extend({
         let y;
         this.data.forEach(d => {
           y = (d.y * 9) / 5 + 32;
-          console.log(d.x, d.y, y);
           this.display.push({ x: d.x, y: y });
         });
       }

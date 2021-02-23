@@ -10,13 +10,17 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faTint,
   faThermometerHalf,
-  faCloud
+  faCloud,
+  faSun,
+  faMoon
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(faTint);
 library.add(faThermometerHalf);
 library.add(faCloud);
+library.add(faSun);
+library.add(faMoon);
 
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
 

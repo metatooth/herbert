@@ -13,12 +13,7 @@
           :units="unitsWithDegree"
         />
         <target icon="tint" :value="humidity" :precision="0" units="%" />
-        <target
-          icon="cloud"
-          :value="vaporPressureDeficit"
-          :precision="1"
-          units="hPa"
-        />
+        <target icon="cloud" :value="pressure" :precision="1" units="hPa" />
       </div>
     </td>
     <td>
@@ -59,9 +54,8 @@ import Vue from "vue";
 import Target from "@/components/Target.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import System from "@/components/System.vue";
-import { saturatedVaporPressure } from "../../shared/utils";
 
-const ClientCard = Vue.extend({
+const ClientRow = Vue.extend({
   props: {
     id: {
       type: String,
@@ -84,6 +78,10 @@ const ClientCard = Vue.extend({
       default: -1
     },
     humidity: {
+      type: Number,
+      default: -1
+    },
+    pressure: {
       type: Number,
       default: -1
     },
@@ -115,17 +113,9 @@ const ClientCard = Vue.extend({
 
     unitsWithDegree(): string {
       return "°" + this.units;
-    },
-
-    vaporPressureDeficit(): number {
-      return (
-        (saturatedVaporPressure(this.temperature - 0.6) -
-          (this.humidity / 100) * saturatedVaporPressure(this.temperature)) /
-        1000
-      );
     }
   }
 });
 
-export default ClientCard;
+export default ClientRow;
 </script>

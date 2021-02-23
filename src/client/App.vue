@@ -5,6 +5,9 @@
         <router-link :to="{ name: 'dashboard' }" class="navbar-item">
           <img src="./assets/images/milltownag.png" />
         </router-link>
+        <div class="navbar-item">
+          <h1 class="title">Automation Control System</h1>
+        </div>
       </div>
     </nav>
     <router-view></router-view>
@@ -13,7 +16,10 @@
         <p>Powered by <img src="./assets/images/logo.png" /><br /></p>
       </div>
       <div class="copyright has-text-centered is-size-7">
-        <p>r0.8.0 &#169; <a href="https://metatooth.com">Metatooth</a> 2021</p>
+        <p>
+          {{ appVersion }} &#169;
+          <a href="https://metatooth.com">Metatooth</a> 2021
+        </p>
       </div>
     </footer>
   </div>
@@ -21,6 +27,8 @@
 
 <script>
 import Vue from "vue";
+import appPackage from "../../package.json";
+
 const App = Vue.extend({
   data() {
     return {
@@ -28,9 +36,14 @@ const App = Vue.extend({
     };
   },
 
+  computed: {
+    appVersion() {
+      return appPackage["version"];
+    }
+  },
+
   methods: {
     changeUnits(units) {
-      console.log("change units", units);
       this.units = units;
     }
   }
