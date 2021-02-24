@@ -53,7 +53,7 @@ export async function status(meter, type, temperature, humidity, pressure) {
       } else {
         query(
           "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
-            [meter, temperature, humidity, pressure]
+          [meter, temperature, humidity, pressure]
         );
       }
     });

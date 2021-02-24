@@ -54,6 +54,7 @@ create table profiles (
 
 create table clients (
   client varchar(255) primary key,
+  nickname varchar(255) unique,
   main varchar(255) references devices(device),
   intake varchar(255) references devices(device),
   profile_id integer references profiles(id),

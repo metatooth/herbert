@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import { register, status } from "./db";
+import { query, register, status } from "./db";
 import path from "path";
 import favicon from "serve-favicon";
 
@@ -11,7 +11,7 @@ const app = express();
 console.log("== Herbert Worker == Starting Up ==");
 console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
 
-app.use(favicon(path.join(__dirname, "..", "src", "server", "favicon.ico")));
+app.use(favicon(path.join(__dirname, "favicon.ico")));
 console.log("favicon!");
 
 app.use(cors());
@@ -54,7 +54,7 @@ console.log("websocket server created");
 wss.on("connection", function(ws: WebSocket) {
   console.log("websocket connection open");
 
-  ws.on("message", function(msg: string) {
+  ws.on("message", async function(msg: string) {
     console.log(msg);
 
     let data;
@@ -91,6 +91,32 @@ wss.on("connection", function(ws: WebSocket) {
         data.payload.intake.humidity,
         data.payload.intake.pressure
       );
+
+      const {
+        rows
+      } = await query(
+        "SELECT * FROM clients c LEFT JOIN profiles p ON c.profile_id = p.id WHERE client = $1",
+        [data.payload.client]
+      );
+      console.log("FOUND CLIENT", rows[0]);
+
+      if (rows[0].profile_id) {
+        const reply = {
+          type: "CONFIG",
+          payload: {
+            id: rows[0].client,
+            lampStart: rows[0].lamp_start,
+            lampDuration: rows[0].lamp_duration,
+            lampOnTemperature: rows[0].lamp_on_temperature,
+            lampOnHumidity: rows[0].lamp_on_humidity,
+            lampOffTemperature: rows[0].lamp_off_temperature,
+            lampOffHumidity: rows[0].lamp_off_humidity,
+            timestamp: new Date()
+          }
+        };
+
+        ws.send(JSON.stringify(reply));
+      }
     }
 
     wss.clients.forEach(client => {

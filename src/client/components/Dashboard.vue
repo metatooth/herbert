@@ -102,16 +102,16 @@ const Dashboard = Vue.extend({
     xhr.onload = () => {
       const data = JSON.parse(xhr.response);
       console.log("clients", data);
-      data.forEach((d) => {
+      data.forEach(d => {
         console.log("client", d);
 
         const cd: ClientData = {
-            id: d.client,
-            main: d.main,
-            intake: d.intake,
-            units: this.units,
-            timestamp: new Date(d.updated_at)
-          };
+          id: d.client,
+          main: d.main,
+          intake: d.intake,
+          units: this.units,
+          timestamp: new Date(d.updated_at)
+        };
 
         this.clients.push(cd);
       });

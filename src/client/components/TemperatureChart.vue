@@ -53,7 +53,7 @@ const TemperatureChart = Vue.extend({
         }
 
         console.log("check", d.y, y);
-        
+
         this.display.push({ x: x, y: y });
       });
     }
