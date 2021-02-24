@@ -1,8 +1,15 @@
 <template>
   <tr>
-    <td>{{ id }}</td>
+    <td>
+      <a :href="linkToConfig">{{ nickname || "Config me!" }}</a>
+    </td>
     <td>
       <timestamp :timestamp="timestamp" />
+    </td>
+    <td>
+      <div>
+        <a :href="linkToConfig">{{ profile || "Config me!" }}</a>
+      </div>
     </td>
     <td>
       <div class="field is-grouped">
@@ -13,12 +20,7 @@
           :units="unitsWithDegree"
         />
         <target icon="tint" :value="humidity" :precision="0" units="%" />
-        <target
-          icon="cloud"
-          :value="vaporPressureDeficit"
-          :precision="1"
-          units="hPa"
-        />
+        <target icon="cloud" :value="pressure" :precision="1" units="hPa" />
       </div>
     </td>
     <td>
@@ -59,11 +61,14 @@ import Vue from "vue";
 import Target from "@/components/Target.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import System from "@/components/System.vue";
-import { saturatedVaporPressure } from "../../shared/utils";
 
-const ClientCard = Vue.extend({
+const ClientRow = Vue.extend({
   props: {
     id: {
+      type: String,
+      default: ""
+    },
+    nickname: {
       type: String,
       default: ""
     },
@@ -75,7 +80,7 @@ const ClientCard = Vue.extend({
       type: String,
       default: ""
     },
-    units: {
+    profile: {
       type: String,
       default: ""
     },
@@ -87,6 +92,10 @@ const ClientCard = Vue.extend({
       type: Number,
       default: -1
     },
+    pressure: {
+      type: Number,
+      default: -1
+    },
     blower: Number,
     dehumidifier: Number,
     heater: Number,
@@ -95,6 +104,10 @@ const ClientCard = Vue.extend({
     timestamp: {
       type: Date,
       default: new Date()
+    },
+    units: {
+      type: String,
+      default: ""
     }
   },
 
@@ -105,6 +118,10 @@ const ClientCard = Vue.extend({
   },
 
   computed: {
+    linkToConfig(): string {
+      return "#" + this.id + "config";
+    },
+
     temp(): number {
       if (this.units === "C") {
         return this.temperature;
@@ -115,17 +132,9 @@ const ClientCard = Vue.extend({
 
     unitsWithDegree(): string {
       return "°" + this.units;
-    },
-
-    vaporPressureDeficit(): number {
-      return (
-        (saturatedVaporPressure(this.temperature - 0.6) -
-          (this.humidity / 100) * saturatedVaporPressure(this.temperature)) /
-        1000
-      );
     }
   }
 });
 
-export default ClientCard;
+export default ClientRow;
 </script>
