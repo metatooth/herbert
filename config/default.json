@@ -4,8 +4,6 @@
   "interval": 30,
   "ws-url": "ws://localhost:5000",
   "devices": [
-    { "type": "main", "manufacturer": "SwitchBot", "id": "mock" },
-    { "type": "intake", "manufacturer": "SwitchBot", "id": "mock" }
   ],
   "environment": {
     "strategies": "temp-humidity|constant-vpd",
