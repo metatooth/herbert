@@ -2,7 +2,7 @@ export class Wyzeplug {
   device: any;
   wyze: any;
 
-  constructor(device: IDevice) {
+  constructor(device: Device) {
     this.device = device;
   }
 

@@ -1,6 +1,6 @@
 <template>
   <span class="is-family-code">
-    {{ hhmm }}<span class="is-size-7">:{{ ss }}</span>
+    {{ hhmm }}<span class="is-size-7">{{ ss }}</span>
   </span>
 </template>
 
@@ -27,9 +27,9 @@ const Timestamp = Vue.extend({
 
     ss(): string {
       if (this.timestamp instanceof Date) {
-        return this.zeroes(this.timestamp.getSeconds());
+        return ":" + this.zeroes(this.timestamp.getSeconds());
       } else {
-        return this.timestamp;
+        return "";
       }
     }
   },

@@ -1,8 +1,13 @@
 <template>
-  <div class="tag">
-    <font-awesome-icon :icon="icon" />
-    &nbsp;
-    <span>{{ formatted }} {{ units }}</span>
+  <div class="control">
+    <div class="tags has-addons">
+      <span class="tag has-text-black-bis has-background-grey-lighter">
+        {{ formatted }} {{ units }}
+      </span>
+      <span class="tag has-text-white-bis has-background-black-bis">
+        <font-awesome-icon :icon="icon" />
+      </span>
+    </div>
   </div>
 </template>
 
@@ -26,9 +31,3 @@ export default class Target extends TargetProps {
   }
 }
 </script>
-
-<style>
-.tag {
-  width: 300px;
-}
-</style>

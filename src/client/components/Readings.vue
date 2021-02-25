@@ -1,38 +1,72 @@
 <template>
-  <div>
-    <section class="section">
-      <h2 class="title">{{ $route.params.environment }}</h2>
-      <h2 class="subtitle">{{ $route.params.name }} Meter Reading</h2>
-      <div class="columns">
-        <div class="column is-half">
-          <chart
-            id="tempchart"
-            v-bind:dataset="temperatures"
-            title="Temperature"
-            label="Celsius (°C)"
-            v-bind:suggestedMin="15"
-            v-bind:suggestedMax="30"
-          />
-        </div>
-        <div class="column is-half">
-          <chart
-            id="humiditychart"
-            v-bind:dataset="humidities"
-            title="Relative Humidity"
-            label="Percent (%)"
-            v-bind:suggestedMin="20"
-            v-bind:suggestedMax="80"
-          />
-        </div>
+  <section class="section">
+    <h2 class="title">{{ $route.params.environment }}</h2>
+    <h2 class="subtitle">{{ $route.params.name }} Meter Reading</h2>
+
+    <form class="control">
+      Last&nbsp;
+      <label for="year" class="radio">
+        <input id="year" v-model="range" type="radio" value="year" />
+        Year
+      </label>
+      &nbsp;
+      <label for="month" class="radio">
+        <input id="month" v-model="range" type="radio" value="month" />
+        Month
+      </label>
+      &nbsp;
+      <label for="week" class="radio">
+        <input id="week" v-model="range" type="radio" value="week" />
+        Week
+      </label>
+      &nbsp;
+      <label for="day" class="radio">
+        <input id="day" v-model="range" type="radio" value="day" />
+        Day
+      </label>
+      &nbsp;
+      <label for="hour" class="radio">
+        <input id="hour" v-model="range" type="radio" value="hour" />
+        Hour
+      </label>
+    </form>
+
+    <div class="columns">
+      <div class="column is-half">
+        <temperature-chart id="tempchart" v-bind:data="temperatures" />
       </div>
-      <h2 class="subtitle is-code">{{ $route.params.meter }}</h2>
-    </section>
-  </div>
+      <div class="column is-half">
+        <chart
+          id="humiditychart"
+          v-bind:data="humidities"
+          title="Relative Humidity"
+          label="Percent (%)"
+          v-bind:suggestedMin="20"
+          v-bind:suggestedMax="80"
+        />
+      </div>
+    </div>
+
+    <div class="columns">
+      <div class="column is-half">
+        <chart
+          id="pressurechart"
+          v-bind:data="pressures"
+          title="Vapor Pressure Deficit"
+          label="hectopascals (hPa)"
+          v-bind:suggestedMin="0"
+          v-bind:suggestedMax="3"
+        />
+      </div>
+    </div>
+    <h2 class="subtitle is-code">{{ $route.params.meter }}</h2>
+  </section>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import Chart from "@/components/Chart.vue";
+import TemperatureChart from "@/components/TemperatureChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
 const Readings = Vue.extend({
@@ -42,37 +76,80 @@ const Readings = Vue.extend({
 
   data() {
     return {
-      temperatures: [],
-      humidities: []
+      range: "hour",
+      temperatures: [] as { x: Date; y: number }[],
+      humidities: [] as { x: Date; y: number }[],
+      pressures: [] as { x: Date; y: number }[],
+      units: "F"
     };
   },
 
   components: {
-    Chart
+    Chart,
+    TemperatureChart
   },
 
   mounted() {
-    const xhr = new XMLHttpRequest();
-    const url = process.env.VUE_APP_API_URL || "ws://localhost:5000";
-    
-    xhr.open(
-      "GET",
-      `${url}/readings/${this.$route.params.meter}`
-    );
+    this.refresh();
+  },
 
-    xhr.onload = () => {
-      const data = JSON.parse(xhr.response);
-      console.log("data has", data.length, "entries");
-      data.forEach(d => {
-        console.log(d.timestamp, d.temperature, d.humidity);
-        const output = convertToLocalTime(d.timestamp, { timeZone: "Etc/UTC" });
-        console.log(output);
-        this.temperatures.push({ x: output, y: d.temperature });
-        this.humidities.push({ x: output, y: 100 * d.humidity });
-      });
-    };
+  watch: {
+    range() {
+      this.refresh();
+    }
+  },
 
-    xhr.send();
+  methods: {
+    changeUnits(units: string) {
+      this.units = units;
+    },
+
+    refresh() {
+      const xhr = new XMLHttpRequest();
+      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+
+      xhr.open(
+        "GET",
+        `${url}/readings/?meter=${this.$route.params.meter}&last=${this.range}`
+      );
+
+      xhr.onload = () => {
+        const data = JSON.parse(xhr.response);
+        if (!data.error) {
+          this.temperatures = [];
+          this.humidities = [];
+          const timeZone = "America/New_York";
+          data.forEach(
+            (d: {
+              created_at: Date;
+              temperature: number;
+              humidity: number;
+              pressure: number;
+            }) => {
+              const ts = convertToLocalTime(d.created_at, { timeZone });
+              const temperature = {
+                x: ts,
+                y: d.temperature as number
+              };
+              const humidity = {
+                x: ts,
+                y: 100 * d.humidity
+              };
+              const pressure = {
+                x: ts,
+                y: d.pressure / 1000
+              };
+
+              this.temperatures.push(temperature);
+              this.humidities.push(humidity);
+              this.pressures.push(pressure);
+            }
+          );
+        }
+      };
+
+      xhr.send();
+    }
   }
 });
 export default Readings;
