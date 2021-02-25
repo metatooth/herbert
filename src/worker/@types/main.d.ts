@@ -1,4 +1,4 @@
-interface IWoSensorTH {
+interface WoSensorTH {
   id: string;
   address: string;
   rssi: number;
@@ -15,11 +15,13 @@ interface IWoSensorTH {
   };
 }
 
-interface IDevice {
+interface Device {
   id: string;
+  type: string;
   nickname: string;
+  macaddr: string;
 }
 
-interface IDeviceState {
+interface DeviceState {
   status: string;
 }

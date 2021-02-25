@@ -8,15 +8,25 @@ import Readings from "./components/Readings.vue";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
-  faTint,
+  faCheckCircle,
+  faCloud,
+  faMoon,
+  faPencilAlt,
+  faSun,
   faThermometerHalf,
-  faCloud
+  faTimesCircle,
+  faTint
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-library.add(faTint);
-library.add(faThermometerHalf);
+library.add(faCheckCircle);
 library.add(faCloud);
+library.add(faMoon);
+library.add(faPencilAlt);
+library.add(faSun);
+library.add(faThermometerHalf);
+library.add(faTimesCircle);
+library.add(faTint);
 
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
 

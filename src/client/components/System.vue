@@ -1,7 +1,7 @@
 <template>
-  <div class="tag" :class="stateClass">
+  <span class="tag" :class="stateClass">
     {{ name }}
-  </div>
+  </span>
 </template>
 
 <script lang="ts">

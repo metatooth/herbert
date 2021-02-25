@@ -1,51 +1,48 @@
 import WebSocket from "ws";
 import express from "express";
+import cors from "cors";
 import http from "http";
-import { createMeterReading, meterReadings } from "../shared/db";
+import mountRoutes from "./routes";
+import { query, register, status } from "./db";
+import path from "path";
+import favicon from "serve-favicon";
 
 const app = express();
+console.log("== Herbert Worker == Starting Up ==");
+console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
+
+app.use(favicon(path.join(__dirname, "favicon.ico")));
+console.log("favicon!");
+
+app.use(cors());
+console.log("cors added");
+
+mountRoutes(app);
+console.log("routes added");
+
 const port = process.env.PORT || 5000;
-
-app.use(function(req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  next();
-});
-
-app.param("meter", (req, res, next, id) => {
-  console.log("meter reading for", id);
-  meterReadings(id).then(readings => {
-    if (readings.length > 0) {
-      res.status(200).json(readings);
-      next();
-    } else {
-      next(new Error("failed to find meter"));
-    }
-  });
-});
 
 app.get("/", (req, res) => {
   res.send("OK");
 });
 
-app.get("/readings/:meter", (req, res, next) => {
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: err
+  });
   next();
 });
 
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render("error", {
-    message: err.message,
-    error: {}
-  });
-});
+function sendError(ws: WebSocket, message: string) {
+  const messageObject = {
+    type: "ERROR",
+    payload: message
+  };
+
+  ws.send(JSON.stringify(messageObject));
+}
 
 const server = http.createServer(app);
 server.listen(port);
@@ -54,33 +51,78 @@ console.log("http server listening on %d", port);
 const wss = new WebSocket.Server({ server: server });
 console.log("websocket server created");
 
-let sockets: WebSocket[] = [];
-wss.on("connection", function(socket: WebSocket) {
+wss.on("connection", function(ws: WebSocket) {
   console.log("websocket connection open");
-  sockets.push(socket);
 
-  // When you receive a message, send that message to every socket.
-  socket.on("message", function(msg: string) {
+  ws.on("message", async function(msg: string) {
     console.log(msg);
-    const data = JSON.parse(msg);
-    console.log(data.id, data.temperature, data.humidity);
-    if (data.main_meter) {
-      createMeterReading(data.main_meter, data.temperature, data.humidity);
+
+    let data;
+    try {
+      data = JSON.parse(msg);
+    } catch (e) {
+      sendError(ws, e);
+      return;
     }
 
-    if (data.intake_meter) {
-      createMeterReading(
-        data.intake_meter,
-        data.intake_temperature,
-        data.intake_humidity
+    if (!data.type || !data.payload) {
+      sendError(ws, "Message must specify type & payload.");
+      return;
+    }
+
+    if (data.type === "STATUS") {
+      register(
+        data.payload.client,
+        data.payload.main.meter,
+        data.payload.intake.meter,
+        ""
       );
+      status(
+        data.payload.main.meter,
+        "main",
+        data.payload.main.temperature,
+        data.payload.main.humidity,
+        data.payload.main.pressure
+      );
+      status(
+        data.payload.intake.meter,
+        "intake",
+        data.payload.intake.temperature,
+        data.payload.intake.humidity,
+        data.payload.intake.pressure
+      );
+
+      const {
+        rows
+      } = await query(
+        "SELECT * FROM clients c LEFT JOIN profiles p ON c.profile_id = p.id WHERE client = $1",
+        [data.payload.client]
+      );
+      console.log("FOUND CLIENT", rows[0]);
+
+      if (rows[0].profile_id) {
+        const reply = {
+          type: "CONFIG",
+          payload: {
+            id: rows[0].client,
+            lampStart: rows[0].lamp_start,
+            lampDuration: rows[0].lamp_duration,
+            lampOnTemperature: rows[0].lamp_on_temperature,
+            lampOnHumidity: rows[0].lamp_on_humidity,
+            lampOffTemperature: rows[0].lamp_off_temperature,
+            lampOffHumidity: rows[0].lamp_off_humidity,
+            timestamp: new Date()
+          }
+        };
+
+        ws.send(JSON.stringify(reply));
+      }
     }
 
-    sockets.forEach(s => s.send(msg));
-  });
-
-  // When a socket closes, or disconnects, remove it from the array.
-  socket.on("close", function() {
-    sockets = sockets.filter(s => s !== socket);
+    wss.clients.forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(msg);
+      }
+    });
   });
 });

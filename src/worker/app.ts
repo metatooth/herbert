@@ -98,7 +98,7 @@ export class App {
       );
     }
 
-    this.socket = new WebSocket(config.get("ws-url"));
+    this.socket = null;
 
     this.clime = new Clime(-1, 0.6, -1);
 
@@ -110,14 +110,14 @@ export class App {
       ["lamp", false]
     ]);
 
-    const meters: Array<Meter> = config.get("meters");
+    const devices: Array<Device> = config.get("devices");
 
-    meters.forEach((meter: Meter) => {
-      logger.debug("METER", meter);
-      if (meter.type === "main") {
-        this.mainMeter = new Meter(meter.id);
-      } else if (meter.type == "intake") {
-        this.intakeMeter = new Meter(meter.id);
+    devices.forEach(device => {
+      logger.debug("DEVICE", device);
+      if (device.type === "main") {
+        this.mainMeter = new Meter(device.id);
+      } else if (device.type == "intake") {
+        this.intakeMeter = new Meter(device.id);
       }
     });
 
@@ -163,7 +163,6 @@ export class App {
 
       const hour = new Date().getHours();
       let directive: AirDirectives;
-      let d: number;
 
       if (app.lamps.isOn(hour)) {
         directive = app.day;
@@ -200,7 +199,7 @@ export class App {
     return app.systems;
   }
 
-  public async handler(ad: IWoSensorTH): Promise<boolean> {
+  public async handler(ad: WoSensorTH): Promise<boolean> {
     const app = App.instance();
     if (app.mainMeter.id === ad.id) {
       app.mainMeter.clime.temperature = ad.serviceData.temperature.c;
@@ -229,7 +228,7 @@ export class App {
     logger.info("Starting up...");
 
     const factory = new PlugFactory(this.systems);
-    await factory.build(config.get("plugs"));
+    await factory.build(config.get("credentials"));
     this.plugs = factory.plugs;
 
     return new Promise(resolve => {
@@ -305,15 +304,20 @@ export class App {
             })
             .catch(result => {
               logger.error(plug.bot.device.nickname, "plug on NOT OK", result);
-              if (app.socket.readyState === 1) {
+              if (app.socket && app.socket.readyState === 1) {
                 const data = {
-                  id: config.get("id"),
-                  plug: plug.bot.device.nickname,
-                  action: "on",
-                  code: result.code,
-                  message: result.msg,
-                  timestamp: new Date()
+                  type: "ERROR",
+                  payload: {
+                    client: config.get("id"),
+                    plug: plug.bot.device.nickname,
+                    action: "on",
+                    code: result.code,
+                    message: result.msg,
+                    timestamp: new Date()
+                  }
                 };
+
+                console.log("sending...", data);
                 app.socket.send(JSON.stringify(data));
               }
             });
@@ -325,16 +329,20 @@ export class App {
             })
             .catch(result => {
               logger.error(plug.bot.device.nickname, "plug off NOT OK", result);
-              if (app.socket.readyState === 1) {
+              if (app.socket && app.socket.readyState === 1) {
                 const data = {
-                  id: config.get("id"),
-                  plug: plug.bot.device.nickname,
-                  action: "on",
-                  code: result.code,
-                  message: result.msg,
-                  timestamp: new Date()
+                  type: "ERROR",
+                  payload: {
+                    client: config.get("id"),
+                    plug: plug.bot.device.nickname,
+                    action: "on",
+                    code: result.code,
+                    message: result.msg,
+                    timestamp: new Date()
+                  }
                 };
 
+                console.log("sending...", data);
                 app.socket.send(JSON.stringify(data));
               }
             });
@@ -344,40 +352,66 @@ export class App {
 
     logger.debug("Done apply systems command.");
 
-    const data = {
-      id: config.get("id"),
-      main_meter: app.mainMeter.id,
-      temperature: app.mainMeter.clime.temperature,
-      humidity: app.mainMeter.clime.humidity,
-      intake_meter: "",
-      intake_temperature: -1,
-      intake_humidity: -1,
-      blower: app.systems.get("blower"),
-      dehumidifier: app.systems.get("dehumidifier"),
-      heater: app.systems.get("heater"),
-      humidifier: app.systems.get("humidifier"),
-      lamp: app.systems.get("lamp"),
-      updated_at: new Date()
-    };
+    logger.debug("Checking app socket...");
 
-    if (app.intakeMeter) {
-      data["intake_meter"] = app.intakeMeter.id;
-      data["intake_temperature"] = app.intakeMeter.clime.temperature;
-      data["intake_humidity"] = app.intakeMeter.clime.humidity;
+    if (app.socket && app.socket.readyState !== 1) {
+      logger.debug("Ready state:", app.socket.readyState);
+      app.socket = null;
     }
 
-    logger.debug("Checking app socket...");
-    logger.debug("Ready state:", app.socket.readyState);
     logger.debug("Done.");
 
-    if (app.socket.readyState !== 1) {
-      app.socket = null;
-      app.socket = new WebSocket(config.get("ws-url"));
+    if (app.socket === null) {
+      try {
+        app.socket = new WebSocket(config.get("ws-url"));
 
-      app.socket.on("close", () => {
-        logger.debug("THIS SOCKET IS CLOSED");
-      });
+        app.socket.on("error", err => {
+          console.log("Caught", err);
+        });
+
+        app.socket.on("close", () => {
+          logger.debug("THIS SOCKET IS CLOSED");
+        });
+
+        app.socket.on("message", (msg: string) => {
+          console.log("A message!", msg);
+        });
+      } catch (e) {
+        console.log("Try again!", e);
+      }
     } else {
+      const data = {
+        type: "STATUS",
+        payload: {
+          client: config.get("id"),
+          blower: app.systems.get("blower"),
+          dehumidifier: app.systems.get("dehumidifier"),
+          heater: app.systems.get("heater"),
+          humidifier: app.systems.get("humidifier"),
+          lamp: app.systems.get("lamp"),
+          timestamp: new Date()
+        }
+      };
+
+      if (app.mainMeter) {
+        data["payload"]["main"] = {
+          meter: app.mainMeter.id,
+          temperature: app.mainMeter.clime.temperature,
+          humidity: app.mainMeter.clime.humidity,
+          pressure: app.mainMeter.clime.vpd()
+        };
+      }
+
+      if (app.intakeMeter) {
+        data["payload"]["intake"] = {
+          meter: app.intakeMeter.id,
+          temperature: app.intakeMeter.clime.temperature,
+          humidity: app.intakeMeter.clime.humidity,
+          pressure: app.intakeMeter.clime.vpd()
+        };
+      }
+
+      console.log("sending...", data);
       app.socket.send(JSON.stringify(data));
     }
 
