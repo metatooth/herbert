@@ -138,7 +138,9 @@ export class App {
       app.mainMeter.clime.humidity !== app.clime.humidity
     ) {
       logger.debug("changed!");
-      app.clime = app.mainMeter.clime;
+      app.clime.temperature = app.mainMeter.clime.temperature;
+      app.clime.humidity = app.mainMeter.clime.humidity;
+      app.clime.timestamp = app.mainMeter.clime.timestamp;
 
       app.systems.set("heater", false);
       app.systems.set("blower", false);
@@ -148,13 +150,15 @@ export class App {
       logger.info(
         app.mainMeter.id,
         app.mainMeter.clime.temperature,
-        app.mainMeter.clime.humidity
+        app.mainMeter.clime.humidity,
+        app.mainMeter.clime.timestamp
       );
 
       logger.info(
         app.intakeMeter.id,
         app.intakeMeter.clime.temperature,
-        app.intakeMeter.clime.humidity
+        app.intakeMeter.clime.humidity,
+        app.intakeMeter.clime.timestamp
       );
 
       const hour = new Date().getHours();
@@ -169,7 +173,8 @@ export class App {
         app.clime.delta = 0.3;
       }
 
-      directive.clime = app.clime;
+      directive.clime.temperature = app.clime.temperature;
+      directive.clime.humidity = app.clime.humidity;
       directive.monitor();
 
       logger.debug(directive);
@@ -291,9 +296,7 @@ export class App {
     logger.debug("PLUGS", app.plugs);
 
     app.plugs.forEach((value: Array<Plug>, key: string) => {
-      console.log("this key here", key);
       value.forEach(plug => {
-        console.log("this plug here", plug);
         if (app.systems.get(key)) {
           plug
             .on()
