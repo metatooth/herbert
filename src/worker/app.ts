@@ -1,6 +1,7 @@
 import WebSocket from "ws";
 import config from "config";
 import fs from "fs";
+import { networkInterfaces } from "os";
 
 import { vaporPressureDeficit } from "../shared/utils";
 
@@ -30,16 +31,17 @@ const logger: Logger = getLogger("app");
 export class App {
   private static _instance: App;
   initialized: boolean;
+  clime: Clime;
   day: AirDirectives;
   night: AirDirectives;
   lamps: LampTimer;
   blowers: BlowerTimer;
   socket: WebSocket;
   systems: Map<string, boolean>;
-  mainMeter: Meter;
-  clime: Clime;
-  intakeMeter: Meter;
+  meters: Map<Meter, Clime>;
   plugs: Map<string, Array<Plug>>;
+  macaddr: string;
+  heldMessages: Array<any>;
 
   private constructor() {
     console.log("process.argv", process.argv);
@@ -99,6 +101,7 @@ export class App {
     }
 
     this.socket = null;
+    this.heldMessages = [];
 
     this.clime = new Clime(-1, 0.6, -1);
 
@@ -110,105 +113,40 @@ export class App {
       ["lamp", false]
     ]);
 
+    this.meters = new Map();
+
     const devices: Array<Device> = config.get("devices");
 
     devices.forEach(device => {
       logger.debug("DEVICE", device);
-      if (device.type === "main") {
-        this.mainMeter = new Meter(device.id);
-      } else if (device.type == "intake") {
-        this.intakeMeter = new Meter(device.id);
+      if (device.type === "meter") {
+        this.meters.set(new Meter(device.id), new Clime(0, 0, 0));
       }
     });
 
     this.initialized = false;
   }
 
-  async check(): Promise<Map<string, boolean>> {
-    const app = App.instance();
-
-    logger.debug("curr:", [
-      app.mainMeter.clime.temperature,
-      app.mainMeter.clime.humidity
-    ]);
-    logger.debug("last:", [app.clime.temperature, app.clime.humidity]);
-
-    if (
-      app.mainMeter.clime.temperature !== app.clime.temperature ||
-      app.mainMeter.clime.humidity !== app.clime.humidity
-    ) {
-      logger.debug("changed!");
-      app.clime.temperature = app.mainMeter.clime.temperature;
-      app.clime.humidity = app.mainMeter.clime.humidity;
-      app.clime.timestamp = app.mainMeter.clime.timestamp;
-
-      app.systems.set("heater", false);
-      app.systems.set("blower", false);
-      app.systems.set("humidifier", false);
-      app.systems.set("dehumidifier", false);
-
-      logger.info(
-        app.mainMeter.id,
-        app.mainMeter.clime.temperature,
-        app.mainMeter.clime.humidity,
-        app.mainMeter.clime.timestamp
-      );
-
-      logger.info(
-        app.intakeMeter.id,
-        app.intakeMeter.clime.temperature,
-        app.intakeMeter.clime.humidity,
-        app.intakeMeter.clime.timestamp
-      );
-
-      const hour = new Date().getHours();
-      let directive: AirDirectives;
-
-      if (app.lamps.isOn(hour)) {
-        directive = app.day;
-        app.clime.delta = -0.6;
-      } else {
-        directive = app.night;
-        app.clime.delta = 0.3;
-      }
-
-      directive.clime.temperature = app.clime.temperature;
-      directive.clime.humidity = app.clime.humidity;
-      directive.monitor();
-
-      logger.debug(directive);
-
-      if (directive.temperature === "heat") {
-        app.systems.set("heater", true);
-      } else if (directive.temperature === "cool") {
-        app.systems.set("blower", true);
-      } else {
-        app.systems.set("heater", false);
-      }
-
-      if (directive.humidity === "humidify") {
-        app.systems.set("humidifier", true);
-      } else if (directive.humidity === "dehumidify") {
-        app.systems.set("dehumidifier", true);
-      } else {
-        app.systems.set("dehumidifier", false);
-        app.systems.set("humidifier", false);
-      }
-    }
-
-    return app.systems;
-  }
-
   public async handler(ad: WoSensorTH): Promise<boolean> {
     const app = App.instance();
-    if (app.mainMeter.id === ad.id) {
-      app.mainMeter.clime.temperature = ad.serviceData.temperature.c;
-      app.mainMeter.clime.humidity = ad.serviceData.humidity / 100.0;
-      app.mainMeter.clime.timestamp = new Date();
-    } else if (app.intakeMeter && app.intakeMeter.id === ad.id) {
-      app.intakeMeter.clime.temperature = ad.serviceData.temperature.c;
-      app.intakeMeter.clime.humidity = ad.serviceData.humidity / 100.0;
-      app.intakeMeter.clime.timestamp = new Date();
+    let meter: Meter;
+    let clime: Clime;
+    app.meters.forEach((value, key) => {
+      if (key.id === ad.id) {
+        meter = key;
+        clime = value;
+      }
+    });
+
+    if (meter) {
+      if (clime.temperature !== ad.serviceData.temperature.c ||
+          clime.humidity !== ad.serviceData.humidity) {
+          clime.temperature = ad.serviceData.temperature.c;
+          clime.delta = 0.6;
+          clime.humidity = ad.serviceData.humidity / 100.0;
+          clime.timestamp = new Date();
+          app.status(meter, clime);
+      }
     } else {
       logger.debug(`XXX unhandled advertisement -- ${ad.id} XXX`);
     }
@@ -224,25 +162,98 @@ export class App {
   }
 
   public async init(): Promise<boolean> {
-    logger.info("====================================");
-    logger.info("Starting up...");
+    logger.info("=====================================");
+    logger.info("== Herbert Worker = Starting up... ==");
+    logger.info("=====================================");
 
     const factory = new PlugFactory(this.systems);
     await factory.build(config.get("credentials"));
     this.plugs = factory.plugs;
 
+    this.macaddr = networkInterfaces()["wlo1"][0]["mac"];
+    this.register(this.macaddr, config.get("id"));
+
     return new Promise(resolve => {
       logger.info("DAY >>", this.day);
       logger.info("NIGHT >>", this.night);
       logger.info(config);
-      logger.info(this.mainMeter);
-      logger.info(this.intakeMeter);
+      logger.info(this.meters);
       logger.info(this.plugs);
       logger.info("====================================");
       this.initialized = true;
       resolve(true);
     });
   }
+
+  private async send(data) {
+    const app = App.instance();
+
+    if (app.socket === null) {
+      app.heldMessages.push(data);
+
+      try {
+        app.socket = await new WebSocket(config.get('ws-url'));
+
+        app.socket.on("error", (err) => {
+          logger.error("Caught", err);
+        });
+
+        app.socket.on("close", () => {
+          logger.info("SOCKET IS CLOSED");
+          app.socket = null;
+        });
+
+        app.socket.on("message", (msg) => {
+          logger.debug("REC", msg);
+        });
+
+      } catch (e) {
+        logger.error("Caught", e);
+      }
+    } else if (app.socket.readyState !== 1) {
+      app.heldMessages.push(data);
+
+    } else {
+      console.log("Sending data", data);
+      app.socket.send(JSON.stringify(data));
+
+      app.heldMessages.forEach((msg) => {
+          console.log("Sending held message", msg);
+          app.socket.send(JSON.stringify(msg));
+      });
+      
+      app.heldMessages = [];
+    }     
+  }
+
+  private async status(meter: Meter, clime: Clime) {
+    const data = {
+        type: "STATUS",
+          payload: {
+              device: meter.id,
+              type: "meter",
+              manufacturer: meter.type,
+              temperature: clime.temperature,
+              humidity: clime.humidity,
+              pressure: clime.vpd(),
+              timestamp: new Date()
+          }
+      };
+      this.send(data);
+  }
+
+    private async register(macaddr: string, nickname: string) {
+      const data = {
+          type: "STATUS",
+          payload: {
+              worker: macaddr,
+              nickname: nickname,
+              timestamp: new Date()
+          }
+      };
+      this.send(data);
+  }
+
 
   public async run(): Promise<boolean> {
     const app = App.instance();
@@ -253,170 +264,16 @@ export class App {
     const polling: number = 1000 * parseInt(config.get("polling"));
     const interval: number = 1000 * parseInt(config.get("interval"));
 
-    logger.debug("Start main meter scan for %dms ...", polling);
-    app.mainMeter.bot.onadvertisement = app.handler;
-    await app.mainMeter.startScan();
-    await app.mainMeter.wait(polling);
-    await app.mainMeter.stopScan();
-    logger.debug("Done main meter scan.");
-
-    if (app.intakeMeter) {
-      logger.debug("Start intake meter scan for %dms ...", polling);
-      app.intakeMeter.bot.onadvertisement = app.handler;
-      await app.intakeMeter.startScan();
-      await app.intakeMeter.wait(polling);
-      await app.intakeMeter.stopScan();
-      logger.debug("Done scan.");
-    }
-
-    logger.debug("Check if climate has changed...");
-    await app.check();
-    logger.debug("done.");
-
-    const now: Date = new Date();
-    const hour: number = now.getHours();
-    const min: number = now.getMinutes();
-    const sec: number = now.getSeconds();
-
-    if (app.lamps.isOn(hour)) {
-      app.systems.set("lamp", true);
-    } else {
-      app.systems.set("lamp", false);
-    }
-
-    if (app.blowers.isOn(min * 60 + sec)) {
-      app.systems.set("blower", true);
-    } else {
-      app.systems.set("blower", false);
-    }
-
-    logger.debug("Apply systems command to plugs...");
-    logger.debug("SYSTEMS", app.systems);
-    logger.debug("PLUGS", app.plugs);
-
-    app.plugs.forEach((value: Array<Plug>, key: string) => {
-      value.forEach(plug => {
-        if (app.systems.get(key)) {
-          plug
-            .on()
-            .then(() => {
-              logger.debug(plug.bot.device.nickname, "plug on OK");
-            })
-            .catch(result => {
-              logger.error(plug.bot.device.nickname, "plug on NOT OK", result);
-              if (app.socket && app.socket.readyState === 1) {
-                const data = {
-                  type: "ERROR",
-                  payload: {
-                    client: config.get("id"),
-                    plug: plug.bot.device.nickname,
-                    action: "on",
-                    code: result.code,
-                    message: result.msg,
-                    timestamp: new Date()
-                  }
-                };
-
-                console.log("sending...", data);
-                app.socket.send(JSON.stringify(data));
-              }
-            });
-        } else {
-          plug
-            .off()
-            .then(() => {
-              logger.debug(plug.bot.device.nickname, "plug off OK");
-            })
-            .catch(result => {
-              logger.error(plug.bot.device.nickname, "plug off NOT OK", result);
-              if (app.socket && app.socket.readyState === 1) {
-                const data = {
-                  type: "ERROR",
-                  payload: {
-                    client: config.get("id"),
-                    plug: plug.bot.device.nickname,
-                    action: "on",
-                    code: result.code,
-                    message: result.msg,
-                    timestamp: new Date()
-                  }
-                };
-
-                console.log("sending...", data);
-                app.socket.send(JSON.stringify(data));
-              }
-            });
-        }
-      });
+    app.meters.forEach(async (clime, meter) => {
+      logger.debug("Start scan on %s for %dms ...", meter.id, polling);
+      meter.bot.onadvertisement = app.handler;
+      await meter.startScan();
+      await meter.wait(polling);
+      await meter.stopScan();
+      logger.debug("Done meter scan.");
     });
-
-    logger.debug("Done apply systems command.");
-
-    logger.debug("Checking app socket...");
-
-    if (app.socket && app.socket.readyState !== 1) {
-      logger.debug("Ready state:", app.socket.readyState);
-      app.socket = null;
-    }
-
-    logger.debug("Done.");
-
-    if (app.socket === null) {
-      try {
-        app.socket = new WebSocket(config.get("ws-url"));
-
-        app.socket.on("error", err => {
-          console.log("Caught", err);
-        });
-
-        app.socket.on("close", () => {
-          logger.debug("THIS SOCKET IS CLOSED");
-        });
-
-        app.socket.on("message", (msg: string) => {
-          console.log("A message!", msg);
-        });
-      } catch (e) {
-        console.log("Try again!", e);
-      }
-    } else {
-      const data = {
-        type: "STATUS",
-        payload: {
-          client: config.get("id"),
-          blower: app.systems.get("blower"),
-          dehumidifier: app.systems.get("dehumidifier"),
-          heater: app.systems.get("heater"),
-          humidifier: app.systems.get("humidifier"),
-          lamp: app.systems.get("lamp"),
-          timestamp: new Date()
-        }
-      };
-
-      if (app.mainMeter) {
-        data["payload"]["main"] = {
-          meter: app.mainMeter.id,
-          temperature: app.mainMeter.clime.temperature,
-          humidity: app.mainMeter.clime.humidity,
-          pressure: app.mainMeter.clime.vpd()
-        };
-      }
-
-      if (app.intakeMeter) {
-        data["payload"]["intake"] = {
-          meter: app.intakeMeter.id,
-          temperature: app.intakeMeter.clime.temperature,
-          humidity: app.intakeMeter.clime.humidity,
-          pressure: app.intakeMeter.clime.vpd()
-        };
-      }
-
-      console.log("sending...", data);
-      app.socket.send(JSON.stringify(data));
-    }
-
-    logger.debug("Done all. Timeout in %dms.", interval - 2 * polling);
-    setTimeout(app.run, interval - 2 * polling);
+      
+    setTimeout(app.run, interval);
 
     return new Promise(resolve => {
       resolve(true);

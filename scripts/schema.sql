@@ -2,6 +2,8 @@ begin;
 
 create table manufacturers (
   manufacturer varchar(255) primary key,
+  username varchar(255),
+  password_digest varchar(255),
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp,
   deleted boolean default false,
@@ -17,11 +19,10 @@ create table device_types (
 );
 
 create table devices (
-  device varchar(255) primary key,
-  manufacturer varchar(255) references manufacturers(manufacturer),
+  device macaddr primary key,
   device_type varchar(255) references device_types(device_type),
-  inet inet,
-  macaddr macaddr,
+  manufacturer varchar(255) references manufacturers(manufacturer),
+  nickname varchar(255),
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp,
   deleted boolean default false,
@@ -30,7 +31,7 @@ create table devices (
 
 create table readings (
   id serial primary key,
-  meter varchar(255) references devices(device),
+  meter macaddr references devices(device),
   temperature numeric not null,
   humidity numeric not null,
   pressure numeric not null,
@@ -52,25 +53,59 @@ create table profiles (
   deleted_at timestamp
 );
 
-create table clients (
-  client varchar(255) primary key,
+create table workers (
+  worker macaddr primary key,
   nickname varchar(255) unique,
-  main varchar(255) references devices(device),
-  intake varchar(255) references devices(device),
-  profile_id integer references profiles(id),
-  inet inet,
-  macaddr macaddr,
   created_at timestamp default current_timestamp,
   updated_at timestamp default current_timestamp,
   deleted boolean default false,
   deleted_at timestamp
 );
 
-insert into manufacturers (manufacturer) values ('SwitchBot'), ('WYZE');
+create table worker_devices (
+  worker macaddr references workers(worker),
+  device macaddr references devices(device),
+  created_at timestamp default current_timestamp
+);
+
+create table zones (
+  id serial primary key,
+  nickname varchar(255) unique,
+  parent_id integer references zones(id),
+  profile_id integer references profiles(id),
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp,
+  deleted boolean default false,
+  deleted_at timestamp
+);
+
+create table zone_devices (
+  zone_id integer references zones(id),
+  device macaddr references devices(device),
+  created_at timestamp default current_timestamp
+);
+
+create table meter_types (
+  meter_type varchar(255) primary key,
+  created_at timestamp default current_timestamp,
+  updated_at timestamp default current_timestamp,
+  deleted boolean default false,
+  deleted_at timestamp
+);
+
+create table zone_meters (
+  zone_id integer references zones(id),
+  meter macaddr references devices(device),
+  meter_type varchar(255) references meter_types(meter_type),
+  created_at timestamp default current_timestamp
+);
+
+insert into manufacturers (manufacturer)
+       values ('SwitchBot'), ('WYZE'), ('mockbot');
 
 insert into device_types (device_type)
-       values ('main'), ('intake'),
-       ('lamp'), ('blower'), ('humidifier'), ('dehumidifier'), ('heater');
+       values ('meter'), ('lamp'), ('blower'),
+       ('humidifier'), ('dehumidifier'), ('heater');
 
 insert into profiles (profile, lamp_start, lamp_duration, lamp_on_temperature,
        lamp_on_humidity, lamp_off_temperature, lamp_off_humidity)
@@ -82,4 +117,6 @@ insert into profiles (profile, lamp_start, lamp_duration, lamp_on_temperature,
        ('Torello Flower 2', '13:00', '12 hours', 22.2, 43, 19.7, 43),
        ('Torello Flower 3', '13:00', '12 hours', 19.2, 35, 16.4, 35);
        
+insert into zones (nickname) VALUES ('root');
+
 commit;

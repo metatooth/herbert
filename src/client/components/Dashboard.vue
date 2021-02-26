@@ -4,82 +4,58 @@
       v-bind:notifications="notifications"
       @delete-notification="deleteNotification"
     />
-    <grow-environments v-bind:clients="clients" :units="units" />
-    <grow-profiles v-bind:profiles="profiles" :units="units" />
-    <client-configurations
-      v-bind:clients="clients"
+    <zones v-bind:zones="zones" :units="units" />
+    <zone-configurations
+      v-bind:zones="zones"
       v-bind:profiles="profiles"
       :units="units"
-      @update-client="updateClient"
+      @update-zone="updateZone"
     />
+    <profiles v-bind:profiles="profiles" :units="units" />
+    <devices v-bind:devices="devices" />
+    <workers v-bind:workers="workers" />
     <units-selector :units="units" @change-units="changeUnits" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ClientConfigurations from "@/components/ClientConfigurations.vue";
-import GrowEnvironments from "@/components/GrowEnvironments.vue";
+
+import Devices from "@/components/Devices.vue";
 import Notifications from "@/components/Notifications.vue";
+import Profiles from "@/components/Profiles.vue";
 import UnitsSelector from "@/components/UnitsSelector.vue";
-import GrowProfiles from "@/components/GrowProfiles.vue";
-
-interface ClientData {
-  id: string;
-  nickname: string;
-  main: string;
-  intake: string;
-  profile: string;
-  units: string;
-  temperature: number;
-  humidity: number;
-  pressure: number;
-  blower: number;
-  dehumidifier: number;
-  heater: number;
-  humidifier: number;
-  lamp: number;
-  timestamp: Date;
-}
-
-interface NotificationData {
-  id: string;
-  plug: string;
-  action: string;
-  code: string;
-  message: string;
-  timestamp: Date;
-}
-
-interface ProfileData {
-  id: number;
-  profile: string;
-  lampOnHour: number;
-  lampOnMinute: number;
-  lampDuration: number;
-  lampOnTemperature: number;
-  lampOnHumidity: number;
-  lampOffTemperature: number;
-  lampOffHumidity: number;
-  timestamp: Date;
-}
+import Workers from "@/components/Workers.vue";
+import ZoneConfigurations from "@/components/ZoneConfigurations.vue";
+import Zones from "@/components/Zones.vue";
+import { Device, 
+Notification, 
+Profile, 
+Worker, 
+Zone } from "../../shared/@types/main";
 
 const Dashboard = Vue.extend({
   data() {
     return {
-      clients: [] as ClientData[],
-      notifications: [] as NotificationData[],
-      profiles: [] as ProfileData[],
+      devices: [] as Device[],
+      zones: [] as Zone[],
+      notifications: [] as Notification[],
+      profiles: [] as Profile[],
+      workers: [] as Worker[],
+      xhr: XMLHttpRequest,
+      url: String,
       units: "F"
     };
   },
 
   components: {
-    ClientConfigurations,
-    GrowEnvironments,
-    GrowProfiles,
+    Devices,
     Notifications,
-    UnitsSelector
+    Profiles, 
+    UnitsSelector,
+    Workers,
+    ZoneConfigurations,
+    Zones
   },
 
   mounted() {
@@ -94,8 +70,12 @@ const Dashboard = Vue.extend({
       this.onWebsocketMessage(ev);
     });
 
-    this.refreshClients();
+    this.url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+
+    this.refreshZones();
     this.refreshProfiles();
+    this.refreshDevices();
+    this.refreshWorkers();
   },
 
   computed: {
@@ -113,7 +93,7 @@ const Dashboard = Vue.extend({
       this.units = units;
     },
 
-    deleteNotification(n): void {
+    deleteNotification(n: any): void {
       console.log("we are here", n);
       const found = this.notifications.findIndex(el => el.id === n.id);
       console.log("found!", found);
@@ -129,143 +109,46 @@ const Dashboard = Vue.extend({
       const data = JSON.parse(ev.data);
       console.log("message with data", data);
       if (data.type === "STATUS") {
-        let found = false;
-        this.clients.forEach((c: ClientData) => {
-          if (c.id === data.payload.client) {
-            c.units = this.units;
-            c.temperature = data.payload.main.temperature;
-            c.humidity = 100 * data.payload.main.humidity;
-            c.pressure = data.payload.main.pressure / 1000;
-            c.blower = data.payload.blower ? 1 : 0;
-            c.dehumidifier = data.payload.dehumidifier ? 1 : 0;
-            c.heater = data.payload.heater ? 1 : 0;
-            c.humidifier = data.payload.humidifier ? 1 : 0;
-            c.lamp = data.payload.lamp ? 1 : 0;
-            c.timestamp = new Date();
-            found = true;
-          }
-        });
-
-        if (!found) {
-          const cd: ClientData = {
-            id: data.payload.client,
-            nickname: data.payload.nickname,
-            main: data.payload.main.meter,
-            intake: data.payload.intake.meter,
-            profile: data.payload.profile,
-            units: this.units,
-            temperature: data.payload.main.temperature,
-            humidity: 100 * data.payload.main.humidity,
-            pressure: data.payload.main.pressure / 1000,
-            blower: data.payload.blower ? 1 : 0,
-            dehumidifier: data.payload.dehumidifer ? 1 : 0,
-            heater: data.payload.heater ? 1 : 0,
-            humidifier: data.payload.humidifier ? 1 : 0,
-            lamp: data.payload.lamp ? 1 : 0,
-            timestamp: new Date()
-          };
-
-          this.clients.push(cd);
-        }
-
-        if (data.payload.profile === null) {
-          const found = this.notifications.find(
-            el => el.id === data.payload.client
-          );
-          if (!found) {
-            const nd: NotificationData = {
-              id: data.payload.client,
-              plug: data.payload.client,
-              action: "",
-              code: "",
-              message: "No profile configured!",
-              timestamp: new Date()
-            };
-
-            this.notifications.push(nd);
-          }
-        }
-      } else if (data.type === "ERROR") {
-        let found = false;
-        console.log("ERROR", data.payload);
-        this.notifications.forEach((nd: NotificationData) => {
-          console.log(nd);
-          if (nd.id === data.payload.id) {
-            nd.plug = data.payload.plug;
-            nd.action = data.payload.action;
-            nd.code = data.payload.code;
-            nd.message = data.payload.message;
-            nd.timestamp = new Date();
-            found = true;
-          }
-        });
-
-        if (!found) {
-          const nd: NotificationData = {
-            id: data.payload.id,
-            plug: data.payload.plug,
-            action: data.payload.action,
-            code: data.payload.code,
-            message: data.payload.message,
-            timestamp: new Date()
-          };
-
-          this.notifications.push(nd);
-        }
+        console.log("do something!");
       } else {
         console.log("Unhandled Message", data);
       }
     },
 
-    refreshClients() {
+    refreshDevices() {
       const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+      xhr.open("GET", `${this.url}/devices`);
 
-      xhr.open("GET", `${url}/clients`);
+      xhr.onload = () => {
+        console.log("onload", xhr.response);
+        const data = JSON.parse(xhr.response);
+        this.devices = [];
+        data.forEach((d: any) => { 
+          console.log("device", d);
+          this.devices.push(d);
+          console.log(this.devices.length);
+        });
+      };
+
+      xhr.send();
+    },
+
+    refreshZones() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", `${this.url}/zones`);
 
       xhr.onload = () => {
         const data = JSON.parse(xhr.response);
-        console.log("clients", data);
-        this.clients = [];
+        this.zones = [];
 
         data.forEach((d: any) => {
-          console.log("client", d);
-
-          const cd: ClientData = {
-            id: d.client,
+          const z: Zone = {
+            id: d.id,
             nickname: d.nickname,
-            main: d.main,
-            intake: d.intake,
             profile: d.profile,
-            temperature: 0,
-            humidity: 0,
-            pressure: 0,
-            lamp: 0,
-            blower: 0,
-            heater: 0,
-            dehumidifier: 0,
-            humidifier: 0,
-            units: this.units,
-            timestamp: new Date(d.updated_at)
+            timestamp: d.created_at
           };
-
-          this.clients.push(cd);
-
-          if (cd.profile === null) {
-            const found = this.notifications.find(el => el.id === cd.id);
-            if (!found) {
-              const nd: NotificationData = {
-                id: cd.id,
-                plug: cd.id,
-                action: "",
-                code: "",
-                message: "No profile configured!",
-                timestamp: new Date()
-              };
-
-              this.notifications.push(nd);
-            }
-          }
+          this.zones.push(z);
         });
       };
 
@@ -274,20 +157,15 @@ const Dashboard = Vue.extend({
 
     refreshProfiles() {
       const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
-
-      xhr.open("GET", `${url}/profiles`);
+      xhr.open("GET", `${this.url}/profiles`);
 
       xhr.onload = () => {
         const data = JSON.parse(xhr.response);
-        console.log("profiles", data);
         this.profiles = [];
         data.forEach((d: any) => {
-          console.log("profile", d);
-
           const start = d.lamp_start.split(":");
 
-          const pd: ProfileData = {
+          const pd: Profile = {
             id: parseInt(d.id),
             profile: d.profile,
             lampOnHour: start[0],
@@ -307,8 +185,31 @@ const Dashboard = Vue.extend({
       xhr.send();
     },
 
-    updateClient(c) {
-      console.log("UPDATE CLIENT", c);
+    refreshWorkers() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", `${this.url}/workers`);
+
+      xhr.onload = () => {
+        const data = JSON.parse(xhr.response);
+        this.workers = [];
+        data.forEach((d: any) => { 
+          console.log("worker", d);
+          const w: Worker = {
+            worker: d.worker,
+            nickname: d.nickname,
+            timestamp: d.updated_at
+          };
+          this.workers.push(w);
+
+console.log("length", this.workers.length);
+        });
+      };
+
+      xhr.send();
+    },
+
+    updateZone(z: any) {
+      console.log("UPDATE ZONE", z);
     }
   }
 });

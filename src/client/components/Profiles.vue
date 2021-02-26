@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="subtitle">Grow Profiles</h2>
+    <h2 class="subtitle">{{ profiles.length }} {{ profilesName }}</h2>
     <table class="table">
       <thead>
         <tr>
@@ -30,7 +30,7 @@
 import Vue from "vue";
 import ProfileRow from "@/components/ProfileRow.vue";
 
-const GrowProfiles = Vue.extend({
+const Profiles = Vue.extend({
   props: {
     profiles: Array,
     units: String
@@ -38,8 +38,18 @@ const GrowProfiles = Vue.extend({
 
   components: {
     ProfileRow
+  },
+
+  computed: {
+    profilesName(): string {
+      if (this.profiles.length === 1) {
+        return "Profile";
+      } else {
+        return "Profiles";
+      }
+    }
   }
 });
 
-export default GrowProfiles;
+export default Profiles;
 </script>

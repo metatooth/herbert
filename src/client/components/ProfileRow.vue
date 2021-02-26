@@ -11,7 +11,7 @@
     <td class="has-background-warning-light">
       <target
         icon="thermometer-half"
-        :value="lampOnTemperature"
+        :value="dayTemperature"
         :precision="1"
         :units="unitsWithDegree"
       />
@@ -25,7 +25,7 @@
     <td class="has-background-info-light">
       <target
         icon="thermometer-half"
-        :value="lampOffTemperature"
+        :value="nightTemperature"
         :precision="1"
         :units="unitsWithDegree"
       />
@@ -76,6 +76,22 @@ const ProfileRow = Vue.extend({
     unitsWithDegree(): string {
       return "°" + this.units;
     },
+
+    dayTemperature(): number {
+if (this.units === "F") {
+return this.lampOnTemperature * 9 /5 + 32;
+} 
+
+return this.lampOnTemperature;
+},
+
+nightTemperature(): number {
+if (this.units === "F") {
+return this.lampOffTemperature * 9 /5 + 32;
+} 
+
+return this.lampOffTemperature;
+},
 
     lampOnPressure(): number {
       return (

@@ -3,12 +3,12 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import { query, register, status } from "./db";
+import { registerDevice, registerWorker, createReading } from "./db";
 import path from "path";
 import favicon from "serve-favicon";
 
 const app = express();
-console.log("== Herbert Worker == Starting Up ==");
+console.log("== Herbert Server == Starting Up ==");
 console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
 
 app.use(favicon(path.join(__dirname, "favicon.ico")));
@@ -71,51 +71,20 @@ wss.on("connection", function(ws: WebSocket) {
     }
 
     if (data.type === "STATUS") {
-      register(
-        data.payload.client,
-        data.payload.main.meter,
-        data.payload.intake.meter,
-        ""
-      );
-      status(
-        data.payload.main.meter,
-        "main",
-        data.payload.main.temperature,
-        data.payload.main.humidity,
-        data.payload.main.pressure
-      );
-      status(
-        data.payload.intake.meter,
-        "intake",
-        data.payload.intake.temperature,
-        data.payload.intake.humidity,
-        data.payload.intake.pressure
-      );
+      if (data.payload.device && data.payload.type === "meter") {
+        console.log("Status message from meter", data.payload);
+        registerDevice(data.payload.device,
+                       data.payload.manufacturer,
+                       data.payload.type);
+        createReading(data.payload.device,
+                      data.payload.temperature,
+                      data.payload.humidity,
+                      data.payload.pressure);
+      }
 
-      const {
-        rows
-      } = await query(
-        "SELECT * FROM clients c LEFT JOIN profiles p ON c.profile_id = p.id WHERE client = $1",
-        [data.payload.client]
-      );
-      console.log("FOUND CLIENT", rows[0]);
-
-      if (rows[0].profile_id) {
-        const reply = {
-          type: "CONFIG",
-          payload: {
-            id: rows[0].client,
-            lampStart: rows[0].lamp_start,
-            lampDuration: rows[0].lamp_duration,
-            lampOnTemperature: rows[0].lamp_on_temperature,
-            lampOnHumidity: rows[0].lamp_on_humidity,
-            lampOffTemperature: rows[0].lamp_off_temperature,
-            lampOffHumidity: rows[0].lamp_off_humidity,
-            timestamp: new Date()
-          }
-        };
-
-        ws.send(JSON.stringify(reply));
+      if (data.payload.worker) {
+        console.log("Status message from worker", data.payload);
+        registerWorker(data.payload.worker, data.payload.nickname);
       }
     }
 

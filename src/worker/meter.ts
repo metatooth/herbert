@@ -1,12 +1,10 @@
 import Switchbot from "node-switchbot";
 
 import { Mockbot } from "./mockbot";
-import { Clime } from "./clime";
 
 export class Meter {
   id: string;
   type: string;
-  clime: Clime;
   bot;
 
   constructor(id: string) {
@@ -22,8 +20,6 @@ export class Meter {
       this.type = "switchbot";
       this.bot = new Switchbot();
     }
-
-    this.clime = new Clime(-1, 0.6, -1);
   }
 
   public async startScan(): Promise<boolean> {

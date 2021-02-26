@@ -12,50 +12,33 @@ export async function query(text, params): Promise<Result> {
   return res;
 }
 
-export async function register(client, main, intake, profile) {
-  query("SELECT * FROM clients WHERE client = $1", [client]).then(res => {
+export async function registerDevice(macaddr, manufacturer, type) {
+  query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
-      console.log("inserting", { client });
-      query("INSERT INTO clients (client) VALUES ($1)", [client]);
-    } else {
-      if (main) {
-        query(
-          "UPDATE clients SET main = $1, updated_at = CURRENT_TIMESTAMP WHERE client = $2",
-          [main, client]
-        );
-      }
-
-      if (intake) {
-        query(
-          "UPDATE clients SET intake = $1, updated_at = CURRENT_TIMESTAMP WHERE client = $2",
-          [intake, client]
-        );
-      }
-
-      if (profile) {
-        query(
-          "UPDATE clients SET profile = $1, updated_at = CURRENT_TIMESTAMP WHERE client = $2",
-          [profile, client]
-        );
-      }
+      console.log("inserting", macaddr);
+      query("INSERT INTO devices (device, manufacturer, device_type) VALUES ($1, $2, $3)",
+            [macaddr, manufacturer, type]);
     }
   });
 }
 
-export async function status(meter, type, temperature, humidity, pressure) {
-  if (meter) {
-    query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
-      if (res.rowCount === 0) {
-        query(
-          "INSERT INTO devices (device, device_type, manufacturer, macaddr) VALUES ($1, $2, 'SwitchBot', $3)",
-          [meter, type, meter]
-        );
-      } else {
-        query(
-          "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
-          [meter, temperature, humidity, pressure]
-        );
-      }
-    });
-  }
+export async function registerWorker(macaddr, nickname) {
+  query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
+    if (res.rowCount === 0) {
+      console.log("inserting", macaddr);
+      query("INSERT INTO workers (worker, nickname) VALUES ($1, $2)",
+            [macaddr, nickname]);
+    }
+  });
+}
+
+export async function createReading(meter, temperature, humidity, pressure) {
+  query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
+    if (res.rowCount !== 0) {
+      query(
+        "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
+        [meter, temperature, humidity, pressure]
+      );
+    }
+  });
 }

@@ -55,55 +55,8 @@
         <p class="card-header-subtitle">
           Status
         </p>
-        <div class="field is-grouped">
-          <target
-            icon="thermometer-half"
-            :value="temp"
-            :precision="1"
-            :units="unitsWithDegree"
-          />
-          <target icon="tint" :value="humidity" :precision="0" units="%" />
-          <target icon="cloud" :value="pressure" :precision="1" units="hPa" />
-        </div>
-        <div class="tags has-addons">
-          <system name="lamp" :status="lamp" />
-          <system name="blower" :status="blower" />
-          <system name="heater" :status="heater" />
-          <system name="dehumidifier" :status="dehumidifier" />
-          <system name="humidifier" :status="humidifier" />
-        </div>
       </div>
       <footer class="card-footer">
-        <div class="card-footer-item">
-          <router-link
-            :to="{
-              name: 'readings',
-              params: {
-                environment: id,
-                name: 'Main',
-                meter: main,
-                units: units
-              }
-            }"
-          >
-            MAIN
-          </router-link>
-        </div>
-        <div class="card-footer-item">
-          <router-link
-            :to="{
-              name: 'readings',
-              params: {
-                environment: id,
-                name: 'Intake',
-                meter: intake,
-                units: units
-              }
-            }"
-          >
-            INTAKE
-          </router-link>
-        </div>
         <div class="card-footer-item">
           <timestamp :timestamp="timestamp" />
         </div>
@@ -115,58 +68,11 @@
 <script lang="ts">
 import Vue from "vue";
 
-import Target from "@/components/Target.vue";
 import Timestamp from "@/components/Timestamp.vue";
-import System from "@/components/System.vue";
 
-const ClientCard = Vue.extend({
+const ZoneCard = Vue.extend({
   props: {
-    id: {
-      type: String,
-      default: ""
-    },
-    nickname: {
-      type: String,
-      default: ""
-    },
-    main: {
-      type: String,
-      default: ""
-    },
-    intake: {
-      type: String,
-      default: ""
-    },
-    profile: {
-      type: String,
-      default: ""
-    },
-    temperature: {
-      type: Number,
-      default: -1
-    },
-    humidity: {
-      type: Number,
-      default: -1
-    },
-    pressure: {
-      type: Number,
-      default: -1
-    },
-    blower: Number,
-    dehumidifier: Number,
-    heater: Number,
-    humidifier: Number,
-    lamp: Number,
-    units: {
-      type: String,
-      default: ""
-    },
-    timestamp: {
-      type: Date,
-      default: new Date()
-    },
-    profiles: Array
+    zone: { type: Object }
   },
 
   data() {
@@ -178,9 +84,7 @@ const ClientCard = Vue.extend({
   },
 
   components: {
-    Target,
-    Timestamp,
-    System
+    Timestamp
   },
 
   computed: {
@@ -206,13 +110,13 @@ const ClientCard = Vue.extend({
       const xhr = new XMLHttpRequest();
       const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
 
-      const found = this.profiles.find(
-        element => element.profile === this.selectedProfile
+      const found: any = this.profiles.find(
+        (element: any) => element.profile === this.selectedProfile
       );
 
       xhr.open(
         "PUT",
-        `${url}/clients/${this.id}/?nickname=${this.selectedNickname}&profile_id=${found.id}`
+        `${url}/zones/${this.id}/?nickname=${this.selectedNickname}&profile_id=${found.id}`
       );
 
       xhr.onload = () => {
@@ -232,5 +136,5 @@ const ClientCard = Vue.extend({
   }
 });
 
-export default ClientCard;
+export default ZoneCard;
 </script>
