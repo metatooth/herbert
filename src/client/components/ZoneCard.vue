@@ -58,7 +58,7 @@
       </div>
       <footer class="card-footer">
         <div class="card-footer-item">
-          <timestamp :timestamp="timestamp" />
+          <timestamp :timestamp="zone.timestamp" />
         </div>
       </footer>
     </div>
@@ -72,13 +72,15 @@ import Timestamp from "@/components/Timestamp.vue";
 
 const ZoneCard = Vue.extend({
   props: {
-    zone: { type: Object }
+    zone: Object,
+    profiles: Array,
+    units: String
   },
 
   data() {
     return {
-      selectedProfile: this.profile,
-      selectedNickname: this.nickname,
+      selectedProfile: this.zone.profile,
+      selectedNickname: this.zone.nickname,
       editing: false
     };
   },
@@ -89,14 +91,14 @@ const ZoneCard = Vue.extend({
 
   computed: {
     anchor(): string {
-      return this.id + "config";
+      return this.zone.id + "config";
     },
 
     temp(): number {
       if (this.units === "C") {
-        return this.temperature;
+        return this.zone.temperature;
       } else {
-        return (this.temperature * 9) / 5 + 32;
+        return (this.zone.temperature * 9) / 5 + 32;
       }
     },
 
@@ -116,7 +118,7 @@ const ZoneCard = Vue.extend({
 
       xhr.open(
         "PUT",
-        `${url}/zones/${this.id}/?nickname=${this.selectedNickname}&profile_id=${found.id}`
+        `${url}/zones/${this.zone.id}/?nickname=${this.selectedNickname}&profile=${found.id}`
       );
 
       xhr.onload = () => {
@@ -129,8 +131,8 @@ const ZoneCard = Vue.extend({
     },
 
     close() {
-      this.selectedNickname = this.nickname;
-      this.selectedProfile = this.profile;
+      this.selectedNickname = this.zone.nickname;
+      this.selectedProfile = this.zone.profile;
       this.editing = false;
     }
   }

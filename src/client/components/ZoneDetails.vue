@@ -4,10 +4,10 @@
     <div class="tile is-ancestor">
       <zone-card
         v-for="zone in zones"
-        v-bind="zone"
-        :key="zone.id"
-        :units="units"
-        :profiles="profiles"
+        v-bind:zone="zone"
+        v-bind:key="zone.id"
+        v-bind:units="units"
+        v-bind:profiles="profiles"
       />
     </div>
   </section>

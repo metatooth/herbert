@@ -13,23 +13,18 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 
 import Timestamp from "@/components/Timestamp.vue";
 
 const WorkerRow = Vue.extend({
   props: {
-    worker: { type: Object }
+    worker: Object
   },
 
   components: {
     Timestamp
-  },
-
-  mounted() {
-    console.log("this guy", this.worker, this.nickname, this.timestamp);
   }
-
 });
 
 export default WorkerRow;

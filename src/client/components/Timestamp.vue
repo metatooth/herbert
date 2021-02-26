@@ -6,35 +6,34 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { convertToLocalTime } from "date-fns-timezone";
 
 const Timestamp = Vue.extend({
   props: {
     timestamp: { type: Date, default: new Date() }
   },
 
-  computed: {
-    hhmm(): string {
-      if (this.timestamp instanceof Date) {
-        return (
-          this.zeroes(this.timestamp.getHours()) +
-          ":" +
-          this.zeroes(this.timestamp.getMinutes())
-        );
-      } else {
-        return this.timestamp;
-      }
-    },
-
-    ss(): string {
-      if (this.timestamp instanceof Date) {
-        return ":" + this.zeroes(this.timestamp.getSeconds());
-      } else {
-        return "";
-      }
-    }
+  data() {
+return {
+    local: convertToLocalTime(this.timestamp, { timeZone: "Etc/UTC" })
+};
   },
 
-  methods: {
+  computed: {
+      hhmm(): string {
+          return (
+              this.zeroes(this.local.getHours()) +
+                  ":" +
+                  this.zeroes(this.local.getMinutes())
+          );
+      },
+      
+      ss(): string {
+          return ":" + this.zeroes(this.local.getSeconds());
+      }
+  },
+    
+    methods: {
     zeroes(n: number): string {
       if (n < 10) {
         return `0${n}`;

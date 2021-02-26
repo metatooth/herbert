@@ -33,7 +33,7 @@ const Workers = Vue.extend({
     WorkerRow
   },
 
-computed: {
+  computed: {
     workersName(): string {
       if (this.workers.length === 1) {
         return "Herbert";
@@ -41,8 +41,7 @@ computed: {
         return "Herberts";
       }
     }
-}
-
+  }
 });
 
 export default Workers;

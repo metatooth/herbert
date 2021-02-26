@@ -13,7 +13,7 @@
       {{ device.manufacturer }}
     </td>
     <td>
-      <timestamp :timestamp="timestamp" />
+      <timestamp :timestamp="device.timestamp" />
     </td>
   </tr>
 </template>
@@ -24,16 +24,13 @@ import Vue from "vue";
 import Timestamp from "@/components/Timestamp.vue";
 
 const DeviceRow = Vue.extend({
-  props: { device: Object },
+  props: {
+    device: Object
+  },
 
   components: {
     Timestamp
-  },
-
-  mounted() {
-console.log("mount", this.device);
-}
-
+  }
 });
 
 export default DeviceRow;

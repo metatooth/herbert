@@ -78,20 +78,20 @@ const ProfileRow = Vue.extend({
     },
 
     dayTemperature(): number {
-if (this.units === "F") {
-return this.lampOnTemperature * 9 /5 + 32;
-} 
+      if (this.units === "F") {
+        return (this.lampOnTemperature * 9) / 5 + 32;
+      }
 
-return this.lampOnTemperature;
-},
+      return this.lampOnTemperature;
+    },
 
-nightTemperature(): number {
-if (this.units === "F") {
-return this.lampOffTemperature * 9 /5 + 32;
-} 
+    nightTemperature(): number {
+      if (this.units === "F") {
+        return (this.lampOffTemperature * 9) / 5 + 32;
+      }
 
-return this.lampOffTemperature;
-},
+      return this.lampOffTemperature;
+    },
 
     lampOnPressure(): number {
       return (

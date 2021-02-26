@@ -43,8 +43,7 @@ const Devices = Vue.extend({
         return "Devices";
       }
     }
- }
-
+  }
 });
 
 export default Devices;

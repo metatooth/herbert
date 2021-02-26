@@ -14,6 +14,9 @@ console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
 app.use(favicon(path.join(__dirname, "favicon.ico")));
 console.log("favicon!");
 
+app.use(express.json());
+console.log("JSON support");
+
 app.use(cors());
 console.log("cors added");
 
@@ -73,13 +76,17 @@ wss.on("connection", function(ws: WebSocket) {
     if (data.type === "STATUS") {
       if (data.payload.device && data.payload.type === "meter") {
         console.log("Status message from meter", data.payload);
-        registerDevice(data.payload.device,
-                       data.payload.manufacturer,
-                       data.payload.type);
-        createReading(data.payload.device,
-                      data.payload.temperature,
-                      data.payload.humidity,
-                      data.payload.pressure);
+        registerDevice(
+          data.payload.device,
+          data.payload.manufacturer,
+          data.payload.type
+        );
+        createReading(
+          data.payload.device,
+          data.payload.temperature,
+          data.payload.humidity,
+          data.payload.pressure
+        );
       }
 
       if (data.payload.worker) {

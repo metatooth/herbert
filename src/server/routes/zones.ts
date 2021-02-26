@@ -1,21 +1,24 @@
 import Router from "express-promise-router";
 
-import { query } from "../db";
+import { query, readZones, readZone } from "../db";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const { rows } = await query(
-    "SELECT z.id, z.nickname, p.profile FROM zones z LEFT JOIN profiles p ON z.profile_id = p.id",
-    []
-  );
+  const rows = await readZones();
+  console.log("rows", rows);
   res.status(200).json(rows);
+});
+
+router.post("/", async (req, res) => {
+  const { rows } = await query("INSERT INTO zones (nickname, profile_id, parent_id) VALUES ($1, $2, $3) RETURNING id", [req.body.nickname, req.body.profile, req.body.parent]);
+  const zone = await readZone(rows[0].id);
+  res.status(201).json(zone);
 });
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  const { rows } = await query("SELECT * FROM zones WHERE zone = $1", [id]);
-  res.status(200).json(rows[0]);
+  res.status(200).json(await readZone(id));
 });
 
 router.put("/:id", async (req, res) => {

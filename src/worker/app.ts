@@ -139,13 +139,15 @@ export class App {
     });
 
     if (meter) {
-      if (clime.temperature !== ad.serviceData.temperature.c ||
-          clime.humidity !== ad.serviceData.humidity) {
-          clime.temperature = ad.serviceData.temperature.c;
-          clime.delta = 0.6;
-          clime.humidity = ad.serviceData.humidity / 100.0;
-          clime.timestamp = new Date();
-          app.status(meter, clime);
+      if (
+        clime.temperature !== ad.serviceData.temperature.c ||
+        clime.humidity !== ad.serviceData.humidity
+      ) {
+        clime.temperature = ad.serviceData.temperature.c;
+        clime.delta = 0.6;
+        clime.humidity = ad.serviceData.humidity / 100.0;
+        clime.timestamp = new Date();
+        app.status(meter, clime);
       }
     } else {
       logger.debug(`XXX unhandled advertisement -- ${ad.id} XXX`);
@@ -192,9 +194,9 @@ export class App {
       app.heldMessages.push(data);
 
       try {
-        app.socket = await new WebSocket(config.get('ws-url'));
+        app.socket = await new WebSocket(config.get("ws-url"));
 
-        app.socket.on("error", (err) => {
+        app.socket.on("error", err => {
           logger.error("Caught", err);
         });
 
@@ -203,57 +205,54 @@ export class App {
           app.socket = null;
         });
 
-        app.socket.on("message", (msg) => {
+        app.socket.on("message", msg => {
           logger.debug("REC", msg);
         });
-
       } catch (e) {
         logger.error("Caught", e);
       }
     } else if (app.socket.readyState !== 1) {
       app.heldMessages.push(data);
-
     } else {
       console.log("Sending data", data);
       app.socket.send(JSON.stringify(data));
 
-      app.heldMessages.forEach((msg) => {
-          console.log("Sending held message", msg);
-          app.socket.send(JSON.stringify(msg));
+      app.heldMessages.forEach(msg => {
+        console.log("Sending held message", msg);
+        app.socket.send(JSON.stringify(msg));
       });
-      
+
       app.heldMessages = [];
-    }     
+    }
   }
 
   private async status(meter: Meter, clime: Clime) {
     const data = {
-        type: "STATUS",
-          payload: {
-              device: meter.id,
-              type: "meter",
-              manufacturer: meter.type,
-              temperature: clime.temperature,
-              humidity: clime.humidity,
-              pressure: clime.vpd(),
-              timestamp: new Date()
-          }
-      };
-      this.send(data);
+      type: "STATUS",
+      payload: {
+        device: meter.id,
+        type: "meter",
+        manufacturer: meter.type,
+        temperature: clime.temperature,
+        humidity: clime.humidity,
+        pressure: clime.vpd(),
+        timestamp: new Date()
+      }
+    };
+    this.send(data);
   }
 
-    private async register(macaddr: string, nickname: string) {
-      const data = {
-          type: "STATUS",
-          payload: {
-              worker: macaddr,
-              nickname: nickname,
-              timestamp: new Date()
-          }
-      };
-      this.send(data);
+  private async register(macaddr: string, nickname: string) {
+    const data = {
+      type: "STATUS",
+      payload: {
+        worker: macaddr,
+        nickname: nickname,
+        timestamp: new Date()
+      }
+    };
+    this.send(data);
   }
-
 
   public async run(): Promise<boolean> {
     const app = App.instance();
@@ -272,7 +271,7 @@ export class App {
       await meter.stopScan();
       logger.debug("Done meter scan.");
     });
-      
+
     setTimeout(app.run, interval);
 
     return new Promise(resolve => {

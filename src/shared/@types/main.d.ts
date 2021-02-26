@@ -2,7 +2,7 @@ interface Manufacturer {
   manufacturer: string;
   username: string;
   passwordDigest: string;
-  timestamp: Date
+  timestamp: Date;
 }
 
 interface Device {
@@ -10,7 +10,7 @@ interface Device {
   deviceType: string;
   manufacturer: string;
   nickname: string;
-  timestamp: Date
+  timestamp: Date;
 }
 
 interface Notification {
@@ -27,11 +27,11 @@ interface Profile {
   profile: string;
   lampStart: number;
   lampDuration: number;
-  lampOnTemperature: number; 
+  lampOnTemperature: number;
   lampOnHumidity: number;
   lampOffTemperature: number;
   lampOffHumidity: number;
-  timestamp: Date
+  timestamp: Date;
 }
 
 interface Reading {
@@ -52,9 +52,8 @@ interface Worker {
 interface Zone {
   id: numeric;
   nickname: string;
-  parent: numeric;
-  profile: numeric;
-  devices: [] as DeviceData[];
+  parent: string;
+  profile: string;
   timestamp: Date;
 }
 

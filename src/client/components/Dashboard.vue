@@ -4,17 +4,22 @@
       v-bind:notifications="notifications"
       @delete-notification="deleteNotification"
     />
-    <zones v-bind:zones="zones" :units="units" />
-    <zone-configurations
+    <zones
       v-bind:zones="zones"
       v-bind:profiles="profiles"
-      :units="units"
+      v-bind:units="units"
+      @create-zone="createZone"
+    />
+    <zone-details
+      v-bind:zones="zones"
+      v-bind:profiles="profiles"
+      v-bind:units="units"
       @update-zone="updateZone"
     />
-    <profiles v-bind:profiles="profiles" :units="units" />
+    <profiles v-bind:profiles="profiles" v-bind:units="units" />
     <devices v-bind:devices="devices" />
     <workers v-bind:workers="workers" />
-    <units-selector :units="units" @change-units="changeUnits" />
+    <units-selector v-bind:units="units" @change-units="changeUnits" />
   </div>
 </template>
 
@@ -26,13 +31,68 @@ import Notifications from "@/components/Notifications.vue";
 import Profiles from "@/components/Profiles.vue";
 import UnitsSelector from "@/components/UnitsSelector.vue";
 import Workers from "@/components/Workers.vue";
-import ZoneConfigurations from "@/components/ZoneConfigurations.vue";
+import ZoneDetails from "@/components/ZoneDetails.vue";
 import Zones from "@/components/Zones.vue";
-import { Device, 
-Notification, 
-Profile, 
-Worker, 
-Zone } from "../../shared/@types/main";
+
+interface Manufacturer {
+  manufacturer: string;
+  username: string;
+  passwordDigest: string;
+  timestamp: Date;
+}
+
+interface Device {
+  device: string;
+  deviceType: string;
+  manufacturer: string;
+  nickname: string;
+  timestamp: Date;
+}
+
+interface Notification {
+  id: string;
+  plug: string;
+  action: string;
+  code: string;
+  message: string;
+  timestamp: Date;
+}
+
+interface Profile {
+  id: number;
+  profile: string;
+  lampStart: number;
+  lampDuration: number;
+  lampOnTemperature: number;
+  lampOnHumidity: number;
+  lampOffTemperature: number;
+  lampOffHumidity: number;
+  timestamp: Date;
+}
+
+interface Reading {
+  id: number;
+  meter: string;
+  temperature: number;
+  humidity: number;
+  pressure: number;
+  timestamp: Date;
+}
+
+interface Worker {
+  worker: string;
+  nickname: string;
+  timestamp: Date;
+}
+
+interface Zone {
+  id: number;
+  nickname: string;
+  parent: string;
+  profile: string;
+  devices: []
+  timestamp: Date;
+}
 
 const Dashboard = Vue.extend({
   data() {
@@ -51,10 +111,10 @@ const Dashboard = Vue.extend({
   components: {
     Devices,
     Notifications,
-    Profiles, 
+    Profiles,
     UnitsSelector,
     Workers,
-    ZoneConfigurations,
+    ZoneDetails,
     Zones
   },
 
@@ -72,20 +132,10 @@ const Dashboard = Vue.extend({
 
     this.url = process.env.VUE_APP_API_URL || "http://localhost:5000";
 
-    this.refreshZones();
-    this.refreshProfiles();
-    this.refreshDevices();
-    this.refreshWorkers();
-  },
-
-  computed: {
-    clientsName(): string {
-      if (this.clients.length === 1) {
-        return "client";
-      } else {
-        return "clients";
-      }
-    }
+    this.readZones();
+    this.readProfiles();
+    this.readDevices();
+    this.readWorkers();
   },
 
   methods: {
@@ -93,7 +143,7 @@ const Dashboard = Vue.extend({
       this.units = units;
     },
 
-    deleteNotification(n: any): void {
+    deleteNotification(n: Notification): void {
       console.log("we are here", n);
       const found = this.notifications.findIndex(el => el.id === n.id);
       console.log("found!", found);
@@ -115,25 +165,55 @@ const Dashboard = Vue.extend({
       }
     },
 
-    refreshDevices() {
+    readDevices() {
       const xhr = new XMLHttpRequest();
       xhr.open("GET", `${this.url}/devices`);
 
       xhr.onload = () => {
-        console.log("onload", xhr.response);
         const data = JSON.parse(xhr.response);
         this.devices = [];
-        data.forEach((d: any) => { 
-          console.log("device", d);
-          this.devices.push(d);
-          console.log(this.devices.length);
+        data.forEach((device: Device) => {
+          device.timestamp = new Date(Date.parse(device.updated_at));
+          this.devices.push(device);
         });
       };
 
       xhr.send();
     },
 
-    refreshZones() {
+    readProfiles() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", `${this.url}/profiles`);
+
+      xhr.onload = () => {
+        const data = JSON.parse(xhr.response);
+        this.profiles = [];
+        data.forEach((profile: Profile) => {
+          profile.timestamp = new Date(Date.parse(profile.updated_at));
+          this.profiles.push(profile);
+        });
+      };
+
+      xhr.send();
+    },
+
+    readWorkers() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", `${this.url}/workers`);
+
+      xhr.onload = () => {
+        const data = JSON.parse(xhr.response);
+        this.workers = [];
+        data.forEach((worker: Worker) => {
+          worker.timestamp = new Date(Date.parse(worker.updated_at));
+          this.workers.push(worker);
+        });
+      };
+
+      xhr.send();
+    },
+
+    readZones() {
       const xhr = new XMLHttpRequest();
       xhr.open("GET", `${this.url}/zones`);
 
@@ -141,75 +221,32 @@ const Dashboard = Vue.extend({
         const data = JSON.parse(xhr.response);
         this.zones = [];
 
-        data.forEach((d: any) => {
-          const z: Zone = {
-            id: d.id,
-            nickname: d.nickname,
-            profile: d.profile,
-            timestamp: d.created_at
-          };
-          this.zones.push(z);
+        data.forEach((zone: Zone) => {
+          zone.timestamp = new Date(Date.parse(zone.updated_at));
+          this.zones.push(zone);
         });
       };
 
       xhr.send();
     },
 
-    refreshProfiles() {
+    createZone(zone: any) {
+      console.log("CREATE ZONE", zone);
       const xhr = new XMLHttpRequest();
-      xhr.open("GET", `${this.url}/profiles`);
-
+      xhr.open("POST", `${this.url}/zones`);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      
       xhr.onload = () => {
         const data = JSON.parse(xhr.response);
-        this.profiles = [];
-        data.forEach((d: any) => {
-          const start = d.lamp_start.split(":");
-
-          const pd: Profile = {
-            id: parseInt(d.id),
-            profile: d.profile,
-            lampOnHour: start[0],
-            lampOnMinute: start[1],
-            lampDuration: parseInt(d.lamp_duration["hours"]),
-            lampOnTemperature: parseFloat(d.lamp_on_temperature),
-            lampOnHumidity: parseFloat(d.lamp_on_humidity),
-            lampOffTemperature: parseFloat(d.lamp_off_temperature),
-            lampOffHumidity: parseFloat(d.lamp_off_humidity),
-            timestamp: new Date(d.updated_at)
-          };
-
-          this.profiles.push(pd);
-        });
+        data.timestamp = new Date(Date.parse(data.updated_at));
+        this.zones.push(data);
       };
 
-      xhr.send();
+      xhr.send(JSON.stringify(zone));
     },
 
-    refreshWorkers() {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", `${this.url}/workers`);
-
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        this.workers = [];
-        data.forEach((d: any) => { 
-          console.log("worker", d);
-          const w: Worker = {
-            worker: d.worker,
-            nickname: d.nickname,
-            timestamp: d.updated_at
-          };
-          this.workers.push(w);
-
-console.log("length", this.workers.length);
-        });
-      };
-
-      xhr.send();
-    },
-
-    updateZone(z: any) {
-      console.log("UPDATE ZONE", z);
+    updateZone(zone: any) {
+      console.log("UPDATE ZONE", zone);
     }
   }
 });

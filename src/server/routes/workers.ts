@@ -23,9 +23,10 @@ router.put("/:id", async (req, res) => {
   const nickname = req.query.nickname as string;
   const {
     rows
-  } = await query(
-    "UPDATE workers SET nickname = $1 WHERE worker = $2", [nickname, id]
-  );
+  } = await query("UPDATE workers SET nickname = $1 WHERE worker = $2", [
+    nickname,
+    id
+  ]);
   res.status(200).json(rows[0]);
 });
 
