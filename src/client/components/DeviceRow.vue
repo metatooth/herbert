@@ -4,16 +4,39 @@
       {{ device.device }}
     </td>
     <td>
-      {{ device.nickname }}
+      <a @click="edit" v-if="!editing">
+        <span v-if="device.nickname">{{ device.nickname }}</span>
+        <span v-else>click to name</span>
+      </a>
+      <div class="field is-grouped" v-else>
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            v-model="nickname"
+            @keyup.esc="cancel"
+          />
+        </div>
+        <div class="control">
+          <button class="button is-primary" @click="save">
+            <font-awesome-icon icon="check" />
+          </button>
+        </div>
+        <div class="control">
+          <button class="button is-danger" @click="cancel">
+            <font-awesome-icon icon="times" />
+          </button>
+        </div>
+      </div>
     </td>
     <td>
-      {{ device.deviceType }}
+      {{ device.device_type }}
     </td>
     <td>
       {{ device.manufacturer }}
     </td>
     <td>
-      <timestamp :timestamp="device.timestamp" />
+      <timestamp :timestamp="new Date(Date.parse(device.updated_at))" />
     </td>
   </tr>
 </template>
@@ -30,6 +53,32 @@ const DeviceRow = Vue.extend({
 
   components: {
     Timestamp
+  },
+
+  data() {
+    return {
+      nickname: this.device.nickname,
+      editing: false
+    };
+  },
+
+  methods: {
+    edit() {
+      this.editing = true;
+    },
+
+    save() {
+      this.$store.dispatch("editDevice", {
+        ...this.device,
+        nickname: this.nickname
+      });
+      this.editing = false;
+    },
+
+    cancel() {
+      this.nickname = this.device.nickname;
+      this.editing = false;
+    }
   }
 });
 

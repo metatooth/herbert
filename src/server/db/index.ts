@@ -44,6 +44,11 @@ export async function readZone(id) {
   return rows[0];
 }
 
+export async function readDevice(id) {
+  const { rows } = await query("SELECT * FROM devices WHERE device = $1", [id]);
+  return rows[0];
+}
+
 export async function registerDevice(macaddr, manufacturer, type) {
   query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {

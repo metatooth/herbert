@@ -1,6 +1,6 @@
 import Router from "express-promise-router";
 
-import { query } from "../db";
+import { query, readDevice } from "../db";
 
 const router = Router();
 
@@ -11,8 +11,21 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  const { rows } = await query("SELECT * FROM devices WHERE device = $1", [id]);
-  res.status(200).json(rows[0]);
+  res.status(200).json(await readDevice(id));
+});
+
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  console.log("PUT DEVICE", id, "WITH", req.body);
+  const {
+    rows
+  } = await query(
+    "UPDATE devices SET nickname = $1 WHERE device = $2 RETURNING device",
+    [req.body.nickname, id]
+  );
+  console.log("UPDATED DEVICES", rows);
+  const device = await readDevice(rows[0].device);
+  res.status(200).json(device);
 });
 
 export default router;

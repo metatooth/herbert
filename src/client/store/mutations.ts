@@ -1,59 +1,58 @@
+import { Device, Profile, Zone } from "./mutation-types";
+
 const mutations = {
-  ADD_ZONE(state, zone) {
-    zone["updated_at"] = new Date();
+  ADD_ZONE(state: any, zone: Zone) {
+    zone.updatedAt = new Date();
     state.zones.push(zone);
   },
 
-  REMOVE_ZONE(state, zone) {
+  REMOVE_ZONE(state: any, zone: Zone) {
     state.zones.splice(state.zones.indexOf(zone), 1);
   },
 
-  EDIT_ZONE(state, zone) {
-    console.log("edit zone?", zone);
-    const found = state.zones.find(el => el.id === zone.id);
-    console.log("found", found);
+  EDIT_ZONE(state: any, zone: Zone) {
+    const found = state.zones.find((el: Zone) => el.id === zone.id);
     const index = state.zones.indexOf(found);
-    console.log("index", index);
-
     state.zones.splice(index, 1, zone);
   },
 
-  SET_ZONES(state, zones: []) {
+  SET_ZONES(state: any, zones: Zone[]) {
     state.zones = zones;
   },
 
-  ADD_PROFILE(state, profile) {
-    console.log("add profile?", profile);
-    profile["updated_at"] = new Date();
+  ADD_PROFILE(state: any, profile: Profile) {
+    profile.updatedAt = new Date();
     state.profiles.push(profile);
   },
 
-  REMOVE_PROFILE(state, profile) {
-    console.log("remove profile?", profile);
+  REMOVE_PROFILE(state: any, profile: Profile) {
     const index = state.profiles.indexOf(profile);
-    console.log("profiles index", index);
     state.profiles.splice(state.profiles.indexOf(profile), 1);
   },
 
-  EDIT_PROFILE(state, profile) {
-    console.log("edit profile?", profile);
-    const found = state.profiles.find(el => el.id === profile.id);
-    console.log("found", found);
+  EDIT_PROFILE(state: any, profile: Profile) {
+    const found = state.profiles.find((el: Profile) => el.id === profile.id);
     const index = state.profiles.indexOf(found);
-    console.log("index", index);
-
     state.profiles.splice(index, 1, profile);
   },
 
-  SET_PROFILES(state, profiles: []) {
+  SET_PROFILES(state: any, profiles: Profile[]) {
     state.profiles = profiles;
   },
 
-  SET_DEVICES(state, devices: []) {
+  EDIT_DEVICE(state: any, device: Device) {
+    const found = state.devices.find(
+      (el: Device) => el.device === device.device
+    );
+    const index = state.devices.indexOf(found);
+    state.devices.splice(index, 1, device);
+  },
+
+  SET_DEVICES(state: any, devices: Device[]) {
     state.devices = devices;
   },
 
-  SET_WORKERS(state, workers: []) {
+  SET_WORKERS(state: any, workers: Worker[]) {
     state.workers = workers;
   }
 };

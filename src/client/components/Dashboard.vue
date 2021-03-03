@@ -32,64 +32,12 @@ import Workers from "@/components/Workers.vue";
 import ZoneDetails from "@/components/ZoneDetails.vue";
 import Zones from "@/components/Zones.vue";
 
-interface Manufacturer {
-  manufacturer: string;
-  username: string;
-  passwordDigest: string;
-  timestamp: Date;
-}
-
-interface Device {
-  device: string;
-  deviceType: string;
-  manufacturer: string;
-  nickname: string;
-  timestamp: Date;
-}
-
 interface Notification {
   id: string;
   plug: string;
   action: string;
   code: string;
   message: string;
-  timestamp: Date;
-}
-
-interface Profile {
-  id: number;
-  profile: string;
-  lampOnHour: number;
-  lampOnMinute: number;
-  lampDuration: number;
-  lampOnTemperature: number;
-  lampOnHumidity: number;
-  lampOffTemperature: number;
-  lampOffHumidity: number;
-  timestamp: Date;
-}
-
-interface Reading {
-  id: number;
-  meter: string;
-  temperature: number;
-  humidity: number;
-  pressure: number;
-  timestamp: Date;
-}
-
-interface Worker {
-  worker: string;
-  nickname: string;
-  timestamp: Date;
-}
-
-interface Zone {
-  id: number;
-  nickname: string;
-  parent: string;
-  profile: string;
-  devices: number;
   timestamp: Date;
 }
 
