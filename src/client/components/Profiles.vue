@@ -32,7 +32,7 @@
                 v-model="profile"
                 size="10"
                 placeHolder="profile name"
-                />
+              />
             </div>
           </td>
 
@@ -45,7 +45,7 @@
                 min="00:00"
                 max="23:59"
                 size="2"
-                />
+              />
             </div>
           </td>
 
@@ -54,11 +54,11 @@
               <input
                 class="input"
                 type="number"
-                  min="0"
+                min="0"
                 max="24"
                 v-model="duration"
                 size="2"
-                />
+              />
             </div>
           </td>
 
@@ -72,12 +72,12 @@
                   :min="tempMin"
                   :max="tempMax"
                   size="2"
-                  />
+                />
                 <span class="icon is-left">
-                <font-awesome-icon icon="thermometer-half" class="is-left" />
-              </span>
+                  <font-awesome-icon icon="thermometer-half" class="is-left" />
+                </span>
               </div>
-              
+
               <div class="control has-icons-left" v-if="adding">
                 <input
                   class="input"
@@ -86,7 +86,7 @@
                   min="0"
                   max="100"
                   size="2"
-                  />
+                />
                 <span class="icon is-left">
                   <font-awesome-icon icon="tint" />
                 </span>
@@ -104,7 +104,7 @@
                   :min="tempMin"
                   :max="tempMax"
                   size="2"
-                  />
+                />
                 <span class="icon is-left">
                   <font-awesome-icon icon="thermometer-half" />
                 </span>
@@ -117,7 +117,7 @@
                   min="0"
                   max="100"
                   size="2"
-                  />
+                />
                 <span class="icon is-left">
                   <font-awesome-icon icon="tint" />
                 </span>
@@ -216,7 +216,7 @@ const Profiles = Vue.extend({
       this.lampOnHumidity = 21;
       this.lampOffHumidity = 21;
     },
-    
+
     save(): void {
       const start = this.start.split(":");
       console.log(start);
@@ -236,8 +236,8 @@ const Profiles = Vue.extend({
       let lampOff = this.lampOffTemperature;
 
       if (this.units === "F") {
-        lampOn = (lampOn - 32) * 5 / 9;
-        lampOff = (lampOff - 32) * 5 / 9;
+        lampOn = ((lampOn - 32) * 5) / 9;
+        lampOff = ((lampOff - 32) * 5) / 9;
       }
       const profile = {
         profile: this.profile,
@@ -248,15 +248,13 @@ const Profiles = Vue.extend({
         lampOffTemperature: lampOff,
         lampOffHumidity: this.lampOffHumidity
       };
-        
+
       this.$store.dispatch("addProfile", profile);
 
       this.clear();
-      
+
       this.adding = false;
-    },
-
-
+    }
   }
 });
 

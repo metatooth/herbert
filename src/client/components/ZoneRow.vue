@@ -103,9 +103,8 @@ const ZoneRow = Vue.extend({
     },
 
     updatedAt(): Date {
-      return new Date(Date.parse(this.zone.updated_at))
+      return new Date(Date.parse(this.zone.updated_at));
     }
-
   },
 
   methods: {

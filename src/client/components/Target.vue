@@ -3,9 +3,7 @@
     <span class="tag" :class="iconClass">
       <font-awesome-icon :icon="icon" />
     </span>
-    <span class="tag" :class="displayClass">
-      {{ formatted }} {{ units }}
-      </span>
+    <span class="tag" :class="displayClass"> {{ formatted }} {{ units }} </span>
   </div>
 </template>
 

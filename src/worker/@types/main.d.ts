@@ -28,5 +28,6 @@ interface DeviceState {
 
 interface Wyze {
   turnOff: function;
-  turnOn; function;
+  turnOn;
+  function;
 }

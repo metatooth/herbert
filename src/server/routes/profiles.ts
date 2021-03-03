@@ -48,20 +48,21 @@ router.put("/:id", async (req, res) => {
     rows
   } = await query(
     "UPDATE profiles SET profile = $1, lamp_start = $2, lamp_duration = $3, lamp_on_temperature = $4, lamp_on_humidity = $5, lamp_off_temperature = $6, lamp_off_humidity = $7 WHERE id = $8 returning id",
-    [req.body.profile,
-     req.body.lampStart,
-     req.body.lampDuration,
-     req.body.lampOnTemperature,
-     req.body.lampOnHumidity,
-     req.body.lampOffTemperature,
-     req.body.lampOffHumidity,
-     id]
+    [
+      req.body.profile,
+      req.body.lampStart,
+      req.body.lampDuration,
+      req.body.lampOnTemperature,
+      req.body.lampOnHumidity,
+      req.body.lampOffTemperature,
+      req.body.lampOffHumidity,
+      id
+    ]
   );
   console.log("update profiles", rows);
   const profile = await readProfile(rows[0].id);
   res.status(200).json(profile);
 });
-
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;

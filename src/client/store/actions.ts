@@ -81,5 +81,4 @@ export default {
       commit(EDIT_PROFILE, response.data);
     });
   }
-
 };
