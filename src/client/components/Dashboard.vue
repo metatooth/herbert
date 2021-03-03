@@ -5,20 +5,18 @@
       @delete-notification="deleteNotification"
     />
     <zones
-      v-bind:zones="zones"
-      v-bind:profiles="profiles"
+      v-bind:zones="getterszones"
+      v-bind:profiles="gettersprofiles"
       v-bind:units="units"
-      @create-zone="createZone"
     />
     <zone-details
-      v-bind:zones="zones"
-      v-bind:profiles="profiles"
+      v-bind:zones="getterszones"
+      v-bind:profiles="gettersprofiles"
       v-bind:units="units"
-      @update-zone="updateZone"
     />
-    <profiles v-bind:profiles="profiles" v-bind:units="units" />
-    <devices v-bind:devices="devices" />
-    <workers v-bind:workers="workers" />
+    <profiles v-bind:profiles="gettersprofiles" v-bind:units="units" />
+    <devices v-bind:devices="gettersdevices" />
+    <workers v-bind:workers="gettersworkers" />
     <units-selector v-bind:units="units" @change-units="changeUnits" />
   </div>
 </template>
@@ -61,7 +59,8 @@ interface Notification {
 interface Profile {
   id: number;
   profile: string;
-  lampStart: number;
+  lampOnHour: number;
+  lampOnMinute: number;
   lampDuration: number;
   lampOnTemperature: number;
   lampOnHumidity: number;
@@ -90,20 +89,14 @@ interface Zone {
   nickname: string;
   parent: string;
   profile: string;
-  devices: []
+  devices: number;
   timestamp: Date;
 }
 
 const Dashboard = Vue.extend({
   data() {
     return {
-      devices: [] as Device[],
-      zones: [] as Zone[],
       notifications: [] as Notification[],
-      profiles: [] as Profile[],
-      workers: [] as Worker[],
-      xhr: XMLHttpRequest,
-      url: String,
       units: "F"
     };
   },
@@ -118,24 +111,52 @@ const Dashboard = Vue.extend({
     Zones
   },
 
+  computed: {
+    getterszones() {
+      return this.$store.getters.allZones;
+    },
+    zones() {
+      return this.$store.state.zones;
+    },
+    gettersprofiles() {
+      return this.$store.getters.allProfiles;
+    },
+    profiles() {
+      return this.$store.state.profiles;
+    },
+    gettersdevices() {
+      return this.$store.getters.allDevices;
+    },
+    devices() {
+      return this.$store.state.devices;
+    },
+    gettersworkers() {
+      return this.$store.getters.allWorkers;
+    },
+    workers() {
+      return this.$store.state.workers;
+    }
+  },
+
   mounted() {
     console.log("Starting connection to WebSocket server...");
+
     const ws = new WebSocket(
       process.env.VUE_APP_WS_URL || "ws://localhost:5000"
     );
+
     ws.addEventListener("open", (ev: Event) => {
       this.onWebsocketOpen(ev);
     });
+
     ws.addEventListener("message", (ev: MessageEvent) => {
       this.onWebsocketMessage(ev);
     });
 
-    this.url = process.env.VUE_APP_API_URL || "http://localhost:5000";
-
-    this.readZones();
-    this.readProfiles();
-    this.readDevices();
-    this.readWorkers();
+    this.$store.dispatch("getZones");
+    this.$store.dispatch("getProfiles");
+    this.$store.dispatch("getDevices");
+    this.$store.dispatch("getWorkers");
   },
 
   methods: {
@@ -159,94 +180,10 @@ const Dashboard = Vue.extend({
       const data = JSON.parse(ev.data);
       console.log("message with data", data);
       if (data.type === "STATUS") {
-        console.log("do something!");
+        console.log("Status report!");
       } else {
         console.log("Unhandled Message", data);
       }
-    },
-
-    readDevices() {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", `${this.url}/devices`);
-
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        this.devices = [];
-        data.forEach((device: Device) => {
-          device.timestamp = new Date(Date.parse(device.updated_at));
-          this.devices.push(device);
-        });
-      };
-
-      xhr.send();
-    },
-
-    readProfiles() {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", `${this.url}/profiles`);
-
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        this.profiles = [];
-        data.forEach((profile: Profile) => {
-          profile.timestamp = new Date(Date.parse(profile.updated_at));
-          this.profiles.push(profile);
-        });
-      };
-
-      xhr.send();
-    },
-
-    readWorkers() {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", `${this.url}/workers`);
-
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        this.workers = [];
-        data.forEach((worker: Worker) => {
-          worker.timestamp = new Date(Date.parse(worker.updated_at));
-          this.workers.push(worker);
-        });
-      };
-
-      xhr.send();
-    },
-
-    readZones() {
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", `${this.url}/zones`);
-
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        this.zones = [];
-
-        data.forEach((zone: Zone) => {
-          zone.timestamp = new Date(Date.parse(zone.updated_at));
-          this.zones.push(zone);
-        });
-      };
-
-      xhr.send();
-    },
-
-    createZone(zone: any) {
-      console.log("CREATE ZONE", zone);
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", `${this.url}/zones`);
-      xhr.setRequestHeader("Content-Type", "application/json");
-      
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        data.timestamp = new Date(Date.parse(data.updated_at));
-        this.zones.push(data);
-      };
-
-      xhr.send(JSON.stringify(zone));
-    },
-
-    updateZone(zone: any) {
-      console.log("UPDATE ZONE", zone);
     }
   }
 });

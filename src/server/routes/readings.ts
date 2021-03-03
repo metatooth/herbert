@@ -7,12 +7,11 @@ const router = Router();
 router.get("/", async (req, res) => {
   const now = Date.now();
   let limit = now - 180000;
-  console.log("NOW NOW NOW", now, "NOW NOW NOW");
-  console.log(new Date(now));
-  console.log(new Date(limit));
-  const bday = new Date(1974, 6, 21);
-  console.log(bday);
-  if (req.query.last === "hour") {
+  let one = false;
+
+  if (req.query.last === "one") {
+    one = true;
+  } else if (req.query.last === "hour") {
     limit = now - 3600000;
   } else if (req.query.last === "day") {
     limit = now - 86400000;
@@ -33,8 +32,16 @@ router.get("/", async (req, res) => {
     .toISOString()
     .slice(0, 19)
     .replace("T", " ");
-  console.log(req.query.last, "gave us", limit, "and", start);
-  if (req.query.meter) {
+
+  if (one) {
+    const {
+      rows
+    } = await query(
+      "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
+      [req.query.meter]
+    );
+    res.status(200).json(rows[0]);
+  } else if (req.query.meter) {
     const {
       rows
     } = await query(

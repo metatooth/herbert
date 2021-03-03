@@ -172,7 +172,15 @@ export class App {
     await factory.build(config.get("credentials"));
     this.plugs = factory.plugs;
 
-    this.macaddr = networkInterfaces()["wlo1"][0]["mac"];
+    console.log("network interfaces", networkInterfaces());
+    let net = networkInterfaces()["wlo1"];
+    console.log("wlo1", net);
+    if (!net) {
+      net = networkInterfaces()["wlan0"];
+      console.log("wlan0", net);
+    }
+
+    this.macaddr = net[0]["mac"];
     this.register(this.macaddr, config.get("id"));
 
     return new Promise(resolve => {

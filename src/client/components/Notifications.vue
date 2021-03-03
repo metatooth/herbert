@@ -21,7 +21,7 @@ const Notifications = Vue.extend({
   },
 
   methods: {
-    deleteNotification(notification: any): void {
+    deleteNotification(notification): void {
       this.$emit("delete-notification", notification);
     }
   }

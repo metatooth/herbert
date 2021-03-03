@@ -12,15 +12,34 @@ export async function query(text, params): Promise<Result> {
   return res;
 }
 
+export async function readProfile(id) {
+  const {
+    rows
+  } = await query(
+    "SELECT id, profile, lamp_start, lamp_duration, lamp_on_temperature, lamp_on_humidity, lamp_off_temperature, lamp_off_humidity, updated_at FROM profiles WHERE id = $1",
+    [id]
+  );
+  return rows[0];
+}
+
 export async function readZones() {
-  const { rows } = await query("SELECT z.id, z.nickname, b.nickname as parent, p.profile, z.updated_at FROM zones z LEFT JOIN zones b ON z.parent_id = b.id LEFT JOIN profiles p ON z.profile_id = p.id ", []);
+  const { rows } = await query(
+    "SELECT z.id, z.nickname, b.id as parent_id, b.nickname as parent, p.id as profile_id, p.profile, z.updated_at FROM zones z LEFT JOIN zones b ON z.parent_id = b.id LEFT JOIN profiles p ON z.profile_id = p.id WHERE z.deleted <> true",
+    []
+  );
   return rows;
 }
 
 export async function readZone(id) {
-  const { rows } = await query("SELECT z.id, z.nickname, b.nickname as parent, p.profile, z.updated_at FROM zones z LEFT JOIN zones b ON z.parent_id = b.id LEFT JOIN profiles p ON z.profile_id = p.id WHERE z.id = $1", [id]);
-  const { children } = await query("SELECT * FROM zones WHERE parent_id = $1",
-                                  [rows[0].id]);
+  const {
+    rows
+  } = await query(
+    "SELECT z.id, z.nickname, b.id as parent_id, b.nickname as parent, p.id as profile_id, p.profile, z.updated_at FROM zones z LEFT JOIN zones b ON z.parent_id = b.id LEFT JOIN profiles p ON z.profile_id = p.id WHERE z.id = $1",
+    [id]
+  );
+  const { children } = await query("SELECT * FROM zones WHERE parent_id = $1", [
+    rows[0].id
+  ]);
   rows[0].children = children;
   return rows[0];
 }

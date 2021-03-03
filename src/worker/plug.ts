@@ -12,11 +12,11 @@ export class Plug {
     }
   }
 
-  public async off(): Promise<any> {
+  public async off() {
     return this.bot.off();
   }
 
-  public async on(): Promise<any> {
+  public async on() {
     return this.bot.on();
   }
 }

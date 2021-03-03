@@ -1,4 +1,4 @@
-const Wyze = require("wyze-node");
+import Wyze from "wyze-node";
 
 import { Plug } from "./plug";
 

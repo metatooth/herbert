@@ -109,25 +109,7 @@ const ZoneCard = Vue.extend({
 
   methods: {
     save() {
-      const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
-
-      const found: any = this.profiles.find(
-        (element: any) => element.profile === this.selectedProfile
-      );
-
-      xhr.open(
-        "PUT",
-        `${url}/zones/${this.zone.id}/?nickname=${this.selectedNickname}&profile=${found.id}`
-      );
-
-      xhr.onload = () => {
-        console.log("RESPONSE", xhr.response);
-      };
-
-      xhr.send();
-
-      this.editing = false;
+      console.log("SAVE!");
     },
 
     close() {

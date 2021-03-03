@@ -1,12 +1,12 @@
 export class Wyzeplug {
-  device: any;
-  wyze: any;
+  device: Device;
+  wyze: Wyze;
 
   constructor(device: Device) {
     this.device = device;
   }
 
-  public async off(): Promise<any> {
+  public async off() {
     const result = await this.wyze.turnOff(this.device);
     return new Promise((resolve, reject) => {
       if (result.code !== "1") {
@@ -17,7 +17,7 @@ export class Wyzeplug {
     });
   }
 
-  public async on(): Promise<any> {
+  public async on() {
     const result = await this.wyze.turnOn(this.device);
     return new Promise((resolve, reject) => {
       if (result.code !== "1") {

@@ -10,30 +10,30 @@ import { convertToLocalTime } from "date-fns-timezone";
 
 const Timestamp = Vue.extend({
   props: {
-    timestamp: { type: Date, default: new Date() }
+    timestamp: Date
   },
 
   data() {
-return {
-    local: convertToLocalTime(this.timestamp, { timeZone: "Etc/UTC" })
-};
+    return {
+      local: convertToLocalTime(this.timestamp, { timeZone: "Etc/UTC" })
+    };
   },
 
   computed: {
-      hhmm(): string {
-          return (
-              this.zeroes(this.local.getHours()) +
-                  ":" +
-                  this.zeroes(this.local.getMinutes())
-          );
-      },
-      
-      ss(): string {
-          return ":" + this.zeroes(this.local.getSeconds());
-      }
+    hhmm(): string {
+      return (
+        this.zeroes(this.local.getHours()) +
+        ":" +
+        this.zeroes(this.local.getMinutes())
+      );
+    },
+
+    ss(): string {
+      return ":" + this.zeroes(this.local.getSeconds());
+    }
   },
-    
-    methods: {
+
+  methods: {
     zeroes(n: number): string {
       if (n < 10) {
         return `0${n}`;
