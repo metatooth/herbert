@@ -173,7 +173,6 @@ const ProfileRow = Vue.extend({
 
   data() {
     const start = this.profile.lamp_start.split(":");
-    console.log(start);
     let hourInt = parseInt(start[0]) - 5; // WARNING!
     if (hourInt < 0) {
       hourInt = 24 + hourInt;
@@ -184,8 +183,6 @@ const ProfileRow = Vue.extend({
     } else {
       hourString = hourInt.toString();
     }
-    console.log(hourInt);
-    console.log(hourString);
 
     let lampOn = parseFloat(this.profile.lamp_on_temperature);
     let lampOff = parseFloat(this.profile.lamp_off_temperature);
@@ -346,7 +343,6 @@ const ProfileRow = Vue.extend({
         lampOffHumidity: this.lampOffHumidity
       };
 
-      console.log("SAVE PROFILE", profile);
       this.$store.dispatch("editProfile", profile);
       this.editing = false;
     },
