@@ -102,7 +102,7 @@
       />
       <target
         icon="tint"
-        :value="parseFloat(profile.lampoffHumidity)"
+        :value="parseFloat(profile.lampoffhumidity)"
         :precision="0"
         units="%"
         text="black"
@@ -136,7 +136,7 @@
           <input
             class="input"
             type="number"
-            v-model="lampoffHumidity"
+            v-model="lampoffhumidity"
             min="0"
             max="100"
             size="2"
@@ -200,7 +200,7 @@ const ProfileRow = Vue.extend({
       lampontemperature: lampon,
       lampofftemperature: lampoff,
       lamponhumidity: this.profile.lamponhumidity,
-      lampoffHumidity: this.profile.lampoffHumidity,
+      lampoffhumidity: this.profile.lampoffhumidity,
       editing: false
     };
   },
@@ -286,7 +286,7 @@ const ProfileRow = Vue.extend({
         vaporPressureDeficit(
           parseFloat(this.profile.lampofftemperature),
           -0.6,
-          parseFloat(this.profile.lampoffHumidity) / 100
+          parseFloat(this.profile.lampoffhumidity) / 100
         ) / 1000
       );
     },
