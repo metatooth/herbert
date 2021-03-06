@@ -11,9 +11,11 @@ import { Clime } from "./clime";
 import { ConstantVpd } from "./constant-vpd";
 import { LampTimer } from "./lamp-timer";
 import { Meter } from "./meter";
-import { Plug } from "./plug";
-import { PlugFactory } from "./plug-factory";
+import { Switch } from "./switch";
 import { TargetTempHumidity } from "./target-temp-humidity";
+
+import Switchbot from "node-switchbot";
+import Wyze from "wyze-node";
 
 try {
   fs.mkdirSync("./log");
@@ -39,7 +41,7 @@ export class App {
   socket: WebSocket;
   systems: Map<string, boolean>;
   meters: Map<Meter, Clime>;
-  plugs: Map<string, Array<Plug>>;
+  switches: Array<Switch>;
   macaddr: string;
   heldMessages: Array<any>;
 
@@ -141,7 +143,7 @@ export class App {
     if (meter) {
       if (
         clime.temperature !== ad.serviceData.temperature.c ||
-        clime.humidity !== ad.serviceData.humidity
+        clime.humidity !== ad.serviceData.humidity / 100.0
       ) {
         clime.temperature = ad.serviceData.temperature.c;
         clime.delta = 0.6;
@@ -151,6 +153,8 @@ export class App {
       }
     } else {
       logger.debug(`XXX unhandled advertisement -- ${ad.id} XXX`);
+      logger.debug(ad);
+      app.meters.set(new Meter(ad.id), new Clime(0, 0, 0));
     }
 
     return true;
@@ -168,10 +172,6 @@ export class App {
     logger.info("== Herbert Worker = Starting up... ==");
     logger.info("=====================================");
 
-    const factory = new PlugFactory(this.systems);
-    await factory.build(config.get("credentials"));
-    this.plugs = factory.plugs;
-
     console.log("network interfaces", networkInterfaces());
     let net = networkInterfaces()["wlo1"];
     console.log("wlo1", net);
@@ -183,14 +183,17 @@ export class App {
     this.macaddr = net[0]["mac"];
     this.register(this.macaddr, config.get("id"));
 
+    const names: Array<string> = [];
+    const iter = this.systems.keys();
+    let result = iter.next();
+    while (result.done !== true) {
+      names.push(result.value);
+      result = iter.next();
+    }
+
+    this.initialized = true;
+
     return new Promise(resolve => {
-      logger.info("DAY >>", this.day);
-      logger.info("NIGHT >>", this.night);
-      logger.info(config);
-      logger.info(this.meters);
-      logger.info(this.plugs);
-      logger.info("====================================");
-      this.initialized = true;
       resolve(true);
     });
   }
@@ -250,6 +253,20 @@ export class App {
     this.send(data);
   }
 
+  private async deviceStatus(device: WyzeDevice, type: string) {
+    const data = {
+      type: "STATUS",
+      payload: {
+        device: device.mac,
+        type: type,
+        manufacturer: "WYZE",
+        status: device.device_params.switch_state,
+        timestamp: new Date()
+      }
+    };
+    this.send(data);
+  }
+
   private async register(macaddr: string, nickname: string) {
     const data = {
       type: "STATUS",
@@ -279,6 +296,35 @@ export class App {
       await meter.stopScan();
       logger.debug("Done meter scan.");
     });
+
+    logger.debug("Start switchbot scan %dms ...", polling);
+    const switchbot = new Switchbot();
+    switchbot.onadvertisement = app.handler;
+    switchbot.startScan();
+    switchbot.wait(polling);
+    switchbot.stopScan();
+    logger.debug("Done switchbot scan.");
+
+    logger.debug("Check on plugs...");
+    config.get("credentials").forEach(async cred => {
+      if (cred.type === "wyze") {
+        const options = {
+          username: cred.username,
+          password: cred.password
+        };
+
+        const wyze = new Wyze(options);
+
+        const devices = await wyze.getDeviceList();
+        console.log("DEVICES!!");
+        devices.forEach(device => {
+          console.log("DEVICE", device);
+          app.deviceStatus(device, "blower");
+        });
+      }
+    });
+
+    logger.debug("Done.");
 
     setTimeout(app.run, interval);
 

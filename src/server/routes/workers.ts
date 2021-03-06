@@ -1,12 +1,12 @@
 import Router from "express-promise-router";
 
-import { query } from "../db";
+import { query, readWorker } from "../db";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
   const { rows } = await query(
-    "SELECT * FROM workers ORDER BY created_at DESC",
+    "SELECT * FROM workers ORDER BY createdAt DESC",
     []
   );
   res.status(200).json(rows);
@@ -14,20 +14,19 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  const { rows } = await query("SELECT * FROM workers WHERE worker = $1", [id]);
-  res.status(200).json(rows[0]);
+  res.status(200).json(await readWorker(id));
 });
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const nickname = req.query.nickname as string;
   const {
     rows
-  } = await query("UPDATE workers SET nickname = $1 WHERE worker = $2", [
-    nickname,
-    id
-  ]);
-  res.status(200).json(rows[0]);
+  } = await query(
+    "UPDATE workers SET nickname = $1 WHERE worker = $2 RETURNING worker",
+    [req.body.nickname, id]
+  );
+
+  res.status(200).json(await readWorker(rows[0].worker));
 });
 
 export default router;

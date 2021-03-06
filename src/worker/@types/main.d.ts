@@ -17,17 +17,19 @@ interface WoSensorTH {
 
 interface Device {
   id: string;
-  type: string;
   nickname: string;
-  macaddr: string;
+  type: string;
 }
 
-interface DeviceState {
-  status: string;
+interface WyzeDevice {
+  nickname: string;
+  mac: string;
+  device_params: {
+    switch_state: nubmer;
+  };
 }
 
 interface Wyze {
   turnOff: function;
-  turnOn;
-  function;
+  turnOn: function;
 }

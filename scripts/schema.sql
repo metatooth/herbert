@@ -3,30 +3,30 @@ begin;
 create table manufacturers (
   manufacturer varchar(255) primary key,
   username varchar(255),
-  password_digest varchar(255),
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  passworddigest varchar(255),
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table device_types (
-  device_type varchar(255) primary key,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  devicetype varchar(255) primary key,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table devices (
   device macaddr primary key,
-  device_type varchar(255) references device_types(device_type),
+  devicetype varchar(255) references device_types(devicetype),
   manufacturer varchar(255) references manufacturers(manufacturer),
   nickname varchar(255),
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table readings (
@@ -35,80 +35,89 @@ create table readings (
   temperature numeric not null,
   humidity numeric not null,
   pressure numeric not null,
-  created_at timestamp default current_timestamp
+  createdat timestamp default current_timestamp
+);
+
+create table statuses (
+  id serial primary key,
+  device macaddr references devices(device),
+  status numeric not null,
+  createdat timestamp default current_timestamp
 );
 
 create table profiles (
   id serial primary key,
   profile varchar(255) unique,
-  lamp_start time not null,
-  lamp_duration interval hour to minute,
-  lamp_on_temperature numeric,
-  lamp_on_humidity numeric,
-  lamp_off_temperature numeric,
-  lamp_off_humidity numeric,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  lampstart time not null,
+  lampduration interval hour to minute,
+  lampontemperature numeric,
+  lamponhumidity numeric,
+  lampofftemperature numeric,
+  lampoffhumidity numeric,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table workers (
   worker macaddr primary key,
   nickname varchar(255) unique,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  createdAt timestamp default current_timestamp,
+  updatedAt timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedAt timestamp
 );
 
 create table worker_devices (
   worker macaddr references workers(worker),
   device macaddr references devices(device),
-  created_at timestamp default current_timestamp
+  createdat timestamp default current_timestamp
 );
 
 create table zones (
   id serial primary key,
   nickname varchar(255) unique,
-  parent_id integer references zones(id),
-  profile_id integer references profiles(id),
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  parentid integer references zones(id),
+  profileid integer references profiles(id),
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table zone_devices (
-  zone_id integer references zones(id),
+  zoneid integer references zones(id),
   device macaddr references devices(device),
-  created_at timestamp default current_timestamp
+  createdat timestamp default current_timestamp,
+  primary key (zoneid, device)
 );
 
 create table meter_types (
-  meter_type varchar(255) primary key,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  metertype varchar(255) primary key,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table zone_meters (
-  zone_id integer references zones(id),
+  zoneid integer references zones(id),
   meter macaddr references devices(device),
-  meter_type varchar(255) references meter_types(meter_type),
-  created_at timestamp default current_timestamp
+  metertype varchar(255) references meter_types(metertype),
+  createdat timestamp default current_timestamp,
+  primary key (zoneid, meter)
 );
 
 insert into manufacturers (manufacturer)
        values ('SwitchBot'), ('WYZE'), ('mockbot');
 
-insert into device_types (device_type)
+insert into device_types (devicetype)
        values ('meter'), ('lamp'), ('blower'),
        ('humidifier'), ('dehumidifier'), ('heater');
 
-insert into profiles (profile, lamp_start, lamp_duration, lamp_on_temperature,
-       lamp_on_humidity, lamp_off_temperature, lamp_off_humidity)
+insert into profiles (profile, lampstart, lampduration, lampontemperature,
+       lamponhumidity, lampofftemperature, lampoffhumidity)
        values
        ('Officespace', '13:00', '10 hours', 18.3, 21, 12.8, 21),
        ('Torello Clone', '5:00', '24 hours', 22.8, 68, 22.8, 68),

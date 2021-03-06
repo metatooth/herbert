@@ -1,7 +1,7 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ $route.params.environment }}</h2>
-    <h2 class="subtitle">{{ $route.params.name }} Meter Reading</h2>
+    <h2 class="title">{{ $route.params.name }} Meter Reading</h2>
+    <h2 class="subtitle">{{ $route.params.meter }}</h2>
 
     <form class="control">
       Last&nbsp;
@@ -59,7 +59,6 @@
         />
       </div>
     </div>
-    <h2 class="subtitle is-code">{{ $route.params.meter }}</h2>
   </section>
 </template>
 
@@ -118,7 +117,7 @@ const Readings = Vue.extend({
         if (!data.error) {
           this.temperatures = [];
           this.humidities = [];
-          const timeZone = "America/New_York";
+          const timeZone = "Etc/UTC";
           data.forEach(
             (d: {
               created_at: Date;
@@ -126,7 +125,7 @@ const Readings = Vue.extend({
               humidity: number;
               pressure: number;
             }) => {
-              const ts = convertToLocalTime(d.created_at, { timeZone });
+              const ts = convertToLocalTime(d.createdat, { timeZone });
               const temperature = {
                 x: ts,
                 y: d.temperature as number

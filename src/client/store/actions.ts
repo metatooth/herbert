@@ -5,8 +5,10 @@ import {
   Profile,
   Device,
   Worker,
+  ADD_ZONE_DEVICE,
   ADD_ZONE,
   EDIT_ZONE,
+  REMOVE_ZONE_DEVICE,
   REMOVE_ZONE,
   SET_ZONES,
   ADD_PROFILE,
@@ -15,6 +17,7 @@ import {
   SET_PROFILES,
   EDIT_DEVICE,
   SET_DEVICES,
+  EDIT_WORKER,
   SET_WORKERS
 } from "./mutation-types";
 
@@ -43,11 +46,25 @@ export default {
     });
   },
 
+  addZoneDevice({ commit }, payload: { zoneid: number, device: string }) {
+    const json = JSON.stringify({ device: payload.device });
+    HTTP.post(`/zones/${payload.zoneid}/devices`, json).then(response => {
+      commit(ADD_ZONE_DEVICE, response.data);
+    });
+  },
+  
   addZone({ commit }, zone: Zone) {
     const json = JSON.stringify(zone);
     const headers = { headers: { "Content-Type": "application/json" } };
     HTTP.post("/zones", json).then(response => {
       commit(ADD_ZONE, response.data);
+    });
+  },
+
+  removeZoneDevice({ commit }, payload: { zoneid: number, device: string }) {
+    HTTP.delete(`/zones/${payload.zoneid}/devices/${payload.device}`).then(response => {
+      console.log("HTTP returned", payload);
+      commit(REMOVE_ZONE_DEVICE, payload);
     });
   },
 
@@ -67,15 +84,12 @@ export default {
   addProfile({ commit }, profile: Profile) {
     const json = JSON.stringify(profile);
     HTTP.post("/profiles", json).then(response => {
-      console.log("added profile", response.data);
       commit(ADD_PROFILE, response.data);
     });
   },
 
   removeProfile({ commit }, profile: Profile) {
-    console.log("remove profile", profile);
     HTTP.delete(`/profiles/${profile.id}`).then(response => {
-      console.log("REMOVED", response);
       commit(REMOVE_PROFILE, profile);
     });
   },
@@ -88,12 +102,16 @@ export default {
   },
 
   editDevice({ commit }, device: Device) {
-    console.log("EDITING DEVICE", device);
     const json = JSON.stringify(device);
-    console.log("JSON IS", json);
     HTTP.put(`/devices/${device.device}`, json).then(response => {
-      console.log("response is", response.data);
       commit(EDIT_DEVICE, response.data);
+    });
+  },
+
+  editWorker({ commit }, worker: Worker) {
+    const json = JSON.stringify(worker);
+    HTTP.put(`/workers/${worker.worker}`, json).then(response => {
+      commit(EDIT_WORKER, response.data);
     });
   }
 };

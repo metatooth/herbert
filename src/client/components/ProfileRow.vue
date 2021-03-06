@@ -13,21 +13,21 @@
     </td>
     <td class="has-background-light">
       <div class="is-family-code" v-if="!editing">
-        {{ lampOnHour }}:{{ lampOnMinute }}
+        {{ lamponHour }}:{{ lamponMinute }}
       </div>
       <div v-else>
-        <input class="input" type="time" v-model="lampStart" />
+        <input class="input" type="time" v-model="lampstart" />
       </div>
     </td>
     <td class="has-background-light">
       <div class="is-family-code" v-if="!editing">
-        {{ duration }}
+        {{ durationWithUnits }}
       </div>
       <div v-else>
         <input
           class="input"
           type="number"
-          v-model="lampDuration"
+          v-model="lampduration"
           min="0"
           max="24"
           size="2"
@@ -46,7 +46,7 @@
       />
       <target
         icon="tint"
-        :value="parseFloat(profile.lamp_on_humidity)"
+        :value="parseFloat(profile.lamponhumidity)"
         :precision="0"
         units="%"
         text="black"
@@ -54,7 +54,7 @@
       />
       <target
         icon="cloud"
-        :value="lampOnPressure"
+        :value="lamponPressure"
         :precision="1"
         units="hPa"
         text="black"
@@ -67,7 +67,7 @@
           <input
             class="input"
             type="number"
-            v-model="lampOnTemperature"
+            v-model="lampontemperature"
             min="lampMin"
             max="lampMax"
             size="2"
@@ -80,7 +80,7 @@
           <input
             class="input"
             type="number"
-            v-model="lampOnHumidity"
+            v-model="lamponhumidity"
             min="0"
             max="100"
             size="2"
@@ -102,7 +102,7 @@
       />
       <target
         icon="tint"
-        :value="parseFloat(profile.lamp_off_humidity)"
+        :value="parseFloat(profile.lampoffHumidity)"
         :precision="0"
         units="%"
         text="black"
@@ -110,7 +110,7 @@
       />
       <target
         icon="cloud"
-        :value="lampOffPressure"
+        :value="lampoffPressure"
         :precision="1"
         units="hPa"
         text="black"
@@ -123,7 +123,7 @@
           <input
             class="input"
             type="number"
-            v-model="lampOffTemperature"
+            v-model="lampofftemperature"
             min="tempMin"
             max="tempMax"
             size="2"
@@ -136,7 +136,7 @@
           <input
             class="input"
             type="number"
-            v-model="lampOffHumidity"
+            v-model="lampoffHumidity"
             min="0"
             max="100"
             size="2"
@@ -163,7 +163,7 @@ import Vue from "vue";
 import Target from "@/components/Target.vue";
 import EditControls from "@/components/EditControls.vue";
 
-import { vaporPressureDeficit } from "../../shared/utils";
+import { celsius2fahrenheit, vaporPressureDeficit } from "../../shared/utils";
 
 const ProfileRow = Vue.extend({
   props: {
@@ -172,7 +172,8 @@ const ProfileRow = Vue.extend({
   },
 
   data() {
-    const start = this.profile.lamp_start.split(":");
+    console.log("profile", this.profile);
+    const start = this.profile.lampstart.split(":");
     let hourInt = parseInt(start[0]) - 5; // WARNING!
     if (hourInt < 0) {
       hourInt = 24 + hourInt;
@@ -184,22 +185,22 @@ const ProfileRow = Vue.extend({
       hourString = hourInt.toString();
     }
 
-    let lampOn = parseFloat(this.profile.lamp_on_temperature);
-    let lampOff = parseFloat(this.profile.lamp_off_temperature);
+    let lampon = parseFloat(this.profile.lampontemperature);
+    let lampoff = parseFloat(this.profile.lampofftemperature);
 
     if (this.units === "F") {
-      lampOn = (lampOn * 9) / 5 + 32;
-      lampOff = (lampOff * 9) / 5 + 32;
+      lampon = celsius2fahrenheit(lampon);
+      lampoff = celsius2fahrenheit(lampoff);
     }
 
     return {
       name: this.profile.profile,
-      lampStart: `${hourString}:${start[1]}:00`,
-      lampDuration: this.profile.lamp_duration["hours"],
-      lampOnTemperature: lampOn,
-      lampOffTemperature: lampOff,
-      lampOnHumidity: this.profile.lamp_on_humidity,
-      lampOffHumidity: this.profile.lamp_off_humidity,
+      lampstart: `${hourString}:${start[1]}:00`,
+      lampduration: this.profile.lampduration["hours"],
+      lampontemperature: lampon,
+      lampofftemperature: lampoff,
+      lamponhumidity: this.profile.lamponhumidity,
+      lampoffHumidity: this.profile.lampoffHumidity,
       editing: false
     };
   },
@@ -210,8 +211,8 @@ const ProfileRow = Vue.extend({
   },
 
   computed: {
-    duration(): string {
-      return this.profile.lamp_duration["hours"] + "hrs";
+    durationWithUnits(): string {
+      return this.profile.lampduration["hours"] + "hrs";
     },
 
     unitsWithDegree(): string {
@@ -220,24 +221,24 @@ const ProfileRow = Vue.extend({
 
     dayTemperature(): number {
       if (this.units === "F") {
-        return (this.profile.lamp_on_temperature * 9) / 5 + 32;
+        return celsius2fahrenheit(this.profile.lampontemperature);
       }
 
-      return parseFloat(this.profile.lamp_on_temperature);
+      return parseFloat(this.profile.lampontemperature);
     },
 
     nightTemperature(): number {
       if (this.units === "F") {
-        return (this.profile.lamp_off_temperature * 9) / 5 + 32;
+        return celsius2fahrenheit(this.profile.lampofftemperature);
       }
 
-      return parseFloat(this.profile.lamp_off_temperature);
+      return parseFloat(this.profile.lampofftemperature);
     },
 
     lampMin(): number {
       const min = 15;
       if (this.units === "F") {
-        return (min * 9) / 5 + 32;
+        return celsius2fahrenheit(min);
       }
 
       return min;
@@ -246,19 +247,19 @@ const ProfileRow = Vue.extend({
     lampMax(): number {
       const max = 30;
       if (this.units === "F") {
-        return (max * 9) / 5 + 32;
+        return celsius2fahrenheit(max);
       }
 
       return max;
     },
 
-    lampOnMinute(): string {
-      const start = this.profile.lamp_start.split(":");
+    lamponMinute(): string {
+      const start = this.profile.lampstart.split(":");
       return start[1];
     },
 
-    lampOnHour(): string {
-      const start = this.profile.lamp_start.split(":");
+    lamponHour(): string {
+      const start = this.profile.lampstart.split(":");
       const hour = parseInt(start[0]) - 5; // WARNING!
 
       if (hour < 0) {
@@ -270,39 +271,39 @@ const ProfileRow = Vue.extend({
       }
     },
 
-    lampOnPressure(): number {
+    lamponPressure(): number {
       return (
         vaporPressureDeficit(
-          parseFloat(this.profile.lamp_on_temperature),
+          parseFloat(this.profile.lampontemperature),
           0.6,
-          parseFloat(this.profile.lamp_on_humidity) / 100
+          parseFloat(this.profile.lamponhumidity) / 100
         ) / 1000
       );
     },
 
-    lampOffPressure(): number {
+    lampoffPressure(): number {
       return (
         vaporPressureDeficit(
-          parseFloat(this.profile.lamp_off_temperature),
+          parseFloat(this.profile.lampofftemperature),
           -0.6,
-          parseFloat(this.profile.lamp_off_humidity) / 100
+          parseFloat(this.profile.lampoffHumidity) / 100
         ) / 1000
       );
     },
 
-    updatedAt(): Date {
-      return new Date(Date.parse(this.profile.updated_at));
+    profileUpdatedAt(): Date {
+      return new Date(Date.parse(this.profile.updatedAt));
     }
   },
 
   watch: {
     units(val) {
       if (val === "F") {
-        this.lampOnTemperature = (this.lampOnTemperature * 9) / 5 + 32;
-        this.lampOffTemperature = (this.lampOffTemperature * 9) / 5 + 32;
+        this.lampontemperature = (this.lampontemperature * 9) / 5 + 32;
+        this.lampofftemperature = (this.lampofftemperature * 9) / 5 + 32;
       } else {
-        this.lampOnTemperature = ((this.lampOnTemperature - 32) * 5) / 9;
-        this.lampOffTemperature = ((this.lampOffTemperature - 32) * 5) / 9;
+        this.lampontemperature = ((this.lampontemperature - 32) * 5) / 9;
+        this.lampofftemperature = ((this.lampofftemperature - 32) * 5) / 9;
       }
     }
   },
@@ -313,7 +314,7 @@ const ProfileRow = Vue.extend({
     },
 
     save() {
-      const start = this.lampStart.split(":");
+      const start = this.lampstart.split(":");
       let hourInt = parseInt(start[0]) + 5; // WARNING!
       if (hourInt > 24) {
         hourInt = hourInt - 24;
@@ -325,22 +326,22 @@ const ProfileRow = Vue.extend({
         hourString = hourInt.toString();
       }
 
-      let onTemp = this.lampOnTemperature;
-      let offTemp = this.lampOffTemperature;
+      let ontemp = this.lampontemperature;
+      let offtemp = this.lampofftemperature;
       if (this.units === "F") {
-        onTemp = ((onTemp - 32) * 5) / 9;
-        offTemp = ((offTemp - 32) * 5) / 9;
+        ontemp = ((ontemp - 32) * 5) / 9;
+        offtemp = ((offtemp - 32) * 5) / 9;
       }
 
       const profile = {
         id: this.profile.id,
         profile: this.name,
-        lampStart: `${hourString}:${start[1]}`,
-        lampDuration: `${this.lampDuration} hours`,
-        lampOnTemperature: onTemp,
-        lampOnHumidity: this.lampOnHumidity,
-        lampOffTemperature: offTemp,
-        lampOffHumidity: this.lampOffHumidity
+        lampstart: `${hourString}:${start[1]}`,
+        lampduration: `${this.lampduration} hours`,
+        lampontemperature: ontemp,
+        lamponhumidity: this.lamponhumidity,
+        lampofftemperature: offtemp,
+        lampoffhumidity: this.lampoffhumidity
       };
 
       this.$store.dispatch("editProfile", profile);

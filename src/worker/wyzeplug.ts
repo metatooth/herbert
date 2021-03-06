@@ -1,9 +1,19 @@
-export class Wyzeplug {
-  device: Device;
+import { Switch } from "./switch";
+import { Wyze } from "wyze-node";
+
+export class Wyzeplug extends Switch {
+  device: WyzeDevice;
   wyze: Wyze;
 
-  constructor(device: Device) {
+  constructor(device: WyzeDevice, username: string, password: string) {
+    super();
+
     this.device = device;
+    const options = {
+      username: username,
+      password: password
+    };
+    this.wyze = new Wyze(options);
   }
 
   public async off() {

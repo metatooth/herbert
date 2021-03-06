@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="subtitle">{{ profiles.length }} {{ profilesName }}</h2>
+    <h2 class="title">{{ profiles.length }} {{ profilesName }}</h2>
     <table class="table is-full-width">
       <thead>
         <tr>
@@ -131,6 +131,9 @@
         </tr>
       </tbody>
     </table>
+    <button class="button is-info">
+      <font-awesome-icon icon="sync" @click="$store.dispatch('getProfiles')" />
+    </button>    
   </section>
 </template>
 

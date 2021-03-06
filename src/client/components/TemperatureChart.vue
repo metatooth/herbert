@@ -7,6 +7,7 @@
       v-bind:label="label"
       v-bind:suggestedMin="suggestedMin"
       v-bind:suggestedMax="suggestedMax"
+      v-bind:stepSize="stepSize"
       v-bind:units="units"
     />
     <units-selector :units="units" @change-units="changeUnits" />
@@ -30,6 +31,7 @@ const TemperatureChart = Vue.extend({
       display: [],
       suggestedMin: 60,
       suggestedMax: 85,
+      stepSize: 0.5,
       units: "F",
       label: "Fahrenheit (°F)"
     };
@@ -64,7 +66,8 @@ const TemperatureChart = Vue.extend({
         this.label = "Celsius (°C)";
         this.suggestedMin = 15;
         this.suggestedMax = 30;
-
+        this.stepSize = 0.1;
+        
         this.display = [];
         this.data.forEach(d => {
           this.display.push({ x: d.x, y: d.y });
@@ -73,6 +76,7 @@ const TemperatureChart = Vue.extend({
         this.label = "Fahrenheit (°F)";
         this.suggestedMin = 60;
         this.suggestedMax = 85;
+        this.stepSize = 0.5;
 
         this.display = [];
         let y;

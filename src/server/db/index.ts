@@ -13,39 +13,54 @@ export async function query(text, params): Promise<Result> {
 }
 
 export async function readProfile(id) {
-  const {
-    rows
-  } = await query(
-    "SELECT id, profile, lamp_start, lamp_duration, lamp_on_temperature, lamp_on_humidity, lamp_off_temperature, lamp_off_humidity, updated_at FROM profiles WHERE id = $1",
+  const {rows } = await query(
+    "SELECT id, profile, lampstart, lampduration, lampontemperature, lamponhumidity, lampofftemperature, lampoffhumidity, updatedat FROM profiles WHERE id = $1",
     [id]
   );
   return rows[0];
 }
 
 export async function readZones() {
-  const { rows } = await query(
-    "SELECT z.id, z.nickname, b.id as parent_id, b.nickname as parent, p.id as profile_id, p.profile, z.updated_at FROM zones z LEFT JOIN zones b ON z.parent_id = b.id LEFT JOIN profiles p ON z.profile_id = p.id WHERE z.deleted <> true",
-    []
-  );
-  return rows;
+  const zones = [];
+
+  const { rows } =
+        await query("SELECT id FROM zones WHERE deleted <> true", []);
+  
+  rows.forEach(row => {
+    const z = readZone(row.id);
+    zones.push(z);
+  });
+
+  console.log("ZONES", zones);
+  
+  return Promise.all(zones);
 }
 
 export async function readZone(id) {
-  const {
-    rows
-  } = await query(
-    "SELECT z.id, z.nickname, b.id as parent_id, b.nickname as parent, p.id as profile_id, p.profile, z.updated_at FROM zones z LEFT JOIN zones b ON z.parent_id = b.id LEFT JOIN profiles p ON z.profile_id = p.id WHERE z.id = $1",
-    [id]
-  );
-  const { children } = await query("SELECT * FROM zones WHERE parent_id = $1", [
-    rows[0].id
-  ]);
-  rows[0].children = children;
-  return rows[0];
+  const res = await query("SELECT z.id, z.nickname, b.id as parentid, b.nickname as parent, p.id as profileid, p.profile, z.updatedat FROM zones z LEFT JOIN zones b ON z.parentid = b.id LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1", [id]);
+  const children = await query("SELECT * FROM zones WHERE parentid = $1", [id]);
+  const devices = await query("SELECT d.* FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE zd.zoneid = $1", [id]);
+
+  const zone = await res.rows[0];
+
+  if (devices) {
+    zone.devices = await devices.rows;
+  }
+
+  if (children) {
+    zone.children = await children.rows;
+  }
+
+  return zone;
 }
 
 export async function readDevice(id) {
   const { rows } = await query("SELECT * FROM devices WHERE device = $1", [id]);
+  return rows[0];
+}
+
+export async function readWorker(id) {
+  const { rows } = await query("SELECT * FROM workers WHERE worker = $1", [id]);
   return rows[0];
 }
 
@@ -54,7 +69,7 @@ export async function registerDevice(macaddr, manufacturer, type) {
     if (res.rowCount === 0) {
       console.log("inserting", macaddr);
       query(
-        "INSERT INTO devices (device, manufacturer, device_type) VALUES ($1, $2, $3)",
+        "INSERT INTO devices (device, manufacturer, deviceType) VALUES ($1, $2, $3)",
         [macaddr, manufacturer, type]
       );
     }
@@ -80,6 +95,17 @@ export async function createReading(meter, temperature, humidity, pressure) {
         "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
         [meter, temperature, humidity, pressure]
       );
+    }
+  });
+}
+
+export async function createStatus(device, status) {
+  query("SELECT * FROM devices WHERE device = $1", [device]).then(res => {
+    if (res.rowCount !== 0) {
+      query("INSERT INTO statuses (device, status) VALUES ($1, $2)", [
+        device,
+        status
+      ]);
     }
   });
 }

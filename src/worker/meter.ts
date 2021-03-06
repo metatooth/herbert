@@ -17,7 +17,7 @@ export class Meter {
       this.type = "mockbot";
       this.bot = new Mockbot(this.id);
     } else {
-      this.type = "switchbot";
+      this.type = "SwitchBot";
       this.bot = new Switchbot();
     }
   }

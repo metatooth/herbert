@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="subtitle">{{ workers.length }} {{ workersName }}</h2>
+    <h2 class="title">{{ workers.length }} {{ workersName }}</h2>
     <table class="table">
       <thead>
         <tr>
@@ -17,6 +17,9 @@
         />
       </tbody>
     </table>
+    <button class="button is-info">
+      <font-awesome-icon icon="sync" @click="$store.dispatch('getWorkers')" />
+    </button>
   </section>
 </template>
 

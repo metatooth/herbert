@@ -15,6 +15,7 @@ const Chart = Vue.extend({
     label: { type: String },
     suggestedMin: { type: Number },
     suggestedMax: { type: Number },
+    stepSize: { type: Number },
     range: { type: Number }
   },
 
@@ -53,12 +54,7 @@ const Chart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss",
-                unit: "minute",
-                unitStepSize: 1,
-                displayFormats: {
-                  minute: "HH:mm"
-                }
+                parser: "yyyy-MM-dd HH:mm:ss"
               }
             }
           ],
@@ -67,7 +63,8 @@ const Chart = Vue.extend({
               display: true,
               ticks: {
                 suggestedMin: this.suggestedMin,
-                suggestedMax: this.suggestedMax
+                suggestedMax: this.suggestedMax,
+                stepSize: this.stepSize
               },
               scaleLabel: {
                 display: true,
@@ -96,12 +93,7 @@ const Chart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss",
-                unit: "minute",
-                unitStepSize: 1,
-                displayFormats: {
-                  minute: "HH:mm"
-                }
+                parser: "yyyy-MM-dd HH:mm:ss"
               }
             }
           ],
@@ -126,8 +118,6 @@ const Chart = Vue.extend({
 
     data(val) {
       this.chart.data.datasets.pop();
-
-      console.log("new data", val);
 
       this.chart.data.datasets.push({
         data: val,

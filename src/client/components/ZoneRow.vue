@@ -22,7 +22,7 @@
       </div>
       <div class="control" v-else>
         <div class="select">
-          <select v-model="profileId">
+          <select v-model="profileid">
             <option
               v-for="profile in profiles"
               v-bind:key="profile.id"
@@ -45,7 +45,7 @@
       </div>
       <div class="control" v-else>
         <div class="select">
-          <select v-model="parentId">
+          <select v-model="parentid">
             <option
               v-for="zone in zones"
               v-bind:key="zone.id"
@@ -58,7 +58,7 @@
       </div>
     </td>
     <td>
-      <timestamp :timestamp="updatedAt" />
+      <timestamp :timestamp="zoneUpdatedAt" />
     </td>
     <td>
       <edit-controls
@@ -102,8 +102,8 @@ const ZoneRow = Vue.extend({
       return "#" + this.zone.id + "config";
     },
 
-    updatedAt(): Date {
-      return new Date(Date.parse(this.zone.updated_at));
+    zoneUpdatedAt(): Date {
+      return new Date(Date.parse(this.zone.updatedat));
     }
   },
 
@@ -113,19 +113,18 @@ const ZoneRow = Vue.extend({
     },
 
     save() {
-      const parent = this.zones.find(el => el.id === this.parentId);
-      const profile = this.profiles.find(el => el.id === this.profileId);
+      const parent = this.zones.find(el => el.id === this.parentid);
+      const profile = this.profiles.find(el => el.id === this.profileid);
 
       const zone = {
         id: this.zone.id,
         nickname: this.nickname,
-        profileId: this.profileId,
+        profileid: this.profileid,
         profile: profile.profile,
-        parentId: this.parentId,
+        parentid: this.parentid,
         parent: parent.nickname
       };
 
-      console.log("SAVE ZONE", zone);
       this.$store.dispatch("editZone", zone);
       this.editing = false;
     },
@@ -137,8 +136,8 @@ const ZoneRow = Vue.extend({
 
     cancel() {
       this.nickname = this.zone.nickname;
-      this.profileId = this.zone.profile_id;
-      this.parentId = this.zone.parent_id;
+      this.profileid = this.zone.profileid;
+      this.parentid = this.zone.parentid;
       this.editing = false;
     }
   }

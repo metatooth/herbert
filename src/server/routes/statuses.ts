@@ -6,13 +6,13 @@ const router = Router();
 
 router.get("/", async (req, res) => {
   const now = Date.now();
-  let limit = now - 3600000;
+  let limit = now - 180000;
   let one = false;
 
   if (req.query.last === "one") {
     one = true;
   } else if (req.query.last === "hour") {
-    // default
+    limit = now - 3600000;
   } else if (req.query.last === "day") {
     limit = now - 86400000;
   } else if (req.query.last === "week") {
@@ -37,7 +37,7 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
+      "SELECT * FROM statuses WHERE meter = $1 ORDER BY id DESC LIMIT 1",
       [req.query.meter]
     );
     res.status(200).json(rows[0]);
@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM readings WHERE meter = $1 AND createdat > $2 ORDER BY id DESC",
+      "SELECT * FROM statuses WHERE meter = $1 AND createdat > $2 ORDER BY id DESC",
       [req.query.meter, start]
     );
     res.status(200).json(rows);
@@ -53,7 +53,7 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM readings WHERE createdat > $1 ORDER BY id DESC",
+      "SELECT * FROM statuses WHERE createdat > $1 ORDER BY id DESC",
       [start]
     );
     res.status(200).json(rows);

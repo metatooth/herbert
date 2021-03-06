@@ -1,4 +1,22 @@
 /**
+ * Convert Celius to Fahrenheit.
+ * @param {number} T temperature in Celsius
+ * @return {number} temperature in Fahrenheit
+ */
+export function celsius2fahrenheit(T: number) {
+  return (T * 9) / 5 + 32;
+}
+
+/**
+ * Convert Fahrenheit to Celius.
+ * @param {number} T temperature in Fahrenheit
+ * @return {number} temperature in Celsius
+ */
+export function fahrenheit2celsius(T: number) {
+  return ((T - 32) * 5) / 9;
+}
+
+/**
  * Calculates saturated vapor pressure
  * @param {number} T temperature in Celsius
  * @return {number} vapor pressure in pascals

@@ -4,17 +4,19 @@
       v-bind:notifications="notifications"
       @delete-notification="deleteNotification"
     />
+    <zone-details
+      v-bind:zones="getterszones"
+      v-bind:profiles="gettersprofiles"
+      v-bind:devices="gettersdevices"
+      v-bind:units="units"
+    />
+    <profiles v-bind:profiles="gettersprofiles" v-bind:units="units" />
     <zones
       v-bind:zones="getterszones"
       v-bind:profiles="gettersprofiles"
       v-bind:units="units"
     />
-    <zone-details
-      v-bind:zones="getterszones"
-      v-bind:profiles="gettersprofiles"
-      v-bind:units="units"
-    />
-    <profiles v-bind:profiles="gettersprofiles" v-bind:units="units" />
+        
     <devices v-bind:devices="gettersdevices" />
     <workers v-bind:workers="gettersworkers" />
     <units-selector v-bind:units="units" @change-units="changeUnits" />

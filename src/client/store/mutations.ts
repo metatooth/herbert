@@ -1,9 +1,17 @@
-import { Device, Profile, Zone } from "./mutation-types";
+import { Device, Profile, Zone, Worker } from "./mutation-types";
 
 const mutations = {
+  ADD_ZONE_DEVICE(state: any, zone: Zone) {
+    console.log("add zone device mutation", zone);
+  },
+
   ADD_ZONE(state: any, zone: Zone) {
     zone.updatedAt = new Date();
     state.zones.push(zone);
+  },
+
+  REMOVE_ZONE_DEVICE(state: any, payload: any) {
+    console.log("remove zone device mutation", payload);
   },
 
   REMOVE_ZONE(state: any, zone: Zone) {
@@ -50,6 +58,14 @@ const mutations = {
 
   SET_DEVICES(state: any, devices: Device[]) {
     state.devices = devices;
+  },
+
+  EDIT_WORKER(state: any, worker: Worker) {
+    const found = state.workers.find(
+      (el: Worker) => el.worker === worker.worker
+    );
+    const index = state.workers.indexOf(worker);
+    state.workers.splice(index, 1, worker);
   },
 
   SET_WORKERS(state: any, workers: Worker[]) {

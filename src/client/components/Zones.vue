@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 id="zones" class="subtitle">{{ zones.length }} {{ zonesName }}</h2>
+    <h2 id="zones" class="title">{{ zones.length }} {{ zonesName }}</h2>
     <table class="table is-fullwidth is-striped">
       <thead>
         <tr>
@@ -68,6 +68,9 @@
         </tr>
       </tbody>
     </table>
+    <button class="button is-info">
+      <font-awesome-icon icon="sync" @click="$store.dispatch('getZones')" />
+    </button>
   </section>
 </template>
 

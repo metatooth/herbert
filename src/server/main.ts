@@ -3,7 +3,12 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import { registerDevice, registerWorker, createReading } from "./db";
+import {
+  registerDevice,
+  registerWorker,
+  createReading,
+  createStatus
+} from "./db";
 import path from "path";
 import favicon from "serve-favicon";
 
@@ -87,6 +92,14 @@ wss.on("connection", function(ws: WebSocket) {
           data.payload.humidity,
           data.payload.pressure
         );
+      } else if (data.payload.device) {
+        console.log("Status message from switch", data.payload);
+        registerDevice(
+          data.payload.device,
+          data.payload.manufacturer,
+          data.payload.type
+        );
+        createStatus(data.payload.device, data.payload.status);
       }
 
       if (data.payload.worker) {

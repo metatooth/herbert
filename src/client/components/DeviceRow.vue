@@ -30,13 +30,33 @@
       </div>
     </td>
     <td>
-      {{ device.device_type }}
+      {{ device.devicetype }}
     </td>
     <td>
       {{ device.manufacturer }}
     </td>
     <td>
-      <timestamp :timestamp="new Date(Date.parse(device.updated_at))" />
+      <timestamp :timestamp="new Date(Date.parse(device.updatedat))" />
+    </td>
+    <td>
+      <router-link
+        :to="{
+          name: 'readings',
+          params: { name: device.nickname, meter: device.device }
+        }"
+        v-if="isMeter"
+      >
+        &gt;&gt;&gt;
+      </router-link>
+      <router-link
+        :to="{
+          name: 'statuses',
+          params: { name: device.nickname, device: device.device }
+        }"
+        v-if="isSwitch"
+      >
+        &gt;&gt;&gt;
+      </router-link>
     </td>
   </tr>
 </template>
@@ -60,6 +80,16 @@ const DeviceRow = Vue.extend({
       nickname: this.device.nickname,
       editing: false
     };
+  },
+
+  computed: {
+    isMeter() {
+      return this.device.devicetype === "meter";
+    },
+
+    isSwitch() {
+      return this.device.devicetype !== "meter";
+    }
   },
 
   methods: {

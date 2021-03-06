@@ -17,6 +17,7 @@ import {
   faPlus,
   faPlusCircle,
   faSun,
+  faSync,
   faThermometerHalf,
   faTimes,
   faTimesCircle,
@@ -34,6 +35,7 @@ library.add(faPencilAlt);
 library.add(faPlus);
 library.add(faPlusCircle);
 library.add(faSun);
+library.add(faSync);
 library.add(faThermometerHalf);
 library.add(faTimes);
 library.add(faTimesCircle);

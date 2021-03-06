@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="subtitle">{{ devices.length }} {{ devicesName }}</h2>
+    <h2 class="title">{{ devices.length }} {{ devicesName }}</h2>
     <table class="table">
       <thead>
         <tr>
@@ -19,6 +19,9 @@
         />
       </tbody>
     </table>
+    <button class="button is-info">
+      <font-awesome-icon icon="sync" @click="$store.dispatch('getDevices')" />
+    </button>
   </section>
 </template>
 

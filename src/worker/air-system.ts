@@ -1,5 +1,5 @@
 import { Clime } from "./clime";
-import { Plug } from "./plug";
+import { Switch } from "./switch";
 
 enum AirSystemStatus {
   Off = 0,
@@ -8,10 +8,10 @@ enum AirSystemStatus {
 
 export class AirSystem {
   status: AirSystemStatus;
-  plug: Plug;
+  switcher: Switch;
 
-  constructor(plug: Plug) {
-    this.plug = plug;
+  constructor(switcher: Switch) {
+    this.switcher = switcher;
   }
 }
 
@@ -19,7 +19,8 @@ export class Blower extends AirSystem {
   intake: Clime;
   main: Clime;
 
-  constructur(plug: Plug, intake: Clime, main: Clime): void {
+  constructor(switcher: Switch, intake: Clime, main: Clime) {
+    super(switcher);
     this.intake = intake;
     this.main = main;
   }

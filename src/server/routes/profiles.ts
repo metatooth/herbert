@@ -47,7 +47,7 @@ router.put("/:id", async (req, res) => {
   const {
     rows
   } = await query(
-    "UPDATE profiles SET profile = $1, lamp_start = $2, lamp_duration = $3, lamp_on_temperature = $4, lamp_on_humidity = $5, lamp_off_temperature = $6, lamp_off_humidity = $7 WHERE id = $8 returning id",
+    "UPDATE profiles SET profile = $1, lampstart = $2, lampduration = $3, lampontemperature = $4, lamponhumidity = $5, lampofftemperature = $6, lampoffhumidity = $7 WHERE id = $8 returning id",
     [
       req.body.profile,
       req.body.lampStart,
