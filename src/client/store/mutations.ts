@@ -64,7 +64,7 @@ const mutations = {
     const found = state.workers.find(
       (el: Worker) => el.worker === worker.worker
     );
-    const index = state.workers.indexOf(worker);
+    const index = state.workers.indexOf(found);
     state.workers.splice(index, 1, worker);
   },
 

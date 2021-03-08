@@ -3,16 +3,8 @@ import config from "config";
 import fs from "fs";
 import { networkInterfaces } from "os";
 
-import { vaporPressureDeficit } from "../shared/utils";
-
-import { AirDirectives } from "./air-directives";
-import { BlowerTimer } from "./blower-timer";
-import { Clime } from "./clime";
-import { ConstantVpd } from "./constant-vpd";
-import { LampTimer } from "./lamp-timer";
-import { Meter } from "./meter";
-import { Switch } from "./switch";
-import { TargetTempHumidity } from "./target-temp-humidity";
+import { Clime } from "../shared/clime";
+import { Meter } from "../shared/meter";
 
 import Switchbot from "node-switchbot";
 import Wyze from "wyze-node";
@@ -33,17 +25,11 @@ const logger: Logger = getLogger("app");
 export class App {
   private static _instance: App;
   initialized: boolean;
-  clime: Clime;
-  day: AirDirectives;
-  night: AirDirectives;
-  lamps: LampTimer;
-  blowers: BlowerTimer;
   socket: WebSocket;
-  systems: Map<string, boolean>;
   meters: Map<Meter, Clime>;
-  switches: Array<Switch>;
   macaddr: string;
   heldMessages: Array<any>;
+  wyze: any;
 
   private constructor() {
     console.log("process.argv", process.argv);
@@ -56,66 +42,9 @@ export class App {
       }
     }
 
-    this.lamps = new LampTimer(
-      parseInt(config.get("environment.lamp.start")),
-      parseInt(config.get("environment.lamp.duration"))
-    );
-
-    this.blowers = new BlowerTimer(
-      parseInt(config.get("environment.blower.active")),
-      parseInt(config.get("environment.blower.cycle"))
-    );
-
-    if (config.get("environment.strategy") === "constant-vpd") {
-      let vpd = vaporPressureDeficit(
-        config.get("environment.lamp-on.temperature"),
-        config.get("environment.lamp-on.delta"),
-        config.get("environment.lamp-on.humidity")
-      );
-
-      this.day = new AirDirectives(
-        new ConstantVpd([vpd, config.get("environment.vpd-tolerance")])
-      );
-
-      vpd = vaporPressureDeficit(
-        config.get("environment.lamp-off.temperature"),
-        config.get("environment.lamp-off.delta"),
-        config.get("environment.lamp-off.humidity")
-      );
-
-      this.night = new AirDirectives(
-        new ConstantVpd([vpd, config.get("environment.vpd-tolerance")])
-      );
-    } else {
-      this.day = new AirDirectives(
-        new TargetTempHumidity([
-          config.get("environment.lamp-on.temperature"),
-          config.get("environment.lamp-on.humidity")
-        ])
-      );
-
-      this.night = new AirDirectives(
-        new TargetTempHumidity([
-          config.get("environment.lamp-off.temperature"),
-          config.get("environment.lamp-off.humidity")
-        ])
-      );
-    }
-
     this.socket = null;
+
     this.heldMessages = [];
-
-    this.clime = new Clime(-1, 0.6, -1);
-
-    this.systems = new Map([
-      ["blower", false],
-      ["dehumidifier", false],
-      ["heater", false],
-      ["humidifier", false],
-      ["lamp", false]
-    ]);
-
-    this.meters = new Map();
 
     const devices: Array<Device> = config.get("devices");
 
@@ -181,21 +110,28 @@ export class App {
     }
 
     this.macaddr = net[0]["mac"];
+
     this.register(this.macaddr, config.get("id"));
 
-    const names: Array<string> = [];
-    const iter = this.systems.keys();
-    let result = iter.next();
-    while (result.done !== true) {
-      names.push(result.value);
-      result = iter.next();
-    }
+    this.meters = new Map();
+    config.get("devices").forEach(async dev => {
+      this.meters.set(new Meter(dev.id), new Clime(0, 0, 0));
+    });
+
+    config.get("credentials").forEach(async cred => {
+      if (cred.type === "wyze") {
+        const options = {
+          username: cred.username,
+          password: cred.password
+        };
+
+        this.wyze = new Wyze(options);
+      }
+    });
 
     this.initialized = true;
 
-    return new Promise(resolve => {
-      resolve(true);
-    });
+    return Promise.resolve(true);
   }
 
   private async send(data) {
@@ -216,8 +152,17 @@ export class App {
           app.socket = null;
         });
 
-        app.socket.on("message", msg => {
-          logger.debug("REC", msg);
+        app.socket.on("message", async msg => {
+          const data = JSON.parse(msg);
+          if (data.type === "COMMAND") {
+            const mac = data.payload.device.replace(/:/g, "").toUpperCase();
+            const device = await this.wyze.getDeviceByMac(mac);
+            if (data.payload.action === "on") {
+              this.wyze.turnOn(device);
+            } else {
+              this.wyze.turnOff(device);
+            }
+          }
         });
       } catch (e) {
         logger.error("Caught", e);
@@ -253,12 +198,11 @@ export class App {
     this.send(data);
   }
 
-  private async deviceStatus(device: WyzeDevice, type: string) {
+  private async deviceStatus(device: WyzeDevice) {
     const data = {
       type: "STATUS",
       payload: {
         device: device.mac,
-        type: type,
         manufacturer: "WYZE",
         status: device.device_params.switch_state,
         timestamp: new Date()
@@ -297,7 +241,7 @@ export class App {
       logger.debug("Done meter scan.");
     });
 
-    logger.debug("Start switchbot scan %dms ...", polling);
+    logger.debug("Start SwitchBot scan %dms ...", polling);
     const switchbot = new Switchbot();
     switchbot.onadvertisement = app.handler;
     switchbot.startScan();
@@ -305,31 +249,20 @@ export class App {
     switchbot.stopScan();
     logger.debug("Done switchbot scan.");
 
-    logger.debug("Check on plugs...");
-    config.get("credentials").forEach(async cred => {
-      if (cred.type === "wyze") {
-        const options = {
-          username: cred.username,
-          password: cred.password
-        };
-
-        const wyze = new Wyze(options);
-
-        const devices = await wyze.getDeviceList();
-        console.log("DEVICES!!");
-        devices.forEach(device => {
-          console.log("DEVICE", device);
-          app.deviceStatus(device, "blower");
-        });
-      }
+    logger.debug("Check on WYZE plugs...");
+    const devices = await app.wyze.getDeviceList();
+    devices.forEach(async device => {
+      const status = await app.wyze.getDeviceStatus(device);
+      const state = await app.wyze.getDeviceState(device);
+      console.log("device", device);
+      console.log("status", status);
+      console.log("state", state);
+      app.deviceStatus(device);
     });
-
     logger.debug("Done.");
 
     setTimeout(app.run, interval);
 
-    return new Promise(resolve => {
-      resolve(true);
-    });
+    return Promise.resolve(true);
   }
 }

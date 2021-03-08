@@ -35,31 +35,32 @@
       </div>
     </td>
     <td class="has-background-warning-light" v-if="!editing">
-      <target
-        v-if="!editing"
-        icon="thermometer-half"
-        :value="dayTemperature"
-        :precision="1"
-        :units="unitsWithDegree"
-        text="black"
-        background="warning"
-      />
-      <target
-        icon="tint"
-        :value="parseFloat(profile.lamponhumidity)"
-        :precision="0"
-        units="%"
-        text="black"
-        background="warning"
-      />
-      <target
-        icon="cloud"
-        :value="lamponPressure"
-        :precision="1"
-        units="hPa"
-        text="black"
-        background="warning"
-      />
+      <div class="field is-grouped">
+        <target
+          icon="thermometer-half"
+          :value="dayTemperature"
+          :precision="1"
+          :units="unitsWithDegree"
+          text="black"
+          background="warning"
+        />
+        <target
+          icon="tint"
+          :value="parseFloat(profile.lamponhumidity)"
+          :precision="0"
+          units="%"
+          text="black"
+          background="warning"
+        />
+        <target
+          icon="cloud"
+          :value="lamponPressure"
+          :precision="1"
+          units="hPa"
+          text="black"
+          background="warning"
+        />
+      </div>
     </td>
     <td v-if="editing">
       <div class="field">
@@ -92,30 +93,32 @@
       </div>
     </td>
     <td class="has-background-info-light" v-if="!editing">
-      <target
-        icon="thermometer-half"
-        :value="nightTemperature"
-        :precision="1"
-        :units="unitsWithDegree"
-        text="black"
-        background="info"
-      />
-      <target
-        icon="tint"
-        :value="parseFloat(profile.lampoffhumidity)"
-        :precision="0"
-        units="%"
-        text="black"
-        background="info"
-      />
-      <target
-        icon="cloud"
-        :value="lampoffPressure"
-        :precision="1"
-        units="hPa"
-        text="black"
-        background="info"
-      />
+      <div class="field is-grouped">
+        <target
+          icon="thermometer-half"
+          :value="nightTemperature"
+          :precision="1"
+          :units="unitsWithDegree"
+          text="white"
+          background="info"
+        />
+        <target
+          icon="tint"
+          :value="parseFloat(profile.lampoffhumidity)"
+          :precision="0"
+          units="%"
+          text="white"
+          background="info"
+        />
+        <target
+          icon="cloud"
+          :value="lampoffPressure"
+          :precision="1"
+          units="hPa"
+          text="white"
+          background="info"
+        />
+      </div>
     </td>
     <td v-if="editing">
       <div class="field">

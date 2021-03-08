@@ -1,7 +1,6 @@
 <template>
   <div :id="anchor" class="column">
     <div class="card">
-      
       <div class="card-content">
         <a v-on:click="edit" v-if="!editing">
           <span v-if="zone.nickname">{{ zone.nickname }}</span>
@@ -14,14 +13,14 @@
               type="text"
               v-model="nickname"
               @keyup.esc="cancel"
-              />
+            />
           </div>
         </div>
       </div>
-      
+
       <div class="card-content">
         <a v-on:click="edit" v-if="!editing">
-          <span v-if="zone.profile">{{ zone.profile }}</span>
+          <span v-if="zone.profile">{{ zone.profile.profile }}</span>
           <span v-else>click to assign profile</span>
         </a>
         <div class="field" v-else>
@@ -32,7 +31,7 @@
                   v-for="profile in profiles"
                   v-bind:key="profile.id"
                   v-bind:value="profile.id"
-                  >
+                >
                   {{ profile.profile }}
                 </option>
               </select>
@@ -48,7 +47,7 @@
               <font-awesome-icon icon="check" />
             </button>
           </div>
-          
+
           <div class="control">
             <button class="button is-danger" v-on:click="cancel">
               <font-awesome-icon icon="times" />
@@ -69,13 +68,13 @@
           </div>
         </div>
       </div>
-      
+
       <div class="card-content">
         <select-device
           label="Meters"
           v-bind:devices="allMeters"
           @select-device="addDevice"
-          />
+        />
       </div>
 
       <div class="card-content">
@@ -96,7 +95,7 @@
           label="Switches"
           v-bind:devices="allSwitches"
           @select-device="addDevice"
-          />
+        />
       </div>
 
       <div class="card-content">
@@ -104,7 +103,7 @@
           Status
         </p>
       </div>
-      
+
       <footer class="card-footer">
         <div class="card-footer-item">
           <timestamp :timestamp="new Date(Date.parse(zone.updatedat))" />
@@ -119,7 +118,6 @@ import Vue from "vue";
 
 import Timestamp from "@/components/Timestamp.vue";
 import { celsius2fahrenheit } from "../../shared/utils";
-import Device from "@/store/mutation-types";
 import SelectDevice from "@/components/SelectDevice";
 
 const ZoneCard = Vue.extend({
@@ -153,20 +151,20 @@ const ZoneCard = Vue.extend({
 
     allMeters(): [] {
       const result = this.devices;
-      const filter = (event) => {
+      const filter = event => {
         return event.devicetype === "meter";
-      }
+      };
       return result.filter(filter);
     },
 
     allSwitches(): [] {
       const result = this.devices;
-      const filter = (event) => {
+      const filter = event => {
         return event.devicetype !== "meter";
-      }
+      };
       return result.filter(filter);
     },
-    
+
     temp(): number {
       if (this.units === "F") {
         return celsius2fahrenheit(this.zone.temperature);
@@ -181,20 +179,19 @@ const ZoneCard = Vue.extend({
 
     zoneMeters(): [] {
       const result = this.zone.devices;
-      const filter = (event) => {
+      const filter = event => {
         return event.devicetype === "meter";
-      }
+      };
       return result.filter(filter);
     },
 
     zoneSwitches(): [] {
       const result = this.zone.devices;
-      const filter = (event) => {
+      const filter = event => {
         return event.devicetype !== "meter";
-      }
+      };
       return result.filter(filter);
     }
-    
   },
 
   methods: {
@@ -209,7 +206,7 @@ const ZoneCard = Vue.extend({
       this.$store.dispatch("removeZoneDevice", payload);
       this.$store.dispatch("getZones");
     },
-    
+
     edit() {
       this.editing = true;
     },
@@ -238,7 +235,7 @@ const ZoneCard = Vue.extend({
       this.parent = this.zone.parent;
       this.nickname = this.zone.nickname;
       this.editing = false;
-     }
+    }
   }
 });
 

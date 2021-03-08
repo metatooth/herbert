@@ -46,32 +46,28 @@ export default {
     });
   },
 
-  addZoneDevice({ commit }, payload: { zoneid: number, device: string }) {
+  addZoneDevice({ commit }, payload: { zoneid: number; device: string }) {
     const json = JSON.stringify({ device: payload.device });
     HTTP.post(`/zones/${payload.zoneid}/devices`, json).then(response => {
       commit(ADD_ZONE_DEVICE, response.data);
     });
   },
-  
+
   addZone({ commit }, zone: Zone) {
     const json = JSON.stringify(zone);
-    const headers = { headers: { "Content-Type": "application/json" } };
     HTTP.post("/zones", json).then(response => {
       commit(ADD_ZONE, response.data);
     });
   },
 
-  removeZoneDevice({ commit }, payload: { zoneid: number, device: string }) {
-    HTTP.delete(`/zones/${payload.zoneid}/devices/${payload.device}`).then(response => {
-      console.log("HTTP returned", payload);
-      commit(REMOVE_ZONE_DEVICE, payload);
-    });
+  removeZoneDevice({ commit }, payload: { zoneid: number; device: string }) {
+    HTTP.delete(`/zones/${payload.zoneid}/devices/${payload.device}`);
+    commit(REMOVE_ZONE_DEVICE, payload);
   },
 
   removeZone({ commit }, zone: Zone) {
-    HTTP.delete(`/zones/${zone.id}`).then(response => {
-      commit(REMOVE_ZONE, zone);
-    });
+    HTTP.delete(`/zones/${zone.id}`);
+    commit(REMOVE_ZONE, zone);
   },
 
   editZone({ commit }, zone: Zone) {
@@ -89,9 +85,8 @@ export default {
   },
 
   removeProfile({ commit }, profile: Profile) {
-    HTTP.delete(`/profiles/${profile.id}`).then(response => {
-      commit(REMOVE_PROFILE, profile);
-    });
+    HTTP.delete(`/profiles/${profile.id}`);
+    commit(REMOVE_PROFILE, profile);
   },
 
   editProfile({ commit }, profile: Profile) {

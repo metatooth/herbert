@@ -1,7 +1,7 @@
 <template>
   <div class="field is-horizontal">
     <div class="field-label">
-  <label class="label">{{ label }}</label>
+      <label class="label">{{ label }}</label>
     </div>
     <div class="field-body">
       <div class="field has-addons">
@@ -12,10 +12,10 @@
                 v-for="device in devices"
                 v-bind:key="device.device"
                 v-bind:value="device.device"
-                >
+              >
                 {{ device.nickname || device.device }}
               </option>
-            </select> 
+            </select>
           </div>
         </div>
         <div class="control">
@@ -49,7 +49,6 @@ const SelectDevice = Vue.extend({
       this.selected = "";
     }
   }
-    
 });
 
 export default SelectDevice;

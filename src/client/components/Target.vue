@@ -1,9 +1,13 @@
 <template>
-  <div class="tags has-addons">
-    <span class="tag" :class="iconClass">
-      <font-awesome-icon :icon="icon" />
-    </span>
-    <span class="tag" :class="displayClass"> {{ formatted }} {{ units }} </span>
+  <div class="control">
+    <div class="tags has-addons">
+      <span class="tag" :class="iconClass">
+        <font-awesome-icon :icon="icon" />
+      </span>
+      <span class="tag" :class="displayClass">
+        {{ formatted }} {{ units }}
+      </span>
+    </div>
   </div>
 </template>
 

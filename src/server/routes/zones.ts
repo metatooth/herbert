@@ -41,7 +41,7 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  const { rows } = await query("DELETE FROM zones WHERE id = $1", [id]);
+  await query("DELETE FROM zones WHERE id = $1", [id]);
   res.status(204).json({});
 });
 
@@ -50,22 +50,27 @@ router.post("/:id/devices", async (req, res) => {
   console.log("POST zone & device", id);
   console.log("BODY", req.body);
   try {
-    await query("INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)",
-                [id, req.body.device]);
+    await query("INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)", [
+      id,
+      req.body.device
+    ]);
   } catch (err) {
     console.log("ERROR", err);
   }
 
-  const { rows } = await query("SELECT * FROM zone_devices WHERE zoneid = $1",
-                               [id]); 
+  const { rows } = await query("SELECT * FROM zone_devices WHERE zoneid = $1", [
+    id
+  ]);
   console.log("ROWS", rows);
   res.status(200).json({});
 });
 
 router.delete("/:id/devices/:device", async (req, res) => {
   const { id, device } = req.params;
-  console.log("DELETE ", id, device);
-  const { rows } = await query("DELETE FROM zone_devices WHERE zoneid = $1 AND device = $2", [id, device]);
+  await query("DELETE FROM zone_devices WHERE zoneid = $1 AND device = $2", [
+    id,
+    device
+  ]);
   res.status(204).json({});
 });
 

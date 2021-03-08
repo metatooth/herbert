@@ -14,7 +14,7 @@
     <td>
       <div v-if="!editing">
         <div v-if="zone.profile">
-          {{ zone.profile }}
+          {{ zone.profile.profile }}
         </div>
         <div v-else>
           <a :href="linkToConfig">no profile set</a>

@@ -9,7 +9,7 @@
           <th class="has-background-warning">
             <font-awesome-icon icon="sun" />
           </th>
-          <th class="has-background-info">
+          <th class="has-text-white has-background-info">
             <font-awesome-icon icon="moon" />
           </th>
           <th></th>
@@ -133,7 +133,7 @@
     </table>
     <button class="button is-info">
       <font-awesome-icon icon="sync" @click="$store.dispatch('getProfiles')" />
-    </button>    
+    </button>
   </section>
 </template>
 

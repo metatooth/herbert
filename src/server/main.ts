@@ -1,16 +1,27 @@
 import WebSocket from "ws";
+import config from "config";
 import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import {
+  readZones,
+  reading,
+  readZoneDevices,
   registerDevice,
   registerWorker,
   createReading,
   createStatus
 } from "./db";
+
 import path from "path";
 import favicon from "serve-favicon";
+
+import { AirDirectives } from "../shared/air-directives";
+import { BlowerTimer } from "../shared/blower-timer";
+import { Clime } from "../shared/clime";
+import { LampTimer } from "../shared/lamp-timer";
+import { TargetTempHumidity } from "../shared/target-temp-humidity";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");
@@ -115,3 +126,104 @@ wss.on("connection", function(ws: WebSocket) {
     });
   });
 });
+
+async function run() {
+  const zones = await readZones();
+  zones.forEach(async zone => {
+    const now = new Date();
+    const hour = now.getHours();
+    const min = now.getMinutes();
+    const sec = now.getSeconds();
+
+    if (zone.profile) {
+      console.log("command for zone", zone.nickname);
+      let temperature = 0;
+      let humidity = 0;
+      const count = 0;
+      await Promise.all(
+        zone.devices.map(async device => {
+          if (device.devicetype === "meter") {
+            const rdg = await reading(device.device);
+            console.log("lastest reading", rdg);
+            temperature = (count * temperature + rdg.temperature) / (count + 1);
+            humidity = (count * humidity + 100 * rdg.humidity) / (count + 1);
+          }
+        })
+      );
+
+      console.log("profile", zone.profile);
+      console.log("state", hour, temperature, humidity);
+
+      const start = zone.profile.lampstart.split(":");
+      const duration = zone.profile.lampduration["hours"];
+
+      const lamp = new LampTimer(parseInt(start[0]), duration);
+
+      const blower = new BlowerTimer(60, 180); // WARNING!!
+
+      let target;
+      let delta;
+
+      if (lamp.isOn(hour)) {
+        console.log("lamps", lamp, "ON");
+        target = new TargetTempHumidity([
+          zone.profile.lampontemperature,
+          zone.profile.lamponhumidity
+        ]);
+        delta = -0.6;
+      } else {
+        console.log("lamps", lamp, "OFF");
+        target = new TargetTempHumidity([
+          zone.profile.lampofftemperature,
+          zone.profile.lampoffhumidity
+        ]);
+        delta = 0.6;
+      }
+
+      const directives = new AirDirectives(target);
+      directives.clime = new Clime(temperature, delta, humidity);
+      directives.monitor();
+
+      console.log(directives);
+
+      const systems = new Map([
+        ["lamp", lamp.isOn(hour)],
+        ["blower", blower.isOn(min * 60 + sec)],
+        ["heater", directives.temperature === "heat"],
+        ["dehumidifer", directives.humidity === "dehumidify"],
+        ["humidifier", directives.humidity === "humidify"]
+      ]);
+
+      console.log(systems);
+
+      systems.forEach((value, key) => {
+        console.log("system", key, value);
+        zone.devices.map(device => {
+          console.log("device type", device.devicetype, key);
+          if (device.devicetype === key) {
+            console.log("device", device);
+            const action = value ? "on" : "off";
+            const data = {
+              type: "COMMAND",
+              payload: {
+                device: device.device,
+                action: action,
+                timestamp: new Date()
+              }
+            };
+            wss.clients.forEach(client => {
+              console.log("sending...", data);
+              client.send(JSON.stringify(data));
+            });
+          }
+        });
+      });
+    }
+  });
+
+  setTimeout(run, config.get("interval") * 1000);
+}
+
+(async () => {
+  run();
+})();

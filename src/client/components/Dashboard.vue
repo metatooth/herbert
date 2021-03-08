@@ -16,7 +16,7 @@
       v-bind:profiles="gettersprofiles"
       v-bind:units="units"
     />
-        
+
     <devices v-bind:devices="gettersdevices" />
     <workers v-bind:workers="gettersworkers" />
     <units-selector v-bind:units="units" @change-units="changeUnits" />

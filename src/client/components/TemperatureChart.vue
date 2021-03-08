@@ -67,7 +67,7 @@ const TemperatureChart = Vue.extend({
         this.suggestedMin = 15;
         this.suggestedMax = 30;
         this.stepSize = 0.1;
-        
+
         this.display = [];
         this.data.forEach(d => {
           this.display.push({ x: d.x, y: d.y });
