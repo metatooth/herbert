@@ -186,6 +186,8 @@ async function run() {
 
       console.log(directives);
 
+      console.log("blower is on", min, sec, blower.isOn(min * 60 + sec));
+
       const systems = new Map([
         ["lamp", lamp.isOn(hour)],
         ["blower", blower.isOn(min * 60 + sec)],
@@ -197,11 +199,8 @@ async function run() {
       console.log(systems);
 
       systems.forEach((value, key) => {
-        console.log("system", key, value);
         zone.devices.map(device => {
-          console.log("device type", device.devicetype, key);
           if (device.devicetype === key) {
-            console.log("device", device);
             const action = value ? "on" : "off";
             const data = {
               type: "COMMAND",
@@ -211,8 +210,8 @@ async function run() {
                 timestamp: new Date()
               }
             };
+            console.log("sending...", data);
             wss.clients.forEach(client => {
-              console.log("sending...", data);
               client.send(JSON.stringify(data));
             });
           }

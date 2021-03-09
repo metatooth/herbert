@@ -30,7 +30,10 @@
       </div>
     </td>
     <td>
-      {{ device.devicetype }}
+      <select-device-type
+        v-bind:devicetype="device.devicetype"
+        @select-device-type="saveDeviceType"
+      />
     </td>
     <td>
       {{ device.manufacturer }}
@@ -62,9 +65,9 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-
+import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
+import Vue from "vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -72,6 +75,7 @@ const DeviceRow = Vue.extend({
   },
 
   components: {
+    SelectDeviceType,
     Timestamp
   },
 
@@ -103,6 +107,13 @@ const DeviceRow = Vue.extend({
         nickname: this.nickname
       });
       this.editing = false;
+    },
+
+    saveDeviceType(devicetype) {
+      this.$store.dispatch("editDevice", {
+        ...this.device,
+        devicetype: devicetype
+      });
     },
 
     cancel() {

@@ -1,5 +1,5 @@
 import { Device } from "./device";
-import { Clime } from "./clime";
+import { Clime } from "../shared/clime";
 
 export class Meter extends Device {
   clime: Clime;

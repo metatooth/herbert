@@ -11,7 +11,6 @@ import { Herbert } from "./herbert";
 
 import Switchbot from "node-switchbot";
 import Wyze from "wyze-node";
-import { Gpio } from "onoff";
 
 try {
   fs.mkdirSync("./log");
@@ -33,7 +32,7 @@ export class App {
   meters: Array<Meter>;
   switches: Array<Switch>;
   macaddr: string;
-  heldMessages: Array<any>;
+  heldMessages: Array<string>;
   wyze: any;
 
   private constructor() {
@@ -60,14 +59,14 @@ export class App {
 
   public async handler(ad: WoSensorTH): Promise<boolean> {
     const app = App.instance();
-    const meter: Meter = app.meters.find(el => {
-      el.device === ad.id;
+
+    let meter = app.meters.find(el => {
+      return el.device === ad.id;
     });
 
     if (!meter) {
-      logger.debug(`XXX unhandled advertisement -- ${ad.id} XXX`);
-      logger.debug(ad);
-      app.meters.push(new Meter(ad.id, "SwitchBot"));
+      meter = new Meter(ad.id, "SwitchBot");
+      app.meters.push(meter);
     }
 
     if (
@@ -75,7 +74,7 @@ export class App {
       meter.clime.humidity !== ad.serviceData.humidity / 100.0
     ) {
       meter.clime.temperature = ad.serviceData.temperature.c;
-      meter.clime.delta = 0.6;
+      meter.clime.delta = 0.6; // WARNING!
       meter.clime.humidity = ad.serviceData.humidity / 100.0;
       meter.clime.timestamp = new Date();
       app.meterStatus(meter);
@@ -106,8 +105,6 @@ export class App {
 
     this.macaddr = net[0]["mac"];
 
-    this.register(this.macaddr, config.get("nickname"));
-
     const meters = this.meters;
     const switches = this.switches;
 
@@ -120,7 +117,7 @@ export class App {
 
         this.wyze = new Wyze(options);
       } else if (dev.manufacturer === "herbert") {
-        switches.push(new Herbert(dev.id, dev.pin));
+        switches.push(new Herbert(dev.id, parseInt(dev.pin)));
       } else if (dev.manufacturer === "mockbot") {
         meters.push(new MockMeter());
       }
@@ -153,13 +150,31 @@ export class App {
           const data = JSON.parse(msg);
           if (data.type === "COMMAND") {
             console.log("action!", data.payload);
-
             const mac = data.payload.device.replace(/:/g, "").toUpperCase();
+            console.log("MAC", mac);
             const device = await this.wyze.getDeviceByMac(mac);
-            if (data.payload.action === "on") {
-              this.wyze.turnOn(device);
+            if (device) {
+              console.log("DEVICE", device);
+              if (data.payload.action === "on") {
+                await this.wyze.turnOn(device);
+              } else {
+                await this.wyze.turnOff(device);
+              }
             } else {
-              this.wyze.turnOff(device);
+              app.switches.forEach(plug => {
+                if (plug.manufacturer === "herbert") {
+                  const herbert = plug as Herbert;
+                  console.log("HERBERT", herbert);
+                  if (herbert.device === data.payload.device) {
+                    console.log("CHANGE", herbert, data.payload.action);
+                    if (data.payload.action === "on") {
+                      herbert.on();
+                    } else {
+                      herbert.off();
+                    }
+                  }
+                }
+              });
             }
           }
         });
@@ -210,7 +225,7 @@ export class App {
     this.send(data);
   }
 
-  private async register(macaddr: string, nickname: string) {
+  private async workerStatus(macaddr: string, nickname: string) {
     const data = {
       type: "STATUS",
       payload: {
@@ -228,6 +243,8 @@ export class App {
       await app.init();
     }
 
+    app.workerStatus(this.macaddr, config.get("nickname"));
+
     const polling: number = 1000 * parseInt(config.get("polling"));
     const interval: number = 1000 * parseInt(config.get("interval"));
 
@@ -239,12 +256,10 @@ export class App {
     switchbot.stopScan();
     logger.debug("Done switchbot scan.");
 
-    const switches = app.switches;
-
     logger.debug("Check on WYZE plugs...");
     const wyzes = await app.wyze.getDeviceList();
     wyzes.forEach(async wyze => {
-      console.log("got wyze", wyze.mac);
+      console.log("got wyze", wyze);
       const plug = new WyzeSwitch(wyze.mac);
       console.log("conn state", wyze.conn_state, new Date(wyze.conn_state_ts));
 
@@ -255,7 +270,6 @@ export class App {
 
     logger.debug("Other meters...");
     app.meters.forEach(meter => {
-      console.log("check on", meter);
       if (meter.manufacturer === "mockbot") {
         const now = new Date().getTime();
         meter.clime.temperature = 23.9 + Math.sin((2 * 3.14 * now) / 3600000);
@@ -268,11 +282,8 @@ export class App {
     logger.debug("Herbert switches...");
     app.switches.forEach(plug => {
       if (plug.manufacturer === "herbert") {
-        console.log("check on", plug);
-        const output = new Gpio(4, "out");
-        plug.state = output.readSync();
-        output.unexport();
-        app.switchStatus(plug);
+        const herbert = plug as Herbert;
+        app.switchStatus(herbert.status());
       }
     });
     logger.debug("Done.");
