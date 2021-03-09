@@ -110,7 +110,7 @@ create table zone_meters (
 );
 
 insert into manufacturers (manufacturer)
-       values ('SwitchBot'), ('WYZE'), ('mockbot');
+       values ('herbert'), ('SwitchBot'), ('WYZE'), ('mockbot');
 
 insert into device_types (devicetype)
        values ('meter'), ('lamp'), ('blower'),

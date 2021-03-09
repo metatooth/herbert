@@ -15,12 +15,6 @@ interface WoSensorTH {
   };
 }
 
-interface Device {
-  id: string;
-  nickname: string;
-  type: string;
-}
-
 interface WyzeDevice {
   nickname: string;
   mac: string;
