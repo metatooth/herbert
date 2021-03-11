@@ -231,7 +231,7 @@ const ZoneCard = Vue.extend({
     meanHumidity(): number {
       let sum = 0;
       this.readings.forEach(reading => {
-        sum = sum + parseFloat(reading.humidity);
+        sum = sum + 100 * parseFloat(reading.humidity);
       });
       return sum / this.readings.length;
     },
