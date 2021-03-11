@@ -152,30 +152,32 @@ export class App {
             console.log("action!", data.payload);
             const mac = data.payload.device.replace(/:/g, "").toUpperCase();
             console.log("MAC", mac);
-            const device = await this.wyze.getDeviceByMac(mac);
-            if (device) {
-              console.log("DEVICE", device);
-              if (data.payload.action === "on") {
-                await this.wyze.turnOn(device);
-              } else {
-                await this.wyze.turnOff(device);
+            if (this.wyze) {
+              const device = await this.wyze.getDeviceByMac(mac);
+              if (device) {
+                console.log("DEVICE", device);
+                if (data.payload.action === "on") {
+                  await this.wyze.turnOn(device);
+                } else {
+                  await this.wyze.turnOff(device);
+                }
               }
-            } else {
-              app.switches.forEach(plug => {
-                if (plug.manufacturer === "herbert") {
-                  const herbert = plug as Herbert;
-                  console.log("HERBERT", herbert);
-                  if (herbert.device === data.payload.device) {
-                    console.log("CHANGE", herbert, data.payload.action);
-                    if (data.payload.action === "on") {
-                      herbert.on();
-                    } else {
-                      herbert.off();
-                    }
+            }
+
+            app.switches.forEach(plug => {
+              if (plug.manufacturer === "herbert") {
+                const herbert = plug as Herbert;
+                console.log("HERBERT", herbert);
+                if (herbert.device === data.payload.device) {
+                  console.log("CHANGE", herbert, data.payload.action);
+                  if (data.payload.action === "on") {
+                    herbert.on();
+                  } else {
+                    herbert.off();
                   }
                 }
-              });
-            }
+              }
+            });
           }
         });
       } catch (e) {
@@ -256,16 +258,23 @@ export class App {
     switchbot.stopScan();
     logger.debug("Done switchbot scan.");
 
-    logger.debug("Check on WYZE plugs...");
-    const wyzes = await app.wyze.getDeviceList();
-    wyzes.forEach(async wyze => {
-      console.log("got wyze", wyze);
-      const plug = new WyzeSwitch(wyze.mac);
-      console.log("conn state", wyze.conn_state, new Date(wyze.conn_state_ts));
+    if (app.wyze) {
+      logger.debug("Check on WYZE plugs...");
+      const wyzes = await app.wyze.getDeviceList();
+      wyzes.forEach(async wyze => {
+        console.log("got wyze", wyze);
+        const plug = new WyzeSwitch(wyze.mac);
+        console.log(
+          "conn state",
+          wyze.conn_state,
+          new Date(wyze.conn_state_ts)
+        );
 
-      plug.state = wyze.device_params.switch_state;
-      app.switchStatus(plug);
-    });
+        plug.state = wyze.device_params.switch_state;
+        app.switchStatus(plug);
+      });
+    }
+
     logger.debug("Done.");
 
     logger.debug("Other meters...");

@@ -1,24 +1,26 @@
 import HTTP from "@/api/http";
 
 import {
-  Zone,
-  Profile,
-  Device,
-  Worker,
-  ADD_ZONE_DEVICE,
-  ADD_ZONE,
-  EDIT_ZONE,
-  REMOVE_ZONE_DEVICE,
-  REMOVE_ZONE,
-  SET_ZONES,
   ADD_PROFILE,
-  EDIT_PROFILE,
-  REMOVE_PROFILE,
-  SET_PROFILES,
+  ADD_ZONE,
+  ADD_ZONE_DEVICE,
+  Device,
   EDIT_DEVICE,
-  SET_DEVICES,
+  EDIT_PROFILE,
   EDIT_WORKER,
-  SET_WORKERS
+  EDIT_ZONE,
+  Profile,
+  REMOVE_DEVICE,
+  REMOVE_PROFILE,
+  REMOVE_WORKER,
+  REMOVE_ZONE,
+  REMOVE_ZONE_DEVICE,
+  SET_DEVICES,
+  SET_PROFILES,
+  SET_WORKERS,
+  SET_ZONES,
+  Worker,
+  Zone
 } from "./mutation-types";
 
 export default {
@@ -38,6 +40,11 @@ export default {
     HTTP.get("/devices").then(response => {
       commit(SET_DEVICES, response.data);
     });
+  },
+
+  removeDevice({ commit }, zone) {
+    HTTP.delete(`/devices/${zone.id}`);
+    commit(REMOVE_DEVICE, zone);
   },
 
   getWorkers({ commit }) {

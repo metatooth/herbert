@@ -37,16 +37,16 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM statuses WHERE meter = $1 ORDER BY id DESC LIMIT 1",
-      [req.query.meter]
+      "SELECT * FROM statuses WHERE device = $1 ORDER BY id DESC LIMIT 1",
+      [req.query.device]
     );
     res.status(200).json(rows[0]);
-  } else if (req.query.meter) {
+  } else if (req.query.device) {
     const {
       rows
     } = await query(
-      "SELECT * FROM statuses WHERE meter = $1 AND createdat > $2 ORDER BY id DESC",
-      [req.query.meter, start]
+      "SELECT * FROM statuses WHERE device = $1 AND createdat > $2 ORDER BY id DESC",
+      [req.query.device, start]
     );
     res.status(200).json(rows);
   } else {

@@ -39,9 +39,6 @@
       {{ device.manufacturer }}
     </td>
     <td>
-      <timestamp :timestamp="new Date(Date.parse(device.updatedat))" />
-    </td>
-    <td>
       <router-link
         :to="{
           name: 'readings',
@@ -60,6 +57,18 @@
       >
         &gt;&gt;&gt;
       </router-link>
+    </td>
+    <td>
+      <timestamp :timestamp="new Date(Date.parse(device.updatedat))" />
+    </td>
+    <td>
+      <div class="field">
+        <div class="control">
+          <button class="button is-danger" @click="destroy">
+            <font-awesome-icon icon="trash" />
+          </button>
+        </div>
+      </div>
     </td>
   </tr>
 </template>
@@ -97,6 +106,10 @@ const DeviceRow = Vue.extend({
   },
 
   methods: {
+    destroy() {
+      this.$store.dispatch("removeDevice", this.device);
+    },
+
     edit() {
       this.editing = true;
     },

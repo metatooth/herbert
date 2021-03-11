@@ -30,7 +30,7 @@
       </div>
     </td>
     <td>
-      <timestamp :timestamp="new Date(Date.parse(worker.udpatedat))" />
+      <timestamp :timestamp="new Date(Date.parse(worker.updatedat))" />
     </td>
   </tr>
 </template>

@@ -7,6 +7,7 @@
         v-bind:zone="zone"
         v-bind:key="zone.id"
         v-bind:units="units"
+        v-bind:zones="zones"
         v-bind:profiles="profiles"
         v-bind:devices="devices"
       />

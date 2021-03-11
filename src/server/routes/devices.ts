@@ -1,5 +1,5 @@
 import Router from "express-promise-router";
-
+import WebSocket from "ws";
 import { query, readDevice } from "../db";
 
 const router = Router();
@@ -26,6 +26,29 @@ router.put("/:id", async (req, res) => {
   console.log("UPDATED DEVICES", rows);
   const device = await readDevice(rows[0].device);
   console.log("DEVICE", device);
+  res.status(200).json(device);
+});
+
+router.put("/:id/:action", async (req, res) => {
+  const { id, action } = req.params;
+  const device = await readDevice(id);
+
+  const url = `ws://localhost:${process.env.PORT || 5000}`;
+  const ws = new WebSocket(url);
+
+  ws.addEventListener("open", ev => {
+    const data = {
+      type: "COMMAND",
+      payload: {
+        device: device.device,
+        action: action,
+        timestamp: new Date()
+      }
+    };
+
+    ws.send(JSON.stringify(data));
+  });
+
   res.status(200).json(device);
 });
 

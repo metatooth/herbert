@@ -73,7 +73,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Timestamp from "@/components/Timestamp";
 import EditControls from "@/components/EditControls.vue";
 
 const ZoneRow = Vue.extend({
@@ -86,8 +86,8 @@ const ZoneRow = Vue.extend({
   data() {
     return {
       nickname: this.zone.nickname,
-      profileId: this.zone.profile_id,
-      parentId: this.zone.parent_id,
+      profileid: this.zone.profileid,
+      parentid: this.zone.parentid,
       editing: false
     };
   },
