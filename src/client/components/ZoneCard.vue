@@ -89,7 +89,7 @@
       <div class="card-content">
         <select-profile
           label="Growing"
-          v-bind:profile="profile"
+          v-bind:profile="zone.profile"
           v-bind:profiles="profiles"
           @select-profile="saveProfile"
         />
