@@ -10,7 +10,6 @@
           <th>Manufacturer</th>
           <th>History</th>
           <th>Updated</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>

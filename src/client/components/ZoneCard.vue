@@ -31,6 +31,17 @@
               </span>
             </div>
           </div>
+
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="meanPressureIconClass">
+                <font-awesome-icon icon="cloud" />
+              </span>
+              <span class="tag is-medium" :class="meanPressureDisplayClass">
+                {{ meanPressure.toFixed(1) }} hPa
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -58,6 +69,17 @@
               </span>
               <span class="tag is-medium" :class="targetDisplayClass">
                 {{ targetHumidity.toFixed(0) }} %
+              </span>
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="targetIconClass">
+                <font-awesome-icon icon="cloud" />
+              </span>
+              <span class="tag is-medium" :class="targetDisplayClass">
+                {{ targetPressure.toFixed(1) }} hPa
               </span>
             </div>
           </div>
@@ -148,7 +170,11 @@ import SelectProfile from "@/components/SelectProfile";
 import Timestamp from "@/components/Timestamp";
 import Vue from "vue";
 import { LampTimer } from "../../shared/lamp-timer";
-import { celsius2fahrenheit } from "../../shared/utils";
+import {
+  celsius2fahrenheit,
+  fahrenheit2celsius,
+  vaporPressureDeficit
+} from "../../shared/utils";
 
 const ZoneCard = Vue.extend({
   props: {
@@ -168,6 +194,7 @@ const ZoneCard = Vue.extend({
       nickname: this.zone.nickname,
       readings: [],
       statuses: [],
+      timestamp: new Date(),
       editing: false
     };
   },
@@ -202,14 +229,14 @@ const ZoneCard = Vue.extend({
 
     isDay(): boolean {
       let day = true;
+
       if (this.zone.profile) {
         const start = this.zone.profile.lampstart.split(":");
         const duration = this.zone.profile.lampduration["hours"];
 
         const lamp = new LampTimer(parseInt(start[0]), duration);
 
-        const now = new Date();
-        const hour = now.getHours();
+        const hour = this.timestamp.getHours();
         console.log("Is daytime?", hour, lamp, lamp.isOn(hour));
         day = lamp.isOn(hour);
       }
@@ -234,6 +261,19 @@ const ZoneCard = Vue.extend({
         sum = sum + 100 * parseFloat(reading.humidity);
       });
       return sum / this.readings.length;
+    },
+
+    meanPressure(): number {
+      const delta = this.isDay ? -0.6 : 0.6;
+      let temp = this.meanTemperature;
+      if (this.units === "F") {
+        temp = fahrenheit2celsius(temp);
+      }
+
+      return (
+        vaporPressureDeficit(parseFloat(temp), delta, this.meanHumidity / 100) /
+        1000
+      );
     },
 
     meanTemperatureDisplayClass(): string {
@@ -270,6 +310,26 @@ const ZoneCard = Vue.extend({
       if (this.meanHumidity < this.targetHumidity) {
         return "has-text-info has-background-black";
       } else if (this.meanHumidity > this.targetHumidity) {
+        return "has-text-danger has-background-black";
+      } else {
+        return "has-text-success has-background-black";
+      }
+    },
+
+    meanPressureDisplayClass(): string {
+      if (this.meanPressure < this.targetPressure) {
+        return "has-text-white has-background-info";
+      } else if (this.meanPressure > this.targetPressure) {
+        return "has-text-white has-background-danger";
+      } else {
+        return "has-text-white has-background-success";
+      }
+    },
+
+    meanPressureIconClass(): string {
+      if (this.meanPressure < this.targetPressure) {
+        return "has-text-info has-background-black";
+      } else if (this.meanPressure > this.targetPressure) {
         return "has-text-danger has-background-black";
       } else {
         return "has-text-success has-background-black";
@@ -315,6 +375,22 @@ const ZoneCard = Vue.extend({
         }
       }
       return target;
+    },
+
+    targetPressure(): number {
+      const delta = this.isDay ? -0.6 : 0.6;
+      let temp = this.targetTemperature;
+      if (this.units === "F") {
+        temp = fahrenheit2celsius(temp);
+      }
+
+      return (
+        vaporPressureDeficit(
+          parseFloat(temp),
+          delta,
+          this.targetHumidity / 100
+        ) / 1000
+      );
     },
 
     temp(): number {
@@ -372,6 +448,8 @@ const ZoneCard = Vue.extend({
 
     refresh() {
       console.log("refresh readings & statuses");
+      this.timestamp = new Date();
+
       this.readings = [];
       this.statuses = [];
 
