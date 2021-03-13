@@ -1,6 +1,6 @@
 # Herbert
 
-An environmental control system using BLE devices and Node.js
+An environment control system with SwitchBot and WYZE devices.
 
 ## Getting Started
 
@@ -32,14 +32,20 @@ npm run serve:client
 # build all
 npm run build
 
-# build for production with minification
+# build client
 npm run build:client
+
+# build server
+npm run build:server
+
+# build worker
+npm run build:worker
 
 # run all tests
 npm test
 ```
 
-## Client Deployment
+## Worker Deployment
 
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
 

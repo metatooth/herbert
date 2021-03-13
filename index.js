@@ -1,6 +1,6 @@
-const role = (process.env.ROLE || 'client');
+const role = process.env.ROLE || "client";
 
-if (role === 'client') {
+if (role === "client") {
   const express = require("express");
   const app = express();
   const port = process.env.PORT || "8080";
@@ -11,5 +11,5 @@ if (role === 'client') {
     console.log(`Herbert ${role} listing at ${port}`);
   });
 } else {
-  require('./server');
+  require("./server");
 }

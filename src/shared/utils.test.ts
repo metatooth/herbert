@@ -1,5 +1,15 @@
 import * as utils from "./utils";
 
+test("celsius2fahrenheit", () => {
+  expect(utils.celsius2fahrenheit(0)).toBeClose(32, 0);
+  expect(utils.celsius2fahrenheit(100)).toBeClose(212, 0);
+});
+
+test("fahrenheit2celsius", () => {
+  expect(utils.fahrenheit2celsius(32)).toBeClose(0, 0);
+  expect(utils.fahrenheit2celsius(212)).toBeClose(100, 0);
+});
+
 test("saturated vapor pressure", () => {
   expect(utils.SaturatedVaporPressure(21.7)).toBeCloseTo(2595, 0);
   expect(utils.SaturatedVaporPressure(1)).toBeCloseTo(657, 0);

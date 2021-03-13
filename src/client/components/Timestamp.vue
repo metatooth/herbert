@@ -1,36 +1,35 @@
 <template>
   <span class="is-family-code">
-    {{ hhmm }}<span class="is-size-7">:{{ ss }}</span>
+    {{ hhmm }}<span class="is-size-7">{{ ss }}</span>
   </span>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { convertToLocalTime } from "date-fns-timezone";
 
 const Timestamp = Vue.extend({
   props: {
-    timestamp: { type: Date, default: new Date() }
+    timestamp: Date
+  },
+
+  data() {
+    return {
+      local: convertToLocalTime(this.timestamp, { timeZone: "Etc/UTC" })
+    };
   },
 
   computed: {
     hhmm(): string {
-      if (this.timestamp instanceof Date) {
-        return (
-          this.zeroes(this.timestamp.getHours()) +
-          ":" +
-          this.zeroes(this.timestamp.getMinutes())
-        );
-      } else {
-        return this.timestamp;
-      }
+      return (
+        this.zeroes(this.local.getHours()) +
+        ":" +
+        this.zeroes(this.local.getMinutes())
+      );
     },
 
     ss(): string {
-      if (this.timestamp instanceof Date) {
-        return this.zeroes(this.timestamp.getSeconds());
-      } else {
-        return this.timestamp;
-      }
+      return ":" + this.zeroes(this.local.getSeconds());
     }
   },
 

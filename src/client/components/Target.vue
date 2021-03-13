@@ -1,34 +1,49 @@
 <template>
-  <div class="tag">
-    <font-awesome-icon :icon="icon" />
-    &nbsp;
-    <span>{{ formatted }} {{ units }}</span>
+  <div class="control">
+    <div class="tags has-addons">
+      <span class="tag" :class="iconClass">
+        <font-awesome-icon :icon="icon" />
+      </span>
+      <span class="tag" :class="displayClass">
+        {{ formatted }} {{ units }}
+      </span>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Component from "vue-class-component";
 
-const TargetProps = Vue.extend({
+const Target = Vue.extend({
   props: {
-    icon: { type: String, default: "" },
-    value: { type: Number, default: 0 },
-    precision: { type: Number, default: 0 },
-    units: { type: String, default: "C" }
+    icon: String,
+    value: Number,
+    precision: Number,
+    units: String,
+    text: String,
+    background: String
+  },
+
+  computed: {
+    displayClass(): string {
+      return `display has-text-${this.text}-bis has-background-${this.background}`;
+    },
+
+    iconClass(): string {
+      return `has-text-${this.background} has-background-black-bis`;
+    },
+
+    formatted(): string {
+      return this.value.toFixed(this.precision);
+    }
   }
 });
 
-@Component
-export default class Target extends TargetProps {
-  get formatted(): string {
-    return this.value.toFixed(this.precision);
-  }
-}
+export default Target;
 </script>
 
-<style>
-.tag {
-  width: 300px;
+<style scoped>
+.display {
+  width: 60px;
 }
 </style>

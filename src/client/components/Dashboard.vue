@@ -1,64 +1,40 @@
 <template>
   <div id="dashboard">
-    <section class="section">
-      <notification
-        v-for="notification in notifications"
-        :key="notification.id"
-        v-bind="notification"
-        @delete-notification="deleteThisNotification(notification)"
-      />
-    </section>
-    <section class="section">
-      <span>{{ clients.length }} {{ clientsName }}</span>
-    </section>
-    <section class="section">
-      <form class="control">
-        <label for="celsius" class="radio">
-          <input id="celsius" v-model="units" type="radio" value="C" />
-          Celsius
-        </label>
-        &nbsp;
-        <label for="fahrenheit" class="radio">
-          <input id="fahrenheit" v-model="units" type="radio" value="F" />
-          Fahrenheit
-        </label>
-      </form>
-    </section>
-    <section class="section">
-      <client-card
-        v-for="client in clients"
-        :key="client.id"
-        :units="units"
-        v-bind="client"
-      />
-    </section>
-    <section class="section">
-      <div id="configurations" />
-    </section>
+    <notifications
+      v-bind:notifications="notifications"
+      @delete-notification="deleteNotification"
+    />
+    <zone-details
+      v-bind:zones="getterszones"
+      v-bind:profiles="gettersprofiles"
+      v-bind:devices="gettersdevices"
+      v-bind:units="units"
+    />
+    <profiles v-bind:profiles="gettersprofiles" v-bind:units="units" />
+    <zones
+      v-bind:zones="getterszones"
+      v-bind:profiles="gettersprofiles"
+      v-bind:units="units"
+    />
+
+    <devices v-bind:devices="gettersdevices" />
+    <workers v-bind:workers="gettersworkers" />
+    <units-selector v-bind:units="units" @change-units="changeUnits" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ClientCard from "@/components/ClientCard.vue";
-import Notification from "@/components/Notification.vue";
 
-interface ClientData {
-  id: string;
-  main: string;
-  intake: string;
-  units: string;
-  temperature: number;
-  humidity: number;
-  blower: number;
-  dehumidifier: number;
-  heater: number;
-  humidifier: number;
-  lamp: number;
-  timestamp: Date;
-}
+import Devices from "@/components/Devices.vue";
+import Notifications from "@/components/Notifications.vue";
+import Profiles from "@/components/Profiles.vue";
+import UnitsSelector from "@/components/UnitsSelector.vue";
+import Workers from "@/components/Workers.vue";
+import ZoneDetails from "@/components/ZoneDetails.vue";
+import Zones from "@/components/Zones.vue";
 
-interface NotificationData {
+interface Notification {
   id: string;
   plug: string;
   action: string;
@@ -70,41 +46,79 @@ interface NotificationData {
 const Dashboard = Vue.extend({
   data() {
     return {
-      clients: [] as ClientData[],
-      notifications: [] as NotificationData[],
+      notifications: [] as Notification[],
       units: "F"
     };
   },
 
   components: {
-    ClientCard,
-    Notification
+    Devices,
+    Notifications,
+    Profiles,
+    UnitsSelector,
+    Workers,
+    ZoneDetails,
+    Zones
+  },
+
+  computed: {
+    getterszones() {
+      return this.$store.getters.allZones;
+    },
+    zones() {
+      return this.$store.state.zones;
+    },
+    gettersprofiles() {
+      return this.$store.getters.allProfiles;
+    },
+    profiles() {
+      return this.$store.state.profiles;
+    },
+    gettersdevices() {
+      return this.$store.getters.allDevices;
+    },
+    devices() {
+      return this.$store.state.devices;
+    },
+    gettersworkers() {
+      return this.$store.getters.allWorkers;
+    },
+    workers() {
+      return this.$store.state.workers;
+    }
   },
 
   mounted() {
     console.log("Starting connection to WebSocket server...");
-    const ws = new WebSocket(process.env.VUE_APP_WS_URL || "ws://localhost:5000");
+
+    const ws = new WebSocket(
+      process.env.VUE_APP_WS_URL || "ws://localhost:5000"
+    );
+
     ws.addEventListener("open", (ev: Event) => {
       this.onWebsocketOpen(ev);
     });
+
     ws.addEventListener("message", (ev: MessageEvent) => {
       this.onWebsocketMessage(ev);
     });
-  },
 
-  computed: {
-    clientsName(): string {
-      if (this.clients.length === 1) {
-        return "client";
-      } else {
-        return "clients";
-      }
-    }
+    this.$store.dispatch("getZones");
+    this.$store.dispatch("getProfiles");
+    this.$store.dispatch("getDevices");
+    this.$store.dispatch("getWorkers");
   },
 
   methods: {
-    deleteThisNotification(notification: NotificationData): void {
-      this.notifications.splice(this.notifications.indexOf(notification), 1);
+    changeUnits(units: string) {
+      this.units = units;
+    },
+
+    deleteNotification(n: Notification): void {
+      console.log("we are here", n);
+      const found = this.notifications.findIndex(el => el.id === n.id);
+      console.log("found!", found);
+      this.notifications.splice(found, 1);
     },
 
     onWebsocketOpen(ev: Event): void {
@@ -114,69 +128,11 @@ const Dashboard = Vue.extend({
 
     onWebsocketMessage(ev: MessageEvent): void {
       const data = JSON.parse(ev.data);
-
-      if (data.temperature) {
-        let found = false;
-        this.clients.forEach((c: ClientData) => {
-          if (c.id === data.id) {
-            c.units = this.units;
-            c.temperature = data.temperature;
-            c.humidity = 100 * data.humidity;
-            c.blower = data.blower ? 1 : 0;
-            c.dehumidifier = data.dehumidifier ? 1 : 0;
-            c.heater = data.heater ? 1 : 0;
-            c.humidifier = data.humidifier ? 1 : 0;
-            c.lamp = data.lamp ? 1 : 0;
-            c.timestamp = new Date();
-            found = true;
-          }
-        });
-
-        if (!found) {
-          const cd: ClientData = {
-            id: data.id,
-            main: data.main_meter,
-            intake: data.intake_meter,
-            units: this.units,
-            temperature: data.temperature,
-            humidity: 100 * data.humidity,
-            blower: data.blower ? 1 : 0,
-            dehumidifier: data.dehumidifer ? 1 : 0,
-            heater: data.heater ? 1 : 0,
-            humidifier: data.humidifier ? 1 : 0,
-            lamp: data.lamp ? 1 : 0,
-            timestamp: new Date()
-          };
-
-          this.clients.push(cd);
-        }
-      } else if (data.code) {
-        let found = false;
-        console.log(data.code);
-        this.notifications.forEach((nd: NotificationData) => {
-          console.log(nd);
-          if (nd.id === data.id) {
-            nd.plug = data.plug;
-            nd.action = data.action;
-            nd.code = data.code;
-            nd.message = data.message;
-            nd.timestamp = new Date();
-            found = true;
-          }
-        });
-
-        if (!found) {
-          const nd: NotificationData = {
-            id: data.id,
-            plug: data.plug,
-            action: data.action,
-            code: data.code,
-            message: data.message,
-            timestamp: new Date()
-          };
-
-          this.notifications.push(nd);
-        }
+      console.log("message with data", data);
+      if (data.type === "STATUS") {
+        console.log("Status report!");
+      } else {
+        console.log("Unhandled Message", data);
       }
     }
   }

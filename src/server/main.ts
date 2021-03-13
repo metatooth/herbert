@@ -1,51 +1,67 @@
 import WebSocket from "ws";
+import config from "config";
 import express from "express";
+import cors from "cors";
 import http from "http";
-import { createMeterReading, meterReadings } from "../shared/db";
+import mountRoutes from "./routes";
+import {
+  readZones,
+  reading,
+  readZoneDevices,
+  registerDevice,
+  registerWorker,
+  createReading,
+  createStatus
+} from "./db";
+
+import path from "path";
+import favicon from "serve-favicon";
+
+import { AirDirectives } from "../shared/air-directives";
+import { BlowerTimer } from "../shared/blower-timer";
+import { Clime } from "../shared/clime";
+import { LampTimer } from "../shared/lamp-timer";
+import { TargetTempHumidity } from "../shared/target-temp-humidity";
 
 const app = express();
+console.log("== Herbert Server == Starting Up ==");
+console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
+
+app.use(favicon(path.join(__dirname, "favicon.ico")));
+console.log("favicon!");
+
+app.use(express.json());
+console.log("JSON support");
+
+app.use(cors());
+console.log("cors added");
+
+mountRoutes(app);
+console.log("routes added");
+
 const port = process.env.PORT || 5000;
-
-app.use(function(req, res, next) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
-  next();
-});
-
-app.param("meter", (req, res, next, id) => {
-  console.log("meter reading for", id);
-  meterReadings(id).then(readings => {
-    if (readings.length > 0) {
-      res.status(200).json(readings);
-      next();
-    } else {
-      next(new Error("failed to find meter"));
-    }
-  });
-});
 
 app.get("/", (req, res) => {
   res.send("OK");
 });
 
-app.get("/readings/:meter", (req, res, next) => {
+app.use(function(err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: err
+  });
   next();
 });
 
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render("error", {
-    message: err.message,
-    error: {}
-  });
-});
+function sendError(ws: WebSocket, message: string) {
+  const messageObject = {
+    type: "ERROR",
+    payload: message
+  };
+
+  ws.send(JSON.stringify(messageObject));
+}
 
 const server = http.createServer(app);
 server.listen(port);
@@ -54,33 +70,159 @@ console.log("http server listening on %d", port);
 const wss = new WebSocket.Server({ server: server });
 console.log("websocket server created");
 
-let sockets: WebSocket[] = [];
-wss.on("connection", function(socket: WebSocket) {
+wss.on("connection", function(ws: WebSocket) {
   console.log("websocket connection open");
-  sockets.push(socket);
 
-  // When you receive a message, send that message to every socket.
-  socket.on("message", function(msg: string) {
+  ws.on("message", async function(msg: string) {
     console.log(msg);
-    const data = JSON.parse(msg);
-    console.log(data.id, data.temperature, data.humidity);
-    if (data.main_meter) {
-      createMeterReading(data.main_meter, data.temperature, data.humidity);
+
+    let data;
+    try {
+      data = JSON.parse(msg);
+    } catch (e) {
+      sendError(ws, e);
+      return;
     }
 
-    if (data.intake_meter) {
-      createMeterReading(
-        data.intake_meter,
-        data.intake_temperature,
-        data.intake_humidity
-      );
+    if (!data.type || !data.payload) {
+      sendError(ws, "Message must specify type & payload.");
+      return;
     }
 
-    sockets.forEach(s => s.send(msg));
-  });
+    if (data.type === "STATUS") {
+      if (data.payload.device && data.payload.type === "meter") {
+        console.log("Status message from meter", data.payload);
+        registerDevice(
+          data.payload.device,
+          data.payload.manufacturer,
+          data.payload.type
+        );
+        createReading(
+          data.payload.device,
+          data.payload.temperature,
+          data.payload.humidity,
+          data.payload.pressure
+        );
+      } else if (data.payload.device) {
+        console.log("Status message from switch", data.payload);
+        registerDevice(
+          data.payload.device,
+          data.payload.manufacturer,
+          data.payload.type
+        );
+        createStatus(data.payload.device, data.payload.status);
+      }
 
-  // When a socket closes, or disconnects, remove it from the array.
-  socket.on("close", function() {
-    sockets = sockets.filter(s => s !== socket);
+      if (data.payload.worker) {
+        console.log("Status message from worker", data.payload);
+        registerWorker(data.payload.worker, data.payload.nickname);
+      }
+    }
+
+    wss.clients.forEach(client => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(msg);
+      }
+    });
   });
 });
+
+async function run() {
+  const zones = await readZones();
+  zones.forEach(async zone => {
+    const now = new Date();
+    const hour = now.getHours();
+    const min = now.getMinutes();
+    const sec = now.getSeconds();
+
+    if (zone.profile) {
+      console.log("command for zone", zone.nickname);
+      let temperature = 0;
+      let humidity = 0;
+      const count = 0;
+      await Promise.all(
+        zone.devices.map(async device => {
+          if (device.devicetype === "meter") {
+            const rdg = await reading(device.device);
+            console.log("lastest reading", rdg);
+            temperature = (count * temperature + rdg.temperature) / (count + 1);
+            humidity = (count * humidity + 100 * rdg.humidity) / (count + 1);
+          }
+        })
+      );
+
+      console.log("profile", zone.profile);
+      console.log("state", hour, temperature, humidity);
+
+      const start = zone.profile.lampstart.split(":");
+      const duration = zone.profile.lampduration["hours"];
+
+      const lamp = new LampTimer(parseInt(start[0]), duration);
+
+      const blower = new BlowerTimer(60, 180); // WARNING!!
+
+      let target;
+      let delta;
+
+      if (lamp.isOn(hour)) {
+        console.log("lamps", lamp, "ON");
+        target = new TargetTempHumidity([
+          zone.profile.lampontemperature,
+          zone.profile.lamponhumidity
+        ]);
+        delta = -0.6;
+      } else {
+        console.log("lamps", lamp, "OFF");
+        target = new TargetTempHumidity([
+          zone.profile.lampofftemperature,
+          zone.profile.lampoffhumidity
+        ]);
+        delta = 0.6;
+      }
+
+      const directives = new AirDirectives(target);
+      directives.clime = new Clime(temperature, delta, humidity);
+      directives.monitor();
+
+      console.log(directives);
+
+      console.log("blower is on", min, sec, blower.isOn(min * 60 + sec));
+
+      const systems = new Map([
+        ["lamp", lamp.isOn(hour)],
+        ["blower", blower.isOn(min * 60 + sec)],
+        ["heater", directives.temperature === "heat"],
+        ["dehumidifer", directives.humidity === "dehumidify"],
+        ["humidifier", directives.humidity === "humidify"]
+      ]);
+
+      console.log(systems);
+
+      systems.forEach((value, key) => {
+        zone.devices.map(device => {
+          if (device.devicetype === key) {
+            const action = value ? "on" : "off";
+            const data = {
+              type: "COMMAND",
+              payload: {
+                device: device.device,
+                action: action,
+                timestamp: new Date()
+              }
+            };
+            console.log("sending...", data);
+            wss.clients.forEach(client => {
+              client.send(JSON.stringify(data));
+            });
+          }
+        });
+      });
+    }
+  });
+
+  setTimeout(run, config.get("interval") * 1000);
+}
+
+(async () => {
+  run();
+})();
