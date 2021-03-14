@@ -32,8 +32,9 @@ export class App {
   meters: Array<Meter>;
   switches: Array<Switch>;
   macaddr: string;
+  inet: string;
   heldMessages: Array<string>;
-  wyze: any;
+  wyze: Wyze;
 
   private constructor() {
     console.log("process.argv", process.argv);
@@ -104,6 +105,7 @@ export class App {
     }
 
     this.macaddr = net[0]["mac"];
+    this.inet = net[0]["address"];
 
     const meters = this.meters;
     const switches = this.switches;
@@ -227,12 +229,12 @@ export class App {
     this.send(data);
   }
 
-  private async workerStatus(macaddr: string, nickname: string) {
+  private async workerStatus(macaddr: string, inet: string) {
     const data = {
       type: "STATUS",
       payload: {
         worker: macaddr,
-        nickname: nickname,
+        inet: inet,
         timestamp: new Date()
       }
     };
@@ -245,7 +247,7 @@ export class App {
       await app.init();
     }
 
-    app.workerStatus(this.macaddr, config.get("nickname"));
+    app.workerStatus(this.macaddr, this.inet);
 
     const polling: number = 1000 * parseInt(config.get("polling"));
     const interval: number = 1000 * parseInt(config.get("interval"));

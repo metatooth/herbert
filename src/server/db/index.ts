@@ -120,14 +120,22 @@ export async function registerDevice(macaddr, manufacturer, type) {
   });
 }
 
-export async function registerWorker(macaddr, nickname) {
+export async function workerStatus(macaddr, inet) {
   query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
       console.log("inserting", macaddr);
-      query("INSERT INTO workers (worker, nickname) VALUES ($1, $2)", [
+      query("INSERT INTO workers (worker, inet) VALUES ($1, $2)", [
         macaddr,
-        nickname
+        inet
       ]);
+    } else if (res.rowCount === 1) {
+      console.log("updating", macaddr);
+      query(
+        "UPDATE workers SET inet = $1, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
+        [inet, macaddr]
+      );
+    } else {
+      // error
     }
   });
 }

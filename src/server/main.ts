@@ -7,11 +7,10 @@ import mountRoutes from "./routes";
 import {
   readZones,
   reading,
-  readZoneDevices,
   registerDevice,
-  registerWorker,
   createReading,
-  createStatus
+  createStatus,
+  workerStatus
 } from "./db";
 
 import path from "path";
@@ -115,7 +114,7 @@ wss.on("connection", function(ws: WebSocket) {
 
       if (data.payload.worker) {
         console.log("Status message from worker", data.payload);
-        registerWorker(data.payload.worker, data.payload.nickname);
+        workerStatus(data.payload.worker, data.payload.inet);
       }
     }
 

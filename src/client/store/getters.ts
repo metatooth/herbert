@@ -1,8 +1,8 @@
 const getters = {
-  allZones: (state: any) => state.zones,
-  allProfiles: (state: any) => state.profiles,
-  allDevices: (state: any) => state.devices,
-  allWorkers: (state: any) => state.workers
+  allZones: (state: Store) => state.zones,
+  allProfiles: (state: Store) => state.profiles,
+  allDevices: (state: Store) => state.devices,
+  allWorkers: (state: Store) => state.workers
 };
 
 export default getters;

@@ -37,6 +37,7 @@ router.put("/:id/:action", async (req, res) => {
   const ws = new WebSocket(url);
 
   ws.addEventListener("open", ev => {
+    console.log("event", ev);
     const data = {
       type: "COMMAND",
       payload: {

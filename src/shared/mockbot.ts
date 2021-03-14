@@ -2,7 +2,7 @@ const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export class Mockbot {
   id: string;
-  onadvertisement: any;
+  onadvertisement: Function;
 
   constructor(id: string) {
     this.id = id;

@@ -96,11 +96,18 @@ const Dashboard = Vue.extend({
     );
 
     ws.addEventListener("open", (ev: Event) => {
-      this.onWebsocketOpen(ev);
+      console.log(ev);
+      console.log("Connection open success!");
     });
 
     ws.addEventListener("message", (ev: MessageEvent) => {
-      this.onWebsocketMessage(ev);
+      const data = JSON.parse(ev.data);
+      console.log("message with data", data);
+      if (data.type === "STATUS") {
+        console.log("Status report!");
+      } else {
+        console.log("Unhandled Message", data);
+      }
     });
 
     this.$store.dispatch("getZones");
@@ -121,20 +128,6 @@ const Dashboard = Vue.extend({
       this.notifications.splice(found, 1);
     },
 
-    onWebsocketOpen(ev: Event): void {
-      console.log(ev);
-      console.log("Connection open success!");
-    },
-
-    onWebsocketMessage(ev: MessageEvent): void {
-      const data = JSON.parse(ev.data);
-      console.log("message with data", data);
-      if (data.type === "STATUS") {
-        console.log("Status report!");
-      } else {
-        console.log("Unhandled Message", data);
-      }
-    }
   }
 });
 

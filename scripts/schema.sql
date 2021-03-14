@@ -63,6 +63,7 @@ create table profiles (
 create table workers (
   worker macaddr primary key,
   nickname varchar(255) unique,
+  inet inet,
   createdAt timestamp default current_timestamp,
   updatedAt timestamp default current_timestamp,
   deleted boolean default false,
