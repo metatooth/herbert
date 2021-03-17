@@ -9,11 +9,11 @@
           <div class="select">
             <select v-model="selected">
               <option
-                v-for="device in devices"
-                v-bind:key="device.device"
-                v-bind:value="device.device"
+                v-for="ds in devices"
+                v-bind:key="ds.device.device"
+                v-bind:value="ds.device.device"
               >
-                {{ device.nickname || device.device }}
+                {{ ds.device.nickname || ds.device.device }}
               </option>
             </select>
           </div>
@@ -30,17 +30,21 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapState } from "vuex";
 
 const SelectDevice = Vue.extend({
   props: {
-    label: String,
-    devices: Array
+    label: String
   },
 
   data() {
     return {
-      selected: String
+      selected: ""
     };
+  },
+
+  computed: {
+    ...mapState(["devices/devices"])
   },
 
   methods: {

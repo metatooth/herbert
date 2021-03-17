@@ -1,8 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Dashboard from "@/components/Dashboard.vue";
-import Readings from "@/components/Readings.vue";
-import Statuses from "@/components/Statuses.vue";
+import Dashboard from "@/pages/Dashboard.vue";
+import Readings from "@/pages/Readings.vue";
+import Statuses from "@/pages/Statuses.vue";
 
 Vue.use(VueRouter);
 

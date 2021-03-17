@@ -133,7 +133,7 @@ async function run() {
     const hour = now.getHours();
     const min = now.getMinutes();
     const sec = now.getSeconds();
-
+    console.log("zone is", zone);
     if (zone.profile) {
       console.log("command for zone", zone.nickname);
       let temperature = 0;

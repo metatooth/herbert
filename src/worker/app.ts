@@ -78,6 +78,7 @@ export class App {
       meter.clime.delta = 0.6; // WARNING!
       meter.clime.humidity = ad.serviceData.humidity / 100.0;
       meter.clime.timestamp = new Date();
+      logger.debug(meter.device, meter.clime);
       app.meterStatus(meter);
     }
 
@@ -171,7 +172,7 @@ export class App {
                 const herbert = plug as Herbert;
                 console.log("HERBERT", herbert);
                 if (herbert.device === data.payload.device) {
-                  console.log("CHANGE", herbert, data.payload.action);
+                  logger.debug("CHANGE", herbert, data.payload.action);
                   if (data.payload.action === "on") {
                     herbert.on();
                   } else {

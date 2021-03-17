@@ -1,12 +1,11 @@
 <template>
   <section class="section">
-    <h2 id="zones" class="title">{{ zones.length }} {{ zonesName }}</h2>
+    <h2 id="zones" class="title">{{ zonesCount }} {{ zonesName }}</h2>
     <table class="table is-fullwidth is-striped">
       <thead>
         <tr>
           <th>Name</th>
           <th>Profile</th>
-          <th>Parent</th>
           <th>Updated</th>
           <th></th>
         </tr>
@@ -17,8 +16,6 @@
           v-bind:key="zone.id"
           v-bind::units="units"
           v-bind:zone="zone"
-          v-bind:profiles="profiles"
-          v-bind:zones="zones"
         />
         <tr>
           <td>
@@ -48,18 +45,6 @@
             </div>
           </td>
 
-          <td>
-            <div class="control" v-if="adding">
-              <div class="select">
-                <select v-model="parent">
-                  <option v-for="zone in zones" :key="zone.id" :value="zone.id">
-                    {{ zone.nickname }}
-                  </option>
-                </select>
-              </div>
-            </div>
-          </td>
-
           <td></td>
 
           <td>
@@ -78,11 +63,10 @@
 import Vue from "vue";
 import ZoneRow from "@/components/ZoneRow.vue";
 import AddControls from "@/components/AddControls.vue";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 const Zones = Vue.extend({
   props: {
-    zones: Array,
-    profiles: Array,
     units: String
   },
 
@@ -90,7 +74,6 @@ const Zones = Vue.extend({
     return {
       nickname: "",
       profile: "",
-      parent: "",
       adding: false
     };
   },
@@ -102,7 +85,7 @@ const Zones = Vue.extend({
 
   computed: {
     zonesName(): string {
-      if (this.zones.length === 1) {
+      if (this.$store.getters.zones.zonesCount === 1) {
         return "Zone";
       } else {
         return "Zones";
@@ -118,19 +101,16 @@ const Zones = Vue.extend({
     save(): void {
       this.$store.dispatch("addZone", {
         nickname: this.nickname,
-        profile: this.profile,
-        parent: this.parent
+        profile: this.profile
       });
       this.nickname = "";
       this.profile = "";
-      this.parent = "";
       this.adding = false;
     },
 
     cancel(): void {
       this.nickname = "";
       this.profile = "";
-      this.parent = "";
       this.adding = false;
     }
   }

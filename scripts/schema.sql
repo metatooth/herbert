@@ -1,5 +1,16 @@
 begin;
 
+create table profiles (
+  id serial primary key,
+  units char,
+  locale varchar(255),
+  timezone varchar(255),
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
+  deleted boolean default false,
+  deletedat timestamp
+);
+
 create table manufacturers (
   manufacturer varchar(255) primary key,
   username varchar(255),
@@ -64,10 +75,10 @@ create table workers (
   worker macaddr primary key,
   nickname varchar(255) unique,
   inet inet,
-  createdAt timestamp default current_timestamp,
-  updatedAt timestamp default current_timestamp,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deletedAt timestamp
+  deletedat timestamp
 );
 
 create table worker_devices (
@@ -79,8 +90,8 @@ create table worker_devices (
 create table zones (
   id serial primary key,
   nickname varchar(255) unique,
-  parentid integer references zones(id),
   profileid integer references profiles(id),
+  timezone varchar(255),
   createdat timestamp default current_timestamp,
   updatedat timestamp default current_timestamp,
   deleted boolean default false,

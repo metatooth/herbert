@@ -120,7 +120,7 @@ const Readings = Vue.extend({
           const timeZone = "Etc/UTC";
           data.forEach(
             (d: {
-              created_at: Date;
+              createdat: Date;
               temperature: number;
               humidity: number;
               pressure: number;

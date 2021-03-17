@@ -7,25 +7,19 @@
       <div class="field has-addons">
         <div class="control">
           <div class="select">
-            <select v-model="selected">
+            <select>
               <option
-                v-for="profile in profiles"
-                v-bind:key="profile.id"
-                v-bind:value="profile.id"
+                v-for="ps in profiles"
+                v-bind:key="ps.profile.id"
+                v-bind:value="ps.profile.id"
               >
-                {{ profile.profile }}
+                {{ ps.profile.profile }}
               </option>
             </select>
           </div>
         </div>
 
-        <herbert-button
-          class="is-primary"
-          :show="changed"
-          label=""
-          @on-click="select"
-          icon="check"
-        />
+        <herbert-button class="is-primary" label="" icon="check" />
       </div>
     </div>
   </div>
@@ -33,44 +27,21 @@
 
 <script lang="ts">
 import Vue from "vue";
-import HerbertButton from "@/components/Button";
+import HerbertButton from "@/components/Button.vue";
+import { mapState } from "vuex";
 
 const SelectProfile = Vue.extend({
   props: {
     label: String,
-    profile: Object,
-    profiles: Array
+    profileid: Number
   },
 
   components: {
     HerbertButton
   },
 
-  data() {
-    let id;
-    if (this.profile) {
-      id = this.profile.id;
-    }
-
-    return {
-      selected: id,
-      editing: false
-    };
-  },
-
   computed: {
-    changed() {
-      if (this.profile) {
-        return this.profile.id !== this.selected;
-      }
-      return true;
-    }
-  },
-
-  methods: {
-    select() {
-      this.$emit("select-profile", this.selected);
-    }
+    ...mapState(["profiles/profiles"])
   }
 });
 

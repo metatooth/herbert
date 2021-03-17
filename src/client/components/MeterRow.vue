@@ -44,16 +44,6 @@
           name: 'readings',
           params: { name: state.device.nickname, meter: state.device.device }
         }"
-        v-if="isMeter"
-      >
-        &gt;&gt;&gt;
-      </router-link>
-      <router-link
-        :to="{
-          name: 'statuses',
-          params: { name: state.device.nickname, device: state.device.device }
-        }"
-        v-if="isSwitch"
       >
         &gt;&gt;&gt;
       </router-link>
@@ -71,7 +61,7 @@ import Vue from "vue";
 import { mapState, mapGetters, mapActions } from "vuex";
 import { DeviceState } from "@/store/devices/types";
 
-const DeviceRow = Vue.extend({
+const MeterRow = Vue.extend({
   props: {
     state: DeviceState
   },
@@ -82,25 +72,10 @@ const DeviceRow = Vue.extend({
   },
 
   data() {
-    let nickname = "";
-    if (this.state.device) {
-      nickname = this.state.device.nickname;
-    }
-
     return {
-      nickname: nickname,
+      nickname: this.state.device.nickname,
       editing: false
     };
-  },
-
-  computed: {
-    isMeter() {
-      return this.state.device.devicetype === "meter";
-    },
-
-    isSwitch() {
-      return this.state.device.devicetype !== "meter";
-    }
   },
 
   methods: {
@@ -134,5 +109,5 @@ const DeviceRow = Vue.extend({
   }
 });
 
-export default DeviceRow;
+export default MeterRow;
 </script>

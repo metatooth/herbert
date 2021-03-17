@@ -14,9 +14,9 @@
       </thead>
       <tbody>
         <device-row
-          v-for="device in devices"
-          v-bind:key="device.device"
-          v-bind:device="device"
+          v-for="devicestate in devices"
+          v-bind:key="devicestate.device"
+          v-bind:state="devicestate"
         />
       </tbody>
     </table>
@@ -29,19 +29,20 @@
 <script lang="ts">
 import Vue from "vue";
 import DeviceRow from "@/components/DeviceRow.vue";
+import { mapState, mapGetters } from "vuex";
 
 const Devices = Vue.extend({
-  props: {
-    devices: Array
-  },
-
   components: {
     DeviceRow
   },
 
   computed: {
+    ...mapState(["devices"]),
+
+    ...mapGetters(["devicesCount"]),
+
     devicesName() {
-      if (this.devices.length === 1) {
+      if (this.devicesCount === 1) {
         return "Device";
       } else {
         return "Devices";

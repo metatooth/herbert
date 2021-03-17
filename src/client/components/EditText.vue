@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import HerbertButton from "@/components/Button";
+import HerbertButton from "@/components/Button.vue";
 
 const EditText = Vue.extend({
   props: {

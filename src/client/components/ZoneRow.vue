@@ -58,7 +58,7 @@
       </div>
     </td>
     <td>
-      <timestamp :timestamp="zoneUpdatedAt" />
+      <timestamp :timestamp="zone.updatedat" />
     </td>
     <td>
       <edit-controls
@@ -73,7 +73,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Timestamp from "@/components/Timestamp";
+import Timestamp from "@/components/Timestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 
 const ZoneRow = Vue.extend({
@@ -113,16 +113,11 @@ const ZoneRow = Vue.extend({
     },
 
     save() {
-      const parent = this.zones.find(el => el.id === this.parentid);
-      const profile = this.profiles.find(el => el.id === this.profileid);
-
       const zone = {
         id: this.zone.id,
         nickname: this.nickname,
         profileid: this.profileid,
-        profile: profile.profile,
-        parentid: this.parentid,
-        parent: parent.nickname
+        parentid: this.parentid
       };
 
       this.$store.dispatch("editZone", zone);

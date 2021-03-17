@@ -2,7 +2,10 @@
   <div :id="anchor" class="column">
     <div class="card">
       <div class="card-content">
-        <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
+        <edit-text
+          v-bind:text="state.zone.nickname"
+          @edit-text="saveNickname"
+        />
       </div>
 
       <div class="card-content">
@@ -89,8 +92,7 @@
       <div class="card-content">
         <select-profile
           label="Growing"
-          v-bind:profile="profile"
-          v-bind:profiles="profiles"
+          v-bind:profileid="profileid"
           @select-profile="saveProfile"
         />
       </div>
@@ -155,7 +157,7 @@
 
       <footer class="card-footer">
         <div class="card-footer-item">
-          <timestamp :timestamp="new Date(Date.parse(zone.updatedat))" />
+          <timestamp :timestamp="new Date(Date.parse(state.zone.updatedat))" />
         </div>
       </footer>
     </div>
@@ -163,37 +165,46 @@
 </template>
 
 <script lang="ts">
-import EditText from "@/components/EditText";
+import EditText from "@/components/EditText.vue";
 import HTTP from "@/api/http";
-import SelectDevice from "@/components/SelectDevice";
-import SelectProfile from "@/components/SelectProfile";
-import Timestamp from "@/components/Timestamp";
+import SelectDevice from "@/components/SelectDevice.vue";
+import SelectProfile from "@/components/SelectProfile.vue";
+import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
+import { Device, DeviceState } from "@/store/devices/types";
 import { LampTimer } from "../../shared/lamp-timer";
+import { Worker } from "@/store/workers/types";
+import { ZoneState } from "@/store/zones/types";
 import {
   celsius2fahrenheit,
   fahrenheit2celsius,
   vaporPressureDeficit
 } from "../../shared/utils";
 
+interface Reading {
+  temperature: number;
+  humidity: number;
+  pressure: number;
+  createdat: Date;
+}
+
+interface Status {
+  state: number;
+  createdat: Date;
+}
+
 const ZoneCard = Vue.extend({
   props: {
-    zone: Object,
-    zones: Array,
-    profiles: Array,
-    devices: Array,
+    state: ZoneState,
     units: String
   },
 
   data() {
     return {
-      profileid: this.zone.profileid,
-      profile: this.zone.profile,
-      parentid: this.zone.parentid,
-      parent: this.zone.parent,
-      nickname: this.zone.nickname,
-      readings: [],
-      statuses: [],
+      profileid: this.state.zone.profileid,
+      nickname: this.state.zone.nickname,
+      readings: [] as Reading[],
+      statuses: [] as Status[],
       timestamp: new Date(),
       editing: false
     };
@@ -208,20 +219,23 @@ const ZoneCard = Vue.extend({
 
   computed: {
     anchor(): string {
-      return this.zone.id + "config";
+      if (this.state.zone) {
+        return this.state.zone.id + "config";
+      }
+      return "nullconfig";
     },
 
     allMeters(): [] {
-      const result = this.devices;
-      const filter = event => {
+      const result = this.$store.getters.devices.allDevices;
+      const filter = (event: Device) => {
         return event.devicetype === "meter";
       };
       return result.filter(filter);
     },
 
     allSwitches(): [] {
-      const result = this.devices;
-      const filter = event => {
+      const result = this.$store.getters.devices.allDevices;
+      const filter = (event: Device) => {
         return event.devicetype !== "meter";
       };
       return result.filter(filter);
@@ -230,9 +244,9 @@ const ZoneCard = Vue.extend({
     isDay(): boolean {
       let day = true;
 
-      if (this.zone.profile) {
-        const start = this.zone.profile.lampstart.split(":");
-        const duration = this.zone.profile.lampduration["hours"];
+      if (this.state.zone && this.state.zone.profile) {
+        const start = this.state.zone.profile.lampstart.split(":");
+        const duration = this.state.zone.profile.lampduration["hours"];
 
         const lamp = new LampTimer(parseInt(start[0]), duration);
 
@@ -240,13 +254,14 @@ const ZoneCard = Vue.extend({
         console.log("Is daytime?", hour, lamp, lamp.isOn(hour));
         day = lamp.isOn(hour);
       }
+
       return day;
     },
 
     meanTemperature(): number {
       let sum = 0;
       this.readings.forEach(reading => {
-        sum = sum + parseFloat(reading.temperature);
+        sum = sum + reading.temperature;
       });
       const mean = sum / this.readings.length;
       if (this.units === "F") {
@@ -258,7 +273,7 @@ const ZoneCard = Vue.extend({
     meanHumidity(): number {
       let sum = 0;
       this.readings.forEach(reading => {
-        sum = sum + 100 * parseFloat(reading.humidity);
+        sum = sum + 100 * reading.humidity;
       });
       return sum / this.readings.length;
     },
@@ -270,10 +285,7 @@ const ZoneCard = Vue.extend({
         temp = fahrenheit2celsius(temp);
       }
 
-      return (
-        vaporPressureDeficit(parseFloat(temp), delta, this.meanHumidity / 100) /
-        1000
-      );
+      return vaporPressureDeficit(temp, delta, this.meanHumidity / 100) / 1000;
     },
 
     meanTemperatureDisplayClass(): string {
@@ -355,23 +367,24 @@ const ZoneCard = Vue.extend({
     targetTemperature(): number {
       let target = 15;
 
-      if (this.zone.profile) {
+      if (this.state.zone && this.state.zone.profile) {
         if (this.isDay) {
-          target = parseFloat(this.zone.profile.lampontemperature);
+          target = this.state.zone.profile.lampontemperature;
         } else {
-          target = parseFloat(this.zone.profile.lampofftemperature);
+          target = this.state.zone.profile.lampofftemperature;
         }
       }
+
       return this.units === "F" ? celsius2fahrenheit(target) : target;
     },
 
     targetHumidity(): number {
       let target = 20;
-      if (this.zone.profile) {
+      if (this.state.zone && this.state.zone.profile) {
         if (this.isDay) {
-          target = parseFloat(this.zone.profile.lamponhumidity);
+          target = this.state.zone.profile.lamponhumidity;
         } else {
-          target = parseFloat(this.zone.profile.lampoffhumidity);
+          target = this.state.zone.profile.lampoffhumidity;
         }
       }
       return target;
@@ -385,40 +398,34 @@ const ZoneCard = Vue.extend({
       }
 
       return (
-        vaporPressureDeficit(
-          parseFloat(temp),
-          delta,
-          this.targetHumidity / 100
-        ) / 1000
+        vaporPressureDeficit(temp, delta, this.targetHumidity / 100) / 1000
       );
-    },
-
-    temp(): number {
-      if (this.units === "F") {
-        return celsius2fahrenheit(this.zone.temperature);
-      } else {
-        return this.zone.temperature;
-      }
     },
 
     unitsWithDegree(): string {
       return "°" + this.units;
     },
 
-    zoneMeters(): [] {
-      const result = this.zone.devices;
-      const filter = event => {
-        return event.devicetype === "meter";
-      };
-      return result.filter(filter);
+    zoneMeters(): Device[] {
+      if (this.state.zone) {
+        const result = this.state.zone.devices;
+        const filter = (event: Device) => {
+          return event.devicetype === "meter";
+        };
+        return result.filter(filter);
+      }
+      return [];
     },
 
-    zoneSwitches(): [] {
-      const result = this.zone.devices;
-      const filter = event => {
-        return event.devicetype !== "meter";
-      };
-      return result.filter(filter);
+    zoneSwitches(): Device[] {
+      if (this.state.zone) {
+        const result = this.state.zone.devices;
+        const filter = (event: Device) => {
+          return event.devicetype !== "meter";
+        };
+        return result.filter(filter);
+      }
+      return [];
     }
   },
 
@@ -427,18 +434,19 @@ const ZoneCard = Vue.extend({
   },
 
   methods: {
-    addDevice(selected) {
-      const payload = { zoneid: this.zone.id, device: selected };
-      this.$store.dispatch("addZoneDevice", payload);
-      this.$store.dispatch("getZones");
+    addDevice(selected: Device) {
+      if (this.state.zone) {
+        const payload = { zoneid: this.state.zone.id, device: selected };
+        this.$store.dispatch("addZoneDevice", payload);
+        this.$store.dispatch("getZones");
+      }
     },
 
     cancel() {
-      this.profileid = this.zone.profileid;
-      this.profile = this.zone.profile;
-      this.parentid = this.zone.parentid;
-      this.parent = this.zone.parent;
-      this.nickname = this.zone.nickname;
+      if (this.state.zone) {
+        this.profileid = this.state.zone.profileid;
+        this.nickname = this.state.zone.nickname;
+      }
       this.editing = false;
     },
 
@@ -448,79 +456,76 @@ const ZoneCard = Vue.extend({
 
     refresh() {
       console.log("refresh readings & statuses");
-      this.timestamp = new Date();
+      if (this.state.zone) {
+        this.timestamp = new Date();
 
-      this.readings = [];
-      this.statuses = [];
+        this.readings = [];
+        this.statuses = [];
 
-      this.zone.devices.forEach(device => {
-        if (device.devicetype === "meter") {
-          HTTP.get(`/readings?meter=${device.device}&last=one`).then(res => {
-            this.readings.push(res.data);
-          });
-        } else {
-          HTTP.get(`/statuses?device=${device.device}&last=one`).then(res => {
-            this.statuses.push(res.data);
-          });
-        }
-      });
-
+        this.state.zone.devices.forEach((device: Device) => {
+          if (device) {
+            if (device.devicetype === "meter") {
+              HTTP.get(`/readings?meter=${device.device}&last=one`).then(
+                res => {
+                  this.readings.push(res.data);
+                }
+              );
+            } else {
+              HTTP.get(`/statuses?device=${device.device}&last=one`).then(
+                res => {
+                  this.statuses.push(res.data);
+                }
+              );
+            }
+          }
+        });
+      }
       setTimeout(this.refresh, 30000);
     },
 
-    removeDevice(selected) {
-      const payload = { zoneid: this.zone.id, device: selected };
-      this.$store.dispatch("removeZoneDevice", payload);
-      this.$store.dispatch("getZones");
+    removeDevice(selected: DeviceState) {
+      if (this.state.zone) {
+        const payload = { zoneid: this.state.zone.id, device: selected.device };
+        this.$store.dispatch("removeZoneDevice", payload);
+        this.$store.dispatch("getZones");
+      }
     },
 
     save() {
-      const parent = this.zones.find(el => el.id === this.parentid);
-      const profile = this.profiles.find(el => el.id === this.profileid);
+      if (this.state.zone) {
+        const zone = {
+          id: this.state.zone.id,
+          nickname: this.nickname,
+          profileid: this.profileid
+        };
 
-      const zone = {
-        id: this.zone.id,
-        nickname: this.nickname,
-        profileid: this.profileid,
-        profile: profile.profile,
-        parentid: this.parentid,
-        parent: parent.nickname
-      };
-
-      this.$store.dispatch("editZone", zone);
+        this.$store.dispatch("editZone", zone);
+      }
       this.editing = false;
     },
 
-    saveNickname(nickname) {
-      const parent = this.zones.find(el => el.id === this.parentid);
-      const profile = this.profiles.find(el => el.id === this.profileid);
+    saveNickname(nickname: string) {
+      if (this.state.zone) {
+        const zone = {
+          id: this.state.zone.id,
+          nickname: nickname,
+          profileid: this.profileid
+        };
 
-      const zone = {
-        id: this.zone.id,
-        nickname: nickname,
-        profileid: this.profileid,
-        profile: profile.profile,
-        parentid: this.parentid,
-        parent: parent.nickname
-      };
-
-      this.$store.dispatch("editZone", zone);
+        this.$store.dispatch("editZone", zone);
+      }
     },
 
-    saveProfile(profileid) {
-      const parent = this.zones.find(el => el.id === this.parentid);
-      const profile = this.profiles.find(el => el.id === profileid);
+    saveProfile(profileid: number) {
+      if (this.state.zone) {
+        const zone = {
+          id: this.state.zone.id,
+          nickname: this.nickname,
+          profileid: profileid
+        };
 
-      const zone = {
-        id: this.zone.id,
-        nickname: this.nickname,
-        profileid: profileid,
-        profile: profile.profile,
-        parentid: this.parentid,
-        parent: parent.nickname
-      };
-
-      this.$store.dispatch("editZone", zone);
+        this.$store.dispatch("editZone", zone);
+      }
     }
   }
 });
