@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapGetters, mapActions } from "vuex";
+import { mapActions } from "vuex";
 import UnitsSelector from "@/components/UnitsSelector.vue";
 import Zones from "@/components/Zones.vue";
 

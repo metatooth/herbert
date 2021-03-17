@@ -63,7 +63,6 @@
 import Vue from "vue";
 import ZoneRow from "@/components/ZoneRow.vue";
 import AddControls from "@/components/AddControls.vue";
-import { mapState, mapGetters, mapActions } from "vuex";
 
 const Zones = Vue.extend({
   props: {

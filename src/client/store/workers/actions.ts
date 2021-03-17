@@ -4,7 +4,7 @@ import { WorkersState, Worker } from "./types";
 import { RootState } from "../types";
 
 export const actions: ActionTree<WorkersState, RootState> = {
-  fetchData({ commit }): any {
+  fetchData({ commit }) {
     HTTP.get("/workers").then(
       response => {
         const payload: Worker[] = response && response.data;

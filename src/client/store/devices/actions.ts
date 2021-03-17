@@ -4,7 +4,7 @@ import { DevicesState, Device } from "./types";
 import { RootState } from "../types";
 
 export const actions: ActionTree<DevicesState, RootState> = {
-  fetchData({ commit }): any {
+  fetchData({ commit }) {
     HTTP.get("/devices").then(
       response => {
         const payload: Device[] = response && response.data;
