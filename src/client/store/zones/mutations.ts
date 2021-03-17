@@ -1,12 +1,33 @@
 import { MutationTree } from "vuex";
-import { ZonesState, ZoneState } from "./types";
+import { ZonesState, Zone } from "./types";
 
 export const mutations: MutationTree<ZonesState> = {
-  SET_ZONES(state, payload: ZoneState[]) {
-    state.error = false;
-    state.zones = payload;
+  ADD(state, zone: Zone) {
+    zone.updatedat = new Date();
+    state.zones.push(zone);
   },
-  ZONES_ERROR(state) {
+  ADD_DEVICE(state, zone: Zone) {
+    console.log("any needed? add zone device mutation");
+  },
+  EDIT(state, zone: Zone) {
+    const found = state.zones.find((el: Zone) => { return el.id === zone.id });
+    const index = state.zones.indexOf(found);
+    state.zones.splice(index, 1, zone);
+  }, 
+  REMOVE(state, zone: Zone) {
+    const found = state.zones.find((el: Zone) => { return el.id === zone.id });
+    const index = state.zones.indexOf(found);
+    state.zones.splice(index, 1);
+  }, 
+  REMOVE_DEVICE(state, zone: Zone) {
+    console.log("any needed? remove zone device mutation");
+  },
+  SET(state, zones: Zone[]) {
+    console.log("and set zones", zones);
+    state.error = false;
+    state.zones = zones;
+  },
+  ERROR(state) {
     state.error = true;
     state.zones = [];
   }

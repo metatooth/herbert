@@ -12,7 +12,7 @@
       </thead>
       <tbody>
         <zone-row
-          v-for="zone in zones"
+          v-for="zone in allZones"
           v-bind:key="zone.id"
           v-bind::units="units"
           v-bind:zone="zone"
@@ -32,7 +32,7 @@
           <td>
             <div class="control" v-if="adding">
               <div class="select">
-                <select v-model="profile">
+                <select v-model="profileid">
                   <option
                     v-for="profile in profiles"
                     :key="profile.id"
@@ -54,7 +54,7 @@
       </tbody>
     </table>
     <button class="button is-info">
-      <font-awesome-icon icon="sync" @click="$store.dispatch('getZones')" />
+      <font-awesome-icon icon="sync" @click="['zones/fetchData']" />
     </button>
   </section>
 </template>
@@ -63,6 +63,7 @@
 import Vue from "vue";
 import ZoneRow from "@/components/ZoneRow.vue";
 import AddControls from "@/components/AddControls.vue";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 const Zones = Vue.extend({
   props: {
@@ -72,7 +73,7 @@ const Zones = Vue.extend({
   data() {
     return {
       nickname: "",
-      profile: "",
+      profileid: 0,
       adding: false
     };
   },
@@ -84,12 +85,14 @@ const Zones = Vue.extend({
 
   computed: {
     zonesName(): string {
-      if (this.$store.getters.zones.zonesCount === 1) {
+      if (this.zonesCount === 1) {
         return "Zone";
       } else {
         return "Zones";
       }
-    }
+    },
+    ...mapState("profiles", ["profiles"]),
+    ...mapGetters("zones", ["allZones", "zonesCount"])
   },
 
   methods: {
@@ -98,20 +101,22 @@ const Zones = Vue.extend({
     },
 
     save(): void {
-      this.$store.dispatch("addZone", {
-        nickname: this.nickname,
-        profile: this.profile
-      });
+      if (this.nickname && this.profileid) {
+        this["zones/add"]({ nickname: this.nickname, profileid: this.profileid });
+      }
+
       this.nickname = "";
-      this.profile = "";
+      this.profileid = 0;
       this.adding = false;
     },
 
     cancel(): void {
       this.nickname = "";
-      this.profile = "";
+      this.profileid = 0;
       this.adding = false;
-    }
+    },
+
+    ...mapActions(["zones/add", "zones/fetchData"])
   }
 });
 

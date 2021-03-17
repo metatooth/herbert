@@ -7,9 +7,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapActions } from "vuex";
 import UnitsSelector from "@/components/UnitsSelector.vue";
 import Zones from "@/components/Zones.vue";
+import { mapActions } from "vuex";
 
 interface Notification {
   id: string;
@@ -34,7 +34,10 @@ const Dashboard = Vue.extend({
   },
 
   mounted() {
-    this.fetchData();
+    this["devices/fetchData"]();
+    this["profiles/fetchData"]();
+    this["workers/fetchData"]();
+    this["zones/fetchData"]();
 
     console.log("Starting connection to WebSocket server...");
 
@@ -62,15 +65,18 @@ const Dashboard = Vue.extend({
     changeUnits(units: string) {
       this.units = units;
     },
-
-    ...mapActions(["fetchData"]),
-
     deleteNotification(n: Notification): void {
       console.log("we are here", n);
       const found = this.notifications.findIndex(el => el.id === n.id);
       console.log("found!", found);
       this.notifications.splice(found, 1);
-    }
+    },
+    ...mapActions([
+      "devices/fetchData",
+      "profiles/fetchData",
+      "workers/fetchData",
+      "zones/fetchData"
+    ])
   }
 });
 

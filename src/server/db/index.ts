@@ -1,8 +1,7 @@
 import { Pool, Result } from "pg";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: false
+  connectionString: process.env.DATABASE_URL
 });
 
 export async function query(text, params): Promise<Result> {
@@ -25,10 +24,9 @@ export async function readProfile(id) {
 
 export async function readZone(id) {
   const res = await query(
-    "SELECT z.id, z.nickname, b.id as parentid, b.nickname as parent, p.id as profileid, p.profile, z.updatedat FROM zones z LEFT JOIN zones b ON z.parentid = b.id LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
+    "SELECT z.id, z.nickname, p.id as profileid, z.updatedat FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
     [id]
   );
-  const children = await query("SELECT * FROM zones WHERE parentid = $1", [id]);
   const devices = await query(
     "SELECT d.* FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE zd.zoneid = $1",
     [id]
@@ -46,10 +44,6 @@ export async function readZone(id) {
 
   if (devices) {
     zone.devices = await devices.rows;
-  }
-
-  if (children) {
-    zone.children = await children.rows;
   }
 
   return zone;
