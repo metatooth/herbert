@@ -1,6 +1,6 @@
 begin;
 
-create table profiles (
+create table accounts (
   id serial primary key,
   units char,
   locale varchar(255),
