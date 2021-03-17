@@ -68,7 +68,6 @@
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { mapState, mapGetters, mapActions } from "vuex";
 import { DeviceState } from "@/store/devices/types";
 
 const DeviceRow = Vue.extend({

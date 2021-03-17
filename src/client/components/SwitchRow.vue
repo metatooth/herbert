@@ -58,7 +58,6 @@
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { mapState, mapGetters, mapActions } from "vuex";
 import { DeviceState } from "@/store/devices/types";
 
 const SwitchRow = Vue.extend({
@@ -72,7 +71,6 @@ const SwitchRow = Vue.extend({
   },
 
   data() {
-    const nickname = "";
     return {
       nickname: this.state.device.nickname,
       editing: false
@@ -110,5 +108,5 @@ const SwitchRow = Vue.extend({
   }
 });
 
-export default DeviceRow;
+export default SwitchRow;
 </script>

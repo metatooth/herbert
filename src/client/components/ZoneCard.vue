@@ -173,7 +173,6 @@ import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device, DeviceState } from "@/store/devices/types";
 import { LampTimer } from "../../shared/lamp-timer";
-import { Worker } from "@/store/workers/types";
 import { ZoneState } from "@/store/zones/types";
 import {
   celsius2fahrenheit,
