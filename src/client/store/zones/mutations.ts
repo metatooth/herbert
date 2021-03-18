@@ -7,20 +7,24 @@ export const mutations: MutationTree<ZonesState> = {
     state.zones.push(zone);
   },
   ADD_DEVICE(state, zone: Zone) {
-    console.log("any needed? add zone device mutation");
+    console.log("any needed? add zone device mutation", state, zone);
   },
   EDIT(state, zone: Zone) {
-    const found = state.zones.find((el: Zone) => { return el.id === zone.id });
+    const found = state.zones.find((el: Zone) => {
+      return el.id === zone.id;
+    });
     const index = state.zones.indexOf(found);
     state.zones.splice(index, 1, zone);
-  }, 
+  },
   REMOVE(state, zone: Zone) {
-    const found = state.zones.find((el: Zone) => { return el.id === zone.id });
+    const found = state.zones.find((el: Zone) => {
+      return el.id === zone.id;
+    });
     const index = state.zones.indexOf(found);
     state.zones.splice(index, 1);
-  }, 
+  },
   REMOVE_DEVICE(state, zone: Zone) {
-    console.log("any needed? remove zone device mutation");
+    console.log("any needed? remove zone device mutation", state, zone);
   },
   SET(state, zones: Zone[]) {
     console.log("and set zones", zones);

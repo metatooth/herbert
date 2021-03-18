@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    console.log("POST /ZONES", req, res);
+  console.log("POST /ZONES", req, res);
   const {
     rows
   } = await query(

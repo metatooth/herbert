@@ -81,7 +81,7 @@ const ZoneRow = Vue.extend({
     zoneUpdatedAt(): Date {
       return new Date(Date.parse(this.zone.updatedat));
     },
- 
+
     ...mapState("profiles", ["profiles"])
   },
 
@@ -94,7 +94,7 @@ const ZoneRow = Vue.extend({
       const zone = {
         id: this.zone.id,
         nickname: this.nickname,
-        profileid: this.profileid,
+        profileid: this.profileid
       };
 
       this.edit(zone);

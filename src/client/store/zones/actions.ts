@@ -6,25 +6,31 @@ import { RootState } from "../types";
 export const actions: ActionTree<ZonesState, RootState> = {
   add({ commit }, payload: Zone) {
     const json = JSON.stringify(payload);
-    HTTP.post("/zones", json).then(response => {
-      console.log("response", response);
-      const zone: Zone = response && response.data;
-      console.log("zone", zone);
-      commit("ADD", zone);
-    }, error => {
-      console.log(error);
-      commit("ERROR");
-    });
+    HTTP.post("/zones", json).then(
+      response => {
+        console.log("response", response);
+        const zone: Zone = response && response.data;
+        console.log("zone", zone);
+        commit("ADD", zone);
+      },
+      error => {
+        console.log(error);
+        commit("ERROR");
+      }
+    );
   },
 
-  addDevice({ commit }, payload: { zoneid: number, device: string }) {
+  addDevice({ commit }, payload: { zoneid: number; device: string }) {
     const json = JSON.stringify({ device: payload.device });
-    HTTP.post(`/zones/${payload.zoneid}/devices`, json).then(response => {
-      commit("ADD_DEVICE", response.data);
-    }, error => {
-      console.log(error);
-      commit("ERROR");
-    });
+    HTTP.post(`/zones/${payload.zoneid}/devices`, json).then(
+      response => {
+        commit("ADD_DEVICE", response.data);
+      },
+      error => {
+        console.log(error);
+        commit("ERROR");
+      }
+    );
   },
 
   edit({ commit }, payload: Zone) {
@@ -49,12 +55,12 @@ export const actions: ActionTree<ZonesState, RootState> = {
   },
 
   remove({ commit }, payload: Zone) {
-   HTTP.delete(`/zones/${payload.id}`); 
-   commit("REMOVE", payload);
+    HTTP.delete(`/zones/${payload.id}`);
+    commit("REMOVE", payload);
   },
 
-  removeDevice({ commit }, payload: { zoneid: number, device: string }) {
+  removeDevice({ commit }, payload: { zoneid: number; device: string }) {
     HTTP.delete(`/zones/${payload.zoneid}/devices/${payload.device}`);
-    commit("REMOVE_DEVICE", zone);    
+    commit("REMOVE_DEVICE", zone);
   }
 };
