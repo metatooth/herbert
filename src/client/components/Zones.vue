@@ -14,12 +14,12 @@
         <zone-row
           v-for="zone in allZones"
           v-bind:key="zone.id"
-          v-bind::units="units"
+          v-bind:units="units"
           v-bind:zone="zone"
         />
         <tr>
           <td>
-            <div class="control" v-if="adding">
+            <div class="control" v-if="editing">
               <input
                 class="input"
                 type="text"
@@ -30,7 +30,7 @@
           </td>
 
           <td>
-            <div class="control" v-if="adding">
+            <div class="control" v-if="editing">
               <div class="select">
                 <select v-model="profileid">
                   <option
@@ -53,9 +53,6 @@
         </tr>
       </tbody>
     </table>
-    <button class="button is-info">
-      <font-awesome-icon icon="sync" @click="['zones/fetchData']" />
-    </button>
   </section>
 </template>
 
@@ -74,7 +71,7 @@ const Zones = Vue.extend({
     return {
       nickname: "",
       profileid: 0,
-      adding: false
+      editing: false
     };
   },
 
@@ -96,8 +93,8 @@ const Zones = Vue.extend({
   },
 
   methods: {
-    add(): void {
-      this.adding = true;
+    editable(): void {
+      this.editing = true;
     },
 
     save(): void {
@@ -110,16 +107,16 @@ const Zones = Vue.extend({
 
       this.nickname = "";
       this.profileid = 0;
-      this.adding = false;
+      this.editing = false;
     },
 
     cancel(): void {
       this.nickname = "";
       this.profileid = 0;
-      this.adding = false;
+      this.editing = false;
     },
 
-    ...mapActions(["zones/add", "zones/fetchData"])
+    ...mapActions("zones", ["add"])
   }
 });
 

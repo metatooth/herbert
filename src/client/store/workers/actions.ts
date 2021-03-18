@@ -8,6 +8,7 @@ export const actions: ActionTree<WorkersState, RootState> = {
     const json = JSON.stringify(payload);
     HTTP.put(`/workers/${payload.worker}`, json).then(
       response => {
+        const payload: Worker = response && response.data;
         commit("EDIT", payload);
       },
       error => {

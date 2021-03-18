@@ -8,7 +8,8 @@ export const actions: ActionTree<DevicesState, RootState> = {
     const json = JSON.stringify(payload);
     HTTP.put(`/devices/${payload.device}`, json).then(
       response => {
-        commit("EDIT", payload);
+        console.log("EDIT", response.data);
+        commit("EDIT", response.data);
       },
       error => {
         console.log(error);

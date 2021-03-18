@@ -9,11 +9,11 @@
           <div class="select">
             <select v-model="selected">
               <option
-                v-for="ds in devices"
-                v-bind:key="ds.device.device"
-                v-bind:value="ds.device.device"
+                v-for="device in devices"
+                v-bind:key="device.device"
+                v-bind:value="device.device"
               >
-                {{ ds.device.nickname || ds.device.device }}
+                {{ device.nickname || device.device }}
               </option>
             </select>
           </div>
@@ -44,7 +44,7 @@ const SelectDevice = Vue.extend({
   },
 
   computed: {
-    ...mapState(["devices/devices"])
+    ...mapState("devices", ["devices"])
   },
 
   methods: {

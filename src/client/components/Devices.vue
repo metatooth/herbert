@@ -20,9 +20,6 @@
         />
       </tbody>
     </table>
-    <button class="button is-info">
-      <font-awesome-icon icon="sync" />
-    </button>
   </section>
 </template>
 

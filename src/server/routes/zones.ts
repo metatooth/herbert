@@ -32,7 +32,7 @@ router.put("/:id", async (req, res) => {
   const {
     rows
   } = await query(
-    "UPDATE zones SET nickname = $1, profileid = $2 WHERE id = $3 RETURNING id",
+    "UPDATE zones SET nickname = $1, profileid = $2, updatedat = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id",
     [req.body.nickname, req.body.profileid, id]
   );
   console.log("update zones", rows);

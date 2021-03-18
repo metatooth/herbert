@@ -10,12 +10,13 @@ import { convertToLocalTime } from "date-fns-timezone";
 
 const Timestamp = Vue.extend({
   props: {
-    timestamp: Date
+    timestamp: Date,
+    timezone: { default: "Etc/UTC", type: String }
   },
 
   data() {
     return {
-      local: convertToLocalTime(this.timestamp, { timeZone: "Etc/UTC" })
+      local: convertToLocalTime(this.timestamp, { timeZone: this.timezone })
     };
   },
 

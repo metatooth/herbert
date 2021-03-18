@@ -49,7 +49,7 @@
       </router-link>
     </td>
     <td>
-      <timestamp :timestamp="new Date(Date.parse(device.updatedat))" />
+      <timestamp v-bind:timestamp="updated" />
     </td>
   </tr>
 </template>
@@ -85,6 +85,9 @@ const DeviceRow = Vue.extend({
       } else {
         return "statuses";
       }
+    },
+    updated() {
+      return new Date(Date.parse(this.device.updatedat));
     }
   },
 

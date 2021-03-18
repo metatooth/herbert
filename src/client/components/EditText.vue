@@ -2,7 +2,7 @@
   <div class="field is-horizontal">
     <div class="field-body">
       <div class="field" v-if="!editing">
-        <span v-bind:class="valueClass">{{ text }}</span>
+        <span v-bind:class="valueClass">{{ text || "undefined" }}</span>
         <button class="button" @click="edit">
           <font-awesome-icon icon="edit" />
         </button>

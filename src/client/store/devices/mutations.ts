@@ -4,10 +4,11 @@ import { DevicesState, Device } from "./types";
 export const mutations: MutationTree<DevicesState> = {
   EDIT(state, payload: Device) {
     const found = state.devices.find((el: Device) => {
-      return el.id === payload.id;
+      return el.device === payload.device;
     });
     const index = state.devices.indexOf(found);
-    state.devices.splice(index, 1, found);
+    console.log(payload, found, index);
+    state.devices.splice(index, 1, payload);
   },
   SET(state, payload: Device[]) {
     state.error = false;

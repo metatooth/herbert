@@ -17,9 +17,6 @@
         />
       </tbody>
     </table>
-    <button class="button is-info">
-      <font-awesome-icon icon="sync" @click="fetchData" />
-    </button>
   </section>
 </template>
 

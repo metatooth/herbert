@@ -1,7 +1,12 @@
 <template>
   <tr>
     <td>
-      <a v-if="!editing" :href="linkToConfig">{{ zone.nickname }}</a>
+      <router-link
+        v-if="!editing"
+        :to="{ name: 'zone', params: { id: zone.id, units: units } }"
+      >
+        {{ zone.nickname }}
+      </router-link>
       <div class="control" v-else>
         <input
           class="input"
@@ -57,7 +62,8 @@ import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
   props: {
-    zone: Zone
+    zone: Zone,
+    units: String
   },
 
   data() {

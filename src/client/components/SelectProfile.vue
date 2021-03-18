@@ -7,13 +7,13 @@
       <div class="field has-addons">
         <div class="control">
           <div class="select">
-            <select>
+            <select v-model="selected">
               <option
-                v-for="ps in profiles"
-                v-bind:key="ps.profile.id"
-                v-bind:value="ps.profile.id"
+                v-for="profile in profiles"
+                v-bind:key="profile.id"
+                v-bind:value="profile.id"
               >
-                {{ ps.profile.profile }}
+                {{ profile.profile }}
               </option>
             </select>
           </div>
@@ -36,12 +36,18 @@ const SelectProfile = Vue.extend({
     profileid: Number
   },
 
+  data() {
+    return {
+      selected: this.profileid
+    };
+  },
+
   components: {
     HerbertButton
   },
 
   computed: {
-    ...mapState(["profiles/profiles"])
+    ...mapState("profiles", ["profiles"])
   }
 });
 
