@@ -325,7 +325,7 @@ const ProfileRow = Vue.extend({
         hourInt = hourInt - 24;
       }
       console.log("hour int", hourInt);
-      
+
       let hourString;
       if (hourInt < 10) {
         hourString = "0" + hourInt;

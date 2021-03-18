@@ -4,14 +4,17 @@ import { DevicesState, Device } from "./types";
 import { RootState } from "../types";
 
 export const actions: ActionTree<DevicesState, RootState> = {
-  edit({ commit }, payload: Device){
+  edit({ commit }, payload: Device) {
     const json = JSON.stringify(payload);
-    HTTP.put(`/devices/${payload.device}`, json).then(response => {
-      commit("EDIT", payload);
-    }, error => {
-      console.log(error);
-      commit("DEVICE_ERROR");
-    });
+    HTTP.put(`/devices/${payload.device}`, json).then(
+      response => {
+        commit("EDIT", payload);
+      },
+      error => {
+        console.log(error);
+        commit("DEVICE_ERROR");
+      }
+    );
   },
   fetchData({ commit }) {
     HTTP.get("/devices").then(

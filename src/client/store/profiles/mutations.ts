@@ -10,7 +10,9 @@ export const mutations: MutationTree<ProfilesState> = {
     state.profiles = payload;
   },
   EDIT(state, payload: Profile) {
-    const found = state.profiles.find((el: Profile) => { return el.id === payload.id });
+    const found = state.profiles.find((el: Profile) => {
+      return el.id === payload.id;
+    });
     const index = state.profiles.indexOf(found);
     state.profiles.splice(index, 1, payload);
   },
@@ -22,8 +24,10 @@ export const mutations: MutationTree<ProfilesState> = {
     state.profiles = [];
   },
   REMOVE(state, payload: Profile) {
-    const found = state.profiles.find((el: Profile) => { return el.id === payload.id });
+    const found = state.profiles.find((el: Profile) => {
+      return el.id === payload.id;
+    });
     const index = state.profiles.indexOf(found);
     state.profiles.splice(index, 1);
-  },
+  }
 };
