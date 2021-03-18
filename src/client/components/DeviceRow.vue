@@ -4,7 +4,7 @@
       {{ device.device }}
     </td>
     <td>
-      <a @click="edit" v-if="!editing">
+      <a @click="editable" v-if="!editing">
         <span v-if="device.nickname">{{ device.nickname }}</span>
         <span v-else>click to name</span>
       </a>
@@ -41,19 +41,9 @@
     <td>
       <router-link
         :to="{
-          name: 'readings',
-          params: { name: device.nickname, meter: device.device }
-        }"
-        v-if="isMeter"
-      >
-        &gt;&gt;&gt;
-      </router-link>
-      <router-link
-        :to="{
-          name: 'statuses',
+          name: linkName,
           params: { name: device.nickname, device: device.device }
         }"
-        v-if="isSwitch"
       >
         &gt;&gt;&gt;
       </router-link>
@@ -69,6 +59,7 @@ import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
+import { mapActions } from "vuex";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -81,38 +72,29 @@ const DeviceRow = Vue.extend({
   },
 
   data() {
-    let nickname = "";
-    if (this.device) {
-      nickname = this.device.nickname;
-    }
-
     return {
-      nickname: nickname,
+      nickname: this.device.nickname,
       editing: false
     };
   },
 
   computed: {
-    isMeter() {
-      return this.device.devicetype === "meter";
-    },
-
-    isSwitch() {
-      return this.device.devicetype !== "meter";
+    linkName() {
+      if (this.device.devicetype === "meter") {
+        return "readings";
+      } else {
+        return "statuses";
+      }
     }
   },
 
   methods: {
-    destroy() {
-      this.$store.dispatch("removeDevice", this.device);
-    },
-
-    edit() {
+    editable() {
       this.editing = true;
     },
 
     save() {
-      this.$store.dispatch("editDevice", {
+      this.edit({
         ...this.device,
         nickname: this.nickname
       });
@@ -120,7 +102,7 @@ const DeviceRow = Vue.extend({
     },
 
     saveDeviceType(devicetype: string) {
-      this.$store.dispatch("editDevice", {
+      this.edit({
         ...this.device,
         devicetype: devicetype
       });
@@ -129,7 +111,9 @@ const DeviceRow = Vue.extend({
     cancel() {
       this.nickname = this.device.nickname;
       this.editing = false;
-    }
+    },
+
+    ...mapActions("devices", ["edit"])
   }
 });
 

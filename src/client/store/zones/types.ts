@@ -26,6 +26,6 @@ export class ZoneState {
 }
 
 export interface ZonesState {
-  zones: ZoneState[];
+  zones: Zone[];
   error: boolean;
 }
