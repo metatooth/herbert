@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ devices.length }} {{ devicesName }}</h2>
+    <h2 class="title">{{ devicesCount }} {{ devicesName }}</h2>
     <table class="table">
       <thead>
         <tr>
@@ -14,14 +14,14 @@
       </thead>
       <tbody>
         <device-row
-          v-for="devicestate in devices"
-          v-bind:key="devicestate.device"
-          v-bind:state="devicestate"
+          v-for="device in devices"
+          v-bind:key="device.device"
+          v-bind:device="device"
         />
       </tbody>
     </table>
     <button class="button is-info">
-      <font-awesome-icon icon="sync" @click="$store.dispatch('getDevices')" />
+      <font-awesome-icon icon="sync" />
     </button>
   </section>
 </template>
@@ -37,9 +37,9 @@ const Devices = Vue.extend({
   },
 
   computed: {
-    ...mapState(["devices"]),
+    ...mapState("devices", ["devices"]),
 
-    ...mapGetters(["devicesCount"]),
+    ...mapGetters("devices", ["devicesCount"]),
 
     devicesName() {
       if (this.devicesCount === 1) {

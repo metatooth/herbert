@@ -1,11 +1,11 @@
 <template>
   <tr>
     <td>
-      {{ state.device.device }}
+      {{ device.device }}
     </td>
     <td>
       <a @click="edit" v-if="!editing">
-        <span v-if="state.device.nickname">{{ state.device.nickname }}</span>
+        <span v-if="device.nickname">{{ device.nickname }}</span>
         <span v-else>click to name</span>
       </a>
       <div class="field is-grouped" v-else>
@@ -31,18 +31,18 @@
     </td>
     <td>
       <select-device-type
-        v-bind:devicetype="state.device.devicetype"
+        v-bind:devicetype="device.devicetype"
         @select-device-type="saveDeviceType"
       />
     </td>
     <td>
-      {{ state.device.manufacturer }}
+      {{ device.manufacturer }}
     </td>
     <td>
       <router-link
         :to="{
           name: 'readings',
-          params: { name: state.device.nickname, meter: state.device.device }
+          params: { name: device.nickname, meter: device.device }
         }"
         v-if="isMeter"
       >
@@ -51,7 +51,7 @@
       <router-link
         :to="{
           name: 'statuses',
-          params: { name: state.device.nickname, device: state.device.device }
+          params: { name: device.nickname, device: device.device }
         }"
         v-if="isSwitch"
       >
@@ -59,7 +59,7 @@
       </router-link>
     </td>
     <td>
-      <timestamp :timestamp="new Date(Date.parse(state.device.updatedat))" />
+      <timestamp :timestamp="new Date(Date.parse(device.updatedat))" />
     </td>
   </tr>
 </template>
@@ -68,11 +68,11 @@
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { DeviceState } from "@/store/devices/types";
+import { Device } from "@/store/devices/types";
 
 const DeviceRow = Vue.extend({
   props: {
-    state: DeviceState
+    device: Device
   },
 
   components: {
@@ -82,8 +82,8 @@ const DeviceRow = Vue.extend({
 
   data() {
     let nickname = "";
-    if (this.state.device) {
-      nickname = this.state.device.nickname;
+    if (this.device) {
+      nickname = this.device.nickname;
     }
 
     return {
@@ -94,17 +94,17 @@ const DeviceRow = Vue.extend({
 
   computed: {
     isMeter() {
-      return this.state.device.devicetype === "meter";
+      return this.device.devicetype === "meter";
     },
 
     isSwitch() {
-      return this.state.device.devicetype !== "meter";
+      return this.device.devicetype !== "meter";
     }
   },
 
   methods: {
     destroy() {
-      this.$store.dispatch("removeDevice", this.state.device);
+      this.$store.dispatch("removeDevice", this.device);
     },
 
     edit() {
@@ -113,7 +113,7 @@ const DeviceRow = Vue.extend({
 
     save() {
       this.$store.dispatch("editDevice", {
-        ...this.state.device,
+        ...this.device,
         nickname: this.nickname
       });
       this.editing = false;
@@ -121,13 +121,13 @@ const DeviceRow = Vue.extend({
 
     saveDeviceType(devicetype: string) {
       this.$store.dispatch("editDevice", {
-        ...this.state.device,
+        ...this.device,
         devicetype: devicetype
       });
     },
 
     cancel() {
-      this.nickname = this.state.device.nickname;
+      this.nickname = this.device.nickname;
       this.editing = false;
     }
   }
