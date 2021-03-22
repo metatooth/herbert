@@ -12,7 +12,7 @@
       </thead>
       <tbody>
         <zone-row
-          v-for="zone in allZones"
+          v-for="zone in zones"
           v-bind:key="zone.id"
           v-bind:units="units"
           v-bind:zone="zone"
@@ -60,7 +60,7 @@
 import Vue from "vue";
 import ZoneRow from "@/components/ZoneRow.vue";
 import AddControls from "@/components/AddControls.vue";
-import { mapState, mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 const Zones = Vue.extend({
   props: {
@@ -88,8 +88,8 @@ const Zones = Vue.extend({
         return "Zones";
       }
     },
-    ...mapState("profiles", ["profiles"]),
-    ...mapGetters("zones", ["allZones", "zonesCount"])
+    ...mapGetters("profiles", ["profiles"]),
+    ...mapGetters("zones", ["zones", "zonesCount"])
   },
 
   methods: {

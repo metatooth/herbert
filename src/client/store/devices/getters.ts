@@ -3,25 +3,19 @@ import { DeviceState, DevicesState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<DevicesState, RootState> = {
-  allDevices(state): DeviceState[] {
+  devices(state): DeviceState[] {
     const { devices } = state;
     return devices;
   },
 
-  allMeters(state): DeviceState[] {
+  meters(state): DeviceState[] {
     const { devices } = state;
-    const filter = (dev: DeviceState) => {
-      return dev.device.devicetype === "meter";
-    };
-    return devices.filter(filter);
+    return devices.filter(device => device.devicetype === "meter");
   },
 
-  allSwitches(state): DeviceState[] {
+  switches(state): DeviceState[] {
     const { devices } = state;
-    const filter = (dev: DeviceState) => {
-      return dev.device.devicetype !== "meter";
-    };
-    return devices.filter(filter);
+    return devices.filter(device => device.devicetype !== "meter");
   },
 
   devicesCount(state): number {

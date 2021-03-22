@@ -3,6 +3,30 @@
     <td>
       {{ device.device }}
     </td>
+    <td class="has-text-centered">
+      <div v-if="meterReadingTemperature" class="field is-grouped is-grouped-multiline">
+        <target icon="thermometer-half" v-bind:value="meterReadingTemperature" :precision="1" :units="unitsWithDegrees" text="warning" background="warning" />
+        <target icon="tint" v-bind:value="meterReadingHumidity" :precision="0" units="%" text="info" background="info" />        
+      </div>
+  <div v-else class="tags has-addons">
+        <span class="tag is-medium" :class="deviceOnClass">
+          <font-awesome-icon icon="circle" />
+        </span>
+        <span class="tag is-medium" :class="deviceOffClass">
+          <font-awesome-icon icon="circle" />
+        </span>
+        <span class="tag is-medium" :class="deviceDisconnectedClass">
+          <font-awesome-icon icon="circle" />
+        </span>
+
+      </div>
+    </td>
+    <td>
+      <select-device-type
+        v-bind:devicetype="device.devicetype"
+        @select-device-type="saveDeviceType"
+        />
+    </td>
     <td>
       <a @click="editable" v-if="!editing">
         <span v-if="device.nickname">{{ device.nickname }}</span>
@@ -30,10 +54,7 @@
       </div>
     </td>
     <td>
-      <select-device-type
-        v-bind:devicetype="device.devicetype"
-        @select-device-type="saveDeviceType"
-      />
+      <timestamp v-bind:timestamp="new Date(Date.parse(device.timestamp))" />
     </td>
     <td>
       {{ device.manufacturer }}
@@ -48,9 +69,6 @@
         &gt;&gt;&gt;
       </router-link>
     </td>
-    <td>
-      <timestamp v-bind:timestamp="updated" />
-    </td>
   </tr>
 </template>
 
@@ -60,15 +78,19 @@ import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
 import { mapActions } from "vuex";
+import Target from "@/components/Target.vue";
+import { celsius2fahrenheit } from "../../shared/utils";
 
 const DeviceRow = Vue.extend({
   props: {
-    device: Device
+    device: Device,
+    units: String
   },
 
   components: {
     SelectDeviceType,
-    Timestamp
+    Timestamp,
+    Target
   },
 
   data() {
@@ -79,12 +101,53 @@ const DeviceRow = Vue.extend({
   },
 
   computed: {
+    deviceOnClass() {
+      if (this.device.status === "on") {
+        return "has-text-success has-background-black";
+      } else {
+        return "has-text-success-light has-background-black";
+      }
+    },
+    deviceOffClass() {
+      if (this.device.status === "off") {
+        return "has-text-warning has-background-black";
+      } else {
+        return "has-text-warning-light has-background-black";
+      }
+    },
+    deviceDisconnectedClass() {
+      if (this.device.status === "disconnected") {
+        return "has-text-danger has-background-black";
+      } else {
+        return "has-text-danger-light has-background-black";
+      }
+    },
+    deviceIcon() {
+      if (this.device.status === "on") {
+        return "circle";
+      } else if (this.device.status === "off") {
+        return "circle";
+      } else if (this.device.status === "disconnected") {
+        return "times";
+      }
+      
+      return null;
+    },
     linkName() {
       if (this.device.devicetype === "meter") {
         return "readings";
       } else {
         return "statuses";
       }
+    },
+    meterReadingHumidity() {
+      return 100 * parseFloat(this.device.humidity);
+    },
+    meterReadingTemperature() {
+      return (this.units === "F") ? celsius2fahrenheit(this.device.temperature) : parseFloat(this.device.temperature);
+    },
+    unitsWithDegrees() {
+      return "" + this.units;
     },
     updated() {
       return new Date(Date.parse(this.device.updatedat));

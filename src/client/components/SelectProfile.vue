@@ -19,7 +19,7 @@
           </div>
         </div>
 
-        <herbert-button class="is-primary" label="" icon="check" />
+        <herbert-button class="is-primary" icon="check" />
       </div>
     </div>
   </div>
@@ -28,17 +28,18 @@
 <script lang="ts">
 import Vue from "vue";
 import HerbertButton from "@/components/Button.vue";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
+import { Zone } from "@/store/zones/types";
 
 const SelectProfile = Vue.extend({
   props: {
     label: String,
-    profileid: Number
+    zone: Zone
   },
 
   data() {
     return {
-      selected: this.profileid
+      selected: Number
     };
   },
 
@@ -46,8 +47,12 @@ const SelectProfile = Vue.extend({
     HerbertButton
   },
 
+  mounted() {
+    this.selected = this.zone.profileid;
+  },
+  
   computed: {
-    ...mapState("profiles", ["profiles"])
+    ...mapGetters("profiles", ["profiles"])
   }
 });
 

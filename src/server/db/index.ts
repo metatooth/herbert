@@ -23,30 +23,44 @@ export async function readProfile(id) {
 }
 
 export async function readZone(id) {
+  const promises = [];
+  
   const res = await query(
     "SELECT z.id, z.nickname, p.id as profileid, z.updatedat FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
     [id]
   );
-  const devices = await query(
-    "SELECT d.* FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE zd.zoneid = $1",
-    [id]
-  );
-
-  const zone = await res.rows[0];
+  
+  promises.push(res.rows[0]);
 
   const profile = await query("SELECT * FROM profiles WHERE id = $1", [
-    zone.profileid
+    promises[0].profileid
   ]);
 
   if (profile) {
-    zone.profile = profile.rows[0];
+    promises[0].profile = profile.rows[0];
   }
 
-  if (devices) {
-    zone.devices = await devices.rows;
+  const devices = await query(
+    "SELECT d.device FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE zd.zoneid = $1",
+    [id]
+  );
+  
+  if (devices.rowCount > 0) {
+    devices.rows.forEach((row) => {
+      promises.push(readDevice(row.device));
+    });
   }
 
-  return zone;
+  return await Promise.all(promises).then(values => {
+    values[0].devices = [];
+    values.forEach(value => {
+      if (value.device) {
+        values[0].devices.push(value);
+      }
+    });
+  
+    return values[0];
+  });
 }
 
 export async function readZones() {
@@ -79,14 +93,37 @@ export async function readZoneDevices(device: string) {
     zones.push(z);
   });
 
-  console.log("ZONES", zones);
-
   return Promise.all(zones);
 }
 
 export async function readDevice(id) {
-  const { rows } = await query("SELECT * FROM devices WHERE device = $1", [id]);
-  return rows[0];
+  const res = await query("SELECT * FROM devices WHERE device = $1", [id]);
+
+  const device = await res.rows[0];
+  
+  if (device.devicetype === "meter") {
+    const { rows } = await query("SELECT d.*, r.temperature, r.humidity, r.pressure, r.createdat as timestamp FROM devices d INNER JOIN readings r ON d.device = r.meter WHERE d.device = $1 ORDER BY r.id DESC LIMIT 1", [id]); 
+    return rows[0];
+  } else {
+    const { rows } = await query("SELECT d.*, s.status, s.createdat as timestamp FROM devices d INNER JOIN statuses s ON d.device = s.device WHERE d.device = $1 ORDER BY s.id DESC LIMIT 1", [id]); 
+    return rows[0];
+  }
+}
+
+export async function readDevices() {
+  const devices = [];
+
+  const { rows } = await query(
+    "SELECT device FROM devices WHERE deleted <> true",
+    []
+  );
+
+  rows.forEach(row => {
+    const d = readDevice(row.device);
+    devices.push(d);
+  });
+
+  return Promise.all(devices);
 }
 
 export async function readWorker(id) {
@@ -106,7 +143,6 @@ export async function reading(device: string) {
 export async function registerDevice(macaddr, manufacturer, type) {
   query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
-      console.log("inserting", macaddr);
       query(
         "INSERT INTO devices (device, manufacturer, deviceType) VALUES ($1, $2, $3)",
         [macaddr, manufacturer, type]
@@ -118,13 +154,11 @@ export async function registerDevice(macaddr, manufacturer, type) {
 export async function workerStatus(macaddr, inet) {
   query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
-      console.log("inserting", macaddr);
       query("INSERT INTO workers (worker, inet) VALUES ($1, $2)", [
         macaddr,
         inet
       ]);
     } else if (res.rowCount === 1) {
-      console.log("updating", macaddr);
       query(
         "UPDATE workers SET inet = $1, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
         [inet, macaddr]

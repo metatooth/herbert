@@ -34,17 +34,14 @@ import { mapState } from "vuex";
 
 const SelectDevice = Vue.extend({
   props: {
-    label: String
+    label: String,
+    devices: Array
   },
 
   data() {
     return {
       selected: ""
     };
-  },
-
-  computed: {
-    ...mapState("devices", ["devices"])
   },
 
   methods: {

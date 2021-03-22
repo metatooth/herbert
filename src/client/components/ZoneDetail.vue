@@ -1,4 +1,5 @@
 <template>
+  <div id="linkto" class="level">
   <div class="card">
     <div class="card-content">
       <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
@@ -88,74 +89,53 @@
     <div class="card-content">
       <select-profile
         label="Growing"
-        v-bind:profileid="zone.profileid"
-        @select-profile="saveProfile"
+        v-bind:zone="zone"
       />
-    </div>
-
-    <div class="card-content" v-if="editing">
-      <div class="field is-grouped is-grouped-right">
-        <div class="control">
-          <button class="button is-primary" v-on:click="save">
-            <font-awesome-icon icon="check" />
-          </button>
-        </div>
-
-        <div class="control">
-          <button class="button is-danger" v-on:click="cancel">
-            <font-awesome-icon icon="times" />
-          </button>
-        </div>
-      </div>
     </div>
 
     <div class="card-content">
       <div class="tags">
-        <div
-          class="tag is-info is-medium"
+        <meter-widget
           v-for="meter in zoneMeters"
-          v-bind:key="meter.device"
-        >
-          {{ meter.nickname || meter.device }}
-          <button class="delete" v-on:click="removeDevice(meter.device)" />
-        </div>
+          :key="meter.device"
+          :meter="meter"
+          :units="units"
+          />
+      </div>
+    </div>
+
+    <div class="card-content">
+      <div class="field is-grouped">
+        <device-widget
+          v-for="device in zoneSwitches"
+          :key="device.device"
+          :device="device"
+          />
       </div>
     </div>
 
     <div class="card-content">
       <select-device
         label="Meters"
-        v-bind:devices="allMeters"
-        @select-device="addDevice"
+        v-bind:devices="meters"
+        @select-device="add"
       />
-    </div>
-
-    <div class="card-content">
-      <div class="tags">
-        <div
-          class="tag is-success is-medium"
-          v-for="meter in zoneSwitches"
-          v-bind:key="meter.device"
-        >
-          {{ meter.nickname || meter.device }}
-          <button class="delete" v-on:click="removeDevice(meter.device)" />
-        </div>
-      </div>
     </div>
 
     <div class="card-content">
       <select-device
         label="Switches"
-        v-bind:devices="allSwitches"
-        @select-device="addDevice"
+        v-bind:devices="switches"
+        @select-device="add"
       />
     </div>
 
     <footer class="card-footer">
       <div class="card-footer-item">
-        <timestamp :timestamp="new Date(Date.parse(zone.updatedat))" />
+        <timestamp :timestamp="this.timestamp" />
       </div>
     </footer>
+  </div>
   </div>
 </template>
 
@@ -166,15 +146,18 @@ import SelectDevice from "@/components/SelectDevice.vue";
 import SelectProfile from "@/components/SelectProfile.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { Device, DeviceState } from "@/store/devices/types";
+import { Device } from "@/store/devices/types";
+import { Profile } from "@/store/profiles/types";
 import { LampTimer } from "../../shared/lamp-timer";
 import { Zone } from "@/store/zones/types";
+import MeterWidget from "@/components/MeterWidget.vue";
+import DeviceWidget from "@/components/DeviceWidget.vue";
 import {
   celsius2fahrenheit,
   fahrenheit2celsius,
   vaporPressureDeficit
 } from "../../shared/utils";
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 interface Reading {
   temperature: number;
@@ -189,24 +172,23 @@ interface Status {
 }
 
 const ZoneDetail = Vue.extend({
+  props: {
+    zone: Zone,
+    units: String
+  },
+  
   data() {
     return {
-      zone: {
-        id: 0,
-        nickname: "",
-        devices: [],
-        profileid: 0,
-        updatedat: new Date()
-      } as Zone,
-      units: "F",
       readings: [] as Reading[],
       statuses: [] as Status[],
-      editing: false
+      timestamp: new Date,
     };
   },
 
   components: {
+    DeviceWidget,
     EditText,
+    MeterWidget,
     SelectDevice,
     SelectProfile,
     Timestamp
@@ -230,6 +212,10 @@ const ZoneDetail = Vue.extend({
       return day;
     },
 
+    linkto(): string {
+      return `zone-details-${this.zone.id}`;
+    },
+    
     meanTemperature(): number {
       let sum = 0;
       this.readings.forEach(reading => {
@@ -338,12 +324,12 @@ const ZoneDetail = Vue.extend({
 
     targetTemperature(): number {
       let target = 15;
-
+      console.log("find target for", this.zone);
       if (this.zone && this.zone.profile) {
         if (this.isDay) {
-          target = this.zone.profile.lampontemperature;
+          target = parseFloat(this.zone.profile.lampontemperature);
         } else {
-          target = this.zone.profile.lampofftemperature;
+          target = parseFloat(this.zone.profile.lampofftemperature);
         }
       }
 
@@ -354,11 +340,12 @@ const ZoneDetail = Vue.extend({
 
     targetHumidity(): number {
       let target = 20;
+      console.log("target humidity", target, this.zone);
       if (this.zone && this.zone.profile) {
         if (this.isDay) {
-          target = this.zone.profile.lamponhumidity;
+          target = parseFloat(this.zone.profile.lamponhumidity);
         } else {
-          target = this.zone.profile.lampoffhumidity;
+          target = parseFloat(this.zone.profile.lampoffhumidity);
         }
       }
       return target;
@@ -394,6 +381,7 @@ const ZoneDetail = Vue.extend({
     zoneSwitches(): Device[] {
       if (this.zone) {
         const result = this.zone.devices;
+        console.log("all devices", this.zone.devices);
         const filter = (event: Device) => {
           return event.devicetype !== "meter";
         };
@@ -405,45 +393,18 @@ const ZoneDetail = Vue.extend({
     ...mapState("devices", ["devices"]),
     ...mapState("profiles", ["profiles"]),
     ...mapState("zones", ["zones"]),
-    ...mapGetters("devices", ["allMeters", "allSwitches"])
+    ...mapGetters("devices", ["meters", "switches"])
   },
 
   mounted() {
-    const zone = this.zones.find((el: Zone) => {
-      return this.$route.params.id === el.id;
-    });
-    console.log("data", zone);
-
-    this.zone.id = zone.id;
-    this.zone.nickname = zone.nickname;
-    this.zone.profileid = zone.profileid;
-    this.zone.devices = zone.devices;
-    this.zone.updatedat = zone.updatedat;
-
-    this.units = this.$route.params.units;
-
     this.refresh();
   },
 
   methods: {
-    addDevice(selected: Device) {
-      if (this.zone) {
-        const payload = { zoneid: this.zone.id, device: selected };
-        this.$store.dispatch("addZoneDevice", payload);
-        this.$store.dispatch("getZones");
-      }
-    },
-
-    cancel() {
-      if (this.zone) {
-        this.profileid = this.zone.profileid;
-        this.nickname = this.zone.nickname;
-      }
-      this.editing = false;
-    },
-
-    edit() {
-      this.editing = true;
+    add(selected: string) {
+      const payload = { zone: this.zone, device: selected };
+      this.addDevice(payload);
+      this.fetchData();
     },
 
     refresh() {
@@ -475,50 +436,33 @@ const ZoneDetail = Vue.extend({
       setTimeout(this.refresh, 30000);
     },
 
-    removeDevice(selected: DeviceState) {
-      if (this.zone) {
-        const payload = { zoneid: this.zone.id, device: selected.device };
-        this.$store.dispatch("removeZoneDevice", payload);
-        this.$store.dispatch("getZones");
-      }
-    },
-
-    save() {
-      if (this.zone) {
-        const zone = {
-          id: this.zone.id,
-          nickname: this.nickname,
-          profileid: this.profileid
-        };
-
-        this.$store.dispatch("editZone", zone);
-      }
-      this.editing = false;
+    remove(selected: string) {
+      const payload = { zone: this.zone, device: selected };
+      this.removeDevice(payload);
+      this.fetchData();
     },
 
     saveNickname(nickname: string) {
-      if (this.zone) {
-        const zone = {
-          id: this.zone.id,
-          nickname: nickname,
-          profileid: this.profileid
-        };
+      const zone = {
+        id: this.zone.id,
+        nickname: nickname,
+        profileid: this.profileid
+      };
 
-        this.$store.dispatch("editZone", zone);
-      }
+      this.edit(zone);
     },
 
     saveProfile(profileid: number) {
-      if (this.zone) {
-        const zone = {
-          id: this.zone.id,
-          nickname: this.nickname,
-          profileid: profileid
-        };
+      const zone = {
+        id: this.zone.id,
+        nickname: this.nickname,
+        profileid: profileid
+      };
+      
+      this.edit(zone);
+    },
 
-        this.$store.dispatch("editZone", zone);
-      }
-    }
+    ...mapActions("zones", ["addDevice", "edit", "fetchData", "removeDevice"])
   }
 });
 

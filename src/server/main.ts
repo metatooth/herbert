@@ -73,7 +73,7 @@ wss.on("connection", function(ws: WebSocket) {
   console.log("websocket connection open");
 
   ws.on("message", async function(msg: string) {
-    console.log(msg);
+    console.log("ON MESSAGE", msg);
 
     let data;
     try {
@@ -192,7 +192,8 @@ async function run() {
         ["blower", blower.isOn(min * 60 + sec)],
         ["heater", directives.temperature === "heat"],
         ["dehumidifer", directives.humidity === "dehumidify"],
-        ["humidifier", directives.humidity === "humidify"]
+        ["humidifier", directives.humidity === "humidify"],
+        ["fan", true]
       ]);
 
       console.log(systems);

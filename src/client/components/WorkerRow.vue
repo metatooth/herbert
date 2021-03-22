@@ -4,6 +4,9 @@
       {{ worker.worker }}
     </td>
     <td>
+      {{ worker.inet }}
+    </td>
+    <td>
       <a @click="editable" v-if="!editing">
         <span v-if="worker.nickname">{{ worker.nickname }}</span>
         <span v-else>click to name</span>

@@ -5,11 +5,12 @@
       <thead>
         <tr>
           <th>MAC</th>
-          <th>Nickname</th>
+          <th>Status</th>
           <th>Type</th>
+          <th>Nickname</th>
+          <th>Updated</th>
           <th>Manufacturer</th>
           <th>History</th>
-          <th>Updated</th>
         </tr>
       </thead>
       <tbody>
@@ -17,6 +18,7 @@
           v-for="device in devices"
           v-bind:key="device.device"
           v-bind:device="device"
+          v-bind:units="units"
         />
       </tbody>
     </table>
@@ -29,6 +31,10 @@ import DeviceRow from "@/components/DeviceRow.vue";
 import { mapState, mapGetters } from "vuex";
 
 const Devices = Vue.extend({
+  props: {
+    units: String
+  },
+  
   components: {
     DeviceRow
   },

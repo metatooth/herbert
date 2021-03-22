@@ -7,6 +7,11 @@ export interface Device {
   updatedat: Date;
   deleted: boolean;
   deletedat?: Date;
+  temperature?: number;
+  humidity?: number;
+  pressure?: number;
+  status?: string;
+  timestamp?: Date;
 }
 
 export class DeviceState {

@@ -1,12 +1,11 @@
 import Router from "express-promise-router";
 import WebSocket from "ws";
-import { query, readDevice } from "../db";
+import { query, readDevice, readDevices } from "../db";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const { rows } = await query("SELECT * FROM devices", []);
-  res.status(200).json(rows);
+  res.status(200).json(await readDevices());
 });
 
 router.get("/:id", async (req, res) => {

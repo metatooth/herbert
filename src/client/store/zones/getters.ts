@@ -3,7 +3,7 @@ import { ZoneState, ZonesState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<ZonesState, RootState> = {
-  allZones(state): ZoneState[] {
+  zones(state): ZoneState[] {
     const { zones } = state;
     return zones;
   },

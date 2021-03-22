@@ -3,7 +3,7 @@ import { Profile, ProfilesState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<ProfilesState, RootState> = {
-  allProfiles(state): Profile[] {
+  profiles(state): Profile[] {
     const { profiles } = state;
     return profiles;
   },
