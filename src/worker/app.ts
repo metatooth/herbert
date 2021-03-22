@@ -266,15 +266,19 @@ export class App {
       const wyzes = await app.wyze.getDeviceList();
       wyzes.forEach(async wyze => {
         console.log("got wyze", wyze);
-        const plug = new WyzeSwitch(wyze.mac);
-        console.log(
-          "conn state",
-          wyze.conn_state,
-          new Date(wyze.conn_state_ts)
-        );
+        if (wyze.conn_state === 0) {
+          const data = {
+            type: "ERROR"
+            payload: {
+              id: wyze.mac,
+              device: wyze.mac,
+              message: "disconnected",
+              timestamp: new Date
+            }
+          };
 
-        plug.state = wyze.device_params.switch_state;
-        app.switchStatus(plug);
+          app.send(JSON.stringify(data));
+        }
       });
     }
 
