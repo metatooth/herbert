@@ -25,6 +25,11 @@ import { configure, getLogger, Logger } from "log4js";
 configure("./config/log4js.json");
 const logger: Logger = getLogger("app");
 
+interface Message {
+  type: String,
+  payload: {}
+}
+
 export class App {
   private static _instance: App;
   initialized: boolean;
@@ -33,7 +38,7 @@ export class App {
   switches: Array<Switch>;
   macaddr: string;
   inet: string;
-  heldMessages: Array<string>;
+  heldMessages: Array<Message>;
   wyze: Wyze;
 
   private constructor() {
@@ -159,10 +164,26 @@ export class App {
               const device = await this.wyze.getDeviceByMac(mac);
               if (device) {
                 console.log("DEVICE", device);
+                let result;
                 if (data.payload.action === "on") {
-                  await this.wyze.turnOn(device);
+                  result = await this.wyze.turnOn(device);
                 } else {
-                  await this.wyze.turnOff(device);
+                  result = await this.wyze.turnOff(device);
+                }
+                if (result.code !== "1") {
+	          logger.error(`ERROR ${result.code} ${device.nickname} ${data.payload.action} - ${result}`);
+                  const reply = {
+		    type: "ERROR",
+                    payload: {
+                      worker: app.macaddr,
+		      device: data.payload.device,
+                      action: data.payload.action,
+                      code: result.code,
+                      message: result.msg,
+                      timestamp: new Date
+                    }
+                  };
+                  app.heldMessages.push(reply);
                 }
               }
             }
@@ -265,10 +286,9 @@ export class App {
       logger.debug("Check on WYZE plugs...");
       const wyzes = await app.wyze.getDeviceList();
       wyzes.forEach(async wyze => {
-        console.log("got wyze", wyze);
         if (wyze.conn_state === 0) {
           const data = {
-            type: "ERROR"
+            type: "ERROR",
             payload: {
               id: wyze.mac,
               device: wyze.mac,
@@ -279,6 +299,18 @@ export class App {
 
           app.send(JSON.stringify(data));
         }
+
+        const plug = new WyzeSwitch(wyze.mac);
+
+        if (wyze.conn_state === 0) {
+          plug.state = "disconnected";
+        } else if (wyze.device_params.switch_state === 1) {
+	  plug.state = "on";
+        } else {
+	  plug.state = "off";
+        }
+
+        app.switchStatus(plug);
       });
     }
 

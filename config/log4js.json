@@ -11,6 +11,6 @@
     }
   },
   "categories": {
-    "default": { "appenders": [ "console" ], "level": "DEBUG" }
+    "default": { "appenders": [ "console", "app" ], "level": "DEBUG" }
   }
 }

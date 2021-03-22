@@ -24,7 +24,11 @@ export class Herbert extends Switch {
   }
 
   public status() {
-    this.state = this.output.readSync();
+    if (this.output.readSync() === 1) {
+      this.state = "on";
+    } else {
+      this.state = "off";
+    }
     return this;
   }
 }
