@@ -1,19 +1,24 @@
 import Vue from "vue";
-import Vuex from "vuex";
-import actions from "./actions";
-import getters from "./getters";
-import mutations from "./mutations";
+import Vuex, { StoreOptions } from "vuex";
+import { RootState } from "./types";
+import { zones } from "./zones";
+import { profiles } from "./profiles";
+import { devices } from "./devices";
+import { workers } from "./workers";
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store: StoreOptions<RootState> = {
+  strict: true,
   state: {
-    zones: [],
-    profiles: [],
-    devices: [],
-    workers: []
+    version: "1.0.0"
   },
-  actions,
-  getters,
-  mutations
-});
+  modules: {
+    zones,
+    profiles,
+    devices,
+    workers
+  }
+};
+
+export default new Vuex.Store<RootState>(store);

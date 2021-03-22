@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ workers.length }} {{ workersName }}</h2>
+    <h2 class="title">{{ workersCount }} {{ workersName }}</h2>
     <table class="table">
       <thead>
         <tr>
@@ -17,33 +17,33 @@
         />
       </tbody>
     </table>
-    <button class="button is-info">
-      <font-awesome-icon icon="sync" @click="$store.dispatch('getWorkers')" />
-    </button>
   </section>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import WorkerRow from "@/components/WorkerRow.vue";
+import { mapState, mapGetters, mapActions } from "vuex";
 
 const Workers = Vue.extend({
-  props: {
-    workers: Array
-  },
-
   components: {
     WorkerRow
   },
 
   computed: {
     workersName(): string {
-      if (this.workers.length === 1) {
+      if (this.workersCount === 1) {
         return "Herbert";
       } else {
         return "Herberts";
       }
-    }
+    },
+    ...mapState("workers", ["workers"]),
+    ...mapGetters("workers", ["workersCount"])
+  },
+
+  methods: {
+    ...mapActions("workers", ["fetchData"])
   }
 });
 

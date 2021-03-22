@@ -5,10 +5,10 @@ const pool = new Pool({
 });
 
 export async function query(text, params): Promise<Result> {
-  const start = Date.now();
+  //const start = Date.now();
   const res = await pool.query(text, params);
-  const duration = Date.now() - start;
-  console.log("executed query", { text, duration, rows: res.rowCount });
+  //const duration = Date.now() - start;
+  //console.log("executed query", { text, duration, rows: res.rowCount });
   return res;
 }
 
@@ -24,10 +24,9 @@ export async function readProfile(id) {
 
 export async function readZone(id) {
   const res = await query(
-    "SELECT z.id, z.nickname, b.id as parentid, b.nickname as parent, p.id as profileid, p.profile, z.updatedat FROM zones z LEFT JOIN zones b ON z.parentid = b.id LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
+    "SELECT z.id, z.nickname, p.id as profileid, z.updatedat FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
     [id]
   );
-  const children = await query("SELECT * FROM zones WHERE parentid = $1", [id]);
   const devices = await query(
     "SELECT d.* FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE zd.zoneid = $1",
     [id]
@@ -45,10 +44,6 @@ export async function readZone(id) {
 
   if (devices) {
     zone.devices = await devices.rows;
-  }
-
-  if (children) {
-    zone.children = await children.rows;
   }
 
   return zone;
@@ -120,14 +115,22 @@ export async function registerDevice(macaddr, manufacturer, type) {
   });
 }
 
-export async function registerWorker(macaddr, nickname) {
+export async function workerStatus(macaddr, inet) {
   query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
       console.log("inserting", macaddr);
-      query("INSERT INTO workers (worker, nickname) VALUES ($1, $2)", [
+      query("INSERT INTO workers (worker, inet) VALUES ($1, $2)", [
         macaddr,
-        nickname
+        inet
       ]);
+    } else if (res.rowCount === 1) {
+      console.log("updating", macaddr);
+      query(
+        "UPDATE workers SET inet = $1, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
+        [inet, macaddr]
+      );
+    } else {
+      // error
     }
   });
 }

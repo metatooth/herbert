@@ -28,16 +28,19 @@ const AddControls = Vue.extend({
 
   methods: {
     on() {
+      console.log("ON");
       this.$emit("on-add");
       this.adding = true;
     },
 
     save() {
+      console.log("SAVE");
       this.$emit("on-save");
       this.adding = false;
     },
 
     cancel() {
+      console.log("CANCEL");
       this.$emit("on-cancel");
       this.adding = false;
     }

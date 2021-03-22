@@ -1,11 +1,11 @@
 <template>
   <tr>
     <td>
-      {{ device.device }}
+      {{ state.device.device }}
     </td>
     <td>
-      <a @click="editable" v-if="!editing">
-        <span v-if="device.nickname">{{ device.nickname }}</span>
+      <a @click="edit" v-if="!editing">
+        <span v-if="state.device.nickname">{{ state.device.nickname }}</span>
         <span v-else>click to name</span>
       </a>
       <div class="field is-grouped" v-else>
@@ -31,25 +31,25 @@
     </td>
     <td>
       <select-device-type
-        v-bind:devicetype="device.devicetype"
+        v-bind:devicetype="state.device.devicetype"
         @select-device-type="saveDeviceType"
       />
     </td>
     <td>
-      {{ device.manufacturer }}
+      {{ state.device.manufacturer }}
     </td>
     <td>
       <router-link
         :to="{
-          name: linkName,
-          params: { name: device.nickname, device: device.device }
+          name: 'readings',
+          params: { name: state.device.nickname, meter: state.device.device }
         }"
       >
         &gt;&gt;&gt;
       </router-link>
     </td>
     <td>
-      <timestamp v-bind:timestamp="updated" />
+      <timestamp :timestamp="new Date(Date.parse(state.device.updatedat))" />
     </td>
   </tr>
 </template>
@@ -58,12 +58,11 @@
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { Device } from "@/store/devices/types";
-import { mapActions } from "vuex";
+import { DeviceState } from "@/store/devices/types";
 
-const DeviceRow = Vue.extend({
+const MeterRow = Vue.extend({
   props: {
-    device: Device
+    state: DeviceState
   },
 
   components: {
@@ -73,52 +72,41 @@ const DeviceRow = Vue.extend({
 
   data() {
     return {
-      nickname: this.device.nickname,
+      nickname: this.state.device.nickname,
       editing: false
     };
   },
 
-  computed: {
-    linkName() {
-      if (this.device.devicetype === "meter") {
-        return "readings";
-      } else {
-        return "statuses";
-      }
-    },
-    updated() {
-      return new Date(Date.parse(this.device.updatedat));
-    }
-  },
-
   methods: {
-    editable() {
+    destroy() {
+      this.$store.dispatch("removeDevice", this.state.device);
+    },
+
+    edit() {
       this.editing = true;
     },
 
     save() {
-      this.edit({
-        ...this.device,
+      this.$store.dispatch("editDevice", {
+        ...this.state.device,
         nickname: this.nickname
       });
       this.editing = false;
     },
 
     saveDeviceType(devicetype: string) {
-      this.edit({
-        ...this.device,
+      this.$store.dispatch("editDevice", {
+        ...this.state.device,
         devicetype: devicetype
       });
     },
 
     cancel() {
-      this.nickname = this.device.nickname;
+      this.nickname = this.state.device.nickname;
       this.editing = false;
-    },
-
-    ...mapActions("devices", ["edit"])
+    }
   }
 });
 
-export default DeviceRow;
+export default MeterRow;
 </script>

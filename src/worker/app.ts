@@ -32,8 +32,9 @@ export class App {
   meters: Array<Meter>;
   switches: Array<Switch>;
   macaddr: string;
+  inet: string;
   heldMessages: Array<string>;
-  wyze: any;
+  wyze: Wyze;
 
   private constructor() {
     console.log("process.argv", process.argv);
@@ -77,6 +78,7 @@ export class App {
       meter.clime.delta = 0.6; // WARNING!
       meter.clime.humidity = ad.serviceData.humidity / 100.0;
       meter.clime.timestamp = new Date();
+      logger.debug(meter.device, meter.clime);
       app.meterStatus(meter);
     }
 
@@ -104,6 +106,7 @@ export class App {
     }
 
     this.macaddr = net[0]["mac"];
+    this.inet = net[0]["address"];
 
     const meters = this.meters;
     const switches = this.switches;
@@ -169,7 +172,7 @@ export class App {
                 const herbert = plug as Herbert;
                 console.log("HERBERT", herbert);
                 if (herbert.device === data.payload.device) {
-                  console.log("CHANGE", herbert, data.payload.action);
+                  logger.debug("CHANGE", herbert, data.payload.action);
                   if (data.payload.action === "on") {
                     herbert.on();
                   } else {
@@ -227,12 +230,12 @@ export class App {
     this.send(data);
   }
 
-  private async workerStatus(macaddr: string, nickname: string) {
+  private async workerStatus(macaddr: string, inet: string) {
     const data = {
       type: "STATUS",
       payload: {
         worker: macaddr,
-        nickname: nickname,
+        inet: inet,
         timestamp: new Date()
       }
     };
@@ -245,7 +248,7 @@ export class App {
       await app.init();
     }
 
-    app.workerStatus(this.macaddr, config.get("nickname"));
+    app.workerStatus(this.macaddr, this.inet);
 
     const polling: number = 1000 * parseInt(config.get("polling"));
     const interval: number = 1000 * parseInt(config.get("interval"));
@@ -263,15 +266,19 @@ export class App {
       const wyzes = await app.wyze.getDeviceList();
       wyzes.forEach(async wyze => {
         console.log("got wyze", wyze);
-        const plug = new WyzeSwitch(wyze.mac);
-        console.log(
-          "conn state",
-          wyze.conn_state,
-          new Date(wyze.conn_state_ts)
-        );
+        if (wyze.conn_state === 0) {
+          const data = {
+            type: "ERROR"
+            payload: {
+              id: wyze.mac,
+              device: wyze.mac,
+              message: "disconnected",
+              timestamp: new Date
+            }
+          };
 
-        plug.state = wyze.device_params.switch_state;
-        app.switchStatus(plug);
+          app.send(JSON.stringify(data));
+        }
       });
     }
 

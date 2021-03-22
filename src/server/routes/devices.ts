@@ -20,7 +20,7 @@ router.put("/:id", async (req, res) => {
   const {
     rows
   } = await query(
-    "UPDATE devices SET nickname = $1, devicetype = $2 WHERE device = $3 RETURNING device",
+    "UPDATE devices SET nickname = $1, devicetype = $2, updatedat = CURRENT_TIMESTAMP WHERE device = $3 RETURNING device",
     [req.body.nickname, req.body.devicetype, id]
   );
   console.log("UPDATED DEVICES", rows);
@@ -37,6 +37,7 @@ router.put("/:id/:action", async (req, res) => {
   const ws = new WebSocket(url);
 
   ws.addEventListener("open", ev => {
+    console.log("event", ev);
     const data = {
       type: "COMMAND",
       payload: {

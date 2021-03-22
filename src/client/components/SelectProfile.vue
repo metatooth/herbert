@@ -36,44 +36,27 @@
 
 <script lang="ts">
 import Vue from "vue";
-import HerbertButton from "@/components/Button";
+import HerbertButton from "@/components/Button.vue";
+import { mapState } from "vuex";
 
 const SelectProfile = Vue.extend({
   props: {
     label: String,
-    profile: Object,
-    profiles: Array
+    profileid: Number
+  },
+
+  data() {
+    return {
+      selected: this.profileid
+    };
   },
 
   components: {
     HerbertButton
   },
 
-  data() {
-    let id;
-    if (this.profile) {
-      id = this.profile.id;
-    }
-
-    return {
-      selected: id,
-      editing: false
-    };
-  },
-
   computed: {
-    changed() {
-      if (this.profile) {
-        return this.profile.id !== this.selected;
-      }
-      return true;
-    }
-  },
-
-  methods: {
-    select() {
-      this.$emit("select-profile", this.selected);
-    }
+    ...mapState("profiles", ["profiles"])
   }
 });
 

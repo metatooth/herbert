@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <h2 class="title">{{ $route.params.name }} Meter Reading</h2>
-    <h2 class="subtitle">{{ $route.params.meter }}</h2>
+    <h2 class="subtitle">{{ $route.params.device }}</h2>
 
     <form class="control">
       Last&nbsp;
@@ -109,7 +109,7 @@ const Readings = Vue.extend({
 
       xhr.open(
         "GET",
-        `${url}/readings/?meter=${this.$route.params.meter}&last=${this.range}`
+        `${url}/readings/?meter=${this.$route.params.device}&last=${this.range}`
       );
 
       xhr.onload = () => {
@@ -120,7 +120,7 @@ const Readings = Vue.extend({
           const timeZone = "Etc/UTC";
           data.forEach(
             (d: {
-              created_at: Date;
+              createdat: Date;
               temperature: number;
               humidity: number;
               pressure: number;

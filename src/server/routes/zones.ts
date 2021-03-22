@@ -11,11 +11,12 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  console.log("POST /ZONES", req, res);
   const {
     rows
   } = await query(
-    "INSERT INTO zones (nickname, profileid, parentid) VALUES ($1, $2, $3) RETURNING id",
-    [req.body.nickname, req.body.profile, req.body.parent]
+    "INSERT INTO zones (nickname, profileid) VALUES ($1, $2) RETURNING id",
+    [req.body.nickname, req.body.profileid]
   );
   const zone = await readZone(rows[0].id);
   res.status(201).json(zone);
@@ -31,8 +32,8 @@ router.put("/:id", async (req, res) => {
   const {
     rows
   } = await query(
-    "UPDATE zones SET parentid = $1, nickname = $2, profileid = $3 WHERE id = $4 RETURNING id",
-    [req.body.parentid, req.body.nickname, req.body.profileid, id]
+    "UPDATE zones SET nickname = $1, profileid = $2, updatedat = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id",
+    [req.body.nickname, req.body.profileid, id]
   );
   console.log("update zones", rows);
   const zone = await readZone(rows[0].id);

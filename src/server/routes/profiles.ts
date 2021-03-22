@@ -46,12 +46,12 @@ router.put("/:id", async (req, res) => {
     "UPDATE profiles SET profile = $1, lampstart = $2, lampduration = $3, lampontemperature = $4, lamponhumidity = $5, lampofftemperature = $6, lampoffhumidity = $7 WHERE id = $8 returning id",
     [
       req.body.profile,
-      req.body.lampStart,
-      req.body.lampDuration,
-      req.body.lampOnTemperature,
-      req.body.lampOnHumidity,
-      req.body.lampOffTemperature,
-      req.body.lampOffHumidity,
+      req.body.lampstart,
+      req.body.lampduration,
+      req.body.lampontemperature,
+      req.body.lamponhumidity,
+      req.body.lampofftemperature,
+      req.body.lampoffhumidity,
       id
     ]
   );

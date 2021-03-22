@@ -1,7 +1,12 @@
 <template>
   <tr>
     <td>
-      <a v-if="!editing" :href="linkToConfig">{{ zone.nickname }}</a>
+      <router-link
+        v-if="!editing"
+        :to="{ name: 'zone', params: { id: zone.id, units: units } }"
+      >
+        {{ zone.nickname }}
+      </router-link>
       <div class="control" v-else>
         <input
           class="input"
@@ -35,34 +40,11 @@
       </div>
     </td>
     <td>
-      <div v-if="!editing">
-        <div v-if="zone.parent">
-          {{ zone.parent }}
-        </div>
-        <div v-else>
-          <a :href="linkToConfig">no parent set</a>
-        </div>
-      </div>
-      <div class="control" v-else>
-        <div class="select">
-          <select v-model="parentid">
-            <option
-              v-for="zone in zones"
-              v-bind:key="zone.id"
-              v-bind:value="zone.id"
-            >
-              {{ zone.nickname }}
-            </option>
-          </select>
-        </div>
-      </div>
-    </td>
-    <td>
-      <timestamp :timestamp="zoneUpdatedAt" />
+      <timestamp :timestamp="new Date(Date.parse(zone.updatedat))" />
     </td>
     <td>
       <edit-controls
-        @on-edit="edit"
+        @on-edit="editable"
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
@@ -73,21 +55,21 @@
 
 <script lang="ts">
 import Vue from "vue";
-import Timestamp from "@/components/Timestamp";
+import Timestamp from "@/components/Timestamp.vue";
 import EditControls from "@/components/EditControls.vue";
+import { mapState, mapActions } from "vuex";
+import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
   props: {
-    zone: Object,
-    profiles: Array,
-    zones: Array
+    zone: Zone,
+    units: String
   },
 
   data() {
     return {
       nickname: this.zone.nickname,
       profileid: this.zone.profileid,
-      parentid: this.zone.parentid,
       editing: false
     };
   },
@@ -104,42 +86,39 @@ const ZoneRow = Vue.extend({
 
     zoneUpdatedAt(): Date {
       return new Date(Date.parse(this.zone.updatedat));
-    }
+    },
+
+    ...mapState("profiles", ["profiles"])
   },
 
   methods: {
-    edit() {
+    editable() {
       this.editing = true;
     },
 
     save() {
-      const parent = this.zones.find(el => el.id === this.parentid);
-      const profile = this.profiles.find(el => el.id === this.profileid);
-
       const zone = {
         id: this.zone.id,
         nickname: this.nickname,
-        profileid: this.profileid,
-        profile: profile.profile,
-        parentid: this.parentid,
-        parent: parent.nickname
+        profileid: this.profileid
       };
 
-      this.$store.dispatch("editZone", zone);
+      this.edit(zone);
       this.editing = false;
     },
 
     destroy() {
-      this.$store.dispatch("removeZone", this.zone);
+      this.remove(this.zone);
       this.editing = false;
     },
 
     cancel() {
       this.nickname = this.zone.nickname;
       this.profileid = this.zone.profileid;
-      this.parentid = this.zone.parentid;
       this.editing = false;
-    }
+    },
+
+    ...mapActions("zones", ["edit", "remove"])
   }
 });
 

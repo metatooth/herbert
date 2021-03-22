@@ -7,11 +7,10 @@ import mountRoutes from "./routes";
 import {
   readZones,
   reading,
-  readZoneDevices,
   registerDevice,
-  registerWorker,
   createReading,
-  createStatus
+  createStatus,
+  workerStatus
 } from "./db";
 
 import path from "path";
@@ -115,7 +114,7 @@ wss.on("connection", function(ws: WebSocket) {
 
       if (data.payload.worker) {
         console.log("Status message from worker", data.payload);
-        registerWorker(data.payload.worker, data.payload.nickname);
+        workerStatus(data.payload.worker, data.payload.inet);
       }
     }
 
@@ -134,7 +133,7 @@ async function run() {
     const hour = now.getHours();
     const min = now.getMinutes();
     const sec = now.getSeconds();
-
+    console.log("zone is", zone);
     if (zone.profile) {
       console.log("command for zone", zone.nickname);
       let temperature = 0;

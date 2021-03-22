@@ -13,6 +13,10 @@
 import Vue from "vue";
 import Notification from "@/components/Notification.vue";
 
+interface NotificationType {
+  id: number;
+}
+
 const Notifications = Vue.extend({
   props: { notifications: Array },
 
@@ -21,7 +25,7 @@ const Notifications = Vue.extend({
   },
 
   methods: {
-    deleteNotification(notification): void {
+    deleteNotification(notification: NotificationType): void {
       this.$emit("delete-notification", notification);
     }
   }

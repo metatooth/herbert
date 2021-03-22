@@ -19,8 +19,8 @@
         <profile-row
           v-for="profile in profiles"
           v-bind:key="profile.id"
-          v-bind:units="units"
           v-bind:profile="profile"
+          v-bind:units="units"
         />
 
         <tr>
@@ -131,9 +131,6 @@
         </tr>
       </tbody>
     </table>
-    <button class="button is-info">
-      <font-awesome-icon icon="sync" @click="$store.dispatch('getProfiles')" />
-    </button>
   </section>
 </template>
 
@@ -141,16 +138,17 @@
 import Vue from "vue";
 import ProfileRow from "@/components/ProfileRow.vue";
 import AddControls from "@/components/AddControls.vue";
+import { mapState, mapGetters } from "vuex";
 
 const Profiles = Vue.extend({
   props: {
-    profiles: Array,
     units: String
   },
 
   data() {
     return {
       profile: "",
+      timezone: "America/New_York",
       start: "08:00",
       duration: 12,
       lampOnTemperature: 65.0,
@@ -185,12 +183,14 @@ const Profiles = Vue.extend({
 
   computed: {
     profilesName(): string {
-      if (this.profiles.length === 1) {
+      if (this.profilesCount === 1) {
         return "Profile";
       } else {
         return "Profiles";
       }
-    }
+    },
+    ...mapState("profiles", ["profiles"]),
+    ...mapGetters("profiles", ["profileCount"])
   },
 
   methods: {

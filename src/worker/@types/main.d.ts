@@ -26,4 +26,6 @@ interface WyzeDevice {
 interface Wyze {
   turnOff: function;
   turnOn: function;
+  getDeviceByMac: function;
+  getDeviceList: function;
 }

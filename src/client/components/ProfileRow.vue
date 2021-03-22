@@ -152,7 +152,7 @@
     </td>
     <td>
       <edit-controls
-        @on-edit="edit"
+        @on-edit="editable"
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
@@ -163,14 +163,15 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 import EditControls from "@/components/EditControls.vue";
-
 import { celsius2fahrenheit, vaporPressureDeficit } from "../../shared/utils";
+import { Profile } from "@/store/profiles/types";
 
 const ProfileRow = Vue.extend({
   props: {
-    profile: Object,
+    profile: Profile,
     units: String
   },
 
@@ -202,8 +203,8 @@ const ProfileRow = Vue.extend({
       lampduration: this.profile.lampduration["hours"],
       lampontemperature: lampon,
       lampofftemperature: lampoff,
-      lamponhumidity: this.profile.lamponhumidity,
-      lampoffhumidity: this.profile.lampoffhumidity,
+      lamponhumidity: parseFloat(this.profile.lamponhumidity),
+      lampoffhumidity: parseFloat(this.profile.lampoffhumidity),
       editing: false
     };
   },
@@ -312,22 +313,26 @@ const ProfileRow = Vue.extend({
   },
 
   methods: {
-    edit() {
+    editable() {
       this.editing = true;
     },
 
     save() {
       const start = this.lampstart.split(":");
-      let hourInt = parseInt(start[0]) + 5; // WARNING!
+      console.log("start", start);
+      let hourInt = parseInt(start[0]);
       if (hourInt > 24) {
         hourInt = hourInt - 24;
       }
+      console.log("hour int", hourInt);
+
       let hourString;
       if (hourInt < 10) {
         hourString = "0" + hourInt;
       } else {
         hourString = hourInt.toString();
       }
+      console.log("hour string", hourString);
 
       let ontemp = this.lampontemperature;
       let offtemp = this.lampofftemperature;
@@ -335,30 +340,32 @@ const ProfileRow = Vue.extend({
         ontemp = ((ontemp - 32) * 5) / 9;
         offtemp = ((offtemp - 32) * 5) / 9;
       }
-
+      console.log("lampstart", `${hourString}:${start[1]}`);
       const profile = {
         id: this.profile.id,
         profile: this.name,
         lampstart: `${hourString}:${start[1]}`,
         lampduration: `${this.lampduration} hours`,
         lampontemperature: ontemp,
-        lamponhumidity: this.lamponhumidity,
+        lamponhumidity: parseFloat(this.lamponhumidity),
         lampofftemperature: offtemp,
-        lampoffhumidity: this.lampoffhumidity
+        lampoffhumidity: parseFloat(this.lampoffhumidity)
       };
 
-      this.$store.dispatch("editProfile", profile);
+      this.edit(profile);
       this.editing = false;
     },
 
     destroy() {
-      this.$store.dispatch("removeProfile", this.profile);
+      this.remove(this.profile);
       this.editing = false;
     },
 
     cancel() {
       this.editing = false;
-    }
+    },
+
+    ...mapActions("profiles", ["edit", "remove"])
   }
 });
 

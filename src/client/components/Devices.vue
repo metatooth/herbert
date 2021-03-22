@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ devices.length }} {{ devicesName }}</h2>
+    <h2 class="title">{{ devicesCount }} {{ devicesName }}</h2>
     <table class="table">
       <thead>
         <tr>
@@ -20,28 +20,26 @@
         />
       </tbody>
     </table>
-    <button class="button is-info">
-      <font-awesome-icon icon="sync" @click="$store.dispatch('getDevices')" />
-    </button>
   </section>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import DeviceRow from "@/components/DeviceRow.vue";
+import { mapState, mapGetters } from "vuex";
 
 const Devices = Vue.extend({
-  props: {
-    devices: Array
-  },
-
   components: {
     DeviceRow
   },
 
   computed: {
+    ...mapState("devices", ["devices"]),
+
+    ...mapGetters("devices", ["devicesCount"]),
+
     devicesName() {
-      if (this.devices.length === 1) {
+      if (this.devicesCount === 1) {
         return "Device";
       } else {
         return "Devices";

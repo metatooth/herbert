@@ -6,7 +6,7 @@
           <img src="./assets/images/milltownag.png" />
         </router-link>
         <div class="navbar-item">
-          <h1 class="title">Automation Control System</h1>
+          <h1 class="title">Automation Control Ecosystem</h1>
         </div>
       </div>
     </nav>

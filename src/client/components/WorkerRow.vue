@@ -4,7 +4,7 @@
       {{ worker.worker }}
     </td>
     <td>
-      <a @click="edit" v-if="!editing">
+      <a @click="editable" v-if="!editing">
         <span v-if="worker.nickname">{{ worker.nickname }}</span>
         <span v-else>click to name</span>
       </a>
@@ -39,10 +39,12 @@
 import Vue from "vue";
 
 import Timestamp from "@/components/Timestamp.vue";
+import { Worker } from "@/store/workers/types";
+import { mapActions } from "vuex";
 
 const WorkerRow = Vue.extend({
   props: {
-    worker: Object
+    worker: Worker
   },
 
   data() {
@@ -57,12 +59,12 @@ const WorkerRow = Vue.extend({
   },
 
   methods: {
-    edit() {
+    editable() {
       this.editing = true;
     },
 
     save() {
-      this.$store.dispatch("editWorker", {
+      this.edit({
         ...this.worker,
         nickname: this.nickname
       });
@@ -72,7 +74,9 @@ const WorkerRow = Vue.extend({
     cancel() {
       this.nickname = this.worker.nickname;
       this.editing = false;
-    }
+    },
+
+    ...mapActions("workers", ["edit"])
   }
 });
 
