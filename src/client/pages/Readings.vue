@@ -69,6 +69,11 @@ import Chart from "@/components/Chart.vue";
 import TemperatureChart from "@/components/TemperatureChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
+interface MeterReading {
+  x: Date;
+  y: Date;
+};
+
 const Readings = Vue.extend({
   props: {
     name: { type: String, default: "" }
@@ -77,9 +82,9 @@ const Readings = Vue.extend({
   data() {
     return {
       range: "hour",
-      temperatures: [] as { x: Date; y: number }[],
-      humidities: [] as { x: Date; y: number }[],
-      pressures: [] as { x: Date; y: number }[],
+      temperatures: [] as MeterReading[],
+      humidities: [] as MeterReading[],
+      pressures: [] as MeterReading[],
       units: "F",
       minmax: [100, 0]
     };
@@ -119,7 +124,7 @@ const Readings = Vue.extend({
 
   methods: {
     calcminmax() {
-      this.humidities.forEach(d => {
+      this.humidities.forEach((d: { x: Date, y: number }) => {
         if (d.y < this.minmax[0]) {
           this.minmax[0] = d.y;
         }

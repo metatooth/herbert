@@ -6,9 +6,10 @@ export const mutations: MutationTree<DevicesState> = {
     const found = state.devices.find((el: Device) => {
       return el.device === payload.device;
     });
-    const index = state.devices.indexOf(found);
-    console.log(payload, found, index);
-    state.devices.splice(index, 1, payload);
+    if (found) {
+      const index = state.devices.indexOf(found);
+      state.devices.splice(index, 1, payload);
+    }
   },
   SET(state, payload: Device[]) {
     state.error = false;

@@ -41,7 +41,7 @@ export const actions: ActionTree<ProfilesState, RootState> = {
     );
   },
   remove({ commit }, payload: Profile) {
-    HTTP.delete(`/profiles/${profile.id}`);
+    HTTP.delete(`/profiles/${payload.id}`);
     commit("REMOVE", payload);
   }
 };

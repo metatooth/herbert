@@ -14,20 +14,7 @@ export interface Device {
   timestamp?: Date;
 }
 
-export class DeviceState {
-  device: Device = {
-    device: "",
-    devicetype: "",
-    manufacturer: "",
-    nickname: "",
-    createdat: new Date(),
-    updatedat: new Date(),
-    deleted: false
-  };
-  error = false;
-}
-
 export interface DevicesState {
-  devices: DeviceState[];
+  devices: Device[];
   error: boolean;
 }
