@@ -41,6 +41,7 @@
           :value="dayTemperature"
           :precision="1"
           :units="unitsWithDegree"
+          size="small"
           text="black"
           background="warning"
         />
@@ -49,6 +50,7 @@
           :value="parseFloat(profile.lamponhumidity)"
           :precision="0"
           units="%"
+          size="small"
           text="black"
           background="warning"
         />
@@ -57,6 +59,7 @@
           :value="lamponPressure"
           :precision="1"
           units="hPa"
+          size="small"
           text="black"
           background="warning"
         />
@@ -99,6 +102,7 @@
           :value="nightTemperature"
           :precision="1"
           :units="unitsWithDegree"
+          size="small"
           text="white"
           background="info"
         />
@@ -107,6 +111,7 @@
           :value="parseFloat(profile.lampoffhumidity)"
           :precision="0"
           units="%"
+          size="small"
           text="white"
           background="info"
         />
@@ -115,6 +120,7 @@
           :value="lampoffPressure"
           :precision="1"
           units="hPa"
+          size="small"
           text="white"
           background="info"
         />
@@ -178,7 +184,7 @@ const ProfileRow = Vue.extend({
   data() {
     console.log("profile", this.profile);
     const start = this.profile.lampstart.split(":");
-    let hourInt = parseInt(start[0]) - 5; // WARNING!
+    let hourInt = parseInt(start[0]);
     if (hourInt < 0) {
       hourInt = 24 + hourInt;
     }
@@ -264,7 +270,7 @@ const ProfileRow = Vue.extend({
 
     lamponHour(): string {
       const start = this.profile.lampstart.split(":");
-      const hour = parseInt(start[0]) - 5; // WARNING!
+      const hour = parseInt(start[0]);
 
       if (hour < 0) {
         return (24 + hour).toString();

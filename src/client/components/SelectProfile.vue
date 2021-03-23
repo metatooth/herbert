@@ -1,25 +1,34 @@
 <template>
-  <div class="field is-horizontal">
-    <div class="field-label">
-      <label class="label">{{ label }}</label>
-    </div>
-    <div class="field-body">
-      <div class="field has-addons">
-        <div class="control">
-          <div class="select">
-            <select v-model="selected">
-              <option
-                v-for="profile in profiles"
-                v-bind:key="profile.id"
-                v-bind:value="profile.id"
-              >
-                {{ profile.profile }}
-              </option>
-            </select>
+  <div class="field is-grouped">
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <label class="label">{{ label }}</label>
+      </div>
+      <div class="field-body">
+        <div class="field">
+          <div class="control">
+            <div class="select">
+              <select v-model="selected">
+                <option
+                  v-for="profile in profiles"
+                  v-bind:key="profile.id"
+                  v-bind:value="profile.id"
+                >
+                  {{ profile.profile }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
-
-        <herbert-button class="is-primary" label="" icon="check" />
+        <div class="field">
+          <herbert-button
+            class="is-primary"
+            :show="changed"
+            label=""
+            @on-click="select"
+            icon="check"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -28,17 +37,18 @@
 <script lang="ts">
 import Vue from "vue";
 import HerbertButton from "@/components/Button.vue";
-import { mapState } from "vuex";
+import { mapGetters } from "vuex";
+import { Zone } from "@/store/zones/types";
 
 const SelectProfile = Vue.extend({
   props: {
     label: String,
-    profileid: Number
+    zone: Zone
   },
 
   data() {
     return {
-      selected: this.profileid
+      selected: Number
     };
   },
 
@@ -46,8 +56,12 @@ const SelectProfile = Vue.extend({
     HerbertButton
   },
 
+  mounted() {
+    this.selected = this.zone.profileid;
+  },
+  
   computed: {
-    ...mapState("profiles", ["profiles"])
+    ...mapGetters("profiles", ["profiles"])
   }
 });
 

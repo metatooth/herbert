@@ -8,9 +8,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
     const json = JSON.stringify(payload);
     HTTP.post("/zones", json).then(
       response => {
-        console.log("response", response);
         const zone: Zone = response && response.data;
-        console.log("zone", zone);
         commit("ADD", zone);
       },
       error => {
@@ -20,9 +18,9 @@ export const actions: ActionTree<ZonesState, RootState> = {
     );
   },
 
-  addDevice({ commit }, payload: { zoneid: number; device: string }) {
+  addDevice({ commit }, payload: { zone: Zone; device: string }) {
     const json = JSON.stringify({ device: payload.device });
-    HTTP.post(`/zones/${payload.zoneid}/devices`, json).then(
+    HTTP.post(`/zones/${payload.zone.id}/devices`, json).then(
       response => {
         commit("ADD_DEVICE", response.data);
       },
@@ -41,7 +39,6 @@ export const actions: ActionTree<ZonesState, RootState> = {
   },
 
   fetchData({ commit }) {
-    console.log("here we are at fetch data!");
     HTTP.get("/zones").then(
       response => {
         const payload: Zone[] = response && response.data;
@@ -59,8 +56,9 @@ export const actions: ActionTree<ZonesState, RootState> = {
     commit("REMOVE", payload);
   },
 
-  removeDevice({ commit }, payload: { zoneid: number; device: string }) {
-    HTTP.delete(`/zones/${payload.zoneid}/devices/${payload.device}`);
-    commit("REMOVE_DEVICE", zone);
+  removeDevice({ commit }, payload: { zone: Zone, device: string }) {
+    console.log("remove device payload", payload);
+    HTTP.delete(`/zones/${payload.zone.id}/devices/${payload.device}`);
+    commit("REMOVE_DEVICE", payload.zone);
   }
 };

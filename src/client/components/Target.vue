@@ -20,17 +20,18 @@ const Target = Vue.extend({
     value: Number,
     precision: Number,
     units: String,
-    text: String,
-    background: String
+    text: { type: String, default: "black" },
+    background: { type: String, default: "black-light" },
+    size: { type: String, default: "medium" }
   },
 
   computed: {
     displayClass(): string {
-      return `display has-text-${this.text}-bis has-background-${this.background}`;
+      return `display has-text-${this.text}-bis has-background-${this.background} is-${this.size}`;
     },
 
     iconClass(): string {
-      return `has-text-${this.background} has-background-black-bis`;
+      return `has-text-${this.background} has-background-black-bis is-${this.size}`;
     },
 
     formatted(): string {

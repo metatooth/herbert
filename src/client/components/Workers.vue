@@ -5,6 +5,7 @@
       <thead>
         <tr>
           <th>MAC</th>
+          <th>INET</th>
           <th>Nickname</th>
           <th>Updated</th>
         </tr>

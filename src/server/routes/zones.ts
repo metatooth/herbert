@@ -6,12 +6,10 @@ const router = Router();
 
 router.get("/", async (req, res) => {
   const rows = await readZones();
-  console.log("ROWS FOR /zones", rows);
   res.status(200).json(rows);
 });
 
 router.post("/", async (req, res) => {
-  console.log("POST /ZONES", req, res);
   const {
     rows
   } = await query(
@@ -35,7 +33,6 @@ router.put("/:id", async (req, res) => {
     "UPDATE zones SET nickname = $1, profileid = $2, updatedat = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id",
     [req.body.nickname, req.body.profileid, id]
   );
-  console.log("update zones", rows);
   const zone = await readZone(rows[0].id);
   res.status(200).json(zone);
 });
@@ -48,8 +45,6 @@ router.delete("/:id", async (req, res) => {
 
 router.post("/:id/devices", async (req, res) => {
   const { id } = req.params;
-  console.log("POST zone & device", id);
-  console.log("BODY", req.body);
   try {
     await query("INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)", [
       id,
@@ -62,7 +57,6 @@ router.post("/:id/devices", async (req, res) => {
   const { rows } = await query("SELECT * FROM zone_devices WHERE zoneid = $1", [
     id
   ]);
-  console.log("ROWS", rows);
   res.status(200).json({});
 });
 

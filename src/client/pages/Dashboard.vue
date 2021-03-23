@@ -24,8 +24,8 @@
         </ul>
       </div>
 
-      <overview v-if="is('overview')" />
-      <devices v-if="is('devices')" />
+      <overview v-if="is('overview')" @child-picked="pick" />
+      <devices v-if="is('devices')" v-bind:units="units" />
       <profiles v-if="is('profiles')" v-bind:units="units" />
       <workers v-if="is('workers')" />
       <zones v-if="is('zones')" v-bind:units="units" />
@@ -61,22 +61,12 @@ import Zones from "@/components/Zones.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import { mapActions } from "vuex";
 
-interface Notification {
-  id: string;
-  plug: string;
-  action: string;
-  code: string;
-  message: string;
-  timestamp: Date;
-}
-
 const Dashboard = Vue.extend({
   data() {
     return {
-      notifications: [] as Notification[],
       picked: "overview",
       units: "F",
-      ts: new Date()
+      ts: new Date
     };
   },
 
@@ -98,32 +88,31 @@ const Dashboard = Vue.extend({
     changeUnits(units: string) {
       this.units = units;
     },
-    deleteNotification(n: Notification): void {
-      const found = this.notifications.findIndex(el => el.id === n.id);
-      console.log("found!", found);
-      this.notifications.splice(found, 1);
-    },
+
     is(section: string) {
       if (this.picked === section) {
         return "is-active";
       }
       return "";
     },
+
     pick(section: string) {
       this.picked = section;
     },
+
     refresh() {
       this["devices/fetchData"]();
       this["profiles/fetchData"]();
       this["workers/fetchData"]();
       this["zones/fetchData"]();
 
-      this.ts = new Date();
+      this.ts = new Date;
 
       console.log("refresh", this.ts);
 
       setTimeout(this.refresh, 30000);
     },
+
     ...mapActions([
       "devices/fetchData",
       "profiles/fetchData",

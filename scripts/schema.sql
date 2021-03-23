@@ -52,7 +52,7 @@ create table readings (
 create table statuses (
   id serial primary key,
   device macaddr references devices(device),
-  status numeric not null,
+  status varchar(80) not null,
   createdat timestamp default current_timestamp
 );
 
@@ -130,7 +130,7 @@ insert into manufacturers (manufacturer)
 
 insert into device_types (devicetype)
        values ('meter'), ('lamp'), ('blower'),
-       ('humidifier'), ('dehumidifier'), ('heater');
+       ('humidifier'), ('dehumidifier'), ('heater'), ('fan');
 
 insert into profiles (profile, timezone, lampstart, lampduration, lampontemperature,
        lamponhumidity, lampofftemperature, lampoffhumidity)
