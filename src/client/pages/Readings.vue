@@ -75,10 +75,6 @@ interface MeterReading {
 }
 
 const Readings = Vue.extend({
-  props: {
-    name: { type: String, default: "" }
-  },
-
   data() {
     return {
       range: "hour",
