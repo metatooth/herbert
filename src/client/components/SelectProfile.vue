@@ -59,9 +59,23 @@ const SelectProfile = Vue.extend({
   mounted() {
     this.selected = this.zone.profileid;
   },
-  
+
   computed: {
+    changed() {
+      if (this.zone.profileid === this.selected) {
+        return false;
+      }
+
+      return true;
+    },
+
     ...mapGetters("profiles", ["profiles"])
+  },
+
+  methods: {
+    select(profile: number) {
+      this.$emit("select-profile", profile);
+    }
   }
 });
 

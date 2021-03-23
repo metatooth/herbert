@@ -126,7 +126,7 @@ insert into accounts (units, locale, timezone)
        values ('F', 'us_EN', 'America/New_York');
  
 insert into manufacturers (manufacturer)
-       values ('herbert'), ('SwitchBot'), ('WYZE'), ('mockbot');
+       values ('herbert'), ('SwitchBot'), ('WYZE'), ('mockbot'), ('sm-8relay');
 
 insert into device_types (devicetype)
        values ('meter'), ('lamp'), ('blower'),

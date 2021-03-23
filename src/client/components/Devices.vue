@@ -34,7 +34,7 @@ const Devices = Vue.extend({
   props: {
     units: String
   },
-  
+
   components: {
     DeviceRow
   },

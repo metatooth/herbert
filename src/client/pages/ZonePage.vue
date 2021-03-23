@@ -5,7 +5,7 @@
       v-bind:key="zone.id"
       v-bind:zone="zone"
       v-bind:units="units"
-      />
+    />
   </section>
 </template>
 
@@ -19,9 +19,9 @@ const ZonePage = Vue.extend({
     return {
       selected: this.$route.params.id,
       units: this.$route.params.units
-    }
+    };
   },
-  
+
   components: {
     ZoneDetail
   },
@@ -29,7 +29,6 @@ const ZonePage = Vue.extend({
   computed: {
     ...mapGetters("zones", ["zones"])
   }
-
 });
 
 export default ZonePage;

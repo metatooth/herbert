@@ -54,9 +54,9 @@ const TemperatureChart = Vue.extend({
         this.calcminmax();
       }
       return this.minmax[1];
-    },
+    }
   },
-  
+
   watch: {
     data() {
       this.display = [];
@@ -86,8 +86,6 @@ const TemperatureChart = Vue.extend({
     calcminmax() {
       console.log("at calcminmax");
       this.data.forEach(d => {
-        
-
         if (d.y < this.minmax[0]) {
           this.minmax[0] = d.y;
         }
@@ -95,10 +93,9 @@ const TemperatureChart = Vue.extend({
         if (d.y > this.minmax[1]) {
           this.minmax[1] = d.y;
         }
-
       });
     },
-    
+
     changeUnits(units) {
       this.units = units;
       if (this.units === "C") {

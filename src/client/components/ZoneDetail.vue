@@ -1,141 +1,142 @@
 <template>
   <div id="linkto" class="level">
-  <div class="card">
-    <div class="card-content">
-      <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
-    </div>
+    <div class="card">
+      <div class="card-content">
+        <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
+      </div>
 
-    <div class="card-content">
-      <div class="field is-grouped">
-        <div class="control">
-          <span class="tag is-medium">Actual</span>
-        </div>
-        <div class="control">
-          <div class="tags has-addons">
-            <span class="tag is-medium" :class="meanTemperatureIconClass">
-              <font-awesome-icon icon="thermometer-half" />
-            </span>
-            <span class="tag is-medium" :class="meanTemperatureDisplayClass">
-              {{ meanTemperature.toFixed(1) }} {{ unitsWithDegree }}
-            </span>
+      <div class="card-content">
+        <div class="field is-grouped">
+          <div class="control">
+            <span class="tag is-medium">Actual</span>
           </div>
-        </div>
-
-        <div class="control">
-          <div class="tags has-addons">
-            <span class="tag is-medium" :class="meanHumidityIconClass">
-              <font-awesome-icon icon="tint" />
-            </span>
-            <span class="tag is-medium" :class="meanHumidityDisplayClass">
-              {{ meanHumidity.toFixed(0) }} %
-            </span>
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="meanTemperatureIconClass">
+                <font-awesome-icon icon="thermometer-half" />
+              </span>
+              <span class="tag is-medium" :class="meanTemperatureDisplayClass">
+                {{ meanTemperature.toFixed(1) }} {{ unitsWithDegree }}
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div class="control">
-          <div class="tags has-addons">
-            <span class="tag is-medium" :class="meanPressureIconClass">
-              <font-awesome-icon icon="cloud" />
-            </span>
-            <span class="tag is-medium" :class="meanPressureDisplayClass">
-              {{ meanPressure.toFixed(1) }} hPa
-            </span>
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="meanHumidityIconClass">
+                <font-awesome-icon icon="tint" />
+              </span>
+              <span class="tag is-medium" :class="meanHumidityDisplayClass">
+                {{ meanHumidity.toFixed(0) }} %
+              </span>
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="meanPressureIconClass">
+                <font-awesome-icon icon="cloud" />
+              </span>
+              <span class="tag is-medium" :class="meanPressureDisplayClass">
+                {{ meanPressure.toFixed(1) }} hPa
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="card-content">
-      <div class="field is-grouped">
-        <div class="control">
-          <span class="tag is-medium">Target</span>
-        </div>
-
-        <div class="control">
-          <div class="tags has-addons">
-            <span class="tag is-medium" :class="targetIconClass">
-              <font-awesome-icon icon="thermometer-half" />
-            </span>
-            <span class="tag is-medium" :class="targetDisplayClass">
-              {{ targetTemperature.toFixed(1) }} {{ unitsWithDegree }}
-            </span>
+      <div class="card-content">
+        <div class="field is-grouped">
+          <div class="control">
+            <span class="tag is-medium">Target</span>
           </div>
-        </div>
 
-        <div class="control">
-          <div class="tags has-addons">
-            <span class="tag is-medium" :class="targetIconClass">
-              <font-awesome-icon icon="tint" />
-            </span>
-            <span class="tag is-medium" :class="targetDisplayClass">
-              {{ targetHumidity.toFixed(0) }} %
-            </span>
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="targetIconClass">
+                <font-awesome-icon icon="thermometer-half" />
+              </span>
+              <span class="tag is-medium" :class="targetDisplayClass">
+                {{ targetTemperature.toFixed(1) }} {{ unitsWithDegree }}
+              </span>
+            </div>
           </div>
-        </div>
 
-        <div class="control">
-          <div class="tags has-addons">
-            <span class="tag is-medium" :class="targetIconClass">
-              <font-awesome-icon icon="cloud" />
-            </span>
-            <span class="tag is-medium" :class="targetDisplayClass">
-              {{ targetPressure.toFixed(1) }} hPa
-            </span>
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="targetIconClass">
+                <font-awesome-icon icon="tint" />
+              </span>
+              <span class="tag is-medium" :class="targetDisplayClass">
+                {{ targetHumidity.toFixed(0) }} %
+              </span>
+            </div>
+          </div>
+
+          <div class="control">
+            <div class="tags has-addons">
+              <span class="tag is-medium" :class="targetIconClass">
+                <font-awesome-icon icon="cloud" />
+              </span>
+              <span class="tag is-medium" :class="targetDisplayClass">
+                {{ targetPressure.toFixed(1) }} hPa
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="card-content">
-      <select-profile
-        label="Growing"
-        v-bind:zone="zone"
-      />
-    </div>
+      <div class="card-content">
+        <select-profile
+          label="Growing"
+          v-bind:zone="zone"
+          @select-profile="saveProfile"
+        />
+      </div>
 
-    <div class="card-content">
-      <div class="tags">
-        <meter-widget
-          v-for="meter in zoneMeters"
-          :key="meter.device"
-          :meter="meter"
-          :units="units"
+      <div class="card-content">
+        <div class="field is-grouped is-grouped-multiline">
+          <meter-widget
+            v-for="meter in zoneMeters"
+            :key="meter.device"
+            :meter="meter"
+            :units="units"
           />
+        </div>
       </div>
-    </div>
 
-    <div class="card-content">
-      <div class="field is-grouped">
-        <device-widget
-          v-for="device in zoneSwitches"
-          :key="device.device"
-          :device="device"
+      <div class="card-content">
+        <div class="field is-grouped is-grouped-multiline">
+          <device-widget
+            v-for="device in zoneSwitches"
+            :key="device.device"
+            :device="device"
           />
+        </div>
       </div>
-    </div>
 
-    <div class="card-content">
-      <select-device
-        label="Meters"
-        v-bind:devices="meters"
-        @select-device="add"
-      />
-    </div>
-
-    <div class="card-content">
-      <select-device
-        label="Switches"
-        v-bind:devices="switches"
-        @select-device="add"
-      />
-    </div>
-
-    <footer class="card-footer">
-      <div class="card-footer-item">
-        <timestamp :timestamp="this.timestamp" />
+      <div class="card-content">
+        <select-device
+          label="Meters"
+          v-bind:devices="meters"
+          @select-device="add"
+        />
       </div>
-    </footer>
-  </div>
+
+      <div class="card-content">
+        <select-device
+          label="Switches"
+          v-bind:devices="switches"
+          @select-device="add"
+        />
+      </div>
+
+      <footer class="card-footer">
+        <div class="card-footer-item">
+          <timestamp :timestamp="this.timestamp" />
+        </div>
+      </footer>
+    </div>
   </div>
 </template>
 
@@ -147,7 +148,6 @@ import SelectProfile from "@/components/SelectProfile.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
-import { Profile } from "@/store/profiles/types";
 import { LampTimer } from "../../shared/lamp-timer";
 import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
@@ -176,12 +176,12 @@ const ZoneDetail = Vue.extend({
     zone: Zone,
     units: String
   },
-  
+
   data() {
     return {
       readings: [] as Reading[],
       statuses: [] as Status[],
-      timestamp: new Date,
+      timestamp: new Date()
     };
   },
 
@@ -205,7 +205,6 @@ const ZoneDetail = Vue.extend({
         const lamp = new LampTimer(parseInt(start[0]), duration);
 
         const hour = this.timestamp.getHours();
-        console.log("Is daytime?", hour, lamp, lamp.isOn(hour));
         day = lamp.isOn(hour);
       }
 
@@ -215,7 +214,7 @@ const ZoneDetail = Vue.extend({
     linkto(): string {
       return `zone-details-${this.zone.id}`;
     },
-    
+
     meanTemperature(): number {
       let sum = 0;
       this.readings.forEach(reading => {
@@ -324,7 +323,6 @@ const ZoneDetail = Vue.extend({
 
     targetTemperature(): number {
       let target = 15;
-      console.log("find target for", this.zone);
       if (this.zone && this.zone.profile) {
         if (this.isDay) {
           target = parseFloat(this.zone.profile.lampontemperature);
@@ -333,14 +331,11 @@ const ZoneDetail = Vue.extend({
         }
       }
 
-      console.log("target temp", target, this.units);
-
       return this.units === "F" ? celsius2fahrenheit(target) : target;
     },
 
     targetHumidity(): number {
       let target = 20;
-      console.log("target humidity", target, this.zone);
       if (this.zone && this.zone.profile) {
         if (this.isDay) {
           target = parseFloat(this.zone.profile.lamponhumidity);
@@ -381,7 +376,6 @@ const ZoneDetail = Vue.extend({
     zoneSwitches(): Device[] {
       if (this.zone) {
         const result = this.zone.devices;
-        console.log("all devices", this.zone.devices);
         const filter = (event: Device) => {
           return event.devicetype !== "meter";
         };
@@ -408,7 +402,6 @@ const ZoneDetail = Vue.extend({
     },
 
     refresh() {
-      console.log("refresh readings & statuses");
       if (this.zone) {
         this.timestamp = new Date();
 
@@ -458,7 +451,7 @@ const ZoneDetail = Vue.extend({
         nickname: this.nickname,
         profileid: profileid
       };
-      
+
       this.edit(zone);
     },
 

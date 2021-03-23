@@ -6,8 +6,8 @@ import { networkInterfaces } from "os";
 import { Meter } from "./meter";
 import { MockMeter } from "./mock-meter";
 import { Switch } from "./switch";
-import { WyzeSwitch } from "./wyze-switch";
 import { Herbert } from "./herbert";
+import { SM8relay } from "./sm-8relay";
 
 import Switchbot from "node-switchbot";
 import Wyze from "wyze-node";
@@ -108,10 +108,13 @@ export class App {
     this.macaddr = net[0]["mac"];
     this.inet = net[0]["address"];
 
+    console.log("wlan0", this.macaddr, this.inet);
+    
     const meters = this.meters;
     const switches = this.switches;
 
     config.get("devices").forEach(dev => {
+      console.log("DEVICE", dev);
       if (dev.manufacturer === "WYZE") {
         const options = {
           username: dev.username,
@@ -121,6 +124,10 @@ export class App {
         this.wyze = new Wyze(options);
       } else if (dev.manufacturer === "herbert") {
         switches.push(new Herbert(dev.id, parseInt(dev.pin)));
+      } else if (dev.manufacturer === "sm-8relay") {
+        switches.push(new SM8relay(dev.id,
+                                   parseInt(dev.board),
+                                   parseInt(dev.channel)));
       } else if (dev.manufacturer === "mockbot") {
         meters.push(new MockMeter());
       }
@@ -177,6 +184,16 @@ export class App {
                     herbert.on();
                   } else {
                     herbert.off();
+                  }
+                }
+              } else if (plug.manufacturer === "sm-8relay") {
+                const relay = plug as SM8relay;
+                if (relay.device === data.payload.device) {
+                  logger.debug("CHANGE", relay, data.payload.action);
+                  if (data.payload.action === "on") {
+                    relay.on();
+                  } else {
+                    relay.off();
                   }
                 }
               }
@@ -268,12 +285,12 @@ export class App {
         console.log("got wyze", wyze);
         if (wyze.conn_state === 0) {
           const data = {
-            type: "ERROR"
+            type: "ERROR",
             payload: {
               id: wyze.mac,
               device: wyze.mac,
               message: "disconnected",
-              timestamp: new Date
+              timestamp: new Date()
             }
           };
 
@@ -300,6 +317,9 @@ export class App {
       if (plug.manufacturer === "herbert") {
         const herbert = plug as Herbert;
         app.switchStatus(herbert.status());
+      } else if (plug.manufacturer === "sm-8relay") {
+        const relay = plug as SM8relay;
+        app.switchStatus(relay.status());
       }
     });
     logger.debug("Done.");

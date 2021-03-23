@@ -66,7 +66,7 @@ const Dashboard = Vue.extend({
     return {
       picked: "overview",
       units: "F",
-      ts: new Date
+      ts: new Date()
     };
   },
 
@@ -106,7 +106,7 @@ const Dashboard = Vue.extend({
       this["workers/fetchData"]();
       this["zones/fetchData"]();
 
-      this.ts = new Date;
+      this.ts = new Date();
 
       console.log("refresh", this.ts);
 

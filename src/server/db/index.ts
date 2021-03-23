@@ -22,14 +22,38 @@ export async function readProfile(id) {
   return rows[0];
 }
 
+export async function readDevice(id) {
+  const res = await query("SELECT * FROM devices WHERE device = $1", [id]);
+
+  const device = await res.rows[0];
+
+  if (device.devicetype === "meter") {
+    const {
+      rows
+    } = await query(
+      "SELECT d.*, r.temperature, r.humidity, r.pressure, r.createdat as timestamp FROM devices d INNER JOIN readings r ON d.device = r.meter WHERE d.device = $1 ORDER BY r.id DESC LIMIT 1",
+      [id]
+    );
+    return rows[0];
+  } else {
+    const {
+      rows
+    } = await query(
+      "SELECT d.*, s.status, s.createdat as timestamp FROM devices d INNER JOIN statuses s ON d.device = s.device WHERE d.device = $1 ORDER BY s.id DESC LIMIT 1",
+      [id]
+    );
+    return rows[0];
+  }
+}
+
 export async function readZone(id) {
   const promises = [];
-  
+
   const res = await query(
     "SELECT z.id, z.nickname, p.id as profileid, z.updatedat FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
     [id]
   );
-  
+
   promises.push(res.rows[0]);
 
   const profile = await query("SELECT * FROM profiles WHERE id = $1", [
@@ -44,9 +68,9 @@ export async function readZone(id) {
     "SELECT d.device FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE zd.zoneid = $1",
     [id]
   );
-  
+
   if (devices.rowCount > 0) {
-    devices.rows.forEach((row) => {
+    devices.rows.forEach(row => {
       promises.push(readDevice(row.device));
     });
   }
@@ -58,7 +82,7 @@ export async function readZone(id) {
         values[0].devices.push(value);
       }
     });
-  
+
     return values[0];
   });
 }
@@ -94,20 +118,6 @@ export async function readZoneDevices(device: string) {
   });
 
   return Promise.all(zones);
-}
-
-export async function readDevice(id) {
-  const res = await query("SELECT * FROM devices WHERE device = $1", [id]);
-
-  const device = await res.rows[0];
-  
-  if (device.devicetype === "meter") {
-    const { rows } = await query("SELECT d.*, r.temperature, r.humidity, r.pressure, r.createdat as timestamp FROM devices d INNER JOIN readings r ON d.device = r.meter WHERE d.device = $1 ORDER BY r.id DESC LIMIT 1", [id]); 
-    return rows[0];
-  } else {
-    const { rows } = await query("SELECT d.*, s.status, s.createdat as timestamp FROM devices d INNER JOIN statuses s ON d.device = s.device WHERE d.device = $1 ORDER BY s.id DESC LIMIT 1", [id]); 
-    return rows[0];
-  }
 }
 
 export async function readDevices() {

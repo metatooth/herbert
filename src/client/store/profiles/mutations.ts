@@ -8,8 +8,10 @@ export const mutations: MutationTree<ProfilesState> = {
   SET(state, payload: Profile[]) {
     state.error = false;
     state.profiles = payload;
-    state.profiles.sort((a, b) => { return a.profile > b.profile });
-  },  
+    state.profiles.sort((a, b) => {
+      return a.profile > b.profile;
+    });
+  },
   EDIT(state, payload: Profile) {
     const found = state.profiles.find((el: Profile) => {
       return el.id === payload.id;

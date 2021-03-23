@@ -1,5 +1,5 @@
 <template>
-  <tr class="notification is-danger">  
+  <tr class="notification is-danger">
     <td><timestamp :timestamp="timestamp" /></td>
     <td>{{ plug }}</td>
     <td>{{ message }}</td>

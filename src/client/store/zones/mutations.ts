@@ -6,7 +6,7 @@ export const mutations: MutationTree<ZonesState> = {
     zone.updatedat = new Date();
     state.zones.push(zone);
   },
-  ADD_DEVICE(state, payload: { zone: Zone, device: string }) {
+  ADD_DEVICE(state, payload: { zone: Zone; device: string }) {
     console.log("any needed? add zone device mutation", payload);
   },
   EDIT(state, zone: Zone) {
@@ -23,7 +23,7 @@ export const mutations: MutationTree<ZonesState> = {
     const index = state.zones.indexOf(found);
     state.zones.splice(index, 1);
   },
-  REMOVE_DEVICE(state, payload: { zone: Zone, device: string }) {
+  REMOVE_DEVICE(state, payload: { zone: Zone; device: string }) {
     console.log("any needed? remove zone device mutation", payload);
   },
   SET(state, zones: Zone[]) {

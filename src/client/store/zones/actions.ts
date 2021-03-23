@@ -56,7 +56,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
     commit("REMOVE", payload);
   },
 
-  removeDevice({ commit }, payload: { zone: Zone, device: string }) {
+  removeDevice({ commit }, payload: { zone: Zone; device: string }) {
     console.log("remove device payload", payload);
     HTTP.delete(`/zones/${payload.zone.id}/devices/${payload.device}`);
     commit("REMOVE_DEVICE", payload.zone);

@@ -42,8 +42,8 @@
           title="Relative Humidity"
           label="Percent (%)"
           v-bind:suggestedMin="suggestedMin"
-v-bind:suggestedMax="suggestedMax"
-v-bind:stepSize="1"
+          v-bind:suggestedMax="suggestedMax"
+          v-bind:stepSize="1"
         />
       </div>
     </div>
@@ -119,7 +119,7 @@ const Readings = Vue.extend({
 
   methods: {
     calcminmax() {
-      this.humidities.forEach((d) => {
+      this.humidities.forEach(d => {
         if (d.y < this.minmax[0]) {
           this.minmax[0] = d.y;
         }
@@ -129,7 +129,7 @@ const Readings = Vue.extend({
         }
       });
     },
-    
+
     changeUnits(units: string) {
       this.units = units;
     },

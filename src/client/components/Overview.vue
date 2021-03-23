@@ -2,25 +2,25 @@
   <div id="overview">
     <section class="section">
       <div class="tile is-ancestor has-text-centered">
-        <div class="tile is-parent" >
+        <div class="tile is-parent">
           <article class="tile is-child box">
             <p class="title">{{ devicesCount }}</p>
             <p class="subtitle"><a @click="picked('devices')">Devices</a></p>
           </article>
         </div>
-        <div class="tile is-parent" @click="picked('profiles')" >
+        <div class="tile is-parent" @click="picked('profiles')">
           <article class="tile is-child box">
             <p class="title">{{ profilesCount }}</p>
             <p class="subtitle"><a @click="picked('profiles')">Profiles</a></p>
           </article>
         </div>
-        <div class="tile is-parent" @click="picked('zones')" >
+        <div class="tile is-parent" @click="picked('zones')">
           <article class="tile is-child box">
             <p class="title">{{ zonesCount }}</p>
             <p class="subtitle"><a @click="picked('zones')">Zones</a></p>
           </article>
         </div>
-        <div class="tile is-parent" @click="picked('workers')" >
+        <div class="tile is-parent" @click="picked('workers')">
           <article class="tile is-child box">
             <p class="title">{{ workersCount }}</p>
             <p class="subtitle"><a @click="picked('workers')">Herberts</a></p>
@@ -77,7 +77,7 @@ const Overview = Vue.extend({
   components: {
     Notification
   },
-  
+
   computed: {
     ...mapGetters("devices", ["devicesCount"]),
     ...mapGetters("profiles", ["profilesCount"]),
@@ -90,15 +90,14 @@ const Overview = Vue.extend({
     const ws = new WebSocket(
       process.env.VUE_APP_WS_URL || "ws://localhost:5000"
     );
-    
+
     ws.addEventListener("open", (ev: Event) => {
       console.log(ev);
       console.log("Connection open success!");
     });
-    
+
     ws.addEventListener("message", (ev: MessageEvent) => {
       const data = JSON.parse(ev.data);
-      console.log("message with data");
       if (data.type === "ERROR") {
         const n: NotificationType = {
           id: data.payload.device,
@@ -108,20 +107,18 @@ const Overview = Vue.extend({
           message: data.payload.message || data.payload.status,
           timestamp: new Date(Date.parse(data.payload.timestamp))
         };
-        const index = this.notifications.findIndex((el: NotificationType) => { return el.id === n.id });
-        console.log("error", data.payload, n);
-        console.log("find index?", index);
+        const index = this.notifications.findIndex((el: NotificationType) => {
+          return el.id === n.id;
+        });
         if (index !== -1) {
           this.notifications.splice(index, 1, n);
         } else {
           this.notifications.push(n);
         }
-      } else {
-        console.log("Unhandled Message", data);
       }
     });
   },
-  
+
   methods: {
     deleteNotification(n: NotificationType): void {
       const found = this.notifications.findIndex(el => el.id === n.id);

@@ -31,6 +31,10 @@ const DeviceWidget = Vue.extend({
     iconClass() {
       if (this.device.devicetype === "heater") {
         return "fire-alt";
+      } else if (this.device.devicetype === "humidifier") {
+        return "tint";
+      } else if (this.device.devicetype === "dehumidifier") {
+        return "tint-slash";
       } else if (this.device.devicetype === "lamp") {
         return "lightbulb";
       } else if (this.device.devicetype === "blower") {
@@ -41,24 +45,24 @@ const DeviceWidget = Vue.extend({
         return "circle";
       }
     },
-    
+
     offClass() {
-      if (this.device.status === "off") {
+      if (this.device.status === "off" || this.device.status === "0") {
         return "has-text-warning";
       } else {
         return "has-text-warning-light";
       }
     },
-    
+
     onClass() {
-      if (this.device.status === "on") {
+      if (this.device.status === "on" || this.device.status === "1") {
         return "has-text-success";
       } else {
         return "has-text-success-light";
       }
     },
-    
-    disconnectedClass(){
+
+    disconnectedClass() {
       if (this.device.status === "disconnected") {
         return "has-text-danger";
       } else {
@@ -66,7 +70,7 @@ const DeviceWidget = Vue.extend({
       }
     }
   },
-  
+
   methods: {
     remove(device: string) {
       this.$emit("remove-device", device);

@@ -30,7 +30,6 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState } from "vuex";
 
 const SelectDevice = Vue.extend({
   props: {

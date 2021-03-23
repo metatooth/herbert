@@ -54,9 +54,8 @@ router.post("/:id/devices", async (req, res) => {
     console.log("ERROR", err);
   }
 
-  const { rows } = await query("SELECT * FROM zone_devices WHERE zoneid = $1", [
-    id
-  ]);
+  await query("SELECT * FROM zone_devices WHERE zoneid = $1", [id]);
+
   res.status(200).json({});
 });
 

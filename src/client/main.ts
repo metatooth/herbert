@@ -27,6 +27,7 @@ import {
   faTimes,
   faTimesCircle,
   faTint,
+  faTintSlash,
   faTrash,
   faWind
 } from "@fortawesome/free-solid-svg-icons";
@@ -51,6 +52,7 @@ library.add(faThermometerHalf);
 library.add(faTimes);
 library.add(faTimesCircle);
 library.add(faTint);
+library.add(faTintSlash);
 library.add(faTrash);
 library.add(faWind);
 
