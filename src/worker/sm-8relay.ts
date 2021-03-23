@@ -46,7 +46,7 @@ export class SM8relay extends Switch {
            if (stderr) {
              console.log(`stderr: ${stderr}`);
            }
-           this.state = parseInt(stdout);
+           this.state = stdout;
          });
     return this;
   }

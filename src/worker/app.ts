@@ -8,6 +8,7 @@ import { MockMeter } from "./mock-meter";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
+import { WyzeSwitch } from "./wyze-switch";
 
 import Switchbot from "node-switchbot";
 import Wyze from "wyze-node";
@@ -196,26 +197,11 @@ export class App {
             }
 
             app.switches.forEach(plug => {
-              if (plug.manufacturer === "herbert") {
-                const herbert = plug as Herbert;
-                console.log("HERBERT", herbert);
-                if (herbert.device === data.payload.device) {
-                  logger.debug("CHANGE", herbert, data.payload.action);
-                  if (data.payload.action === "on") {
-                    herbert.on();
-                  } else {
-                    herbert.off();
-                  }
-                }
-              } else if (plug.manufacturer === "sm-8relay") {
-                const relay = plug as SM8relay;
-                if (relay.device === data.payload.device) {
-                  logger.debug("CHANGE", relay, data.payload.action);
-                  if (data.payload.action === "on") {
-                    relay.on();
-                  } else {
-                    relay.off();
-                  }
+              if (plug.device === data.payload.device) {
+	        if (data.payload.action === "on") {
+                  plug.on();
+                } else {
+                  plug.off();
                 }
               }
             });
@@ -249,7 +235,7 @@ export class App {
         temperature: meter.clime.temperature,
         humidity: meter.clime.humidity,
         pressure: meter.clime.vpd(),
-        timestamp: new Date()
+        timestamp: new Date
       }
     };
     this.send(data);
@@ -262,7 +248,7 @@ export class App {
         device: switcher.device,
         manufacturer: switcher.manufacturer,
         status: switcher.state,
-        timestamp: new Date()
+        timestamp: new Date
       }
     };
     this.send(data);
@@ -346,13 +332,7 @@ export class App {
 
     logger.debug("Herbert switches...");
     app.switches.forEach(plug => {
-      if (plug.manufacturer === "herbert") {
-        const herbert = plug as Herbert;
-        app.switchStatus(herbert.status());
-      } else if (plug.manufacturer === "sm-8relay") {
-        const relay = plug as SM8relay;
-        app.switchStatus(relay.status());
-      }
+        app.switchStatus(plug.status());
     });
     logger.debug("Done.");
 
