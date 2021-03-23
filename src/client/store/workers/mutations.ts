@@ -17,13 +17,10 @@ export const mutations: MutationTree<WorkersState> = {
   },
   SET(state, payload: Worker[]) {
     state.error = false;
+
     state.workers = [];
     payload.forEach(w => {
-      const wstate: WorkerState = {
-        worker: w,
-        error: false
-      };
-      state.workers.push(wstate);
+      state.workers.push({ worker: w, error: false });
     });
   },
   WORKERS_ERROR(state) {

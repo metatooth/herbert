@@ -133,7 +133,7 @@ async function run() {
     const hour = now.getHours();
     const min = now.getMinutes();
     const sec = now.getSeconds();
-    console.log("zone is", zone);
+
     if (zone.profile) {
       console.log("command for zone", zone.nickname);
       let temperature = 0;
@@ -193,10 +193,10 @@ async function run() {
         ["heater", directives.temperature === "heat"],
         ["dehumidifer", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],
-        ["fan", true]
+        ["fan", 1 === 1]
       ]);
 
-      console.log(systems);
+      console.log("SYSTEMS!", systems);
 
       systems.forEach((value, key) => {
         zone.devices.map(device => {

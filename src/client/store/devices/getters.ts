@@ -1,21 +1,21 @@
 import { GetterTree } from "vuex";
-import { Device, DevicesState } from "./types";
+import { Device, DeviceState, DevicesState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<DevicesState, RootState> = {
-  devices(state): Device[] {
+  devices(state): DeviceState[] {
     const { devices } = state;
     return devices;
   },
 
-  meters(state): Device[] {
+  meters(state): DeviceState[] {
     const { devices } = state;
-    return devices.filter(device => device.devicetype === "meter");
+    return devices.filter(d => d.device.devicetype === "meter");
   },
 
-  switches(state): Device[] {
+  switches(state): DeviceState[] {
     const { devices } = state;
-    return devices.filter(device => device.devicetype !== "meter");
+    return devices.filter(d => d.device.devicetype !== "meter");
   },
 
   devicesCount(state): number {

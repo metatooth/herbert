@@ -38,13 +38,13 @@ export const mutations: MutationTree<ZonesState> = {
   REMOVE_DEVICE(state, payload: { zone: Zone; device: string }) {
     console.log("any needed? remove zone device mutation", payload);
   },
-  SET(state, zones: Zone[]) {
+  SET(state, payload: Zone[]) {
     state.error = false;
-    const zstates: ZoneState[] = [];
-    zones.forEach(z => {
-      zstates.push({ zone: z, error: false });
+
+    state.zones = [];
+    payload.forEach(z => {
+      state.zones.push({ zone: z, error: false });
     });
-    state.zones = zstates;
   },
   ERROR(state) {
     state.error = true;

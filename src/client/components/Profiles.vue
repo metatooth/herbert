@@ -17,9 +17,9 @@
       </thead>
       <tbody>
         <profile-row
-          v-for="profile in profiles"
-          v-bind:key="profile.id"
-          v-bind:profile="profile"
+          v-for="pstate in profiles"
+          v-bind:key="pstate.profile.id"
+          v-bind:profile="pstate.profile"
           v-bind:units="units"
         />
 

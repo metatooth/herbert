@@ -29,11 +29,11 @@
         <div class="select">
           <select v-model="profileid">
             <option
-              v-for="profile in profiles"
-              v-bind:key="profile.id"
-              v-bind:value="profile.id"
+              v-for="pstate in profiles"
+              v-bind:key="pstate.profile.id"
+              v-bind:value="pstate.profile.id"
             >
-              {{ profile.profile }}
+              {{ pstate.profile.profile }}
             </option>
           </select>
         </div>
@@ -57,19 +57,19 @@
 import Vue from "vue";
 import Timestamp from "@/components/Timestamp.vue";
 import EditControls from "@/components/EditControls.vue";
-import { mapState, mapActions } from "vuex";
-import { Zone, ZoneState } from "@/store/zones/types";
+import { mapGetters, mapActions } from "vuex";
+import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
   props: {
-    state: ZoneState,
+    zone: { type: Zone },
     units: String
   },
 
   data() {
     return {
-      nickname: this.state.zone.nickname,
-      profileid: this.state.zone.profileid,
+      nickname: this.zone.nickname,
+      profileid: this.zone.profileid,
       editing: false
     };
   },
@@ -79,17 +79,17 @@ const ZoneRow = Vue.extend({
     EditControls
   },
 
+  mounted() {
+    console.log("zone row as profiles", this.profiles);
+  },
+ 
   computed: {
     linkToConfig(): string {
-      return "#" + this.state.zone.id + "config";
+      return "#" + this.zone.id + "config";
     },
 
-    zone(): Zone {
-      return this.state.zone;
-    },
-
-    ...mapState("profiles", ["profiles"])
-  },
+    ...mapGetters("profiles", ["profiles"])
+  },      
 
   methods: {
     editable() {
@@ -98,7 +98,7 @@ const ZoneRow = Vue.extend({
 
     save() {
       const zone = {
-        id: this.state.zone.id,
+        id: this.zone.id,
         nickname: this.nickname,
         profileid: this.profileid
       };
@@ -108,13 +108,13 @@ const ZoneRow = Vue.extend({
     },
 
     destroy() {
-      this.remove(this.state.zone);
+      this.remove(this.zone);
       this.editing = false;
     },
 
     cancel() {
-      this.nickname = this.state.zone.nickname;
-      this.profileid = this.state.zone.profileid;
+      this.nickname = this.zone.nickname;
+      this.profileid = this.zone.profileid;
       this.editing = false;
     },
 

@@ -2,11 +2,11 @@ import { Module } from "vuex";
 import { getters } from "./getters";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
-import { ProfilesState } from "./types";
+import { ProfileState, ProfilesState } from "./types";
 import { RootState } from "../types";
 
 const state: ProfilesState = {
-  profiles: [],
+  profiles: [] as ProfileState[],
   error: false
 };
 

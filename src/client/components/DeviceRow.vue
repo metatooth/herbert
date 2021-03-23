@@ -92,14 +92,14 @@
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { Device, DeviceState } from "@/store/devices/types";
+import { Device } from "@/store/devices/types";
 import { mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 import { celsius2fahrenheit } from "../../shared/utils";
 
 const DeviceRow = Vue.extend({
   props: {
-    state: DeviceState,
+    device: { type: Device },
     units: String
   },
 
@@ -111,21 +111,17 @@ const DeviceRow = Vue.extend({
 
   data() {
     return {
-      nickname: this.state.device.nickname,
+      nickname: this.device.nickname,
       editing: false
     };
   },
 
   computed: {
-    device(): Device {
-      return this.state.device;
-    },
-
     deviceOnClass() {
-      console.log("device row on?", this.state.device);
+      console.log("device row on?", this.device);
       if (
-        this.state.device.status === "on" ||
-        this.state.device.status === "1"
+        this.device.status === "on" ||
+        this.device.status === "1"
       ) {
         return "has-text-success has-background-black";
       } else {
@@ -134,8 +130,8 @@ const DeviceRow = Vue.extend({
     },
     deviceOffClass() {
       if (
-        this.state.device.status === "off" ||
-        this.state.device.status === "0"
+        this.device.status === "off" ||
+        this.device.status === "0"
       ) {
         return "has-text-warning has-background-black";
       } else {
@@ -150,30 +146,30 @@ const DeviceRow = Vue.extend({
       }
     },
     deviceIcon() {
-      if (this.state.device.status === "on") {
+      if (this.device.status === "on") {
         return "circle";
-      } else if (this.state.device.status === "off") {
+      } else if (this.device.status === "off") {
         return "circle";
-      } else if (this.state.device.status === "disconnected") {
+      } else if (this.device.status === "disconnected") {
         return "times";
       }
 
       return null;
     },
     linkName() {
-      if (this.state.device.devicetype === "meter") {
+      if (this.device.devicetype === "meter") {
         return "readings";
       } else {
         return "statuses";
       }
     },
     meterReadingHumidity() {
-      return 100 * (this.state.device.humidity || 0);
+      return 100 * (this.device.humidity || 0);
     },
     meterReadingTemperature() {
       return this.units === "F"
-        ? celsius2fahrenheit(this.state.device.temperature || 0)
-        : this.state.device.temperature || 0;
+        ? celsius2fahrenheit(this.device.temperature || 0)
+        : this.device.temperature || 0;
     },
     unitsWithDegrees() {
       return "" + this.units;
@@ -187,7 +183,7 @@ const DeviceRow = Vue.extend({
 
     save() {
       this.edit({
-        ...this.state.device,
+        ...this.device,
         nickname: this.nickname
       });
       this.editing = false;
@@ -195,13 +191,13 @@ const DeviceRow = Vue.extend({
 
     saveDeviceType(devicetype: string) {
       this.edit({
-        ...this.state.device,
+        ...this.device,
         devicetype: devicetype
       });
     },
 
     cancel() {
-      this.nickname = this.state.device.nickname;
+      this.nickname = this.device.nickname;
       this.editing = false;
     },
 

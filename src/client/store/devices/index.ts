@@ -2,11 +2,11 @@ import { Module } from "vuex";
 import { getters } from "./getters";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
-import { DevicesState } from "./types";
+import { DeviceState, DevicesState } from "./types";
 import { RootState } from "../types";
 
 const state: DevicesState = {
-  devices: [],
+  devices: [] as DeviceState[],
   error: false
 };
 

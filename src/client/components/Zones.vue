@@ -34,11 +34,11 @@
               <div class="select">
                 <select v-model="profileid">
                   <option
-                    v-for="profile in profiles"
-                    :key="profile.id"
-                    :value="profile.id"
+                    v-for="pstate in profiles"
+                    :key="pstate.profile.id"
+                    :value="pstate.profile.id"
                   >
-                    {{ profile.profile }}
+                    {{ pstate.profile.profile }}
                   </option>
                 </select>
               </div>
@@ -48,7 +48,7 @@
           <td></td>
 
           <td>
-            <add-controls @on-add="add" @on-save="save" @on-cancel="cancel" />
+            <add-controls @on-add="editable" @on-save="save" @on-cancel="cancel" />
           </td>
         </tr>
       </tbody>

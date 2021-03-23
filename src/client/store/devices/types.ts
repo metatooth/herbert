@@ -28,6 +28,6 @@ export class DeviceState {
 }
 
 export interface DevicesState {
-  devices: Device[];
+  devices: DeviceState[];
   error: boolean;
 }

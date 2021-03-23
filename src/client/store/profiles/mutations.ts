@@ -11,13 +11,10 @@ export const mutations: MutationTree<ProfilesState> = {
   },
   SET(state, payload: Profile[]) {
     state.error = false;
+
     state.profiles = [];
     payload.forEach(p => {
-      const pstate: ProfileState = {
-        profile: p,
-        error: false
-      };
-      state.profiles.push(pstate);
+      state.profiles.push({ profile: p, error: false });
     });
     state.profiles.sort((a, b) => {
       return a.profile.profile.localeCompare(b.profile.profile);

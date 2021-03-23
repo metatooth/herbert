@@ -173,16 +173,16 @@ import { mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 import EditControls from "@/components/EditControls.vue";
 import { celsius2fahrenheit, vaporPressureDeficit } from "../../shared/utils";
-import { Profile, ProfileState } from "@/store/profiles/types";
+import { Profile } from "@/store/profiles/types";
 
 const ProfileRow = Vue.extend({
   props: {
-    state: ProfileState,
+    profile: Profile,
     units: String
   },
 
   data() {
-    const start = this.state.profile.lampstart.split(":");
+    const start = this.profile.lampstart.split(":");
     let hourInt = parseInt(start[0]);
     if (hourInt < 0) {
       hourInt = 24 + hourInt;
@@ -194,8 +194,8 @@ const ProfileRow = Vue.extend({
       hourString = hourInt.toString();
     }
 
-    let lampon = this.state.profile.lampontemperature;
-    let lampoff = this.state.profile.lampofftemperature;
+    let lampon = this.profile.lampontemperature;
+    let lampoff = this.profile.lampofftemperature;
 
     if (this.units === "F") {
       lampon = celsius2fahrenheit(lampon);
@@ -203,13 +203,13 @@ const ProfileRow = Vue.extend({
     }
 
     return {
-      name: this.state.profile.profile,
+      name: this.profile.profile,
       lampstart: `${hourString}:${start[1]}:00`,
-      lampduration: this.state.profile.lampduration["hours"],
+      lampduration: this.profile.lampduration["hours"],
       lampontemperature: lampon,
       lampofftemperature: lampoff,
-      lamponhumidity: this.state.profile.lamponhumidity,
-      lampoffhumidity: this.state.profile.lampoffhumidity,
+      lamponhumidity: this.profile.lamponhumidity,
+      lampoffhumidity: this.profile.lampoffhumidity,
       editing: false
     };
   },
@@ -220,12 +220,8 @@ const ProfileRow = Vue.extend({
   },
 
   computed: {
-    profile(): Profile {
-      return this.state.profile;
-    },
-
     durationWithUnits(): string {
-      return this.state.profile.lampduration["hours"] + "hrs";
+      return this.profile.lampduration["hours"] + "hrs";
     },
 
     unitsWithDegree(): string {
@@ -234,18 +230,18 @@ const ProfileRow = Vue.extend({
 
     dayTemperature(): number {
       if (this.units === "F") {
-        return celsius2fahrenheit(this.state.profile.lampontemperature);
+        return celsius2fahrenheit(this.profile.lampontemperature);
       }
 
-      return this.state.profile.lampontemperature;
+      return this.profile.lampontemperature;
     },
 
     nightTemperature(): number {
       if (this.units === "F") {
-        return celsius2fahrenheit(this.state.profile.lampofftemperature);
+        return celsius2fahrenheit(this.profile.lampofftemperature);
       }
 
-      return this.state.profile.lampofftemperature;
+      return this.profile.lampofftemperature;
     },
 
     lampMin(): number {
@@ -267,12 +263,12 @@ const ProfileRow = Vue.extend({
     },
 
     lamponMinute(): string {
-      const start = this.state.profile.lampstart.split(":");
+      const start = this.profile.lampstart.split(":");
       return start[1];
     },
 
     lamponHour(): string {
-      const start = this.state.profile.lampstart.split(":");
+      const start = this.profile.lampstart.split(":");
       const hour = parseInt(start[0]);
 
       if (hour < 0) {
@@ -287,9 +283,9 @@ const ProfileRow = Vue.extend({
     lamponPressure(): number {
       return (
         vaporPressureDeficit(
-          this.state.profile.lampontemperature,
+          this.profile.lampontemperature,
           0.6,
-          this.state.profile.lamponhumidity / 100
+          this.profile.lamponhumidity / 100
         ) / 1000
       );
     },
@@ -297,9 +293,9 @@ const ProfileRow = Vue.extend({
     lampoffPressure(): number {
       return (
         vaporPressureDeficit(
-          this.state.profile.lampofftemperature,
+          this.profile.lampofftemperature,
           -0.6,
-          this.state.profile.lampoffhumidity / 100
+          this.profile.lampoffhumidity / 100
         ) / 1000
       );
     }
@@ -347,7 +343,7 @@ const ProfileRow = Vue.extend({
       }
       console.log("lampstart", `${hourString}:${start[1]}`);
       const profile = {
-        id: this.state.profile.id,
+        id: this.profile.id,
         profile: this.name,
         lampstart: `${hourString}:${start[1]}`,
         lampduration: `${this.lampduration} hours`,
@@ -362,7 +358,7 @@ const ProfileRow = Vue.extend({
     },
 
     destroy() {
-      this.remove(this.state.profile);
+      this.remove(this.profile);
       this.editing = false;
     },
 
