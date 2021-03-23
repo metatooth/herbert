@@ -29,7 +29,6 @@ const MeterWidget = Vue.extend({
 
   computed: {
     temperature() {
-      console.log("temperature??", this.meter);
       if (this.units === "F") {
         return celsius2fahrenheit(this.meter.temperature);
       } else {
