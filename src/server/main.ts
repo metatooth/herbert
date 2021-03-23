@@ -1,18 +1,36 @@
 import WebSocket from "ws";
+import config from "config";
 import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import { query, register, status } from "./db";
+import {
+  readZones,
+  reading,
+  registerDevice,
+  createReading,
+  createStatus,
+  workerStatus
+} from "./db";
+
 import path from "path";
 import favicon from "serve-favicon";
 
+import { AirDirectives } from "../shared/air-directives";
+import { BlowerTimer } from "../shared/blower-timer";
+import { Clime } from "../shared/clime";
+import { LampTimer } from "../shared/lamp-timer";
+import { TargetTempHumidity } from "../shared/target-temp-humidity";
+
 const app = express();
-console.log("== Herbert Worker == Starting Up ==");
+console.log("== Herbert Server == Starting Up ==");
 console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
 
 app.use(favicon(path.join(__dirname, "favicon.ico")));
 console.log("favicon!");
+
+app.use(express.json());
+console.log("JSON support");
 
 app.use(cors());
 console.log("cors added");
@@ -55,7 +73,7 @@ wss.on("connection", function(ws: WebSocket) {
   console.log("websocket connection open");
 
   ws.on("message", async function(msg: string) {
-    console.log(msg);
+    console.log("ON MESSAGE", msg);
 
     let data;
     try {
@@ -71,51 +89,32 @@ wss.on("connection", function(ws: WebSocket) {
     }
 
     if (data.type === "STATUS") {
-      register(
-        data.payload.client,
-        data.payload.main.meter,
-        data.payload.intake.meter,
-        ""
-      );
-      status(
-        data.payload.main.meter,
-        "main",
-        data.payload.main.temperature,
-        data.payload.main.humidity,
-        data.payload.main.pressure
-      );
-      status(
-        data.payload.intake.meter,
-        "intake",
-        data.payload.intake.temperature,
-        data.payload.intake.humidity,
-        data.payload.intake.pressure
-      );
+      if (data.payload.device && data.payload.type === "meter") {
+        console.log("Status message from meter", data.payload);
+        registerDevice(
+          data.payload.device,
+          data.payload.manufacturer,
+          data.payload.type
+        );
+        createReading(
+          data.payload.device,
+          data.payload.temperature,
+          data.payload.humidity,
+          data.payload.pressure
+        );
+      } else if (data.payload.device) {
+        console.log("Status message from switch", data.payload);
+        registerDevice(
+          data.payload.device,
+          data.payload.manufacturer,
+          data.payload.type
+        );
+        createStatus(data.payload.device, data.payload.status);
+      }
 
-      const {
-        rows
-      } = await query(
-        "SELECT * FROM clients c LEFT JOIN profiles p ON c.profile_id = p.id WHERE client = $1",
-        [data.payload.client]
-      );
-      console.log("FOUND CLIENT", rows[0]);
-
-      if (rows[0].profile_id) {
-        const reply = {
-          type: "CONFIG",
-          payload: {
-            id: rows[0].client,
-            lampStart: rows[0].lamp_start,
-            lampDuration: rows[0].lamp_duration,
-            lampOnTemperature: rows[0].lamp_on_temperature,
-            lampOnHumidity: rows[0].lamp_on_humidity,
-            lampOffTemperature: rows[0].lamp_off_temperature,
-            lampOffHumidity: rows[0].lamp_off_humidity,
-            timestamp: new Date()
-          }
-        };
-
-        ws.send(JSON.stringify(reply));
+      if (data.payload.worker) {
+        console.log("Status message from worker", data.payload);
+        workerStatus(data.payload.worker, data.payload.inet);
       }
     }
 
@@ -126,3 +125,104 @@ wss.on("connection", function(ws: WebSocket) {
     });
   });
 });
+
+async function run() {
+  const zones = await readZones();
+  zones.forEach(async zone => {
+    const now = new Date();
+    const hour = now.getHours();
+    const min = now.getMinutes();
+    const sec = now.getSeconds();
+    console.log("zone is", zone);
+    if (zone.profile) {
+      console.log("command for zone", zone.nickname);
+      let temperature = 0;
+      let humidity = 0;
+      const count = 0;
+      await Promise.all(
+        zone.devices.map(async device => {
+          if (device.devicetype === "meter") {
+            const rdg = await reading(device.device);
+            console.log("lastest reading", rdg);
+            temperature = (count * temperature + rdg.temperature) / (count + 1);
+            humidity = (count * humidity + 100 * rdg.humidity) / (count + 1);
+          }
+        })
+      );
+
+      console.log("profile", zone.profile);
+      console.log("state", hour, temperature, humidity);
+
+      const start = zone.profile.lampstart.split(":");
+      const duration = zone.profile.lampduration["hours"];
+
+      const lamp = new LampTimer(parseInt(start[0]), duration);
+
+      const blower = new BlowerTimer(60, 180); // WARNING!!
+
+      let target;
+      let delta;
+
+      if (lamp.isOn(hour)) {
+        console.log("lamps", lamp, "ON");
+        target = new TargetTempHumidity([
+          zone.profile.lampontemperature,
+          zone.profile.lamponhumidity
+        ]);
+        delta = -0.6;
+      } else {
+        console.log("lamps", lamp, "OFF");
+        target = new TargetTempHumidity([
+          zone.profile.lampofftemperature,
+          zone.profile.lampoffhumidity
+        ]);
+        delta = 0.6;
+      }
+
+      const directives = new AirDirectives(target);
+      directives.clime = new Clime(temperature, delta, humidity);
+      directives.monitor();
+
+      console.log(directives);
+
+      console.log("blower is on", min, sec, blower.isOn(min * 60 + sec));
+
+      const systems = new Map([
+        ["lamp", lamp.isOn(hour)],
+        ["blower", blower.isOn(min * 60 + sec)],
+        ["heater", directives.temperature === "heat"],
+        ["dehumidifer", directives.humidity === "dehumidify"],
+        ["humidifier", directives.humidity === "humidify"],
+        ["fan", true]
+      ]);
+
+      console.log(systems);
+
+      systems.forEach((value, key) => {
+        zone.devices.map(device => {
+          if (device.devicetype === key) {
+            const action = value ? "on" : "off";
+            const data = {
+              type: "COMMAND",
+              payload: {
+                device: device.device,
+                action: action,
+                timestamp: new Date()
+              }
+            };
+            console.log("sending...", data);
+            wss.clients.forEach(client => {
+              client.send(JSON.stringify(data));
+            });
+          }
+        });
+      });
+    }
+  });
+
+  setTimeout(run, config.get("interval") * 1000);
+}
+
+(async () => {
+  run();
+})();

@@ -1,85 +1,145 @@
 begin;
 
+create table accounts (
+  id serial primary key,
+  units char,
+  locale varchar(255),
+  timezone varchar(255) default 'Etc/UTC',
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
+  deleted boolean default false,
+  deletedat timestamp
+);
+
 create table manufacturers (
   manufacturer varchar(255) primary key,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  username varchar(255),
+  passworddigest varchar(255),
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table device_types (
-  device_type varchar(255) primary key,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  devicetype varchar(255) primary key,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table devices (
-  device varchar(255) primary key,
+  device macaddr primary key,
+  devicetype varchar(255) references device_types(devicetype),
   manufacturer varchar(255) references manufacturers(manufacturer),
-  device_type varchar(255) references device_types(device_type),
-  inet inet,
-  macaddr macaddr,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  nickname varchar(255),
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
 create table readings (
   id serial primary key,
-  meter varchar(255) references devices(device),
+  meter macaddr references devices(device),
   temperature numeric not null,
   humidity numeric not null,
   pressure numeric not null,
-  created_at timestamp default current_timestamp
+  createdat timestamp default current_timestamp
+);
+
+create table statuses (
+  id serial primary key,
+  device macaddr references devices(device),
+  status varchar(80) not null,
+  createdat timestamp default current_timestamp
 );
 
 create table profiles (
   id serial primary key,
   profile varchar(255) unique,
-  lamp_start time not null,
-  lamp_duration interval hour to minute,
-  lamp_on_temperature numeric,
-  lamp_on_humidity numeric,
-  lamp_off_temperature numeric,
-  lamp_off_humidity numeric,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  timezone varchar(255) default 'Etc/UTC',
+  lampstart time not null,
+  lampduration interval hour to minute,
+  lampontemperature numeric,
+  lamponhumidity numeric,
+  lampofftemperature numeric,
+  lampoffhumidity numeric,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
-create table clients (
-  client varchar(255) primary key,
+create table workers (
+  worker macaddr primary key,
   nickname varchar(255) unique,
-  main varchar(255) references devices(device),
-  intake varchar(255) references devices(device),
-  profile_id integer references profiles(id),
   inet inet,
-  macaddr macaddr,
-  created_at timestamp default current_timestamp,
-  updated_at timestamp default current_timestamp,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
   deleted boolean default false,
-  deleted_at timestamp
+  deletedat timestamp
 );
 
-insert into manufacturers (manufacturer) values ('SwitchBot'), ('WYZE');
+create table worker_devices (
+  worker macaddr references workers(worker),
+  device macaddr references devices(device),
+  createdat timestamp default current_timestamp
+);
 
-insert into device_types (device_type)
-       values ('main'), ('intake'),
-       ('lamp'), ('blower'), ('humidifier'), ('dehumidifier'), ('heater');
+create table zones (
+  id serial primary key,
+  nickname varchar(255) unique,
+  profileid integer references profiles(id),
+  timezone varchar(255),
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
+  deleted boolean default false,
+  deletedat timestamp
+);
 
-insert into profiles (profile, lamp_start, lamp_duration, lamp_on_temperature,
-       lamp_on_humidity, lamp_off_temperature, lamp_off_humidity)
+create table zone_devices (
+  zoneid integer references zones(id),
+  device macaddr references devices(device),
+  createdat timestamp default current_timestamp,
+  primary key (zoneid, device)
+);
+
+create table meter_types (
+  metertype varchar(255) primary key,
+  createdat timestamp default current_timestamp,
+  updatedat timestamp default current_timestamp,
+  deleted boolean default false,
+  deletedat timestamp
+);
+
+create table zone_meters (
+  zoneid integer references zones(id),
+  meter macaddr references devices(device),
+  metertype varchar(255) references meter_types(metertype),
+  createdat timestamp default current_timestamp,
+  primary key (zoneid, meter)
+);
+
+insert into accounts (units, locale, timezone)
+       values ('F', 'us_EN', 'America/New_York');
+ 
+insert into manufacturers (manufacturer)
+       values ('herbert'), ('SwitchBot'), ('WYZE'), ('mockbot'), ('sm-8relay');
+
+insert into device_types (devicetype)
+       values ('meter'), ('lamp'), ('blower'),
+       ('humidifier'), ('dehumidifier'), ('heater'), ('fan');
+
+insert into profiles (profile, timezone, lampstart, lampduration, lampontemperature,
+       lamponhumidity, lampofftemperature, lampoffhumidity)
        values
-       ('Officespace', '13:00', '10 hours', 18.35, 21, 12.85, 21),
-       ('Torello Clone', '00:00', '24 hours', 22.8, 68, 22.8, 68),
-       ('Torello Veg', '13:00', '18 hours', 25.3, 55, 23.1, 55),
-       ('Torello Flower 1', '13:00', '12 hours', 24.7, 55, 21.1, 43),
-       ('Torello Flower 2', '13:00', '12 hours', 22.2, 43, 19.7, 43),
-       ('Torello Flower 3', '13:00', '12 hours', 19.2, 35, 16.4, 35);
+       ('Officespace', 'America/New_York', '08:00', '10 hours', 18.3, 21, 12.8, 21),
+       ('Torello Clone', 'America/New_York', '00:00', '24 hours', 22.8, 68, 22.8, 68),
+       ('Torello Veg', 'America/New_York', '08:00', '18 hours', 25.3, 55, 23.1, 55),
+       ('Torello Flower 1', 'America/New_York', '08:00', '12 hours', 24.7, 55, 21.1, 43),
+       ('Torello Flower 2', 'America/New_York', '08:00', '12 hours', 22.2, 43, 19.7, 43),
+       ('Torello Flower 3', 'America/New_York', '08:00', '12 hours', 19.2, 35, 16.4, 35);
        
 commit;

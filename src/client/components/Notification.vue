@@ -1,10 +1,12 @@
 <template>
-  <div class="notification is-danger">
-    <button class="delete" @click="$emit('delete-notification')" />
-    <timestamp :timestamp="timestamp" /> --&nbsp;
-    <span>{{ plug }}</span> --&nbsp;
-    <span>{{ message }}</span>
-  </div>
+  <tr class="notification is-danger">
+    <td><timestamp :timestamp="timestamp" /></td>
+    <td>{{ plug }}</td>
+    <td>{{ message }}</td>
+    <td class="has-text-centered">
+      <button class="delete" @click="$emit('delete-notification')" />
+    </td>
+  </tr>
 </template>
 
 <script>
