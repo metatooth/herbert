@@ -167,11 +167,11 @@ export class App {
           if (data.type === "COMMAND") {
             console.log("action!", data.payload);
             const mac = data.payload.device.replace(/:/g, "").toUpperCase();
-            console.log("MAC", mac);
+            console.log("MAC...", mac);
             if (this.wyze) {
               const device = await this.wyze.getDeviceByMac(mac);
               if (device) {
-                console.log("DEVICE", device);
+                console.log("Found.");
                 let result;
                 if (data.payload.action === "on") {
                   result = await this.wyze.turnOn(device);
@@ -179,12 +179,12 @@ export class App {
                   result = await this.wyze.turnOff(device);
                 }
                 if (result.code !== "1") {
-	          logger.error(`ERROR ${result.code} ${device.nickname} ${data.payload.action} - ${result}`);
+	                logger.error(`ERROR ${result.code} ${device.nickname} ${data.payload.action} - ${result}`);
                   const reply = {
-		    type: "ERROR",
+		                type: "ERROR",
                     payload: {
                       worker: app.macaddr,
-		      device: data.payload.device,
+		                  device: data.payload.device,
                       action: data.payload.action,
                       code: result.code,
                       message: result.msg,
@@ -196,15 +196,19 @@ export class App {
               }
             }
 
+            console.log("Check other devices...");
             app.switches.forEach(plug => {
               if (plug.device === data.payload.device) {
-	        if (data.payload.action === "on") {
+	              if (data.payload.action === "on") {
+                  console.log(plug.device, "on");
                   plug.on();
                 } else {
+                  console.log(plug.device, "off");
                   plug.off();
                 }
               }
             });
+            console.log("Done.");
           }
         });
       } catch (e) {
