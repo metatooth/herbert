@@ -71,8 +71,8 @@ import { convertToLocalTime } from "date-fns-timezone";
 
 interface MeterReading {
   x: Date;
-  y: Date;
-};
+  y: number;
+}
 
 const Readings = Vue.extend({
   props: {
@@ -124,7 +124,7 @@ const Readings = Vue.extend({
 
   methods: {
     calcminmax() {
-      this.humidities.forEach((d: { x: Date, y: number }) => {
+      this.humidities.forEach(d => {
         if (d.y < this.minmax[0]) {
           this.minmax[0] = d.y;
         }

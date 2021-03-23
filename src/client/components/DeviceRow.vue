@@ -92,14 +92,14 @@
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { Device } from "@/store/devices/types";
+import { Device, DeviceState } from "@/store/devices/types";
 import { mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 import { celsius2fahrenheit } from "../../shared/utils";
 
 const DeviceRow = Vue.extend({
   props: {
-    device: Device,
+    state: DeviceState,
     units: String
   },
 
@@ -111,22 +111,32 @@ const DeviceRow = Vue.extend({
 
   data() {
     return {
-      nickname: this.device.nickname,
+      nickname: this.state.device.nickname,
       editing: false
     };
   },
 
   computed: {
+    device(): Device {
+      return this.state.device;
+    },
+
     deviceOnClass() {
-      console.log("device row on?", this.device);
-      if (this.device.status === "on" || this.device.status === "1") {
+      console.log("device row on?", this.state.device);
+      if (
+        this.state.device.status === "on" ||
+        this.state.device.status === "1"
+      ) {
         return "has-text-success has-background-black";
       } else {
         return "has-text-success-light has-background-black";
       }
     },
     deviceOffClass() {
-      if (this.device.status === "off" || this.device.status === "0") {
+      if (
+        this.state.device.status === "off" ||
+        this.state.device.status === "0"
+      ) {
         return "has-text-warning has-background-black";
       } else {
         return "has-text-warning-light has-background-black";
@@ -140,36 +150,33 @@ const DeviceRow = Vue.extend({
       }
     },
     deviceIcon() {
-      if (this.device.status === "on") {
+      if (this.state.device.status === "on") {
         return "circle";
-      } else if (this.device.status === "off") {
+      } else if (this.state.device.status === "off") {
         return "circle";
-      } else if (this.device.status === "disconnected") {
+      } else if (this.state.device.status === "disconnected") {
         return "times";
       }
 
       return null;
     },
     linkName() {
-      if (this.device.devicetype === "meter") {
+      if (this.state.device.devicetype === "meter") {
         return "readings";
       } else {
         return "statuses";
       }
     },
     meterReadingHumidity() {
-      return 100 * parseFloat(this.device.humidity);
+      return 100 * (this.state.device.humidity || 0);
     },
     meterReadingTemperature() {
       return this.units === "F"
-        ? celsius2fahrenheit(this.device.temperature)
-        : parseFloat(this.device.temperature);
+        ? celsius2fahrenheit(this.state.device.temperature || 0)
+        : this.state.device.temperature || 0;
     },
     unitsWithDegrees() {
       return "" + this.units;
-    },
-    updated() {
-      return new Date(Date.parse(this.device.updatedat));
     }
   },
 
@@ -180,7 +187,7 @@ const DeviceRow = Vue.extend({
 
     save() {
       this.edit({
-        ...this.device,
+        ...this.state.device,
         nickname: this.nickname
       });
       this.editing = false;
@@ -188,13 +195,13 @@ const DeviceRow = Vue.extend({
 
     saveDeviceType(devicetype: string) {
       this.edit({
-        ...this.device,
+        ...this.state.device,
         devicetype: devicetype
       });
     },
 
     cancel() {
-      this.nickname = this.device.nickname;
+      this.nickname = this.state.device.nickname;
       this.editing = false;
     },
 

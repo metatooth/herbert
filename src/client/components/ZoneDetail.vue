@@ -149,7 +149,7 @@ import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
 import { LampTimer } from "../../shared/lamp-timer";
-import { Zone } from "@/store/zones/types";
+import { Zone, ZoneState } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
 import DeviceWidget from "@/components/DeviceWidget.vue";
 import {
@@ -173,7 +173,7 @@ interface Status {
 
 const ZoneDetail = Vue.extend({
   props: {
-    zone: Zone,
+    state: ZoneState,
     units: String
   },
 
@@ -195,12 +195,16 @@ const ZoneDetail = Vue.extend({
   },
 
   computed: {
+    zone(): Zone {
+      return this.state.zone;
+    },
+
     isDay(): boolean {
       let day = true;
 
-      if (this.zone && this.zone.profile) {
-        const start = this.zone.profile.lampstart.split(":");
-        const duration = this.zone.profile.lampduration["hours"];
+      if (this.state.zone && this.state.zone.profile) {
+        const start = this.state.zone.profile.lampstart.split(":");
+        const duration = this.state.zone.profile.lampduration["hours"];
 
         const lamp = new LampTimer(parseInt(start[0]), duration);
 
@@ -212,7 +216,7 @@ const ZoneDetail = Vue.extend({
     },
 
     linkto(): string {
-      return `zone-details-${this.zone.id}`;
+      return `zone-details-${this.state.zone.id}`;
     },
 
     meanTemperature(): number {
@@ -323,11 +327,11 @@ const ZoneDetail = Vue.extend({
 
     targetTemperature(): number {
       let target = 15;
-      if (this.zone && this.zone.profile) {
+      if (this.state.zone && this.state.zone.profile) {
         if (this.isDay) {
-          target = parseFloat(this.zone.profile.lampontemperature);
+          target = this.state.zone.profile.lampontemperature;
         } else {
-          target = parseFloat(this.zone.profile.lampofftemperature);
+          target = this.state.zone.profile.lampofftemperature;
         }
       }
 
@@ -336,11 +340,11 @@ const ZoneDetail = Vue.extend({
 
     targetHumidity(): number {
       let target = 20;
-      if (this.zone && this.zone.profile) {
+      if (this.state.zone && this.state.zone.profile) {
         if (this.isDay) {
-          target = parseFloat(this.zone.profile.lamponhumidity);
+          target = this.state.zone.profile.lamponhumidity;
         } else {
-          target = parseFloat(this.zone.profile.lampoffhumidity);
+          target = this.state.zone.profile.lampoffhumidity;
         }
       }
       return target;
@@ -363,8 +367,8 @@ const ZoneDetail = Vue.extend({
     },
 
     zoneMeters(): Device[] {
-      if (this.zone) {
-        const result = this.zone.devices;
+      if (this.state.zone) {
+        const result = this.state.zone.devices;
         const filter = (event: Device) => {
           return event.devicetype === "meter";
         };
@@ -374,8 +378,8 @@ const ZoneDetail = Vue.extend({
     },
 
     zoneSwitches(): Device[] {
-      if (this.zone) {
-        const result = this.zone.devices;
+      if (this.state.zone) {
+        const result = this.state.zone.devices;
         const filter = (event: Device) => {
           return event.devicetype !== "meter";
         };
@@ -396,19 +400,19 @@ const ZoneDetail = Vue.extend({
 
   methods: {
     add(selected: string) {
-      const payload = { zone: this.zone, device: selected };
+      const payload = { zone: this.state.zone, device: selected };
       this.addDevice(payload);
       this.fetchData();
     },
 
     refresh() {
-      if (this.zone) {
+      if (this.state.zone) {
         this.timestamp = new Date();
 
         this.readings = [];
         this.statuses = [];
 
-        this.zone.devices.forEach((device: Device) => {
+        this.state.zone.devices.forEach((device: Device) => {
           if (device) {
             if (device.devicetype === "meter") {
               HTTP.get(`/readings?meter=${device.device}&last=one`).then(
@@ -430,16 +434,16 @@ const ZoneDetail = Vue.extend({
     },
 
     remove(selected: string) {
-      const payload = { zone: this.zone, device: selected };
+      const payload = { zone: this.state.zone, device: selected };
       this.removeDevice(payload);
       this.fetchData();
     },
 
     saveNickname(nickname: string) {
       const zone = {
-        id: this.zone.id,
+        id: this.state.zone.id,
         nickname: nickname,
-        profileid: this.profileid
+        profileid: this.state.zone.profileid
       };
 
       this.edit(zone);
@@ -447,8 +451,8 @@ const ZoneDetail = Vue.extend({
 
     saveProfile(profileid: number) {
       const zone = {
-        id: this.zone.id,
-        nickname: this.nickname,
+        id: this.state.zone.id,
+        nickname: this.state.zone.nickname,
         profileid: profileid
       };
 

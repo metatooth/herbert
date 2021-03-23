@@ -27,8 +27,8 @@ configure("./config/log4js.json");
 const logger: Logger = getLogger("app");
 
 interface Message {
-  type: String,
-  payload: {}
+  type: string;
+  payload: {};
 }
 
 export class App {
@@ -115,7 +115,7 @@ export class App {
     this.inet = net[0]["address"];
 
     console.log("wlan0", this.macaddr, this.inet);
-    
+
     const meters = this.meters;
     const switches = this.switches;
 
@@ -131,9 +131,9 @@ export class App {
       } else if (dev.manufacturer === "herbert") {
         switches.push(new Herbert(dev.id, parseInt(dev.pin)));
       } else if (dev.manufacturer === "sm-8relay") {
-        switches.push(new SM8relay(dev.id,
-                                   parseInt(dev.board),
-                                   parseInt(dev.channel)));
+        switches.push(
+          new SM8relay(dev.id, parseInt(dev.board), parseInt(dev.channel))
+        );
       } else if (dev.manufacturer === "mockbot") {
         meters.push(new MockMeter());
       }
@@ -179,16 +179,18 @@ export class App {
                   result = await this.wyze.turnOff(device);
                 }
                 if (result.code !== "1") {
-	                logger.error(`ERROR ${result.code} ${device.nickname} ${data.payload.action} - ${result}`);
+                  logger.error(
+                    `ERROR ${result.code} ${device.nickname} ${data.payload.action} - ${result}`
+                  );
                   const reply = {
-		                type: "ERROR",
+                    type: "ERROR",
                     payload: {
                       worker: app.macaddr,
-		                  device: data.payload.device,
+                      device: data.payload.device,
                       action: data.payload.action,
                       code: result.code,
                       message: result.msg,
-                      timestamp: new Date
+                      timestamp: new Date()
                     }
                   };
                   app.heldMessages.push(reply);
@@ -199,7 +201,7 @@ export class App {
             console.log("Check other devices...");
             app.switches.forEach(plug => {
               if (plug.device === data.payload.device) {
-	              if (data.payload.action === "on") {
+                if (data.payload.action === "on") {
                   console.log(plug.device, "on");
                   plug.on();
                 } else {
@@ -239,7 +241,7 @@ export class App {
         temperature: meter.clime.temperature,
         humidity: meter.clime.humidity,
         pressure: meter.clime.vpd(),
-        timestamp: new Date
+        timestamp: new Date()
       }
     };
     this.send(data);
@@ -252,7 +254,7 @@ export class App {
         device: switcher.device,
         manufacturer: switcher.manufacturer,
         status: switcher.state,
-        timestamp: new Date
+        timestamp: new Date()
       }
     };
     this.send(data);
@@ -312,9 +314,9 @@ export class App {
         if (wyze.conn_state === 0) {
           plug.state = "disconnected";
         } else if (wyze.device_params.switch_state === 1) {
-	  plug.state = "on";
+          plug.state = "on";
         } else {
-	  plug.state = "off";
+          plug.state = "off";
         }
 
         app.switchStatus(plug);
@@ -336,7 +338,7 @@ export class App {
 
     logger.debug("Herbert switches...");
     app.switches.forEach(plug => {
-        app.switchStatus(plug.status());
+      app.switchStatus(plug.status());
     });
     logger.debug("Done.");
 

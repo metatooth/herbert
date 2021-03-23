@@ -1,26 +1,34 @@
 import { MutationTree } from "vuex";
-import { ZonesState, Zone } from "./types";
+import { ZonesState, ZoneState, Zone } from "./types";
 
 export const mutations: MutationTree<ZonesState> = {
   ADD(state, zone: Zone) {
     zone.updatedat = new Date();
-    state.zones.push(zone);
+    const zstate: ZoneState = {
+      zone: zone,
+      error: false
+    };
+    state.zones.push(zstate);
   },
   ADD_DEVICE(state, payload: { zone: Zone; device: string }) {
     console.log("any needed? add zone device mutation", payload);
   },
   EDIT(state, zone: Zone) {
-    const found = state.zones.find((el: Zone) => {
-      return el.id === zone.id;
+    const found = state.zones.find((el: ZoneState) => {
+      return el.zone.id === zone.id;
     });
     if (found) {
       const index = state.zones.indexOf(found);
-      state.zones.splice(index, 1, zone);
+      const zstate: ZoneState = {
+        zone: zone,
+        error: false
+      };
+      state.zones.splice(index, 1, zstate);
     }
   },
   REMOVE(state, zone: Zone) {
-    const found = state.zones.find((el: Zone) => {
-      return el.id === zone.id;
+    const found = state.zones.find((el: ZoneState) => {
+      return el.zone.id === zone.id;
     });
     if (found) {
       const index = state.zones.indexOf(found);
@@ -32,7 +40,11 @@ export const mutations: MutationTree<ZonesState> = {
   },
   SET(state, zones: Zone[]) {
     state.error = false;
-    state.zones = zones;
+    const zstates: ZoneState[] = [];
+    zones.forEach(z => {
+      zstates.push({ zone: z, error: false });
+    });
+    state.zones = zstates;
   },
   ERROR(state) {
     state.error = true;

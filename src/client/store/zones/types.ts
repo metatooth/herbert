@@ -13,7 +13,19 @@ export interface Zone {
   deletedat?: Date;
 }
 
+export class ZoneState {
+  zone: Zone = {
+    id: 0,
+    nickname: "",
+    devices: [],
+    createdat: new Date(),
+    updatedat: new Date(),
+    deleted: false
+  };
+  error = false;
+}
+
 export interface ZonesState {
-  zones: Zone[];
+  zones: ZoneState[];
   error: boolean;
 }

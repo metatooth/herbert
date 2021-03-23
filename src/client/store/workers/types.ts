@@ -5,10 +5,21 @@ export interface Worker {
   createdat: Date;
   updatedat: Date;
   deleted: boolean;
-  deletedat: Date;
+  deletedat?: Date;
+}
+
+export class WorkerState {
+  worker: Worker = {
+    worker: "",
+    nickname: "",
+    createdat: new Date(),
+    updatedat: new Date(),
+    deleted: false
+  };
+  error = false;
 }
 
 export interface WorkersState {
-  workers: Worker[];
+  workers: WorkerState[];
   error: boolean;
 }

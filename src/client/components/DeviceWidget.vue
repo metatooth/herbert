@@ -20,26 +20,30 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Device } from "@/store/devices/types";
+import { Device, DeviceState } from "@/store/devices/types";
 
 const DeviceWidget = Vue.extend({
   props: {
-    device: Device
+    state: DeviceState
   },
 
   computed: {
+    device(): Device {
+      return this.state.device;
+    },
+
     iconClass() {
-      if (this.device.devicetype === "heater") {
+      if (this.state.device.devicetype === "heater") {
         return "fire-alt";
-      } else if (this.device.devicetype === "humidifier") {
+      } else if (this.state.device.devicetype === "humidifier") {
         return "tint";
-      } else if (this.device.devicetype === "dehumidifier") {
+      } else if (this.state.device.devicetype === "dehumidifier") {
         return "tint-slash";
-      } else if (this.device.devicetype === "lamp") {
+      } else if (this.state.device.devicetype === "lamp") {
         return "lightbulb";
-      } else if (this.device.devicetype === "blower") {
+      } else if (this.state.device.devicetype === "blower") {
         return "wind";
-      } else if (this.device.devicetype === "fan") {
+      } else if (this.state.device.devicetype === "fan") {
         return "fan";
       } else {
         return "circle";
@@ -47,7 +51,10 @@ const DeviceWidget = Vue.extend({
     },
 
     offClass() {
-      if (this.device.status === "off" || this.device.status === "0") {
+      if (
+        this.state.device.status === "off" ||
+        this.state.device.status === "0"
+      ) {
         return "has-text-warning";
       } else {
         return "has-text-warning-light";
@@ -55,7 +62,10 @@ const DeviceWidget = Vue.extend({
     },
 
     onClass() {
-      if (this.device.status === "on" || this.device.status === "1") {
+      if (
+        this.state.device.status === "on" ||
+        this.state.device.status === "1"
+      ) {
         return "has-text-success";
       } else {
         return "has-text-success-light";
@@ -63,7 +73,7 @@ const DeviceWidget = Vue.extend({
     },
 
     disconnectedClass() {
-      if (this.device.status === "disconnected") {
+      if (this.state.device.status === "disconnected") {
         return "has-text-danger";
       } else {
         return "has-text-danger-light";

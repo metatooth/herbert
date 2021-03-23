@@ -42,23 +42,29 @@
 import Vue from "vue";
 
 import Timestamp from "@/components/Timestamp.vue";
-import { Worker } from "@/store/workers/types";
+import { Worker, WorkerState } from "@/store/workers/types";
 import { mapActions } from "vuex";
 
 const WorkerRow = Vue.extend({
   props: {
-    worker: Worker
+    state: WorkerState
   },
 
   data() {
     return {
-      nickname: this.worker.nickname,
+      nickname: this.state.worker.nickname || "",
       editing: false
     };
   },
 
   components: {
     Timestamp
+  },
+
+  computed: {
+    worker(): Worker {
+      return this.state.worker;
+    }
   },
 
   methods: {
@@ -68,14 +74,14 @@ const WorkerRow = Vue.extend({
 
     save() {
       this.edit({
-        ...this.worker,
+        ...this.state.worker,
         nickname: this.nickname
       });
       this.editing = false;
     },
 
     cancel() {
-      this.nickname = this.worker.nickname;
+      this.nickname = this.state.worker.nickname;
       this.editing = false;
     },
 

@@ -99,7 +99,7 @@ const Zones = Vue.extend({
 
     save(): void {
       if (this.nickname && this.profileid) {
-        this["zones/add"]({
+        this.add({
           nickname: this.nickname,
           profileid: this.profileid
         });

@@ -18,26 +18,30 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { Device } from "@/store/devices/types";
+import { Device, DeviceState } from "@/store/devices/types";
 import { celsius2fahrenheit } from "../../shared/utils";
 
 const MeterWidget = Vue.extend({
   props: {
-    meter: Device,
+    state: DeviceState,
     units: String
   },
 
   computed: {
+    meter(): Device {
+      return this.state.device;
+    },
+
     temperature() {
       if (this.units === "F") {
-        return celsius2fahrenheit(this.meter.temperature);
+        return celsius2fahrenheit(this.state.device.temperature || 0);
       } else {
-        return parseFloat(this.meter.temperature);
+        return this.state.device.temperature || 0;
       }
     },
 
     humidity() {
-      return 100 * this.meter.humidity;
+      return 100 * (this.state.device.humidity || 0);
     },
 
     unitsWithDegrees() {

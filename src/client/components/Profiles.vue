@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ profiles.length }} {{ profilesName }}</h2>
+    <h2 class="title">{{ profilesCount }} {{ profilesName }}</h2>
     <table class="table is-full-width">
       <thead>
         <tr>
@@ -190,7 +190,7 @@ const Profiles = Vue.extend({
       }
     },
     ...mapState("profiles", ["profiles"]),
-    ...mapGetters("profiles", ["profileCount"])
+    ...mapGetters("profiles", ["profilesCount"])
   },
 
   methods: {

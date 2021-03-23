@@ -14,52 +14,58 @@ export class SM8relay extends Switch {
   public on() {
     console.log("SM 8-relay ON?", this.state);
     if (this.state === "off" || this.state === "0") {
-      exec(`8relay ${this.board} write ${this.channel} on`,
-           (error, stdout, stderr) => {
-             if (error) {
-               console.log(`error: ${error.message}`);
-             }
-             if (stderr) {
-               console.log(`stderr: ${stderr}`);
-             }
-             if (stdout) {
-               console.log(`stdout: ${stdout}`);
-             }
-           });
+      exec(
+        `8relay ${this.board} write ${this.channel} on`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.log(`error: ${error.message}`);
+          }
+          if (stderr) {
+            console.log(`stderr: ${stderr}`);
+          }
+          if (stdout) {
+            console.log(`stdout: ${stdout}`);
+          }
+        }
+      );
       this.state = "on";
     }
   }
-  
+
   public off() {
     console.log("SM 8-relay OFF?", this.state);
     if (this.state === "on" || this.state === "1") {
-      exec(`8relay ${this.board} write ${this.channel} off`,
-           (error, stdout, stderr) => {
-             if (error) {
-               console.log(`error: ${error.message}`);
-             }
-             if (stderr) {
-               console.log(`stderr: ${stderr}`);
-             }
-             if (stdout) {
-               console.log(`stdout: ${stdout}`);
-             }
-           });
+      exec(
+        `8relay ${this.board} write ${this.channel} off`,
+        (error, stdout, stderr) => {
+          if (error) {
+            console.log(`error: ${error.message}`);
+          }
+          if (stderr) {
+            console.log(`stderr: ${stderr}`);
+          }
+          if (stdout) {
+            console.log(`stdout: ${stdout}`);
+          }
+        }
+      );
       this.state = "off";
     }
   }
 
   public status() {
-    exec(`8relay ${this.board} read ${this.channel}`,
-         (error, stdout, stderr) => {
-           if (error) {
-             console.log(`error: ${error.message}`);
-           }
-           if (stderr) {
-             console.log(`stderr: ${stderr}`);
-           }
-           this.state = stdout.replace(/[\n]$/, "");
-         });
+    exec(
+      `8relay ${this.board} read ${this.channel}`,
+      (error, stdout, stderr) => {
+        if (error) {
+          console.log(`error: ${error.message}`);
+        }
+        if (stderr) {
+          console.log(`stderr: ${stderr}`);
+        }
+        this.state = stdout.replace(/[\n]$/, "");
+      }
+    );
     return this;
   }
 }

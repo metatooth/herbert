@@ -1,7 +1,6 @@
 import { Device } from "./device";
 
 export class Switch extends Device {
-
   public on() {
     console.log("switch on?", this.state);
     this.state = "on";
@@ -15,5 +14,4 @@ export class Switch extends Device {
   public status() {
     return this;
   }
-
 }

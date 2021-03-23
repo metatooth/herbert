@@ -1,9 +1,9 @@
 import { GetterTree } from "vuex";
-import { Profile, ProfilesState } from "./types";
+import { ProfileState, ProfilesState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<ProfilesState, RootState> = {
-  profiles(state): Profile[] {
+  profiles(state): ProfileState[] {
     const { profiles } = state;
     return profiles;
   },

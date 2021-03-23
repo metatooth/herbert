@@ -1,19 +1,30 @@
 import { MutationTree } from "vuex";
-import { WorkersState, Worker } from "./types";
+import { WorkersState, WorkerState, Worker } from "./types";
 
 export const mutations: MutationTree<WorkersState> = {
   EDIT(state, payload: Worker) {
-    const found = state.workers.find((el: Worker) => {
-      el.worker === payload.worker;
+    const found = state.workers.find((el: WorkerState) => {
+      el.worker.worker === payload.worker;
     });
     if (found) {
       const index = state.workers.indexOf(found);
-      state.workers.splice(index, 1, payload);
+      const wstate: WorkerState = {
+        worker: payload,
+        error: false
+      };
+      state.workers.splice(index, 1, wstate);
     }
   },
   SET(state, payload: Worker[]) {
     state.error = false;
-    state.workers = payload;
+    state.workers = [];
+    payload.forEach(w => {
+      const wstate: WorkerState = {
+        worker: w,
+        error: false
+      };
+      state.workers.push(wstate);
+    });
   },
   WORKERS_ERROR(state) {
     state.error = true;

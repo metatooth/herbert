@@ -38,17 +38,17 @@
 import Vue from "vue";
 import HerbertButton from "@/components/Button.vue";
 import { mapGetters } from "vuex";
-import { Zone } from "@/store/zones/types";
+import { Zone, ZoneState } from "@/store/zones/types";
 
 const SelectProfile = Vue.extend({
   props: {
     label: String,
-    zone: Zone
+    state: ZoneState
   },
 
   data() {
     return {
-      selected: Number
+      selected: this.state.zone.profileid || 0
     };
   },
 
@@ -56,12 +56,12 @@ const SelectProfile = Vue.extend({
     HerbertButton
   },
 
-  mounted() {
-    this.selected = this.zone.profileid;
-  },
-
   computed: {
-    changed() {
+    zone(): Zone {
+      return this.state.zone;
+    },
+
+    changed(): boolean {
       if (this.zone.profileid === this.selected) {
         return false;
       }

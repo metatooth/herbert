@@ -58,18 +58,18 @@ import Vue from "vue";
 import Timestamp from "@/components/Timestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 import { mapState, mapActions } from "vuex";
-import { Zone } from "@/store/zones/types";
+import { Zone, ZoneState } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
   props: {
-    zone: Zone,
+    state: ZoneState,
     units: String
   },
 
   data() {
     return {
-      nickname: this.zone.nickname,
-      profileid: this.zone.profileid,
+      nickname: this.state.zone.nickname,
+      profileid: this.state.zone.profileid,
       editing: false
     };
   },
@@ -81,11 +81,11 @@ const ZoneRow = Vue.extend({
 
   computed: {
     linkToConfig(): string {
-      return "#" + this.zone.id + "config";
+      return "#" + this.state.zone.id + "config";
     },
 
-    zoneUpdatedAt(): Date {
-      return new Date(Date.parse(this.zone.updatedat));
+    zone(): Zone {
+      return this.state.zone;
     },
 
     ...mapState("profiles", ["profiles"])
@@ -98,7 +98,7 @@ const ZoneRow = Vue.extend({
 
     save() {
       const zone = {
-        id: this.zone.id,
+        id: this.state.zone.id,
         nickname: this.nickname,
         profileid: this.profileid
       };
@@ -108,13 +108,13 @@ const ZoneRow = Vue.extend({
     },
 
     destroy() {
-      this.remove(this.zone);
+      this.remove(this.state.zone);
       this.editing = false;
     },
 
     cancel() {
-      this.nickname = this.zone.nickname;
-      this.profileid = this.zone.profileid;
+      this.nickname = this.state.zone.nickname;
+      this.profileid = this.state.zone.profileid;
       this.editing = false;
     },
 
