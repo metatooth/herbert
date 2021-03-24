@@ -1,6 +1,6 @@
 <template>
   <tr>
-    <td class="has-background-primary-light">
+    <td>
       <div v-if="!editing">{{ profile.profile }}</div>
       <div v-else>
         <input
@@ -11,7 +11,7 @@
         />
       </div>
     </td>
-    <td class="has-background-light">
+    <td>
       <div class="is-family-code" v-if="!editing">
         {{ lamponHour }}:{{ lamponMinute }}
       </div>
@@ -19,7 +19,7 @@
         <input class="input" type="time" v-model="lampstart" />
       </div>
     </td>
-    <td class="has-background-light">
+    <td>
       <div class="is-family-code" v-if="!editing">
         {{ durationWithUnits }}
       </div>
@@ -34,7 +34,7 @@
         />
       </div>
     </td>
-    <td class="has-background-warning-light" v-if="!editing">
+    <td v-if="!editing">
       <div class="field is-grouped">
         <target
           icon="thermometer-half"
@@ -42,8 +42,7 @@
           :precision="1"
           :units="unitsWithDegree"
           size="small"
-          text="black"
-          background="warning"
+          color="warning"
         />
         <target
           icon="tint"
@@ -51,8 +50,7 @@
           :precision="0"
           units="%"
           size="small"
-          text="black"
-          background="warning"
+          color="warning"
         />
         <target
           icon="cloud"
@@ -60,8 +58,7 @@
           :precision="1"
           units="hPa"
           size="small"
-          text="black"
-          background="warning"
+          color="warning"
         />
       </div>
     </td>
@@ -96,7 +93,7 @@
         </div>
       </div>
     </td>
-    <td class="has-background-info-light" v-if="!editing">
+    <td v-if="!editing">
       <div class="field is-grouped">
         <target
           icon="thermometer-half"
@@ -104,8 +101,7 @@
           :precision="1"
           :units="unitsWithDegree"
           size="small"
-          text="white"
-          background="info"
+          color="info"
         />
         <target
           icon="tint"
@@ -113,8 +109,7 @@
           :precision="0"
           units="%"
           size="small"
-          text="white"
-          background="info"
+          color="info"
         />
         <target
           icon="cloud"
@@ -122,8 +117,7 @@
           :precision="1"
           units="hPa"
           size="small"
-          text="white"
-          background="info"
+          color="info"
         />
       </div>
     </td>

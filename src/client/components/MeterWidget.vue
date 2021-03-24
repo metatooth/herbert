@@ -1,47 +1,45 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <span class="tag is-medium">
+      <span class="tag is-medium has-text-success has-background-dark">
         <font-awesome-icon icon="tachometer-alt" />
       </span>
-      <span class="tag is-medium">
+      <span class="tag is-medium has-text-light has-background-dark">
         {{ temperature.toFixed(1) }} {{ unitsWithDegrees }}
       </span>
-      <span class="tag is-medium"> {{ humidity.toFixed(0) }} % </span>
-      <span class="tag is-medium">
-        {{ meter.nickname || meter.meter }}
+      <span class="tag is-medium has-text-light has-background-dark">
+        {{ humidity.toFixed(0) }} %
       </span>
-      <span class="tag is-medium is-delete" v-on:click="remove(meter.device)" />
+      <span class="tag is-medium has-text-light has-background-dark">
+        {{ device.nickname || device.device }}
+        <button class="delete" v-on:click="remove(device.device)" />
+      </span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Device, DeviceState } from "@/store/devices/types";
+import { Device } from "@/store/devices/types";
 import { celsius2fahrenheit } from "../../shared/utils";
 
 const MeterWidget = Vue.extend({
   props: {
-    state: DeviceState,
+    device: Device,
     units: String
   },
 
   computed: {
-    meter(): Device {
-      return this.state.device;
-    },
-
     temperature() {
       if (this.units === "F") {
-        return celsius2fahrenheit(this.state.device.temperature || 0);
+        return celsius2fahrenheit(this.device.temperature);
       } else {
-        return this.state.device.temperature || 0;
+        return parseFloat(this.device.temperature);
       }
     },
 
     humidity() {
-      return 100 * (this.state.device.humidity || 0);
+      return 100 * this.device.humidity;
     },
 
     unitsWithDegrees() {

@@ -9,11 +9,11 @@
           <div class="select">
             <select v-model="selected">
               <option
-                v-for="device in devices"
-                v-bind:key="device.device"
-                v-bind:value="device.device"
+                v-for="dstate in devices"
+                v-bind:key="dstate.device.device"
+                v-bind:value="dstate.device.device"
               >
-                {{ device.nickname || device.device }}
+                {{ dstate.device.nickname || dstate.device.device }}
               </option>
             </select>
           </div>

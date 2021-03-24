@@ -1,15 +1,15 @@
 <template>
   <section class="section">
     <h2 class="title">{{ profilesCount }} {{ profilesName }}</h2>
-    <table class="table is-full-width">
+    <table class="table is-full-width is-striped">
       <thead>
         <tr>
-          <th class="has-background-primary">ID</th>
-          <th colspan="2" class="has-background-light">Lamps</th>
-          <th class="has-background-warning">
+          <th>ID</th>
+          <th colspan="2">Lamps</th>
+          <th class="has-background-warning has-text-centered">
             <font-awesome-icon icon="sun" />
           </th>
-          <th class="has-text-white has-background-info">
+          <th class="has-text-white has-background-info has-text-centered">
             <font-awesome-icon icon="moon" />
           </th>
           <th></th>

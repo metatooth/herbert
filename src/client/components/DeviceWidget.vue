@@ -1,49 +1,49 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <div class="tag is-medium" :class="onClass">
+      <div class="tag is-medium has-background-dark" :class="onClass">
         <font-awesome-icon :icon="iconClass" />
       </div>
-      <div class="tag is-medium" :class="offClass">
+      <div class="tag is-medium has-background-dark" :class="offClass">
         <font-awesome-icon :icon="iconClass" />
       </div>
-      <div class="tag is-medium" :class="disconnectedClass">
+      <div class="tag is-medium has-background-dark" :class="disconnectedClass">
         <font-awesome-icon :icon="iconClass" />
       </div>
-      <div class="tag is-medium">
+      <div class="tag is-medium has-text-light has-background-dark">
         {{ device.nickname || device.device }}
+        <button
+          class="delete"
+          v-on:click="remove(device.device)"
+          @click="remove(device.device)"
+        />
       </div>
-      <div class="tag is-delete is-medium" v-on:click="remove(device.device)" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Device, DeviceState } from "@/store/devices/types";
+import { Device } from "@/store/devices/types";
 
 const DeviceWidget = Vue.extend({
   props: {
-    state: DeviceState
+    device: Device
   },
 
   computed: {
-    device(): Device {
-      return this.state.device;
-    },
-
     iconClass() {
-      if (this.state.device.devicetype === "heater") {
+      if (this.device.devicetype === "heater") {
         return "fire-alt";
-      } else if (this.state.device.devicetype === "humidifier") {
+      } else if (this.device.devicetype === "humidifier") {
         return "tint";
-      } else if (this.state.device.devicetype === "dehumidifier") {
+      } else if (this.device.devicetype === "dehumidifier") {
         return "tint-slash";
-      } else if (this.state.device.devicetype === "lamp") {
+      } else if (this.device.devicetype === "lamp") {
         return "lightbulb";
-      } else if (this.state.device.devicetype === "blower") {
+      } else if (this.device.devicetype === "blower") {
         return "wind";
-      } else if (this.state.device.devicetype === "fan") {
+      } else if (this.device.devicetype === "fan") {
         return "fan";
       } else {
         return "circle";
@@ -51,10 +51,7 @@ const DeviceWidget = Vue.extend({
     },
 
     offClass() {
-      if (
-        this.state.device.status === "off" ||
-        this.state.device.status === "0"
-      ) {
+      if (this.device.status === "off" || this.device.status === "0") {
         return "has-text-warning";
       } else {
         return "has-text-warning-light";
@@ -62,10 +59,7 @@ const DeviceWidget = Vue.extend({
     },
 
     onClass() {
-      if (
-        this.state.device.status === "on" ||
-        this.state.device.status === "1"
-      ) {
+      if (this.device.status === "on" || this.device.status === "1") {
         return "has-text-success";
       } else {
         return "has-text-success-light";
@@ -73,7 +67,7 @@ const DeviceWidget = Vue.extend({
     },
 
     disconnectedClass() {
-      if (this.state.device.status === "disconnected") {
+      if (this.device.status === "disconnected") {
         return "has-text-danger";
       } else {
         return "has-text-danger-light";
@@ -83,6 +77,7 @@ const DeviceWidget = Vue.extend({
 
   methods: {
     remove(device: string) {
+      console.log("remove???", device);
       this.$emit("remove-device", device);
     }
   }

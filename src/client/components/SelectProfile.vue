@@ -10,11 +10,11 @@
             <div class="select">
               <select v-model="selected">
                 <option
-                  v-for="profile in profiles"
-                  v-bind:key="profile.id"
-                  v-bind:value="profile.id"
+                  v-for="pstate in profiles"
+                  v-bind:key="pstate.profile.id"
+                  v-bind:value="pstate.profile.id"
                 >
-                  {{ profile.profile }}
+                  {{ pstate.profile.profile }}
                 </option>
               </select>
             </div>
@@ -22,7 +22,6 @@
         </div>
         <div class="field">
           <herbert-button
-            class="is-primary"
             :show="changed"
             label=""
             @on-click="select"
@@ -38,17 +37,17 @@
 import Vue from "vue";
 import HerbertButton from "@/components/Button.vue";
 import { mapGetters } from "vuex";
-import { Zone, ZoneState } from "@/store/zones/types";
+import { Zone } from "@/store/zones/types";
 
 const SelectProfile = Vue.extend({
   props: {
     label: String,
-    state: ZoneState
+    zone: Zone
   },
 
   data() {
     return {
-      selected: this.state.zone.profileid || 0
+      selected: this.zone.profileid || 0
     };
   },
 
@@ -57,10 +56,6 @@ const SelectProfile = Vue.extend({
   },
 
   computed: {
-    zone(): Zone {
-      return this.state.zone;
-    },
-
     changed(): boolean {
       if (this.zone.profileid === this.selected) {
         return false;
@@ -73,8 +68,10 @@ const SelectProfile = Vue.extend({
   },
 
   methods: {
-    select(profile: number) {
-      this.$emit("select-profile", profile);
+    select() {
+      console.log("SELECT SELECT!");
+      console.log("SELECT", this.selected);
+      this.$emit("select-profile", this.selected);
     }
   }
 });

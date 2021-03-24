@@ -10,38 +10,29 @@
           <div class="control">
             <span class="tag is-medium">Actual</span>
           </div>
-          <div class="control">
-            <div class="tags has-addons">
-              <span class="tag is-medium" :class="meanTemperatureIconClass">
-                <font-awesome-icon icon="thermometer-half" />
-              </span>
-              <span class="tag is-medium" :class="meanTemperatureDisplayClass">
-                {{ meanTemperature.toFixed(1) }} {{ unitsWithDegree }}
-              </span>
-            </div>
-          </div>
+          <target
+            icon="thermometer-half"
+            :value="meanTemperature"
+            :precision="1"
+            :units="unitsWithDegree"
+            :color="meanTemperatureColor"
+          />
 
-          <div class="control">
-            <div class="tags has-addons">
-              <span class="tag is-medium" :class="meanHumidityIconClass">
-                <font-awesome-icon icon="tint" />
-              </span>
-              <span class="tag is-medium" :class="meanHumidityDisplayClass">
-                {{ meanHumidity.toFixed(0) }} %
-              </span>
-            </div>
-          </div>
+          <target
+            icon="tint"
+            :value="meanHumidity"
+            :precision="0"
+            units="%"
+            :color="meanHumidityColor"
+          />
 
-          <div class="control">
-            <div class="tags has-addons">
-              <span class="tag is-medium" :class="meanPressureIconClass">
-                <font-awesome-icon icon="cloud" />
-              </span>
-              <span class="tag is-medium" :class="meanPressureDisplayClass">
-                {{ meanPressure.toFixed(1) }} hPa
-              </span>
-            </div>
-          </div>
+          <target
+            icon="cloud"
+            :value="meanPressure"
+            :precision="1"
+            units="hPa"
+            :color="meanPressureColor"
+          />
         </div>
       </div>
 
@@ -50,39 +41,29 @@
           <div class="control">
             <span class="tag is-medium">Target</span>
           </div>
+          <target
+            icon="thermometer-half"
+            :value="targetTemperature"
+            :precision="1"
+            :units="unitsWithDegree"
+            :color="targetColor"
+          />
 
-          <div class="control">
-            <div class="tags has-addons">
-              <span class="tag is-medium" :class="targetIconClass">
-                <font-awesome-icon icon="thermometer-half" />
-              </span>
-              <span class="tag is-medium" :class="targetDisplayClass">
-                {{ targetTemperature.toFixed(1) }} {{ unitsWithDegree }}
-              </span>
-            </div>
-          </div>
+          <target
+            icon="tint"
+            :value="targetHumidity"
+            :precision="0"
+            units="%"
+            :color="targetColor"
+          />
 
-          <div class="control">
-            <div class="tags has-addons">
-              <span class="tag is-medium" :class="targetIconClass">
-                <font-awesome-icon icon="tint" />
-              </span>
-              <span class="tag is-medium" :class="targetDisplayClass">
-                {{ targetHumidity.toFixed(0) }} %
-              </span>
-            </div>
-          </div>
-
-          <div class="control">
-            <div class="tags has-addons">
-              <span class="tag is-medium" :class="targetIconClass">
-                <font-awesome-icon icon="cloud" />
-              </span>
-              <span class="tag is-medium" :class="targetDisplayClass">
-                {{ targetPressure.toFixed(1) }} hPa
-              </span>
-            </div>
-          </div>
+          <target
+            icon="cloud"
+            :value="targetPressure"
+            :precision="1"
+            units="hPa"
+            :color="targetColor"
+          />
         </div>
       </div>
 
@@ -97,10 +78,11 @@
       <div class="card-content">
         <div class="field is-grouped is-grouped-multiline">
           <meter-widget
-            v-for="meter in zoneMeters"
-            :key="meter.device"
-            :meter="meter"
+            v-for="device in zoneMeters"
+            :key="device.device"
+            :device="device"
             :units="units"
+            @remove-device="remove"
           />
         </div>
       </div>
@@ -111,6 +93,7 @@
             v-for="device in zoneSwitches"
             :key="device.device"
             :device="device"
+            @remove-device="remove"
           />
         </div>
       </div>
@@ -149,7 +132,7 @@ import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
 import { LampTimer } from "../../shared/lamp-timer";
-import { Zone, ZoneState } from "@/store/zones/types";
+import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
 import DeviceWidget from "@/components/DeviceWidget.vue";
 import {
@@ -158,6 +141,7 @@ import {
   vaporPressureDeficit
 } from "../../shared/utils";
 import { mapState, mapGetters, mapActions } from "vuex";
+import Target from "@/components/Target.vue";
 
 interface Reading {
   temperature: number;
@@ -173,7 +157,7 @@ interface Status {
 
 const ZoneDetail = Vue.extend({
   props: {
-    state: ZoneState,
+    zone: Zone,
     units: String
   },
 
@@ -191,20 +175,17 @@ const ZoneDetail = Vue.extend({
     MeterWidget,
     SelectDevice,
     SelectProfile,
+    Target,
     Timestamp
   },
 
   computed: {
-    zone(): Zone {
-      return this.state.zone;
-    },
-
     isDay(): boolean {
       let day = true;
 
-      if (this.state.zone && this.state.zone.profile) {
-        const start = this.state.zone.profile.lampstart.split(":");
-        const duration = this.state.zone.profile.lampduration["hours"];
+      if (this.zone.profile) {
+        const start = this.zone.profile.lampstart.split(":");
+        const duration = this.zone.profile.lampduration["hours"];
 
         const lamp = new LampTimer(parseInt(start[0]), duration);
 
@@ -216,19 +197,16 @@ const ZoneDetail = Vue.extend({
     },
 
     linkto(): string {
-      return `zone-details-${this.state.zone.id}`;
+      return `zone-details-${this.zone.id}`;
     },
 
     meanTemperature(): number {
       let sum = 0;
       this.readings.forEach(reading => {
-        sum = sum + reading.temperature;
+        sum = sum + parseFloat(reading.temperature);
       });
       const mean = sum / this.readings.length;
-      if (this.units === "F") {
-        return celsius2fahrenheit(mean);
-      }
-      return mean;
+      return this.units === "F" ? celsius2fahrenheit(mean) : mean;
     },
 
     meanHumidity(): number {
@@ -249,105 +227,56 @@ const ZoneDetail = Vue.extend({
       return vaporPressureDeficit(temp, delta, this.meanHumidity / 100) / 1000;
     },
 
-    meanTemperatureDisplayClass(): string {
+    meanTemperatureColor(): string {
       if (this.meanTemperature < this.targetTemperature) {
-        return "has-text-white has-background-info";
+        return "info";
       } else if (this.meanTemperature > this.targetTemperature) {
-        return "has-text-white has-background-danger";
+        return "danger";
       } else {
-        return "has-text-white has-background-success";
+        return "success";
       }
     },
 
-    meanTemperatureIconClass(): string {
-      if (this.meanTemperature < this.targetTemperature) {
-        return "has-text-info has-background-black";
-      } else if (this.meanTemperature > this.targetTemperature) {
-        return "has-text-danger has-background-black";
-      } else {
-        return "has-text-success has-background-black";
-      }
-    },
-
-    meanHumidityDisplayClass(): string {
+    meanHumidityColor(): string {
       if (this.meanHumidity < this.targetHumidity) {
-        return "has-text-white has-background-info";
+        return "info";
       } else if (this.meanHumidity > this.targetHumidity) {
-        return "has-text-white has-background-danger";
+        return "danger";
       } else {
-        return "has-text-white has-background-success";
+        return "success";
       }
     },
 
-    meanHumidityIconClass(): string {
-      if (this.meanHumidity < this.targetHumidity) {
-        return "has-text-info has-background-black";
-      } else if (this.meanHumidity > this.targetHumidity) {
-        return "has-text-danger has-background-black";
-      } else {
-        return "has-text-success has-background-black";
-      }
-    },
-
-    meanPressureDisplayClass(): string {
+    meanPressureColor(): string {
       if (this.meanPressure < this.targetPressure) {
-        return "has-text-white has-background-info";
+        return "info";
       } else if (this.meanPressure > this.targetPressure) {
-        return "has-text-white has-background-danger";
+        return "danger";
       } else {
-        return "has-text-white has-background-success";
+        return "success";
       }
     },
 
-    meanPressureIconClass(): string {
-      if (this.meanPressure < this.targetPressure) {
-        return "has-text-info has-background-black";
-      } else if (this.meanPressure > this.targetPressure) {
-        return "has-text-danger has-background-black";
-      } else {
-        return "has-text-success has-background-black";
-      }
-    },
-
-    targetDisplayClass(): string {
-      if (this.isDay) {
-        return "has-text-black has-background-warning";
-      } else {
-        return "has-text-white has-background-dark";
-      }
-    },
-
-    targetIconClass(): string {
-      if (this.isDay) {
-        return "has-text-warning has-background-black";
-      } else {
-        return "has-text-dark has-background-black";
-      }
+    targetColor(): string {
+      return this.isDay ? "warning" : "info";
     },
 
     targetTemperature(): number {
-      let target = 15;
-      if (this.state.zone && this.state.zone.profile) {
-        if (this.isDay) {
-          target = this.state.zone.profile.lampontemperature;
-        } else {
-          target = this.state.zone.profile.lampofftemperature;
-        }
-      }
+      const target = this.isDay
+        ? this.zone.profile.lampontemperature
+        : this.zone.profile.lampofftemperature;
 
-      return this.units === "F" ? celsius2fahrenheit(target) : target;
+      return this.units === "F"
+        ? celsius2fahrenheit(target)
+        : parseFloat(target);
     },
 
     targetHumidity(): number {
-      let target = 20;
-      if (this.state.zone && this.state.zone.profile) {
-        if (this.isDay) {
-          target = this.state.zone.profile.lamponhumidity;
-        } else {
-          target = this.state.zone.profile.lampoffhumidity;
-        }
-      }
-      return target;
+      const target = this.isDay
+        ? this.zone.profile.lamponhumidity
+        : this.zone.profile.lampoffhumidity;
+
+      return parseFloat(target);
     },
 
     targetPressure(): number {
@@ -367,25 +296,19 @@ const ZoneDetail = Vue.extend({
     },
 
     zoneMeters(): Device[] {
-      if (this.state.zone) {
-        const result = this.state.zone.devices;
-        const filter = (event: Device) => {
-          return event.devicetype === "meter";
-        };
-        return result.filter(filter);
-      }
-      return [];
+      const result = this.zone.devices;
+      const filter = (event: Device) => {
+        return event.devicetype === "meter";
+      };
+      return result.filter(filter);
     },
 
     zoneSwitches(): Device[] {
-      if (this.state.zone) {
-        const result = this.state.zone.devices;
-        const filter = (event: Device) => {
-          return event.devicetype !== "meter";
-        };
-        return result.filter(filter);
-      }
-      return [];
+      const result = this.zone.devices;
+      const filter = (event: Device) => {
+        return event.devicetype !== "meter";
+      };
+      return result.filter(filter);
     },
 
     ...mapState("devices", ["devices"]),
@@ -400,19 +323,19 @@ const ZoneDetail = Vue.extend({
 
   methods: {
     add(selected: string) {
-      const payload = { zone: this.state.zone, device: selected };
+      const payload = { zone: this.zone, device: selected };
       this.addDevice(payload);
       this.fetchData();
     },
 
     refresh() {
-      if (this.state.zone) {
+      if (this.zone) {
         this.timestamp = new Date();
 
         this.readings = [];
         this.statuses = [];
 
-        this.state.zone.devices.forEach((device: Device) => {
+        this.zone.devices.forEach((device: Device) => {
           if (device) {
             if (device.devicetype === "meter") {
               HTTP.get(`/readings?meter=${device.device}&last=one`).then(
@@ -434,27 +357,31 @@ const ZoneDetail = Vue.extend({
     },
 
     remove(selected: string) {
-      const payload = { zone: this.state.zone, device: selected };
+      const payload = { zone: this.zone, device: selected };
       this.removeDevice(payload);
       this.fetchData();
     },
 
     saveNickname(nickname: string) {
       const zone = {
-        id: this.state.zone.id,
+        id: this.zone.id,
         nickname: nickname,
-        profileid: this.state.zone.profileid
+        profileid: this.zone.profileid
       };
 
       this.edit(zone);
     },
 
-    saveProfile(profileid: number) {
+    saveProfile(profile) {
+      console.log("save profile", profile);
+
       const zone = {
-        id: this.state.zone.id,
-        nickname: this.state.zone.nickname,
-        profileid: profileid
+        id: this.zone.id,
+        nickname: this.zone.nickname,
+        profileid: profile
       };
+
+      console.log("zone", zone);
 
       this.edit(zone);
     },

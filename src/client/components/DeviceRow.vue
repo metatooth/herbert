@@ -4,32 +4,25 @@
       {{ device.device }}
     </td>
     <td class="has-text-centered">
-      <div v-if="isMeter" class="field is-grouped is-grouped-multiline">
-        <target
-          icon="thermometer-half"
-          v-bind:value="meterReadingTemperature"
-          :precision="1"
-          :units="unitsWithDegrees"
-          text="warning"
-          background="warning"
-        />
-        <target
-          icon="tint"
-          v-bind:value="meterReadingHumidity"
-          :precision="0"
-          units="%"
-          text="info"
-          background="info"
-        />
+      <div v-if="isMeter" class="tags has-addons">
+        <span class="tag has-text-success has-background-dark">
+          <font-awesome-icon icon="tachometer-alt" />
+        </span>
+        <span class="tag has-text-light has-background-dark">
+          {{ meterReadingTemperature.toFixed(1) }} {{ unitsWithDegrees }}
+        </span>
+        <span class="tag has-text-light has-background-dark">
+          {{ meterReadingHumidity.toFixed(0) }} %
+        </span>
       </div>
       <div v-else class="tags has-addons">
-        <span class="tag is-medium" :class="deviceOnClass">
+        <span class="tag" :class="deviceOnClass">
           <font-awesome-icon icon="circle" />
         </span>
-        <span class="tag is-medium" :class="deviceOffClass">
+        <span class="tag" :class="deviceOffClass">
           <font-awesome-icon icon="circle" />
         </span>
-        <span class="tag is-medium" :class="deviceDisconnectedClass">
+        <span class="tag" :class="deviceDisconnectedClass">
           <font-awesome-icon icon="circle" />
         </span>
       </div>
@@ -91,7 +84,6 @@ import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
 import { mapActions } from "vuex";
-import Target from "@/components/Target.vue";
 import { celsius2fahrenheit } from "../../shared/utils";
 
 const DeviceRow = Vue.extend({
@@ -101,8 +93,7 @@ const DeviceRow = Vue.extend({
   },
 
   components: {
-    SelectDeviceType,
-    Target
+    SelectDeviceType
   },
 
   data() {
@@ -116,23 +107,23 @@ const DeviceRow = Vue.extend({
     deviceOnClass() {
       console.log("device row on?", this.device);
       if (this.device.status === "on" || this.device.status === "1") {
-        return "has-text-success has-background-black";
+        return "has-text-success has-background-dark";
       } else {
-        return "has-text-success-light has-background-black";
+        return "has-text-success-light has-background-dark";
       }
     },
     deviceOffClass() {
       if (this.device.status === "off" || this.device.status === "0") {
-        return "has-text-warning has-background-black";
+        return "has-text-warning has-background-dark";
       } else {
-        return "has-text-warning-light has-background-black";
+        return "has-text-warning-light has-background-dark";
       }
     },
     deviceDisconnectedClass() {
       if (this.device.status === "disconnected") {
-        return "has-text-danger has-background-black";
+        return "has-text-danger has-background-dark";
       } else {
-        return "has-text-danger-light has-background-black";
+        return "has-text-danger-light has-background-dark";
       }
     },
     deviceIcon() {
