@@ -12,13 +12,13 @@ export const mutations: MutationTree<DevicesState> = {
         device: payload,
         error: false
       };
-      
+
       state.devices.splice(index, 1, dstate);
     }
   },
   SET(state, payload: Device[]) {
     state.error = false;
-    
+
     state.devices = [];
     payload.forEach(d => {
       state.devices.push({ device: d, error: false });

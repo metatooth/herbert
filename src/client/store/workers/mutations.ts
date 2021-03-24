@@ -4,7 +4,7 @@ import { WorkersState, WorkerState, Worker } from "./types";
 export const mutations: MutationTree<WorkersState> = {
   EDIT(state, payload: Worker) {
     const found = state.workers.find((el: WorkerState) => {
-      el.worker.worker === payload.worker;
+      return el.worker.worker === payload.worker;
     });
     if (found) {
       const index = state.workers.indexOf(found);

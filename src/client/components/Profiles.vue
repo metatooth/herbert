@@ -63,7 +63,7 @@
           </td>
 
           <td>
-            <div class="field">
+            <div class="field is-grouped">
               <div class="control has-icons-left" v-if="adding">
                 <input
                   class="input"
@@ -71,7 +71,8 @@
                   v-model="lampOnTemperature"
                   :min="tempMin"
                   :max="tempMax"
-                  size="2"
+                  step="0.1"
+                  size="4"
                 />
                 <span class="icon is-left">
                   <font-awesome-icon icon="thermometer-half" class="is-left" />
@@ -95,7 +96,7 @@
           </td>
 
           <td>
-            <div class="field">
+            <div class="field is-grouped">
               <div class="control has-icons-left" v-if="adding">
                 <input
                   class="input"
@@ -103,7 +104,8 @@
                   v-model="lampOffTemperature"
                   :min="tempMin"
                   :max="tempMax"
-                  size="2"
+                  step="0.1"
+                  size="4"
                 />
                 <span class="icon is-left">
                   <font-awesome-icon icon="thermometer-half" />
@@ -126,7 +128,11 @@
           </td>
 
           <td>
-            <add-controls @on-add="add" @on-save="save" @on-cancel="cancel" />
+            <add-controls
+              @on-add="editable"
+              @on-save="save"
+              @on-cancel="cancel"
+            />
           </td>
         </tr>
       </tbody>
@@ -138,7 +144,8 @@
 import Vue from "vue";
 import ProfileRow from "@/components/ProfileRow.vue";
 import AddControls from "@/components/AddControls.vue";
-import { mapState, mapGetters } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
+import { celsius2fahrenheit } from "../../shared/utils";
 
 const Profiles = Vue.extend({
   props: {
@@ -146,14 +153,17 @@ const Profiles = Vue.extend({
   },
 
   data() {
+    const on = this.units === "C" ? 23 : celsius2fahrenheit(23);
+    const off = this.units === "C" ? 23 : celsius2fahrenheit(23);
+
     return {
       profile: "",
       timezone: "America/New_York",
       start: "08:00",
       duration: 12,
-      lampOnTemperature: 65.0,
+      lampOnTemperature: on,
       lampOnHumidity: 21,
-      lampOffTemperature: 55.0,
+      lampOffTemperature: off,
       lampOffHumidity: 21,
       adding: false
     };
@@ -162,10 +172,6 @@ const Profiles = Vue.extend({
   components: {
     AddControls,
     ProfileRow
-  },
-
-  mounted() {
-    console.log("profiles mounted, adjust min/max for temperature inputs");
   },
 
   watch: {
@@ -189,12 +195,18 @@ const Profiles = Vue.extend({
         return "Profiles";
       }
     },
+    tempMin() {
+      return this.units === "F" ? 50 : 15;
+    },
+    tempMax() {
+      return this.units === "F" ? 80 : 30;
+    },
     ...mapState("profiles", ["profiles"]),
     ...mapGetters("profiles", ["profilesCount"])
   },
 
   methods: {
-    add(): void {
+    editable(): void {
       this.adding = true;
     },
 
@@ -252,12 +264,14 @@ const Profiles = Vue.extend({
         lampOffHumidity: this.lampOffHumidity
       };
 
-      this.$store.dispatch("addProfile", profile);
+      this.add(profile);
 
       this.clear();
 
       this.adding = false;
-    }
+    },
+
+    ...mapActions("profiles", ["add"])
   }
 });
 

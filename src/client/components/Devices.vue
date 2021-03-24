@@ -8,7 +8,6 @@
           <th>Status</th>
           <th>Type</th>
           <th>Nickname</th>
-          <th>Updated</th>
           <th>Manufacturer</th>
           <th>History</th>
         </tr>

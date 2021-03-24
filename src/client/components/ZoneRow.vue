@@ -82,14 +82,14 @@ const ZoneRow = Vue.extend({
   mounted() {
     console.log("zone row as profiles", this.profiles);
   },
- 
+
   computed: {
     linkToConfig(): string {
       return "#" + this.zone.id + "config";
     },
 
     ...mapGetters("profiles", ["profiles"])
-  },      
+  },
 
   methods: {
     editable() {

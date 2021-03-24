@@ -66,7 +66,7 @@
       </div>
     </td>
     <td v-if="editing">
-      <div class="field">
+      <div class="field is-grouped">
         <div class="control has-icons-left">
           <input
             class="input"
@@ -74,7 +74,8 @@
             v-model="lampontemperature"
             min="lampMin"
             max="lampMax"
-            size="2"
+            size="4"
+            step="0.1"
           />
           <span class="icon is-left">
             <font-awesome-icon icon="thermometer-half" class="is-left" />
@@ -127,7 +128,7 @@
       </div>
     </td>
     <td v-if="editing">
-      <div class="field">
+      <div class="field is-grouped">
         <div class="control has-icons-left">
           <input
             class="input"
@@ -135,7 +136,8 @@
             v-model="lampofftemperature"
             min="tempMin"
             max="tempMax"
-            size="2"
+            step="0.1"
+            size="4"
           />
           <span class="icon is-left">
             <font-awesome-icon icon="thermometer-half" class="is-left" />
@@ -233,7 +235,7 @@ const ProfileRow = Vue.extend({
         return celsius2fahrenheit(this.profile.lampontemperature);
       }
 
-      return this.profile.lampontemperature;
+      return parseFloat(this.profile.lampontemperature);
     },
 
     nightTemperature(): number {
@@ -241,7 +243,7 @@ const ProfileRow = Vue.extend({
         return celsius2fahrenheit(this.profile.lampofftemperature);
       }
 
-      return this.profile.lampofftemperature;
+      return parseFloat(this.profile.lampofftemperature);
     },
 
     lampMin(): number {
@@ -283,7 +285,7 @@ const ProfileRow = Vue.extend({
     lamponPressure(): number {
       return (
         vaporPressureDeficit(
-          this.profile.lampontemperature,
+          parseFloat(this.profile.lampontemperature),
           0.6,
           this.profile.lamponhumidity / 100
         ) / 1000
@@ -293,7 +295,7 @@ const ProfileRow = Vue.extend({
     lampoffPressure(): number {
       return (
         vaporPressureDeficit(
-          this.profile.lampofftemperature,
+          parseFloat(this.profile.lampofftemperature),
           -0.6,
           this.profile.lampoffhumidity / 100
         ) / 1000

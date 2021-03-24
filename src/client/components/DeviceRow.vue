@@ -4,10 +4,7 @@
       {{ device.device }}
     </td>
     <td class="has-text-centered">
-      <div
-        v-if="meterReadingTemperature"
-        class="field is-grouped is-grouped-multiline"
-      >
+      <div v-if="isMeter" class="field is-grouped is-grouped-multiline">
         <target
           icon="thermometer-half"
           v-bind:value="meterReadingTemperature"
@@ -37,8 +34,12 @@
         </span>
       </div>
     </td>
-    <td>
+    <td class="has-text-centered">
+      <span v-if="isMeter">
+        {{ device.devicetype }}
+      </span>
       <select-device-type
+        v-else
         v-bind:devicetype="device.devicetype"
         @select-device-type="saveDeviceType"
       />
@@ -70,9 +71,6 @@
       </div>
     </td>
     <td>
-      <timestamp v-bind:timestamp="new Date(Date.parse(device.timestamp))" />
-    </td>
-    <td>
       {{ device.manufacturer }}
     </td>
     <td>
@@ -90,7 +88,6 @@
 
 <script lang="ts">
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
 import { mapActions } from "vuex";
@@ -105,7 +102,6 @@ const DeviceRow = Vue.extend({
 
   components: {
     SelectDeviceType,
-    Timestamp,
     Target
   },
 
@@ -119,20 +115,14 @@ const DeviceRow = Vue.extend({
   computed: {
     deviceOnClass() {
       console.log("device row on?", this.device);
-      if (
-        this.device.status === "on" ||
-        this.device.status === "1"
-      ) {
+      if (this.device.status === "on" || this.device.status === "1") {
         return "has-text-success has-background-black";
       } else {
         return "has-text-success-light has-background-black";
       }
     },
     deviceOffClass() {
-      if (
-        this.device.status === "off" ||
-        this.device.status === "0"
-      ) {
+      if (this.device.status === "off" || this.device.status === "0") {
         return "has-text-warning has-background-black";
       } else {
         return "has-text-warning-light has-background-black";
@@ -156,6 +146,9 @@ const DeviceRow = Vue.extend({
 
       return null;
     },
+    isMeter() {
+      return this.device.devicetype === "meter";
+    },
     linkName() {
       if (this.device.devicetype === "meter") {
         return "readings";
@@ -164,15 +157,15 @@ const DeviceRow = Vue.extend({
       }
     },
     meterReadingHumidity() {
-      return 100 * (this.device.humidity || 0);
+      return 100 * this.device.humidity;
     },
     meterReadingTemperature() {
       return this.units === "F"
-        ? celsius2fahrenheit(this.device.temperature || 0)
-        : this.device.temperature || 0;
+        ? celsius2fahrenheit(this.device.temperature)
+        : parseFloat(this.device.temperature);
     },
     unitsWithDegrees() {
-      return "" + this.units;
+      return "°" + this.units;
     }
   },
 

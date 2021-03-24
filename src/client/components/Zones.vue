@@ -12,10 +12,10 @@
       </thead>
       <tbody>
         <zone-row
-          v-for="zone in zones"
-          v-bind:key="zone.id"
+          v-for="szone in zones"
+          v-bind:key="szone.zone.id"
           v-bind:units="units"
-          v-bind:zone="zone"
+          v-bind:zone="szone.zone"
         />
         <tr>
           <td>
@@ -48,7 +48,11 @@
           <td></td>
 
           <td>
-            <add-controls @on-add="editable" @on-save="save" @on-cancel="cancel" />
+            <add-controls
+              @on-add="editable"
+              @on-save="save"
+              @on-cancel="cancel"
+            />
           </td>
         </tr>
       </tbody>
