@@ -28,5 +28,15 @@ export const actions: ActionTree<DevicesState, RootState> = {
         commit("DEVICES_ERROR");
       }
     );
+  },
+  off({ commit }, payload: string) {
+    HTTP.put(`/devices/${payload}/off`).then(response => {
+      commit("OFF", response.data);
+    });
+  },
+  on({ commit }, payload: string) {
+    HTTP.put(`/devices/${payload}/on`).then(response => {
+      commit("ON", response.data);
+    });
   }
 };

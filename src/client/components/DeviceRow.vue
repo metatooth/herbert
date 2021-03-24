@@ -16,15 +16,15 @@
         </span>
       </div>
       <div v-else class="tags has-addons">
-        <span class="tag" :class="deviceOnClass">
+        <a class="tag" :class="deviceOnClass" @click="on(device.device)">
           <font-awesome-icon icon="circle" />
-        </span>
-        <span class="tag" :class="deviceOffClass">
+        </a>
+        <a class="tag" :class="deviceOffClass" @click="off(device.device)">
           <font-awesome-icon icon="circle" />
-        </span>
-        <span class="tag" :class="deviceDisconnectedClass">
+        </a>
+        <a class="tag" :class="deviceDisconnectedClass">
           <font-awesome-icon icon="circle" />
-        </span>
+        </a>
       </div>
     </td>
     <td class="has-text-centered">
@@ -105,7 +105,6 @@ const DeviceRow = Vue.extend({
 
   computed: {
     deviceOnClass() {
-      console.log("device row on?", this.device);
       if (this.device.status === "on" || this.device.status === "1") {
         return "has-text-success has-background-dark";
       } else {
@@ -185,7 +184,7 @@ const DeviceRow = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("devices", ["edit"])
+    ...mapActions("devices", ["edit", "on", "off"])
   }
 });
 

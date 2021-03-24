@@ -3,7 +3,7 @@
     <div class="field-body">
       <div class="field has-addons">
         <div class="control">
-          <div class="select">
+          <div class="select is-small">
             <select v-model="selected">
               <option
                 v-for="devicetype in devicetypes"

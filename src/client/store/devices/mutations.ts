@@ -16,6 +16,26 @@ export const mutations: MutationTree<DevicesState> = {
       state.devices.splice(index, 1, dstate);
     }
   },
+  OFF(state, payload: string) {
+    const found = state.devices.find((el: DeviceState) => {
+      return el.device.device === payload;
+    });
+    if (found) {
+      const index = state.devices.indexOf(found);
+      found.status = "off";
+      state.devices.splice(index, 1, found);
+    }
+  },
+  ON(state, payload: string) {
+    const found = state.devices.find((el: DeviceState) => {
+      return el.device.device === payload;
+    });
+    if (found) {
+      const index = state.devices.indexOf(found);
+      found.status = "on";
+      state.devices.splice(index, 1, found);
+    }
+  },
   SET(state, payload: Device[]) {
     state.error = false;
 
