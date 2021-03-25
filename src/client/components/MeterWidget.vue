@@ -32,14 +32,14 @@ const MeterWidget = Vue.extend({
   computed: {
     temperature() {
       if (this.units === "F") {
-        return celsius2fahrenheit(this.device.temperature);
+        return celsius2fahrenheit(this.device.temperature || 23);
       } else {
-        return parseFloat(this.device.temperature);
+        return this.device.temperature || 23;
       }
     },
 
     humidity() {
-      return 100 * this.device.humidity;
+      return 100 * (this.device.humidity || 35);
     },
 
     unitsWithDegrees() {

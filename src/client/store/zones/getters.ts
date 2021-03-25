@@ -1,9 +1,9 @@
 import { GetterTree } from "vuex";
-import { ZoneState, ZonesState } from "./types";
+import { Zone, ZonesState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<ZonesState, RootState> = {
-  zones(state): ZoneState[] {
+  zones(state): Zone[] {
     const { zones } = state;
     return zones;
   },

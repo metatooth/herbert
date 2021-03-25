@@ -1,36 +1,24 @@
 import { MutationTree } from "vuex";
-import { ProfilesState, ProfileState, Profile } from "./types";
+import { Profile, ProfilesState } from "./types";
 
 export const mutations: MutationTree<ProfilesState> = {
   ADD(state, payload: Profile) {
-    const pstate: ProfileState = {
-      profile: payload,
-      error: false
-    };
-    state.profiles.push(pstate);
+    state.profiles.push(payload);
   },
   SET(state, payload: Profile[]) {
     state.error = false;
-
-    state.profiles = [];
-    payload.forEach(p => {
-      state.profiles.push({ profile: p, error: false });
-    });
+    state.profiles = payload;
     state.profiles.sort((a, b) => {
-      return a.profile.profile.localeCompare(b.profile.profile);
+      return a.profile.localeCompare(b.profile);
     });
   },
   EDIT(state, payload: Profile) {
-    const found = state.profiles.find((el: ProfileState) => {
-      return el.profile.id === payload.id;
+    const found = state.profiles.find((el: Profile) => {
+      return el.id === payload.id;
     });
     if (found) {
       const index = state.profiles.indexOf(found);
-      const pstate: ProfileState = {
-        profile: payload,
-        error: false
-      };
-      state.profiles.splice(index, 1, pstate);
+      state.profiles.splice(index, 1, found);
     }
   },
   ERROR(state) {
@@ -41,8 +29,8 @@ export const mutations: MutationTree<ProfilesState> = {
     state.profiles = [];
   },
   REMOVE(state, payload: Profile) {
-    const found = state.profiles.find((el: ProfileState) => {
-      return el.profile.id === payload.id;
+    const found = state.profiles.find((el: Profile) => {
+      return el.id === payload.id;
     });
     if (found) {
       const index = state.profiles.indexOf(found);

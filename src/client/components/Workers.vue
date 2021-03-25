@@ -12,9 +12,9 @@
       </thead>
       <tbody>
         <worker-row
-          v-for="wstate in workers"
-          v-bind:key="wstate.worker.worker"
-          v-bind:worker="wstate.worker"
+          v-for="worker in workers"
+          v-bind:key="worker.worker"
+          v-bind:worker="worker"
         />
       </tbody>
     </table>

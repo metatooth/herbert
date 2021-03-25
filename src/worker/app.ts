@@ -120,7 +120,7 @@ export class App {
     const switches = this.switches;
 
     config.get("devices").forEach(dev => {
-      console.log("DEVICE", dev);
+      logger.debug("DEVICE", dev);
       if (dev.manufacturer === "WYZE") {
         const options = {
           username: dev.username,
@@ -219,11 +219,11 @@ export class App {
     } else if (app.socket.readyState !== 1) {
       app.heldMessages.push(data);
     } else {
-      console.log("Sending data", data);
+      logger.debug("Sending data", data);
       app.socket.send(JSON.stringify(data));
 
       app.heldMessages.forEach(msg => {
-        console.log("Sending held message", msg);
+        logger.debug("Sending held message", msg);
         app.socket.send(JSON.stringify(msg));
       });
 

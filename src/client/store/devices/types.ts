@@ -1,4 +1,4 @@
-export interface Device {
+export class Device {
   device: string;
   devicetype: string;
   manufacturer: string;
@@ -12,22 +12,24 @@ export interface Device {
   pressure?: number;
   status?: string;
   timestamp?: Date;
+
+  constructor() {
+    this.device = "";
+    this.devicetype = "";
+    this.manufacturer = "";
+    this.nickname = "";
+    this.createdat = new Date();
+    this.updatedat = new Date();
+    this.deleted = false;
+  }
 }
 
-export class DeviceState {
-  device: Device = {
-    device: "",
-    devicetype: "",
-    manufacturer: "",
-    nickname: "",
-    createdat: new Date(),
-    updatedat: new Date(),
-    deleted: false
-  };
-  error = false;
-}
-
-export interface DevicesState {
-  devices: DeviceState[];
+export class DevicesState {
+  devices: Device[];
   error: boolean;
+
+  constructor() {
+    this.devices = [];
+    this.error = false;
+  }
 }

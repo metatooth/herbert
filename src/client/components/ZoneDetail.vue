@@ -203,7 +203,7 @@ const ZoneDetail = Vue.extend({
     meanTemperature(): number {
       let sum = 0;
       this.readings.forEach(reading => {
-        sum = sum + parseFloat(reading.temperature);
+        sum = sum + reading.temperature;
       });
       const mean = sum / this.readings.length;
       return this.units === "F" ? celsius2fahrenheit(mean) : mean;
@@ -262,21 +262,25 @@ const ZoneDetail = Vue.extend({
     },
 
     targetTemperature(): number {
-      const target = this.isDay
-        ? this.zone.profile.lampontemperature
-        : this.zone.profile.lampofftemperature;
+      let target = 20;
+      if (this.zone.profile) {
+        target = this.isDay
+          ? this.zone.profile.lampontemperature
+          : this.zone.profile.lampofftemperature;
+      }
 
-      return this.units === "F"
-        ? celsius2fahrenheit(target)
-        : parseFloat(target);
+      return this.units === "F" ? celsius2fahrenheit(target) : target;
     },
 
     targetHumidity(): number {
-      const target = this.isDay
-        ? this.zone.profile.lamponhumidity
-        : this.zone.profile.lampoffhumidity;
+      let target = 35;
+      if (this.zone.profile) {
+        target = this.isDay
+          ? this.zone.profile.lamponhumidity
+          : this.zone.profile.lampoffhumidity;
+      }
 
-      return parseFloat(target);
+      return target;
     },
 
     targetPressure(): number {
@@ -372,7 +376,7 @@ const ZoneDetail = Vue.extend({
       this.edit(zone);
     },
 
-    saveProfile(profile) {
+    saveProfile(profile: number) {
       console.log("save profile", profile);
 
       const zone = {

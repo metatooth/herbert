@@ -1,9 +1,9 @@
 <template>
   <section class="section">
     <zone-detail
-      v-for="zstate in zones"
-      v-bind:key="zstate.zone.id"
-      v-bind:zone="zstate.zone"
+      v-for="zone in zones"
+      v-bind:key="zone.id"
+      v-bind:zone="zone"
       v-bind:units="units"
     />
   </section>

@@ -1,25 +1,25 @@
 <template>
   <div class="field is-grouped">
     <herbert-button
-      label="Edit"
+      color="warning"
       icon="edit"
       :show="!editing"
       @on-click="edit"
     />
     <herbert-button
-      label="Delete"
+      color="danger"
       icon="trash"
       :show="!editing"
       @on-click="destroy"
     />
     <herbert-button
-      label="Save"
+      color="success"
       icon="check"
       :show="editing"
       @on-click="save"
     />
     <herbert-button
-      label="Cancel"
+      color="danger"
       icon="times"
       :show="editing"
       @on-click="cancel"

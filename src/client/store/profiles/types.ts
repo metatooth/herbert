@@ -1,4 +1,4 @@
-export interface Profile {
+export class Profile {
   id: number;
   profile: string;
   lampstart: string;
@@ -11,26 +11,23 @@ export interface Profile {
   updatedat: Date;
   deleted: boolean;
   deletedat?: Date;
-}
 
-export class ProfileState {
-  profile: Profile = {
-    id: 0,
-    profile: "",
-    lampstart: "00:00:00",
-    lampduration: { hours: 12 },
-    lampontemperature: 0,
-    lamponhumidity: 0,
-    lampofftemperature: 0,
-    lampoffhumidity: 0,
-    createdat: new Date(),
-    updatedat: new Date(),
-    deleted: false
-  };
-  error = false;
+  constructor() {
+    this.id = 0;
+    this.profile = "";
+    this.lampstart = "00:00:00";
+    this.lampduration = { hours: 12 };
+    this.lampontemperature = 0;
+    this.lamponhumidity = 0;
+    this.lampofftemperature = 0;
+    this.lampoffhumidity = 0;
+    this.createdat = new Date();
+    this.updatedat = new Date();
+    this.deleted = false;
+  }
 }
 
 export interface ProfilesState {
-  profiles: ProfileState[];
+  profiles: Profile[];
   error: boolean;
 }

@@ -3,6 +3,16 @@
     <td>
       {{ device.device }}
     </td>
+    <td>
+      <router-link
+        :to="{
+          name: linkName,
+          params: { name: device.nickname, device: device.device }
+        }"
+      >
+        &gt;&gt;&gt;
+      </router-link>
+    </td>
     <td class="has-text-centered">
       <div v-if="isMeter" class="tags has-addons">
         <span class="tag has-text-success has-background-dark">
@@ -67,14 +77,11 @@
       {{ device.manufacturer }}
     </td>
     <td>
-      <router-link
-        :to="{
-          name: linkName,
-          params: { name: device.nickname, device: device.device }
-        }"
-      >
-        &gt;&gt;&gt;
-      </router-link>
+      <div class="control">
+        <button class="button is-danger" @click="trash">
+          <font-awesome-icon icon="trash" />
+        </button>
+      </div>
     </td>
   </tr>
 </template>
@@ -88,7 +95,7 @@ import { celsius2fahrenheit } from "../../shared/utils";
 
 const DeviceRow = Vue.extend({
   props: {
-    device: { type: Device },
+    device: Device,
     units: String
   },
 
@@ -147,12 +154,15 @@ const DeviceRow = Vue.extend({
       }
     },
     meterReadingHumidity() {
-      return 100 * this.device.humidity;
+      return 100 * (this.device.humidity || 35);
     },
     meterReadingTemperature() {
       return this.units === "F"
-        ? celsius2fahrenheit(this.device.temperature)
-        : parseFloat(this.device.temperature);
+        ? celsius2fahrenheit(this.device.temperature || 23)
+        : this.device.temperature || 23;
+    },
+    switchStatus() {
+      return this.device.status || "off";
     },
     unitsWithDegrees() {
       return "°" + this.units;
@@ -184,7 +194,13 @@ const DeviceRow = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("devices", ["edit", "on", "off"])
+    trash() {
+      if (confirm("You sure, bro?")) {
+        this.remove(this.device);
+      }
+    },
+
+    ...mapActions("devices", ["edit", "remove", "on", "off"])
   }
 });
 

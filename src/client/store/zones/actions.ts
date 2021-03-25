@@ -8,8 +8,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
     const json = JSON.stringify(payload);
     HTTP.post("/zones", json).then(
       response => {
-        const zone: Zone = response && response.data;
-        commit("ADD", zone);
+        commit("ADD", Object.assign(new Zone(), response.data));
       },
       error => {
         console.log(error);
@@ -22,7 +21,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
     const json = JSON.stringify({ device: payload.device });
     HTTP.post(`/zones/${payload.zone.id}/devices`, json).then(
       response => {
-        commit("ADD_DEVICE", response.data);
+        commit("ADD_DEVICE", Object.assign(new Zone(), response.data));
       },
       error => {
         console.log(error);
@@ -34,14 +33,17 @@ export const actions: ActionTree<ZonesState, RootState> = {
   edit({ commit }, payload: Zone) {
     const json = JSON.stringify(payload);
     HTTP.put(`/zones/${payload.id}`, json).then(response => {
-      commit("EDIT", response.data);
+      commit("EDIT", Object.assign(new Zone(), response.data));
     });
   },
 
   fetchData({ commit }) {
     HTTP.get("/zones").then(
       response => {
-        const payload: Zone[] = response && response.data;
+        const payload: Zone[] = [];
+        response.data.forEach((json: object) => {
+          payload.push(Object.assign(new Zone(), json));
+        });
         commit("SET", payload);
       },
       error => {

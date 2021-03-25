@@ -1,9 +1,9 @@
 import { GetterTree } from "vuex";
-import { WorkerState, WorkersState } from "./types";
+import { Worker, WorkersState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<WorkersState, RootState> = {
-  allWorkers(state): WorkerState[] {
+  allWorkers(state): Worker[] {
     const { workers } = state;
     return workers;
   },

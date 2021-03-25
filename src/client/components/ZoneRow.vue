@@ -29,11 +29,11 @@
         <div class="select">
           <select v-model="profileid">
             <option
-              v-for="pstate in profiles"
-              v-bind:key="pstate.profile.id"
-              v-bind:value="pstate.profile.id"
+              v-for="profile in profiles"
+              v-bind:key="profile.id"
+              v-bind:value="profile.id"
             >
-              {{ pstate.profile.profile }}
+              {{ profile.profile }}
             </option>
           </select>
         </div>
@@ -62,7 +62,7 @@ import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
   props: {
-    zone: { type: Zone },
+    zone: Zone,
     units: String
   },
 

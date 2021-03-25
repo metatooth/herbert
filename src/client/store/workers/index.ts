@@ -2,11 +2,11 @@ import { Module } from "vuex";
 import { getters } from "./getters";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
-import { WorkerState, WorkersState } from "./types";
+import { Worker, WorkersState } from "./types";
 import { RootState } from "../types";
 
 const state: WorkersState = {
-  workers: [] as WorkerState[],
+  workers: [] as Worker[],
   error: false
 };
 

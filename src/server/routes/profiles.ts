@@ -13,18 +13,20 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  console.log("POST /profiles");
+  console.log(req.body);
   const {
     rows
   } = await query(
     "INSERT INTO profiles (profile, lampstart, lampduration, lampontemperature, lamponhumidity, lampofftemperature, lampoffhumidity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
     [
       req.body.profile,
-      req.body.start,
-      req.body.duration + " hours",
-      req.body.lampOnTemperature,
-      req.body.lampOnHumidity,
-      req.body.lampOffTemperature,
-      req.body.lampOffHumidity
+      req.body.lampstart,
+      `${req.body.lampduration.hours} hours`,
+      req.body.lampontemperature,
+      req.body.lamponhumidity,
+      req.body.lampofftemperature,
+      req.body.lampoffhumidity
     ]
   );
   const profile = await readProfile(rows[0].id);
@@ -62,7 +64,10 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  await query("DELETE FROM profiles WHERE id = $1", [id]);
+  await query(
+    "UPDATE profiles SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE id = $1",
+    [id]
+  );
   res.status(204).json({});
 });
 

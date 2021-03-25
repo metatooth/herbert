@@ -1,4 +1,4 @@
-export interface Worker {
+export class Worker {
   worker: string;
   nickname: string;
   inet?: string;
@@ -6,20 +6,17 @@ export interface Worker {
   updatedat: Date;
   deleted: boolean;
   deletedat?: Date;
-}
 
-export class WorkerState {
-  worker: Worker = {
-    worker: "",
-    nickname: "",
-    createdat: new Date(),
-    updatedat: new Date(),
-    deleted: false
-  };
-  error = false;
+  constructor() {
+    this.worker = "";
+    this.nickname = "";
+    this.createdat = new Date();
+    this.updatedat = new Date();
+    this.deleted = false;
+  }
 }
 
 export interface WorkersState {
-  workers: WorkerState[];
+  workers: Worker[];
   error: boolean;
 }

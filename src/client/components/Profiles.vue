@@ -17,9 +17,9 @@
       </thead>
       <tbody>
         <profile-row
-          v-for="pstate in profiles"
-          v-bind:key="pstate.profile.id"
-          v-bind:profile="pstate.profile"
+          v-for="profile in profiles"
+          v-bind:key="profile.id"
+          v-bind:profile="profile"
           v-bind:units="units"
         />
 
@@ -68,7 +68,7 @@
                 <input
                   class="input"
                   type="number"
-                  v-model="lampOnTemperature"
+                  v-model="lampontemperature"
                   :min="tempMin"
                   :max="tempMax"
                   step="0.1"
@@ -83,7 +83,7 @@
                 <input
                   class="input"
                   type="number"
-                  v-model="lampOnHumidity"
+                  v-model="lamponhumidity"
                   min="0"
                   max="100"
                   size="2"
@@ -101,7 +101,7 @@
                 <input
                   class="input"
                   type="number"
-                  v-model="lampOffTemperature"
+                  v-model="lampofftemperature"
                   :min="tempMin"
                   :max="tempMax"
                   step="0.1"
@@ -115,7 +115,7 @@
                 <input
                   class="input"
                   type="number"
-                  v-model="lampOffHumidity"
+                  v-model="lampoffhumidity"
                   min="0"
                   max="100"
                   size="2"
@@ -129,7 +129,7 @@
 
           <td>
             <add-controls
-              @on-add="editable"
+              @on-add="addable"
               @on-save="save"
               @on-cancel="cancel"
             />
@@ -142,10 +142,11 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapState, mapGetters, mapActions } from "vuex";
+import { Profile } from "@/store/profiles/types";
 import ProfileRow from "@/components/ProfileRow.vue";
 import AddControls from "@/components/AddControls.vue";
-import { mapState, mapGetters, mapActions } from "vuex";
-import { celsius2fahrenheit } from "../../shared/utils";
+import { celsius2fahrenheit, fahrenheit2celsius } from "../../shared/utils";
 
 const Profiles = Vue.extend({
   props: {
@@ -154,17 +155,17 @@ const Profiles = Vue.extend({
 
   data() {
     const on = this.units === "C" ? 23 : celsius2fahrenheit(23);
-    const off = this.units === "C" ? 23 : celsius2fahrenheit(23);
+    const off = this.units === "C" ? 18 : celsius2fahrenheit(18);
 
     return {
       profile: "",
       timezone: "America/New_York",
       start: "08:00",
       duration: 12,
-      lampOnTemperature: on,
-      lampOnHumidity: 21,
-      lampOffTemperature: off,
-      lampOffHumidity: 21,
+      lampontemperature: on,
+      lamponhumidity: 25,
+      lampofftemperature: off,
+      lampoffhumidity: 25,
       adding: false
     };
   },
@@ -172,19 +173,6 @@ const Profiles = Vue.extend({
   components: {
     AddControls,
     ProfileRow
-  },
-
-  watch: {
-    units(val) {
-      console.log("profile units is now", val);
-      if (val === "F") {
-        this.lampOnTemperature = (this.lampOnTemperature * 9) / 5 + 32;
-        this.lampOffTemperature = (this.lampOffTemperature * 9) / 5 + 32;
-      } else {
-        this.lampOnTemperature = ((this.lampOnTemperature - 32) * 5) / 9;
-        this.lampOffTemperature = ((this.lampOffTemperature - 32) * 5) / 9;
-      }
-    }
   },
 
   computed: {
@@ -195,47 +183,28 @@ const Profiles = Vue.extend({
         return "Profiles";
       }
     },
-    tempMin() {
+
+    tempMin(): number {
       return this.units === "F" ? 50 : 15;
     },
-    tempMax() {
+
+    tempMax(): number {
       return this.units === "F" ? 80 : 30;
     },
+
     ...mapState("profiles", ["profiles"]),
+
     ...mapGetters("profiles", ["profilesCount"])
   },
 
   methods: {
-    editable(): void {
+    addable() {
       this.adding = true;
     },
 
-    cancel(): void {
-      this.clear();
-      this.adding = false;
-    },
-
-    clear(): void {
-      this.profile = "";
-      this.start = "08:00";
-      this.duration = 12;
-
-      if (this.units === "F") {
-        this.lampOnTemperature = 65.0;
-        this.lampOffTemperature = 55.0;
-      } else {
-        this.lampOnTemperature = 18.3;
-        this.lampOffTemperature = 12.8;
-      }
-
-      this.lampOnHumidity = 21;
-      this.lampOffHumidity = 21;
-    },
-
-    save(): void {
+    save() {
       const start = this.start.split(":");
-      console.log(start);
-      let hourInt = parseInt(start[0]) + 5; // WARNING!
+      let hourInt = parseInt(start[0]) + 4; // WARNING!
       if (hourInt > 24) {
         hourInt = hourInt - 24;
       }
@@ -245,35 +214,45 @@ const Profiles = Vue.extend({
       } else {
         hourString = hourInt.toString();
       }
-      console.log(hourInt);
-      console.log(hourString);
-      let lampOn = this.lampOnTemperature;
-      let lampOff = this.lampOffTemperature;
 
+      const profile = new Profile();
+      profile.profile = this.profile;
+      profile.lampstart = `${hourString}:${start[1]}`;
+      profile.lampduration = { hours: this.duration };
       if (this.units === "F") {
-        lampOn = ((lampOn - 32) * 5) / 9;
-        lampOff = ((lampOff - 32) * 5) / 9;
+        profile.lampontemperature = fahrenheit2celsius(this.lampontemperature);
+        profile.lampofftemperature = fahrenheit2celsius(
+          this.lampofftemperature
+        );
+      } else {
+        profile.lampontemperature = this.lampontemperature;
+        profile.lampofftemperature = this.lampofftemperature;
       }
-      const profile = {
-        profile: this.profile,
-        start: `${hourString}:${start[1]}`,
-        duration: this.duration,
-        lampOnTemperature: lampOn,
-        lampOnHumidity: this.lampOnHumidity,
-        lampOffTemperature: lampOff,
-        lampOffHumidity: this.lampOffHumidity
-      };
+
+      profile.lamponhumidity = this.lamponhumidity;
+      profile.lampoffhumidity = this.lampoffhumidity;
 
       this.add(profile);
+      this.adding = false;
+    },
 
-      this.clear();
+    cancel() {
+      const on = this.units === "C" ? 23 : celsius2fahrenheit(23);
+      const off = this.units === "C" ? 18 : celsius2fahrenheit(18);
 
+      this.profile = "";
+      this.timezone = "America/New_York";
+      this.start = "08:00";
+      this.duration = 12;
+      this.lampontemperature = on;
+      this.lamponhumidity = 25;
+      this.lampofftemperature = off;
+      this.lampoffhumidity = 25;
       this.adding = false;
     },
 
     ...mapActions("profiles", ["add"])
   }
 });
-
 export default Profiles;
 </script>

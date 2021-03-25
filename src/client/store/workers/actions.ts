@@ -8,8 +8,7 @@ export const actions: ActionTree<WorkersState, RootState> = {
     const json = JSON.stringify(payload);
     HTTP.put(`/workers/${payload.worker}`, json).then(
       response => {
-        const payload: Worker = response && response.data;
-        commit("EDIT", payload);
+        commit("EDIT", Object.assign(new Worker(), response.data));
       },
       error => {
         console.log(error);
@@ -19,7 +18,10 @@ export const actions: ActionTree<WorkersState, RootState> = {
   fetchData({ commit }) {
     HTTP.get("/workers").then(
       response => {
-        const payload: Worker[] = response && response.data;
+        const payload: Worker[] = [];
+        response.data.forEach((json: object) => {
+          payload.push(Object.assign(new Worker(), json));
+        });
         commit("SET", payload);
       },
       error => {

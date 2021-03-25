@@ -1,24 +1,19 @@
 import { MutationTree } from "vuex";
-import { DevicesState, DeviceState, Device } from "./types";
+import { Device, DevicesState } from "./types";
 
 export const mutations: MutationTree<DevicesState> = {
   EDIT(state, payload: Device) {
-    const found = state.devices.find((el: DeviceState) => {
-      return el.device.device === payload.device;
+    const found = state.devices.find((el: Device) => {
+      return el.device === payload.device;
     });
     if (found) {
       const index = state.devices.indexOf(found);
-      const dstate = {
-        device: payload,
-        error: false
-      };
-
-      state.devices.splice(index, 1, dstate);
+      state.devices.splice(index, 1, payload);
     }
   },
   OFF(state, payload: string) {
-    const found = state.devices.find((el: DeviceState) => {
-      return el.device.device === payload;
+    const found = state.devices.find((el: Device) => {
+      return el.device === payload;
     });
     if (found) {
       const index = state.devices.indexOf(found);
@@ -27,8 +22,8 @@ export const mutations: MutationTree<DevicesState> = {
     }
   },
   ON(state, payload: string) {
-    const found = state.devices.find((el: DeviceState) => {
-      return el.device.device === payload;
+    const found = state.devices.find((el: Device) => {
+      return el.device === payload;
     });
     if (found) {
       const index = state.devices.indexOf(found);
@@ -36,13 +31,18 @@ export const mutations: MutationTree<DevicesState> = {
       state.devices.splice(index, 1, found);
     }
   },
+  REMOVE(state, payload: Device) {
+    const found = state.devices.find((el: Device) => {
+      return el.device === payload.device;
+    });
+    if (found) {
+      const index = state.devices.indexOf(found);
+      state.devices.splice(index, 1);
+    }
+  },
   SET(state, payload: Device[]) {
     state.error = false;
-
-    state.devices = [];
-    payload.forEach(d => {
-      state.devices.push({ device: d, error: false });
-    });
+    state.devices = payload;
   },
   DEVICE_ERROR(state) {
     state.error = true;

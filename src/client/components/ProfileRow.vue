@@ -46,7 +46,7 @@
         />
         <target
           icon="tint"
-          :value="parseFloat(profile.lamponhumidity)"
+          :value="dayHumidity"
           :precision="0"
           units="%"
           size="small"
@@ -54,7 +54,7 @@
         />
         <target
           icon="cloud"
-          :value="lamponPressure"
+          :value="dayPressure"
           :precision="1"
           units="hPa"
           size="small"
@@ -105,7 +105,7 @@
         />
         <target
           icon="tint"
-          :value="parseFloat(profile.lampoffhumidity)"
+          :value="nightHumidity"
           :precision="0"
           units="%"
           size="small"
@@ -113,7 +113,7 @@
         />
         <target
           icon="cloud"
-          :value="lampoffPressure"
+          :value="nightPressure"
           :precision="1"
           units="hPa"
           size="small"
@@ -224,12 +224,30 @@ const ProfileRow = Vue.extend({
       return "°" + this.units;
     },
 
+    lamponMinute(): string {
+      const start = this.profile.lampstart.split(":");
+      return start[1];
+    },
+
+    lamponHour(): string {
+      const start = this.profile.lampstart.split(":");
+      const hour = parseInt(start[0]);
+
+      if (hour < 0) {
+        return (24 + hour).toString();
+      } else if (hour < 10) {
+        return "0" + hour;
+      } else {
+        return hour.toString();
+      }
+    },
+
     dayTemperature(): number {
       if (this.units === "F") {
         return celsius2fahrenheit(this.profile.lampontemperature);
       }
 
-      return parseFloat(this.profile.lampontemperature);
+      return this.profile.lampontemperature;
     },
 
     nightTemperature(): number {
@@ -237,7 +255,15 @@ const ProfileRow = Vue.extend({
         return celsius2fahrenheit(this.profile.lampofftemperature);
       }
 
-      return parseFloat(this.profile.lampofftemperature);
+      return this.profile.lampofftemperature;
+    },
+
+    dayHumidity(): number {
+      return this.profile.lamponhumidity;
+    },
+
+    nightHumidity(): number {
+      return this.profile.lampoffhumidity;
     },
 
     lampMin(): number {
@@ -258,38 +284,20 @@ const ProfileRow = Vue.extend({
       return max;
     },
 
-    lamponMinute(): string {
-      const start = this.profile.lampstart.split(":");
-      return start[1];
-    },
-
-    lamponHour(): string {
-      const start = this.profile.lampstart.split(":");
-      const hour = parseInt(start[0]);
-
-      if (hour < 0) {
-        return (24 + hour).toString();
-      } else if (hour < 10) {
-        return "0" + hour;
-      } else {
-        return hour.toString();
-      }
-    },
-
-    lamponPressure(): number {
+    dayPressure(): number {
       return (
         vaporPressureDeficit(
-          parseFloat(this.profile.lampontemperature),
+          this.profile.lampontemperature,
           0.6,
           this.profile.lamponhumidity / 100
         ) / 1000
       );
     },
 
-    lampoffPressure(): number {
+    nightPressure(): number {
       return (
         vaporPressureDeficit(
-          parseFloat(this.profile.lampofftemperature),
+          this.profile.lampofftemperature,
           -0.6,
           this.profile.lampoffhumidity / 100
         ) / 1000

@@ -12,10 +12,10 @@
       </thead>
       <tbody>
         <zone-row
-          v-for="szone in zones"
-          v-bind:key="szone.zone.id"
+          v-for="zone in zones"
+          v-bind:key="zone.id"
           v-bind:units="units"
-          v-bind:zone="szone.zone"
+          v-bind:zone="zone"
         />
         <tr>
           <td>
@@ -34,11 +34,11 @@
               <div class="select">
                 <select v-model="profileid">
                   <option
-                    v-for="pstate in profiles"
-                    :key="pstate.profile.id"
-                    :value="pstate.profile.id"
+                    v-for="profile in profiles"
+                    :key="profile.id"
+                    :value="profile.id"
                   >
-                    {{ pstate.profile.profile }}
+                    {{ profile.profile }}
                   </option>
                 </select>
               </div>

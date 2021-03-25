@@ -5,18 +5,19 @@
       <thead>
         <tr>
           <th>MAC</th>
+          <th>History</th>
           <th>Status</th>
           <th>Type</th>
           <th>Nickname</th>
           <th>Manufacturer</th>
-          <th>History</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <device-row
-          v-for="dstate in devices"
-          v-bind:key="dstate.device.device"
-          v-bind:device="dstate.device"
+          v-for="device in devices"
+          v-bind:key="device.device"
+          v-bind:device="device"
           v-bind:units="units"
         />
       </tbody>

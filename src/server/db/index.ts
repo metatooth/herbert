@@ -182,6 +182,7 @@ export async function workerStatus(macaddr, inet) {
 export async function createReading(meter, temperature, humidity, pressure) {
   query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
     if (res.rowCount !== 0) {
+      query("UPDATE devices SET deleted = false WHERE device = $1", [meter]);
       query(
         "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
         [meter, temperature, humidity, pressure]
@@ -193,6 +194,7 @@ export async function createReading(meter, temperature, humidity, pressure) {
 export async function createStatus(device, status) {
   query("SELECT * FROM devices WHERE device = $1", [device]).then(res => {
     if (res.rowCount !== 0) {
+      query("UPDATE devices SET deleted = false WHERE device = $1", [device]);
       query("INSERT INTO statuses (device, status) VALUES ($1, $2)", [
         device,
         status

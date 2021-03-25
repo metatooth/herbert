@@ -41,8 +41,8 @@
           v-bind:data="humidities"
           title="Relative Humidity"
           label="Percent (%)"
-          v-bind:suggestedMin="suggestedMin"
-          v-bind:suggestedMax="suggestedMax"
+          v-bind:suggestedMin="min"
+          v-bind:suggestedMax="max"
           v-bind:stepSize="1"
         />
       </div>
@@ -82,7 +82,8 @@ const Readings = Vue.extend({
       humidities: [] as MeterReading[],
       pressures: [] as MeterReading[],
       units: "F",
-      minmax: [100, 0]
+      min: 100,
+      max: 0
     };
   },
 
@@ -101,36 +102,7 @@ const Readings = Vue.extend({
     }
   },
 
-  computed: {
-    suggestedMin() {
-      console.log("min max", this.minmax);
-      if (this.minmax[0] === 100) {
-        this.calcminmax();
-      }
-      return this.minmax[0] - 1;
-    },
-
-    suggestedMax() {
-      if (this.minmax[1] === 0) {
-        this.calcminmax();
-      }
-      return this.minmax[1] + 1;
-    }
-  },
-
   methods: {
-    calcminmax() {
-      this.humidities.forEach(d => {
-        if (d.y < this.minmax[0]) {
-          this.minmax[0] = d.y;
-        }
-
-        if (d.y > this.minmax[1]) {
-          this.minmax[1] = d.y;
-        }
-      });
-    },
-
     changeUnits(units: string) {
       this.units = units;
     },
@@ -166,6 +138,15 @@ const Readings = Vue.extend({
                 x: ts,
                 y: 100 * d.humidity
               };
+
+              if (humidity.y < this.min) {
+                this.min = humidity.y;
+              }
+
+              if (humidity.y > this.max) {
+                this.max = humidity.y;
+              }
+
               const pressure = {
                 x: ts,
                 y: d.pressure / 1000
