@@ -143,16 +143,28 @@ import {
 import { mapState, mapGetters, mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 
-interface Reading {
+class Reading {
   temperature: number;
   humidity: number;
   pressure: number;
   createdat: Date;
+
+  constructor() {
+    this.temperature = 0;
+    this.humidity = 0;
+    this.pressure = 0;
+    this.createdat = new Date();
+  }
 }
 
-interface Status {
+class Status {
   state: number;
   createdat: Date;
+
+  constructor() {
+    this.state = 0;
+    this.createdat = new Date();
+  }
 }
 
 const ZoneDetail = Vue.extend({
@@ -344,13 +356,17 @@ const ZoneDetail = Vue.extend({
             if (device.devicetype === "meter") {
               HTTP.get(`/readings?meter=${device.device}&last=one`).then(
                 res => {
-                  this.readings.push(res.data);
+                  const reading = Object.assign(new Reading(), res.data);
+                  reading.temperature = parseFloat(res.data.temperature);
+                  reading.humidity = parseFloat(res.data.humidity);
+                  reading.pressure = parseFloat(res.data.humidity);
+                  this.readings.push(reading);
                 }
               );
             } else {
               HTTP.get(`/statuses?device=${device.device}&last=one`).then(
                 res => {
-                  this.statuses.push(res.data);
+                  this.statuses.push(Object.assign(new Status(), res.data));
                 }
               );
             }

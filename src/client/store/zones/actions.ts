@@ -1,6 +1,7 @@
 import { ActionTree } from "vuex";
 import HTTP from "@/api/http";
 import { ZonesState, Zone } from "./types";
+import { Device } from "../devices/types";
 import { RootState } from "../types";
 
 export const actions: ActionTree<ZonesState, RootState> = {
@@ -42,7 +43,31 @@ export const actions: ActionTree<ZonesState, RootState> = {
       response => {
         const payload: Zone[] = [];
         response.data.forEach((json: object) => {
-          payload.push(Object.assign(new Zone(), json));
+          const zone = Object.assign(new Zone(), json);
+          const clone = JSON.parse(JSON.stringify(json));
+          if (zone.profile) {
+            zone.profile.lampontemperature = parseFloat(
+              clone.profile.lampontemperature
+            );
+
+            zone.profile.lamponhumidity = parseFloat(
+              clone.profile.lamponhumidity
+            );
+            zone.profile.lampofftemperature = parseFloat(
+              clone.profile.lampofftemperature
+            );
+
+            zone.profile.lampoffhumidity = parseFloat(
+              clone.profile.lampoffhumidity
+            );
+          }
+          const devices: Device[] = [];
+          clone.devices.forEach((d: object) => {
+            devices.push(Object.assign(new Device(), d));
+          });
+
+          zone.devices = devices;
+          payload.push(zone);
         });
         commit("SET", payload);
       },
