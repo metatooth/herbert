@@ -1,6 +1,6 @@
 # Herbert
 
-An environment control system with Switchbot and WYZE devices.
+An environment control system with SwitchBot and WYZE devices.
 
 ## Getting Started
 

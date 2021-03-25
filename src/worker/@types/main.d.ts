@@ -1,4 +1,4 @@
-interface IWoSensorTH {
+interface WoSensorTH {
   id: string;
   address: string;
   rssi: number;
@@ -15,11 +15,17 @@ interface IWoSensorTH {
   };
 }
 
-interface IDevice {
-  id: string;
+interface WyzeDevice {
   nickname: string;
+  mac: string;
+  device_params: {
+    switch_state: nubmer;
+  };
 }
 
-interface IDeviceState {
-  status: string;
+interface Wyze {
+  turnOff: function;
+  turnOn: function;
+  getDeviceByMac: function;
+  getDeviceList: function;
 }
