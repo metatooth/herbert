@@ -135,11 +135,6 @@ insert into device_types (devicetype)
 insert into profiles (profile, timezone, lampstart, lampduration, lampontemperature,
        lamponhumidity, lampofftemperature, lampoffhumidity)
        values
-       ('Officespace', 'America/New_York', '08:00', '10 hours', 18.3, 21, 12.8, 21),
-       ('Torello Clone', 'America/New_York', '00:00', '24 hours', 22.8, 68, 22.8, 68),
-       ('Torello Veg', 'America/New_York', '08:00', '18 hours', 25.3, 55, 23.1, 55),
-       ('Torello Flower 1', 'America/New_York', '08:00', '12 hours', 24.7, 55, 21.1, 43),
-       ('Torello Flower 2', 'America/New_York', '08:00', '12 hours', 22.2, 43, 19.7, 43),
-       ('Torello Flower 3', 'America/New_York', '08:00', '12 hours', 19.2, 35, 16.4, 35);
+       ('Officespace', 'America/New_York', '08:00', '10 hours', 18.3, 21, 12.8, 21);
        
 commit;
