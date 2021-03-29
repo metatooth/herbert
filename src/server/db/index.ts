@@ -1,11 +1,9 @@
 import { Pool, Result } from "pg";
 
-let ssl = null;
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 30,
-  ssl:ssl
+  ssl: { rejectUnauthorized: false }
 });
 
 export async function query(text, params): Promise<Result> {
