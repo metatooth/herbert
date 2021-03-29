@@ -4,12 +4,10 @@
     <table class="table">
       <thead>
         <tr>
-          <th>MAC</th>
-          <th>History</th>
           <th>Status</th>
-          <th>Type</th>
-          <th>Nickname</th>
-          <th>Manufacturer</th>
+          <th>Name</th>
+          <th>History</th>
+          <th>MAC</th>
           <th></th>
         </tr>
       </thead>

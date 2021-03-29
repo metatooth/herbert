@@ -1,7 +1,64 @@
 <template>
   <tr>
+    <td class="has-text-centered" v-if="isMeter">
+      <div class="tags has-addons">
+        <span class="tag has-text-success has-background-dark">
+          <font-awesome-icon icon="tachometer-alt" />
+        </span>
+        <span class="tag has-text-light has-background-dark">
+          {{ meterReadingTemperature.toFixed(1) }} {{ unitsWithDegrees }}
+        </span>
+        <span class="tag has-text-light has-background-dark">
+          {{ meterReadingHumidity.toFixed(0) }} %
+        </span>
+      </div>
+    </td>
+    <td class="has-text-centered" v-else>
+      <div class="field is-grouped">
+        <div class="control">
+          <select-device-type :devicetype="device.devicetype" />
+        </div>
+
+        <div class="control">
+          <div class="tags has-addons">
+            <a class="tag" :class="deviceOnClass" @click="on(device.device)">
+              <font-awesome-icon icon="circle" />
+            </a>
+            <a class="tag" :class="deviceOffClass" @click="off(device.device)">
+              <font-awesome-icon icon="circle" />
+            </a>
+            <a class="tag" :class="deviceDisconnectedClass">
+              <font-awesome-icon icon="circle" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </td>
     <td>
-      {{ device.device }}
+      <a @click="editable" v-if="!editing">
+        <span v-if="device.nickname">{{ device.nickname }}</span>
+        <span v-else>click to name</span>
+      </a>
+      <div class="field is-grouped" v-else>
+        <div class="control">
+          <input
+            class="input is-small"
+            type="text"
+            v-model="nickname"
+            @keyup.esc="cancel"
+          />
+        </div>
+        <div class="control">
+          <button class="button is-small is-primary" @click="save">
+            <font-awesome-icon icon="check" />
+          </button>
+        </div>
+        <div class="control">
+          <button class="button is-small is-danger" @click="cancel">
+            <font-awesome-icon icon="times" />
+          </button>
+        </div>
+      </div>
     </td>
     <td>
       <router-link
@@ -13,72 +70,12 @@
         &gt;&gt;&gt;
       </router-link>
     </td>
-    <td class="has-text-centered">
-      <div v-if="isMeter" class="tags has-addons">
-        <span class="tag has-text-success has-background-dark">
-          <font-awesome-icon icon="tachometer-alt" />
-        </span>
-        <span class="tag has-text-light has-background-dark">
-          {{ meterReadingTemperature.toFixed(1) }} {{ unitsWithDegrees }}
-        </span>
-        <span class="tag has-text-light has-background-dark">
-          {{ meterReadingHumidity.toFixed(0) }} %
-        </span>
-      </div>
-      <div v-else class="tags has-addons">
-        <a class="tag" :class="deviceOnClass" @click="on(device.device)">
-          <font-awesome-icon icon="circle" />
-        </a>
-        <a class="tag" :class="deviceOffClass" @click="off(device.device)">
-          <font-awesome-icon icon="circle" />
-        </a>
-        <a class="tag" :class="deviceDisconnectedClass">
-          <font-awesome-icon icon="circle" />
-        </a>
-      </div>
-    </td>
-    <td class="has-text-centered">
-      <span v-if="isMeter">
-        {{ device.devicetype }}
-      </span>
-      <select-device-type
-        v-else
-        v-bind:devicetype="device.devicetype"
-        @select-device-type="saveDeviceType"
-      />
-    </td>
     <td>
-      <a @click="editable" v-if="!editing">
-        <span v-if="device.nickname">{{ device.nickname }}</span>
-        <span v-else>click to name</span>
-      </a>
-      <div class="field is-grouped" v-else>
-        <div class="control">
-          <input
-            class="input"
-            type="text"
-            v-model="nickname"
-            @keyup.esc="cancel"
-          />
-        </div>
-        <div class="control">
-          <button class="button is-primary" @click="save">
-            <font-awesome-icon icon="check" />
-          </button>
-        </div>
-        <div class="control">
-          <button class="button is-danger" @click="cancel">
-            <font-awesome-icon icon="times" />
-          </button>
-        </div>
-      </div>
-    </td>
-    <td>
-      {{ device.manufacturer }}
+      {{ device.device }}
     </td>
     <td>
       <div class="control">
-        <button class="button is-danger" @click="trash">
+        <button class="button is-small is-danger" @click="trash">
           <font-awesome-icon icon="trash" />
         </button>
       </div>
@@ -87,11 +84,11 @@
 </template>
 
 <script lang="ts">
-import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
 import { mapActions } from "vuex";
 import { celsius2fahrenheit } from "../../shared/utils";
+import SelectDeviceType from "@/components/SelectDeviceType.vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -99,15 +96,15 @@ const DeviceRow = Vue.extend({
     units: String
   },
 
-  components: {
-    SelectDeviceType
-  },
-
   data() {
     return {
       nickname: this.device.nickname,
       editing: false
     };
+  },
+
+  components: {
+    SelectDeviceType
   },
 
   computed: {

@@ -4,12 +4,6 @@
       <div class="tag is-medium has-background-dark" :class="onClass">
         <font-awesome-icon :icon="iconClass" />
       </div>
-      <div class="tag is-medium has-background-dark" :class="offClass">
-        <font-awesome-icon :icon="iconClass" />
-      </div>
-      <div class="tag is-medium has-background-dark" :class="disconnectedClass">
-        <font-awesome-icon :icon="iconClass" />
-      </div>
       <div class="tag is-medium has-text-light has-background-dark">
         {{ device.nickname || device.device }}
         <button

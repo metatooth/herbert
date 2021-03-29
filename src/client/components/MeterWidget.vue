@@ -11,7 +11,17 @@
         {{ humidity.toFixed(0) }} %
       </span>
       <span class="tag is-medium has-text-light has-background-dark">
-        {{ device.nickname || device.device }}
+        <router-link
+          :to="{
+            name: 'readings',
+            params: { name: device.nickname, device: device.device }
+          }"
+        >
+          &gt;&gt;&gt;
+        </router-link>
+      </span>
+      <span class="tag is-medium has-text-light has-background-dark">
+        {{ linkName }}
         <button class="delete" v-on:click="remove(device.device)" />
       </span>
     </div>
@@ -40,6 +50,10 @@ const MeterWidget = Vue.extend({
 
     humidity() {
       return 100 * (this.device.humidity || 35);
+    },
+
+    linkName() {
+      return this.device.nickname || this.device.device;
     },
 
     unitsWithDegrees() {
