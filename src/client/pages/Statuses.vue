@@ -95,7 +95,7 @@ const Statuses = Vue.extend({
             const ts = convertToLocalTime(d.createdat, { timeZone });
             const status = {
               x: ts,
-              y: (d.status === "on") ? 1 : 0
+              y: d.status === "on" ? 1 : 0
             };
 
             this.statuses.push(status);

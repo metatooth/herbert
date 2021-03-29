@@ -186,10 +186,14 @@ async function run() {
       console.log(directives);
 
       console.log("blower is on", min, sec, blower.isOn(min * 60 + sec));
+      console.log("blower is cooling", directives.temperature === "cool");
 
       const systems = new Map([
         ["lamp", lamp.isOn(hour)],
-        ["blower", blower.isOn(min * 60 + sec)],
+        [
+          "blower",
+          blower.isOn(min * 60 + sec) || directives.temperature === "cool"
+        ],
         ["heater", directives.temperature === "heat"],
         ["dehumidifer", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],

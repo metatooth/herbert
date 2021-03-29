@@ -25,7 +25,10 @@ export async function readProfile(id) {
 }
 
 export async function readDevice(id) {
-  const res = await query("SELECT * FROM devices WHERE device = $1 ORDER BY devicetype, nickname, device", [id]);
+  const res = await query(
+    "SELECT * FROM devices WHERE device = $1 ORDER BY devicetype, nickname, device",
+    [id]
+  );
 
   const device = await res.rows[0];
 
