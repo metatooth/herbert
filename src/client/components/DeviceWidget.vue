@@ -4,6 +4,16 @@
       <div class="tag is-medium has-background-dark" :class="onClass">
         <font-awesome-icon :icon="iconClass" />
       </div>
+      <span class="tag is-medium has-text-light has-background-dark">
+        <router-link
+          :to="{
+            name: 'statuses',
+            params: { name: device.nickname, device: device.device }
+          }"
+        >
+          &gt;&gt;&gt;
+        </router-link>
+      </span>
       <div class="tag is-medium has-text-light has-background-dark">
         {{ device.nickname || device.device }}
         <button
