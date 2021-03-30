@@ -60,7 +60,7 @@ const SelectDeviceType = Vue.extend({
       } else if (this.selected === "fan") {
         return "fan";
       }
-      
+
       return "circle";
     }
   }
