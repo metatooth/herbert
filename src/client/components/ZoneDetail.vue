@@ -1,5 +1,5 @@
 <template>
-  <div id="linkto" class="level">
+  <div :id="linkto" class="level">
     <div class="card">
       <div class="card-content">
         <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
@@ -334,6 +334,7 @@ const ZoneDetail = Vue.extend({
   },
 
   mounted() {
+    setTimeout(() => this.scrollFix(this.$route.hash), 1);
     this.refresh();
   },
 
@@ -393,17 +394,17 @@ const ZoneDetail = Vue.extend({
     },
 
     saveProfile(profile: number) {
-      console.log("save profile", profile);
-
       const zone = {
         id: this.zone.id,
         nickname: this.zone.nickname,
         profileid: profile
       };
 
-      console.log("zone", zone);
-
       this.edit(zone);
+    },
+
+    scrollFix(hashbang: string) {
+      location.hash = hashbang;
     },
 
     ...mapActions("zones", ["addDevice", "edit", "fetchData", "removeDevice"])

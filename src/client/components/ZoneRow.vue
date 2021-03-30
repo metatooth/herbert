@@ -3,7 +3,10 @@
     <td>
       <router-link
         v-if="!editing"
-        :to="{ name: 'zone', params: { id: zone.id, units: units } }"
+        :to="{ name: 'zone', 
+               hash: linkto,
+             params: { id: zone.id, units: units } 
+             }"
       >
         {{ zone.nickname }}
       </router-link>
@@ -22,7 +25,7 @@
           {{ zone.profile.profile }}
         </div>
         <div v-else>
-          <a :href="linkToConfig">no profile set</a>
+          no profile set
         </div>
       </div>
       <div class="control" v-else>
@@ -80,8 +83,8 @@ const ZoneRow = Vue.extend({
   },
 
   computed: {
-    linkToConfig(): string {
-      return "#" + this.zone.id + "config";
+    linkto(): string {
+      return `#zone-details-${this.zone.id}`;
     },
 
     ...mapGetters("profiles", ["profiles"])

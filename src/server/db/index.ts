@@ -110,7 +110,7 @@ export async function readZoneDevices(device: string) {
 
   const {
     rows
-  } = await query("SELECT zoneid as id FROM zone_devices WHERE device = $1", [
+  } = await query("SELECT d.id FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.device = $1 ORDER BY d.devicetype", [
     device
   ]);
 

@@ -91,7 +91,7 @@ const Statuses = Vue.extend({
         if (!data.error) {
           this.statuses = [];
           const timeZone = "Etc/UTC";
-          data.forEach((d: { createdat: Date; status: number }) => {
+          data.forEach((d: { createdat: Date; status: string }) => {
             const ts = convertToLocalTime(d.createdat, { timeZone });
             const status = {
               x: ts,
