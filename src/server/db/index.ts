@@ -113,9 +113,10 @@ export async function readZoneDevices(device: string) {
 
   const {
     rows
-  } = await query("SELECT d.id FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.device = $1 ORDER BY d.devicetype", [
-    device
-  ]);
+  } = await query(
+    "SELECT d.id FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.device = $1 ORDER BY d.devicetype",
+    [device]
+  );
 
   rows.forEach(row => {
     const z = readZone(row.id);

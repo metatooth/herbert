@@ -3,10 +3,11 @@
     <td>
       <router-link
         v-if="!editing"
-        :to="{ name: 'zone', 
-               hash: linkto,
-             params: { id: zone.id, units: units } 
-             }"
+        :to="{
+          name: 'zone',
+          hash: linkto,
+          params: { id: zone.id, units: units }
+        }"
       >
         {{ zone.nickname }}
       </router-link>

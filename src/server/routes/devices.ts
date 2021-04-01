@@ -15,16 +15,13 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  console.log("PUT DEVICE", id, "WITH", req.body);
   const {
     rows
   } = await query(
     "UPDATE devices SET nickname = $1, devicetype = $2, updatedat = CURRENT_TIMESTAMP WHERE device = $3 RETURNING device",
     [req.body.nickname, req.body.devicetype, id]
   );
-  console.log("UPDATED DEVICES", rows);
   const device = await readDevice(rows[0].device);
-  console.log("DEVICE", device);
   res.status(201).json(device);
 });
 

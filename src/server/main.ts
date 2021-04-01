@@ -21,6 +21,7 @@ import { BlowerTimer } from "../shared/blower-timer";
 import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
+import { zonedTimeToUtc } from "date-fns-tz";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");
@@ -61,6 +62,8 @@ function sendError(ws: WebSocket, message: string) {
 
   ws.send(JSON.stringify(messageObject));
 }
+
+process.env.TZ = "ETC/Utc";
 
 const server = http.createServer(app);
 server.listen(port);
@@ -153,10 +156,26 @@ async function run() {
       console.log("profile", zone.profile);
       console.log("state", hour, temperature, humidity);
 
-      const start = zone.profile.lampstart.split(":");
+      const now = new Date();
+      console.log("now", now);
+      const month =
+        now.getMonth() < 10 ? `0${now.getMonth()}` : now.getMonth().toString();
+      const day =
+        now.getDay() < 10 ? `0${now.getDay()}` : now.getDay().toString();
+
+      const startat = `${now.getFullYear()}-${month}-${day} ${
+        zone.profile.lampstart
+      }`;
+
+      console.log("startat", startat);
+
+      const utc = zonedTimeToUtc(startat, zone.profile.timezone);
+
+      console.log("UTC", utc);
+
       const duration = zone.profile.lampduration["hours"];
 
-      const lamp = new LampTimer(parseInt(start[0]), duration);
+      const lamp = new LampTimer(utc.getHours(), duration);
 
       const blower = new BlowerTimer(60, 180); // WARNING!!
 

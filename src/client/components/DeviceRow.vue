@@ -2,7 +2,7 @@
   <tr>
     <td class="has-text-centered" v-if="isMeter">
       <div class="tags has-addons">
-        <span class="tag has-text-success has-background-dark">
+        <span class="tag has-background-dark" :class="meterClass">
           <font-awesome-icon icon="tachometer-alt" />
         </span>
         <span class="tag has-text-light has-background-dark">
@@ -16,21 +16,15 @@
     <td class="has-text-centered" v-else>
       <div class="field is-grouped">
         <div class="control">
-          <select-device-type :devicetype="device.devicetype" />
+          <div class="tags has-addons">
+            <a class="tag" :class="deviceClass" @click="toggle(device.device)">
+              <font-awesome-icon :icon="deviceIcon" />
+            </a>
+          </div>
         </div>
 
         <div class="control">
-          <div class="tags has-addons">
-            <a class="tag" :class="deviceOnClass" @click="on(device.device)">
-              <font-awesome-icon icon="circle" />
-            </a>
-            <a class="tag" :class="deviceOffClass" @click="off(device.device)">
-              <font-awesome-icon icon="circle" />
-            </a>
-            <a class="tag" :class="deviceDisconnectedClass">
-              <font-awesome-icon icon="circle" />
-            </a>
-          </div>
+          <select-device-type :devicetype="device.devicetype" />
         </div>
       </div>
     </td>
@@ -85,8 +79,9 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapState, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
-import { mapActions } from "vuex";
+import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit } from "../../shared/utils";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 
@@ -108,28 +103,21 @@ const DeviceRow = Vue.extend({
   },
 
   computed: {
-    deviceOnClass() {
-      if (this.device.status === "on" || this.device.status === "1") {
-        return "has-text-success has-background-dark";
-      } else {
-        return "has-text-success-light has-background-dark";
-      }
-    },
-    deviceOffClass() {
-      if (this.device.status === "off" || this.device.status === "0") {
-        return "has-text-warning has-background-dark";
-      } else {
-        return "has-text-warning-light has-background-dark";
-      }
-    },
-    deviceDisconnectedClass() {
-      if (this.device.status === "disconnected") {
+    deviceClass(): string {
+      const found = this.notifications.find((n: Notification) => {
+        return n.id === this.device.device;
+      });
+      if (found || this.device.status === "disconnected") {
         return "has-text-danger has-background-dark";
-      } else {
-        return "has-text-danger-light has-background-dark";
+      } else if (this.device.status === "on" || this.device.status === "1") {
+        return "has-text-success has-background-dark";
+      } else if (this.device.status === "off" || this.device.status === "0") {
+        return "has-text-warning has-background-dark";
       }
+
+      return "has-background-dark";
     },
-    deviceIcon() {
+    deviceIcon(): string | null {
       if (this.device.status === "on") {
         return "circle";
       } else if (this.device.status === "off") {
@@ -137,41 +125,51 @@ const DeviceRow = Vue.extend({
       } else if (this.device.status === "disconnected") {
         return "times";
       }
-
       return null;
     },
-    isMeter() {
+    isMeter(): boolean {
       return this.device.devicetype === "meter";
     },
-    linkName() {
+    linkName(): string {
       if (this.device.devicetype === "meter") {
         return "readings";
-      } else {
-        return "statuses";
       }
+      return "statuses";
     },
-    meterReadingHumidity() {
+    meterClass(): string {
+      const found = this.notifications.find((n: Notification) => {
+        return n.id === this.device.device;
+      });
+      if (found || this.device.status === "disconnected") {
+        return "has-text-danger";
+      }
+
+      return "has-text-success";
+    },
+    meterReadingHumidity(): number {
       return 100 * (this.device.humidity || 35);
     },
-    meterReadingTemperature() {
+    meterReadingTemperature(): number {
       return this.units === "F"
         ? celsius2fahrenheit(this.device.temperature || 23)
         : this.device.temperature || 23;
     },
-    switchStatus() {
+    switchStatus(): string {
       return this.device.status || "off";
     },
-    unitsWithDegrees() {
+    unitsWithDegrees(): string {
       return "°" + this.units;
-    }
+    },
+
+    ...mapState("notifications", ["notifications"])
   },
 
   methods: {
-    editable() {
+    editable(): void {
       this.editing = true;
     },
 
-    save() {
+    save(): void {
       this.edit({
         ...this.device,
         nickname: this.nickname
@@ -179,7 +177,7 @@ const DeviceRow = Vue.extend({
       this.editing = false;
     },
 
-    saveDeviceType(devicetype: string) {
+    saveDeviceType(devicetype: string): void {
       this.edit({
         ...this.device,
         devicetype: devicetype
@@ -192,7 +190,7 @@ const DeviceRow = Vue.extend({
     },
 
     trash() {
-      if (confirm("You sure, bro?")) {
+      if (confirm("OK to remove?")) {
         this.remove(this.device);
       }
     },

@@ -109,7 +109,7 @@ const Readings = Vue.extend({
 
     refresh() {
       const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+      const url = process.env.VUE_APP_API_URL;
 
       xhr.open(
         "GET",
@@ -121,7 +121,7 @@ const Readings = Vue.extend({
         if (!data.error) {
           this.temperatures = [];
           this.humidities = [];
-          const timeZone = "Etc/UTC";
+          const timeZone = "America/New_York";
           data.forEach(
             (d: {
               createdat: Date;

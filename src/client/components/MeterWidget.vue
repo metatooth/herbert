@@ -1,7 +1,7 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <span class="tag is-medium has-text-success has-background-dark">
+      <span class="tag is-medium has-background-dark" :class="meterClass">
         <font-awesome-icon icon="tachometer-alt" />
       </span>
       <span class="tag is-medium has-text-light has-background-dark">
@@ -30,7 +30,9 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapState } from "vuex";
 import { Device } from "@/store/devices/types";
+import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit } from "../../shared/utils";
 
 const MeterWidget = Vue.extend({
@@ -56,9 +58,23 @@ const MeterWidget = Vue.extend({
       return this.device.nickname || this.device.device;
     },
 
+    meterClass() {
+      const found = this.notifications.find((n: Notification) => {
+        return n.id === this.device.device;
+      });
+
+      if (found || this.device.status === "disconnected") {
+        return "has-text-danger";
+      } else {
+        return "has-text-success";
+      }
+    },
+
     unitsWithDegrees() {
       return "°" + this.units;
-    }
+    },
+
+    ...mapState("notifications", ["notifications"])
   },
 
   methods: {
