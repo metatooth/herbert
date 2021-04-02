@@ -112,7 +112,7 @@ const Overview = Vue.extend({
           timeZone: "America/New_York"
         });
         const diff = check - local.getTime();
-        console.log(d.device, check, local, d.timestamp, diff);
+        console.log("check health", d.device, d.timestamp, diff);
         if (diff > 5 * 60 * 1000) {
           console.log("TOO LONG!");
           const formatted = this.pretty(local);
