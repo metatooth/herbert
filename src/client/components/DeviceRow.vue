@@ -16,11 +16,11 @@
     <td class="has-text-centered" v-else>
       <div class="field is-grouped">
         <div class="control">
-          <div class="tags has-addons">
-            <a class="tag" :class="deviceClass" @click="toggle">
+          <button class="button is-small" :class="deviceClass" @click="toggle">
+            <span class="icon">
               <font-awesome-icon :icon="deviceIcon" />
-            </a>
-          </div>
+            </span>
+          </button>
         </div>
 
         <div class="control">
@@ -94,6 +94,7 @@ const DeviceRow = Vue.extend({
   data() {
     return {
       nickname: this.device.nickname,
+      updating: false,
       editing: false
     };
   },
@@ -102,20 +103,33 @@ const DeviceRow = Vue.extend({
     SelectDeviceType
   },
 
+  watch: {
+    device() {
+      this.updating = false;
+    }
+  },
+
   computed: {
     deviceClass(): string {
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.device.device;
       });
+
+      let style = "has-background-dark";
+
       if (found || this.device.status === "disconnected") {
-        return "has-text-danger has-background-dark";
+        style = `has-text-danger ${style}`;
       } else if (this.device.status === "on" || this.device.status === "1") {
-        return "has-text-success has-background-dark";
+        style = `has-text-success ${style}`;
       } else if (this.device.status === "off" || this.device.status === "0") {
-        return "has-text-warning has-background-dark";
+        style = `has-text-warning ${style}`;
       }
 
-      return "has-background-dark";
+      if (this.updating) {
+        style = `is-loading ${style}`;
+      }
+
+      return style;
     },
     deviceIcon(): string | null {
       if (this.device.status === "on") {
@@ -190,6 +204,7 @@ const DeviceRow = Vue.extend({
     },
 
     toggle() {
+      this.updating = true;
       if (this.device.status === "off") {
         this.on(this.device.device);
       } else if (this.device.status === "on") {
