@@ -133,9 +133,9 @@ async function run() {
   const zones = await readZones();
   zones.forEach(async zone => {
     const now = new Date();
-    const hour = now.getHours();
-    const min = now.getMinutes();
-    const sec = now.getSeconds();
+    const hour = now.getUTCHours();
+    const min = now.getUTCMinutes();
+    const sec = now.getUTCSeconds();
 
     if (zone.profile) {
       console.log("command for zone", zone.nickname);
@@ -158,12 +158,21 @@ async function run() {
 
       const now = new Date();
       console.log("now", now);
-      const month =
-        now.getMonth() < 10 ? `0${now.getMonth()}` : now.getMonth().toString();
-      const day =
-        now.getDay() < 10 ? `0${now.getDay()}` : now.getDay().toString();
 
-      const startat = `${now.getFullYear()}-${month}-${day} ${
+      console.log(now.getMonth());
+
+      console.log(now.getDate());
+
+      const monthnbr = now.getMonth() + 1;
+
+      const month =
+        monthnbr < 10 ? `0${monthnbr}` : monthnbr.toString();
+      const date =
+        now.getDate() < 10 ? `0${now.getDate()}` : now.getDate().toString();
+
+      console.log("month", month, "date", date);
+
+      const startat = `${now.getFullYear()}-${month}-${date} ${
         zone.profile.lampstart
       }`;
 
@@ -181,6 +190,8 @@ async function run() {
 
       let target;
       let delta;
+
+      console.log("check hour", hour);
 
       if (lamp.isOn(hour)) {
         console.log("lamps", lamp, "ON");
