@@ -18,7 +18,7 @@ export const mutations: MutationTree<ProfilesState> = {
     });
     if (found) {
       const index = state.profiles.indexOf(found);
-      state.profiles.splice(index, 1, found);
+      state.profiles.splice(index, 1, payload);
     }
   },
   ERROR(state) {

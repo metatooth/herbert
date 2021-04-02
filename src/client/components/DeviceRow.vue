@@ -17,7 +17,7 @@
       <div class="field is-grouped">
         <div class="control">
           <div class="tags has-addons">
-            <a class="tag" :class="deviceClass" @click="toggle(device.device)">
+            <a class="tag" :class="deviceClass" @click="toggle">
               <font-awesome-icon :icon="deviceIcon" />
             </a>
           </div>
@@ -187,6 +187,14 @@ const DeviceRow = Vue.extend({
     cancel() {
       this.nickname = this.device.nickname;
       this.editing = false;
+    },
+
+    toggle() {
+      if (this.device.status === "off") {
+        this.on(this.device.device);
+      } else if (this.device.status === "on") {
+        this.off(this.device.device);
+      }
     },
 
     trash() {

@@ -29,14 +29,7 @@
       </div>
     </section>
     <section class="section">
-      <p class="title">Notifications</p>
       <table class="table is-fullwidth is-bordered">
-        <thead>
-          <th>&nbsp;</th>
-          <th>Device</th>
-          <th>Message</th>
-          <th class="has-text-centered">Delete?</th>
-        </thead>
         <tbody>
           <tr v-if="notificationsCount === 0">
             <td class="has-text-centered" colspan="4">None!</td>
@@ -119,8 +112,9 @@ const Overview = Vue.extend({
           timeZone: "America/New_York"
         });
         const diff = check - local.getTime();
-
+        console.log(d.device, check, local, d.timestamp, diff);
         if (diff > 5 * 60 * 1000) {
+          console.log("TOO LONG!");
           const formatted = this.pretty(local);
 
           const n: Notification = {

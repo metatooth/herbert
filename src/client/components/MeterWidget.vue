@@ -42,7 +42,7 @@ const MeterWidget = Vue.extend({
   },
 
   computed: {
-    temperature() {
+    temperature(): number {
       if (this.units === "F") {
         return celsius2fahrenheit(this.device.temperature || 23);
       } else {
@@ -50,15 +50,15 @@ const MeterWidget = Vue.extend({
       }
     },
 
-    humidity() {
+    humidity(): number {
       return 100 * (this.device.humidity || 35);
     },
 
-    linkName() {
+    linkName(): string {
       return this.device.nickname || this.device.device;
     },
 
-    meterClass() {
+    meterClass(): string {
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.device.device;
       });
