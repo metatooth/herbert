@@ -22,7 +22,6 @@ export const actions: ActionTree<DevicesState, RootState> = {
       response => {
         const payload: Device[] = [];
         response.data.forEach((json: object) => {
-          console.log("device timestamp", json.device, json.timestamp);
           payload.push(Object.assign(new Device(), json));
         });
         commit("SET", payload);
