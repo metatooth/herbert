@@ -1,47 +1,32 @@
 <template>
   <tr>
-    <td>
-      {{ device.device }}
-    </td>
-    <td class="has-text-centered">
-      <div
-        v-if="meterReadingTemperature"
-        class="field is-grouped is-grouped-multiline"
-      >
-        <target
-          icon="thermometer-half"
-          v-bind:value="meterReadingTemperature"
-          :precision="1"
-          :units="unitsWithDegrees"
-          text="warning"
-          background="warning"
-        />
-        <target
-          icon="tint"
-          v-bind:value="meterReadingHumidity"
-          :precision="0"
-          units="%"
-          text="info"
-          background="info"
-        />
-      </div>
-      <div v-else class="tags has-addons">
-        <span class="tag is-medium" :class="deviceOnClass">
-          <font-awesome-icon icon="circle" />
+    <td class="has-text-centered" v-if="isMeter">
+      <div class="tags has-addons">
+        <span class="tag has-background-dark" :class="meterClass">
+          <font-awesome-icon icon="tachometer-alt" />
         </span>
-        <span class="tag is-medium" :class="deviceOffClass">
-          <font-awesome-icon icon="circle" />
+        <span class="tag has-text-light has-background-dark">
+          {{ meterReadingTemperature.toFixed(1) }} {{ unitsWithDegrees }}
         </span>
-        <span class="tag is-medium" :class="deviceDisconnectedClass">
-          <font-awesome-icon icon="circle" />
+        <span class="tag has-text-light has-background-dark">
+          {{ meterReadingHumidity.toFixed(0) }} %
         </span>
       </div>
     </td>
-    <td>
-      <select-device-type
-        v-bind:devicetype="device.devicetype"
-        @select-device-type="saveDeviceType"
-      />
+    <td class="has-text-centered" v-else>
+      <div class="field is-grouped">
+        <div class="control">
+          <button class="button is-small" :class="deviceClass" @click="toggle">
+            <span class="icon">
+              <font-awesome-icon :icon="deviceIcon" />
+            </span>
+          </button>
+        </div>
+
+        <div class="control">
+          <select-device-type :devicetype="device.devicetype" />
+        </div>
+      </div>
     </td>
     <td>
       <a @click="editable" v-if="!editing">
@@ -51,29 +36,23 @@
       <div class="field is-grouped" v-else>
         <div class="control">
           <input
-            class="input"
+            class="input is-small"
             type="text"
             v-model="nickname"
             @keyup.esc="cancel"
           />
         </div>
         <div class="control">
-          <button class="button is-primary" @click="save">
+          <button class="button is-small is-primary" @click="save">
             <font-awesome-icon icon="check" />
           </button>
         </div>
         <div class="control">
-          <button class="button is-danger" @click="cancel">
+          <button class="button is-small is-danger" @click="cancel">
             <font-awesome-icon icon="times" />
           </button>
         </div>
       </div>
-    </td>
-    <td>
-      <timestamp v-bind:timestamp="new Date(Date.parse(device.timestamp))" />
-    </td>
-    <td>
-      {{ device.manufacturer }}
     </td>
     <td>
       <router-link
@@ -85,17 +64,26 @@
         &gt;&gt;&gt;
       </router-link>
     </td>
+    <td>
+      {{ device.device }}
+    </td>
+    <td>
+      <div class="control">
+        <button class="button is-small is-danger" @click="trash">
+          <font-awesome-icon icon="trash" />
+        </button>
+      </div>
+    </td>
   </tr>
 </template>
 
 <script lang="ts">
-import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
+import { mapState, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
-import { mapActions } from "vuex";
-import Target from "@/components/Target.vue";
+import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit } from "../../shared/utils";
+import SelectDeviceType from "@/components/SelectDeviceType.vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -103,43 +91,47 @@ const DeviceRow = Vue.extend({
     units: String
   },
 
-  components: {
-    SelectDeviceType,
-    Timestamp,
-    Target
-  },
-
   data() {
     return {
       nickname: this.device.nickname,
+      updating: false,
       editing: false
     };
   },
 
+  components: {
+    SelectDeviceType
+  },
+
+  watch: {
+    device() {
+      this.updating = false;
+    }
+  },
+
   computed: {
-    deviceOnClass() {
-      console.log("device row on?", this.device);
-      if (this.device.status === "on" || this.device.status === "1") {
-        return "has-text-success has-background-black";
-      } else {
-        return "has-text-success-light has-background-black";
+    deviceClass(): string {
+      const found = this.notifications.find((n: Notification) => {
+        return n.id === this.device.device;
+      });
+
+      let style = "has-background-dark";
+
+      if (found || this.device.status === "disconnected") {
+        style = `has-text-danger ${style}`;
+      } else if (this.device.status === "on" || this.device.status === "1") {
+        style = `has-text-success ${style}`;
+      } else if (this.device.status === "off" || this.device.status === "0") {
+        style = `has-text-warning ${style}`;
       }
-    },
-    deviceOffClass() {
-      if (this.device.status === "off" || this.device.status === "0") {
-        return "has-text-warning has-background-black";
-      } else {
-        return "has-text-warning-light has-background-black";
+
+      if (this.updating) {
+        style = `is-loading ${style}`;
       }
+
+      return style;
     },
-    deviceDisconnectedClass() {
-      if (this.device.status === "disconnected") {
-        return "has-text-danger has-background-black";
-      } else {
-        return "has-text-danger-light has-background-black";
-      }
-    },
-    deviceIcon() {
+    deviceIcon(): string | null {
       if (this.device.status === "on") {
         return "circle";
       } else if (this.device.status === "off") {
@@ -147,38 +139,51 @@ const DeviceRow = Vue.extend({
       } else if (this.device.status === "disconnected") {
         return "times";
       }
-
       return null;
     },
-    linkName() {
+    isMeter(): boolean {
+      return this.device.devicetype === "meter";
+    },
+    linkName(): string {
       if (this.device.devicetype === "meter") {
         return "readings";
-      } else {
-        return "statuses";
       }
+      return "statuses";
     },
-    meterReadingHumidity() {
-      return 100 * parseFloat(this.device.humidity);
+    meterClass(): string {
+      const found = this.notifications.find((n: Notification) => {
+        return n.id === this.device.device;
+      });
+      if (found || this.device.status === "disconnected") {
+        return "has-text-danger";
+      }
+
+      return "has-text-success";
     },
-    meterReadingTemperature() {
+    meterReadingHumidity(): number {
+      return 100 * (this.device.humidity || 35);
+    },
+    meterReadingTemperature(): number {
       return this.units === "F"
-        ? celsius2fahrenheit(this.device.temperature)
-        : parseFloat(this.device.temperature);
+        ? celsius2fahrenheit(this.device.temperature || 23)
+        : this.device.temperature || 23;
     },
-    unitsWithDegrees() {
-      return "" + this.units;
+    switchStatus(): string {
+      return this.device.status || "off";
     },
-    updated() {
-      return new Date(Date.parse(this.device.updatedat));
-    }
+    unitsWithDegrees(): string {
+      return "°" + this.units;
+    },
+
+    ...mapState("notifications", ["notifications"])
   },
 
   methods: {
-    editable() {
+    editable(): void {
       this.editing = true;
     },
 
-    save() {
+    save(): void {
       this.edit({
         ...this.device,
         nickname: this.nickname
@@ -186,7 +191,7 @@ const DeviceRow = Vue.extend({
       this.editing = false;
     },
 
-    saveDeviceType(devicetype: string) {
+    saveDeviceType(devicetype: string): void {
       this.edit({
         ...this.device,
         devicetype: devicetype
@@ -198,7 +203,22 @@ const DeviceRow = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("devices", ["edit"])
+    toggle() {
+      this.updating = true;
+      if (this.device.status === "off") {
+        this.on(this.device.device);
+      } else if (this.device.status === "on") {
+        this.off(this.device.device);
+      }
+    },
+
+    trash() {
+      if (confirm("OK to remove?")) {
+        this.remove(this.device);
+      }
+    },
+
+    ...mapActions("devices", ["edit", "remove", "on", "off"])
   }
 });
 

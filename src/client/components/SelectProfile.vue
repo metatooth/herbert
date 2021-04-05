@@ -22,7 +22,6 @@
         </div>
         <div class="field">
           <herbert-button
-            class="is-primary"
             :show="changed"
             label=""
             @on-click="select"
@@ -48,7 +47,7 @@ const SelectProfile = Vue.extend({
 
   data() {
     return {
-      selected: Number
+      selected: this.zone.profileid || 0
     };
   },
 
@@ -56,12 +55,8 @@ const SelectProfile = Vue.extend({
     HerbertButton
   },
 
-  mounted() {
-    this.selected = this.zone.profileid;
-  },
-
   computed: {
-    changed() {
+    changed(): boolean {
       if (this.zone.profileid === this.selected) {
         return false;
       }
@@ -73,8 +68,10 @@ const SelectProfile = Vue.extend({
   },
 
   methods: {
-    select(profile: number) {
-      this.$emit("select-profile", profile);
+    select() {
+      console.log("SELECT SELECT!");
+      console.log("SELECT", this.selected);
+      this.$emit("select-profile", this.selected);
     }
   }
 });

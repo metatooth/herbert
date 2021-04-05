@@ -1,5 +1,5 @@
 import { MutationTree } from "vuex";
-import { ProfilesState, Profile } from "./types";
+import { Profile, ProfilesState } from "./types";
 
 export const mutations: MutationTree<ProfilesState> = {
   ADD(state, payload: Profile) {
@@ -9,15 +9,17 @@ export const mutations: MutationTree<ProfilesState> = {
     state.error = false;
     state.profiles = payload;
     state.profiles.sort((a, b) => {
-      return a.profile > b.profile;
+      return a.profile.localeCompare(b.profile);
     });
   },
   EDIT(state, payload: Profile) {
     const found = state.profiles.find((el: Profile) => {
       return el.id === payload.id;
     });
-    const index = state.profiles.indexOf(found);
-    state.profiles.splice(index, 1, payload);
+    if (found) {
+      const index = state.profiles.indexOf(found);
+      state.profiles.splice(index, 1, payload);
+    }
   },
   ERROR(state) {
     state.error = true;
@@ -30,7 +32,9 @@ export const mutations: MutationTree<ProfilesState> = {
     const found = state.profiles.find((el: Profile) => {
       return el.id === payload.id;
     });
-    const index = state.profiles.indexOf(found);
-    state.profiles.splice(index, 1);
+    if (found) {
+      const index = state.profiles.indexOf(found);
+      state.profiles.splice(index, 1);
+    }
   }
 };

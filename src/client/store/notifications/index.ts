@@ -2,17 +2,17 @@ import { Module } from "vuex";
 import { getters } from "./getters";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
-import { Profile, ProfilesState } from "./types";
+import { Notification, NotificationsState } from "./types";
 import { RootState } from "../types";
 
-const state: ProfilesState = {
-  profiles: [] as Profile[],
+const state: NotificationsState = {
+  notifications: [] as Notification[],
   error: false
 };
 
 const namespaced = true;
 
-export const profiles: Module<ProfilesState, RootState> = {
+export const notifications: Module<NotificationsState, RootState> = {
   namespaced,
   state,
   getters,

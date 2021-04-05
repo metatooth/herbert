@@ -2,11 +2,11 @@ import { Module } from "vuex";
 import { getters } from "./getters";
 import { actions } from "./actions";
 import { mutations } from "./mutations";
-import { ZonesState } from "./types";
+import { Zone, ZonesState } from "./types";
 import { RootState } from "../types";
 
 const state: ZonesState = {
-  zones: [],
+  zones: [] as Zone[],
   error: false
 };
 

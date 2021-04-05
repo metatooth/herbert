@@ -48,7 +48,11 @@
           <td></td>
 
           <td>
-            <add-controls @on-add="add" @on-save="save" @on-cancel="cancel" />
+            <add-controls
+              @on-add="editable"
+              @on-save="save"
+              @on-cancel="cancel"
+            />
           </td>
         </tr>
       </tbody>
@@ -99,7 +103,7 @@ const Zones = Vue.extend({
 
     save(): void {
       if (this.nickname && this.profileid) {
-        this["zones/add"]({
+        this.add({
           nickname: this.nickname,
           profileid: this.profileid
         });

@@ -13,22 +13,26 @@ export const mutations: MutationTree<ZonesState> = {
     const found = state.zones.find((el: Zone) => {
       return el.id === zone.id;
     });
-    const index = state.zones.indexOf(found);
-    state.zones.splice(index, 1, zone);
+    if (found) {
+      const index = state.zones.indexOf(found);
+      state.zones.splice(index, 1, zone);
+    }
   },
   REMOVE(state, zone: Zone) {
     const found = state.zones.find((el: Zone) => {
       return el.id === zone.id;
     });
-    const index = state.zones.indexOf(found);
-    state.zones.splice(index, 1);
+    if (found) {
+      const index = state.zones.indexOf(found);
+      state.zones.splice(index, 1);
+    }
   },
   REMOVE_DEVICE(state, payload: { zone: Zone; device: string }) {
     console.log("any needed? remove zone device mutation", payload);
   },
-  SET(state, zones: Zone[]) {
+  SET(state, payload: Zone[]) {
     state.error = false;
-    state.zones = zones;
+    state.zones = payload;
   },
   ERROR(state) {
     state.error = true;

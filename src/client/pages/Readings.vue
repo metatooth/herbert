@@ -41,8 +41,8 @@
           v-bind:data="humidities"
           title="Relative Humidity"
           label="Percent (%)"
-          v-bind:suggestedMin="suggestedMin"
-          v-bind:suggestedMax="suggestedMax"
+          v-bind:suggestedMin="min"
+          v-bind:suggestedMax="max"
           v-bind:stepSize="1"
         />
       </div>
@@ -69,19 +69,21 @@ import Chart from "@/components/Chart.vue";
 import TemperatureChart from "@/components/TemperatureChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
-const Readings = Vue.extend({
-  props: {
-    name: { type: String, default: "" }
-  },
+interface MeterReading {
+  x: Date;
+  y: number;
+}
 
+const Readings = Vue.extend({
   data() {
     return {
       range: "hour",
-      temperatures: [] as { x: Date; y: number }[],
-      humidities: [] as { x: Date; y: number }[],
-      pressures: [] as { x: Date; y: number }[],
+      temperatures: [] as MeterReading[],
+      humidities: [] as MeterReading[],
+      pressures: [] as MeterReading[],
       units: "F",
-      minmax: [100, 0]
+      min: 100,
+      max: 0
     };
   },
 
@@ -100,43 +102,14 @@ const Readings = Vue.extend({
     }
   },
 
-  computed: {
-    suggestedMin() {
-      console.log("min max", this.minmax);
-      if (this.minmax[0] === 100) {
-        this.calcminmax();
-      }
-      return this.minmax[0] - 1;
-    },
-
-    suggestedMax() {
-      if (this.minmax[1] === 0) {
-        this.calcminmax();
-      }
-      return this.minmax[1] + 1;
-    }
-  },
-
   methods: {
-    calcminmax() {
-      this.humidities.forEach(d => {
-        if (d.y < this.minmax[0]) {
-          this.minmax[0] = d.y;
-        }
-
-        if (d.y > this.minmax[1]) {
-          this.minmax[1] = d.y;
-        }
-      });
-    },
-
     changeUnits(units: string) {
       this.units = units;
     },
 
     refresh() {
       const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+      const url = process.env.VUE_APP_API_URL;
 
       xhr.open(
         "GET",
@@ -148,7 +121,7 @@ const Readings = Vue.extend({
         if (!data.error) {
           this.temperatures = [];
           this.humidities = [];
-          const timeZone = "Etc/UTC";
+          const timeZone = "America/New_York";
           data.forEach(
             (d: {
               createdat: Date;
@@ -165,6 +138,15 @@ const Readings = Vue.extend({
                 x: ts,
                 y: 100 * d.humidity
               };
+
+              if (humidity.y < this.min) {
+                this.min = humidity.y;
+              }
+
+              if (humidity.y > this.max) {
+                this.max = humidity.y;
+              }
+
               const pressure = {
                 x: ts,
                 y: d.pressure / 1000

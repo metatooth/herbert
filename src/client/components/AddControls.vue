@@ -1,9 +1,14 @@
 <template>
   <div class="field is-grouped is-grouped-center">
-    <herbert-button label="Add" icon="plus" :show="!adding" @on-click="on" />
-    <herbert-button label="Save" icon="check" :show="adding" @on-click="save" />
+    <herbert-button color="info" icon="plus" :show="!adding" @on-click="on" />
     <herbert-button
-      label="Cancel"
+      color="success"
+      icon="check"
+      :show="adding"
+      @on-click="save"
+    />
+    <herbert-button
+      color="danger"
       icon="times"
       :show="adding"
       @on-click="cancel"

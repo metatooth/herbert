@@ -11,7 +11,7 @@ import { convertToLocalTime } from "date-fns-timezone";
 const Timestamp = Vue.extend({
   props: {
     timestamp: { default: new Date(), type: Date },
-    timezone: { default: "Etc/UTC", type: String }
+    timezone: { default: "America/New_York", type: String }
   },
 
   computed: {

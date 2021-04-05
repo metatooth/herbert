@@ -1,7 +1,7 @@
 import { Device } from "@/store/devices/types";
 import { Profile } from "@/store/profiles/types";
 
-export interface Zone {
+export class Zone {
   id: number;
   nickname: string;
   profileid?: number;
@@ -11,18 +11,15 @@ export interface Zone {
   updatedat: Date;
   deleted: boolean;
   deletedat?: Date;
-}
 
-export class ZoneState {
-  zone: Zone = {
-    id: 0,
-    nickname: "",
-    devices: [],
-    createdat: new Date(),
-    updatedat: new Date(),
-    deleted: false
-  };
-  error = false;
+  constructor() {
+    this.id = 0;
+    this.nickname = "";
+    this.devices = [];
+    this.createdat = new Date();
+    this.updatedat = new Date();
+    this.deleted = false;
+  }
 }
 
 export interface ZonesState {

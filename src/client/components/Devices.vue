@@ -4,13 +4,11 @@
     <table class="table">
       <thead>
         <tr>
-          <th>MAC</th>
           <th>Status</th>
-          <th>Type</th>
-          <th>Nickname</th>
-          <th>Updated</th>
-          <th>Manufacturer</th>
+          <th>Name</th>
           <th>History</th>
+          <th>MAC</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -28,7 +26,7 @@
 <script lang="ts">
 import Vue from "vue";
 import DeviceRow from "@/components/DeviceRow.vue";
-import { mapState, mapGetters } from "vuex";
+import { mapGetters } from "vuex";
 
 const Devices = Vue.extend({
   props: {
@@ -40,9 +38,7 @@ const Devices = Vue.extend({
   },
 
   computed: {
-    ...mapState("devices", ["devices"]),
-
-    ...mapGetters("devices", ["devicesCount"]),
+    ...mapGetters("devices", ["devices", "devicesCount"]),
 
     devicesName() {
       if (this.devicesCount === 1) {

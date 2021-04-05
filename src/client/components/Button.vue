@@ -1,8 +1,8 @@
 <template>
   <div class="control" v-if="show">
-    <button class="button" @click="$emit('on-click')">
+    <button :class="display" @click="$emit('on-click')">
       <font-awesome-icon :icon="icon" />
-      <span>{{ label }}</span>
+      <span v-if="label">{{ label }}</span>
     </button>
   </div>
 </template>
@@ -14,8 +14,16 @@ const Button = Vue.extend({
   props: {
     show: Boolean,
     callback: Function,
-    icon: String,
-    label: String
+    label: String,
+    icon: { type: String, default: "cannabis" },
+    size: { type: String, default: "small" },
+    color: { type: String, default: "primary" }
+  },
+
+  computed: {
+    display() {
+      return `button is-${this.size} is-${this.color}`;
+    }
   }
 });
 export default Button;

@@ -79,7 +79,7 @@ const Statuses = Vue.extend({
   methods: {
     refresh() {
       const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL || "http://localhost:5000";
+      const url = process.env.VUE_APP_API_URL;
 
       xhr.open(
         "GET",
@@ -91,11 +91,11 @@ const Statuses = Vue.extend({
         if (!data.error) {
           this.statuses = [];
           const timeZone = "Etc/UTC";
-          data.forEach((d: { createdat: Date; status: number }) => {
+          data.forEach((d: { createdat: Date; status: string }) => {
             const ts = convertToLocalTime(d.createdat, { timeZone });
             const status = {
               x: ts,
-              y: d.status as number
+              y: d.status === "on" ? 1 : 0
             };
 
             this.statuses.push(status);

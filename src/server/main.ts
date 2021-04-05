@@ -21,6 +21,7 @@ import { BlowerTimer } from "../shared/blower-timer";
 import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
+import { zonedTimeToUtc } from "date-fns-tz";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");
@@ -61,6 +62,8 @@ function sendError(ws: WebSocket, message: string) {
 
   ws.send(JSON.stringify(messageObject));
 }
+
+process.env.TZ = "ETC/Utc";
 
 const server = http.createServer(app);
 server.listen(port);
@@ -130,10 +133,10 @@ async function run() {
   const zones = await readZones();
   zones.forEach(async zone => {
     const now = new Date();
-    const hour = now.getHours();
-    const min = now.getMinutes();
-    const sec = now.getSeconds();
-    console.log("zone is", zone);
+    const hour = now.getUTCHours();
+    const min = now.getUTCMinutes();
+    const sec = now.getUTCSeconds();
+
     if (zone.profile) {
       console.log("command for zone", zone.nickname);
       let temperature = 0;
@@ -153,15 +156,42 @@ async function run() {
       console.log("profile", zone.profile);
       console.log("state", hour, temperature, humidity);
 
-      const start = zone.profile.lampstart.split(":");
+      const now = new Date();
+      console.log("now", now);
+
+      console.log(now.getMonth());
+
+      console.log(now.getDate());
+
+      const monthnbr = now.getMonth() + 1;
+
+      const month =
+        monthnbr < 10 ? `0${monthnbr}` : monthnbr.toString();
+      const date =
+        now.getDate() < 10 ? `0${now.getDate()}` : now.getDate().toString();
+
+      console.log("month", month, "date", date);
+
+      const startat = `${now.getFullYear()}-${month}-${date} ${
+        zone.profile.lampstart
+      }`;
+
+      console.log("startat", startat);
+
+      const utc = zonedTimeToUtc(startat, zone.profile.timezone);
+
+      console.log("UTC", utc);
+
       const duration = zone.profile.lampduration["hours"];
 
-      const lamp = new LampTimer(parseInt(start[0]), duration);
+      const lamp = new LampTimer(utc.getHours(), duration);
 
       const blower = new BlowerTimer(60, 180); // WARNING!!
 
       let target;
       let delta;
+
+      console.log("check hour", hour);
 
       if (lamp.isOn(hour)) {
         console.log("lamps", lamp, "ON");
@@ -186,17 +216,21 @@ async function run() {
       console.log(directives);
 
       console.log("blower is on", min, sec, blower.isOn(min * 60 + sec));
+      console.log("blower is cooling", directives.temperature === "cool");
 
       const systems = new Map([
         ["lamp", lamp.isOn(hour)],
-        ["blower", blower.isOn(min * 60 + sec)],
+        [
+          "blower",
+          blower.isOn(min * 60 + sec) || directives.temperature === "cool"
+        ],
         ["heater", directives.temperature === "heat"],
         ["dehumidifer", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],
-        ["fan", true]
+        ["fan", 1 === 1]
       ]);
 
-      console.log(systems);
+      console.log("SYSTEMS!", systems);
 
       systems.forEach((value, key) => {
         zone.devices.map(device => {

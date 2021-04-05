@@ -1,6 +1,6 @@
 <template>
   <tr>
-    <td class="has-background-primary-light">
+    <td>
       <div v-if="!editing">{{ profile.profile }}</div>
       <div v-else>
         <input
@@ -11,7 +11,7 @@
         />
       </div>
     </td>
-    <td class="has-background-light">
+    <td>
       <div class="is-family-code" v-if="!editing">
         {{ lamponHour }}:{{ lamponMinute }}
       </div>
@@ -19,7 +19,7 @@
         <input class="input" type="time" v-model="lampstart" />
       </div>
     </td>
-    <td class="has-background-light">
+    <td>
       <div class="is-family-code" v-if="!editing">
         {{ durationWithUnits }}
       </div>
@@ -34,7 +34,7 @@
         />
       </div>
     </td>
-    <td class="has-background-warning-light" v-if="!editing">
+    <td v-if="!editing">
       <div class="field is-grouped">
         <target
           icon="thermometer-half"
@@ -42,31 +42,28 @@
           :precision="1"
           :units="unitsWithDegree"
           size="small"
-          text="black"
-          background="warning"
+          color="warning"
         />
         <target
           icon="tint"
-          :value="parseFloat(profile.lamponhumidity)"
+          :value="dayHumidity"
           :precision="0"
           units="%"
           size="small"
-          text="black"
-          background="warning"
+          color="warning"
         />
         <target
           icon="cloud"
-          :value="lamponPressure"
+          :value="dayPressure"
           :precision="1"
           units="hPa"
           size="small"
-          text="black"
-          background="warning"
+          color="warning"
         />
       </div>
     </td>
     <td v-if="editing">
-      <div class="field">
+      <div class="field is-grouped">
         <div class="control has-icons-left">
           <input
             class="input"
@@ -74,7 +71,8 @@
             v-model="lampontemperature"
             min="lampMin"
             max="lampMax"
-            size="2"
+            size="4"
+            step="0.1"
           />
           <span class="icon is-left">
             <font-awesome-icon icon="thermometer-half" class="is-left" />
@@ -95,7 +93,7 @@
         </div>
       </div>
     </td>
-    <td class="has-background-info-light" v-if="!editing">
+    <td v-if="!editing">
       <div class="field is-grouped">
         <target
           icon="thermometer-half"
@@ -103,31 +101,28 @@
           :precision="1"
           :units="unitsWithDegree"
           size="small"
-          text="white"
-          background="info"
+          color="info"
         />
         <target
           icon="tint"
-          :value="parseFloat(profile.lampoffhumidity)"
+          :value="nightHumidity"
           :precision="0"
           units="%"
           size="small"
-          text="white"
-          background="info"
+          color="info"
         />
         <target
           icon="cloud"
-          :value="lampoffPressure"
+          :value="nightPressure"
           :precision="1"
           units="hPa"
           size="small"
-          text="white"
-          background="info"
+          color="info"
         />
       </div>
     </td>
     <td v-if="editing">
-      <div class="field">
+      <div class="field is-grouped">
         <div class="control has-icons-left">
           <input
             class="input"
@@ -135,7 +130,8 @@
             v-model="lampofftemperature"
             min="tempMin"
             max="tempMax"
-            size="2"
+            step="0.1"
+            size="4"
           />
           <span class="icon is-left">
             <font-awesome-icon icon="thermometer-half" class="is-left" />
@@ -182,7 +178,6 @@ const ProfileRow = Vue.extend({
   },
 
   data() {
-    console.log("profile", this.profile);
     const start = this.profile.lampstart.split(":");
     let hourInt = parseInt(start[0]);
     if (hourInt < 0) {
@@ -195,8 +190,8 @@ const ProfileRow = Vue.extend({
       hourString = hourInt.toString();
     }
 
-    let lampon = parseFloat(this.profile.lampontemperature);
-    let lampoff = parseFloat(this.profile.lampofftemperature);
+    let lampon = this.profile.lampontemperature;
+    let lampoff = this.profile.lampofftemperature;
 
     if (this.units === "F") {
       lampon = celsius2fahrenheit(lampon);
@@ -209,8 +204,8 @@ const ProfileRow = Vue.extend({
       lampduration: this.profile.lampduration["hours"],
       lampontemperature: lampon,
       lampofftemperature: lampoff,
-      lamponhumidity: parseFloat(this.profile.lamponhumidity),
-      lampoffhumidity: parseFloat(this.profile.lampoffhumidity),
+      lamponhumidity: this.profile.lamponhumidity,
+      lampoffhumidity: this.profile.lampoffhumidity,
       editing: false
     };
   },
@@ -227,40 +222,6 @@ const ProfileRow = Vue.extend({
 
     unitsWithDegree(): string {
       return "°" + this.units;
-    },
-
-    dayTemperature(): number {
-      if (this.units === "F") {
-        return celsius2fahrenheit(this.profile.lampontemperature);
-      }
-
-      return parseFloat(this.profile.lampontemperature);
-    },
-
-    nightTemperature(): number {
-      if (this.units === "F") {
-        return celsius2fahrenheit(this.profile.lampofftemperature);
-      }
-
-      return parseFloat(this.profile.lampofftemperature);
-    },
-
-    lampMin(): number {
-      const min = 15;
-      if (this.units === "F") {
-        return celsius2fahrenheit(min);
-      }
-
-      return min;
-    },
-
-    lampMax(): number {
-      const max = 30;
-      if (this.units === "F") {
-        return celsius2fahrenheit(max);
-      }
-
-      return max;
     },
 
     lamponMinute(): string {
@@ -281,28 +242,66 @@ const ProfileRow = Vue.extend({
       }
     },
 
-    lamponPressure(): number {
+    dayTemperature(): number {
+      if (this.units === "F") {
+        return celsius2fahrenheit(this.profile.lampontemperature);
+      }
+
+      return this.profile.lampontemperature;
+    },
+
+    nightTemperature(): number {
+      if (this.units === "F") {
+        return celsius2fahrenheit(this.profile.lampofftemperature);
+      }
+
+      return this.profile.lampofftemperature;
+    },
+
+    dayHumidity(): number {
+      return this.profile.lamponhumidity;
+    },
+
+    nightHumidity(): number {
+      return this.profile.lampoffhumidity;
+    },
+
+    lampMin(): number {
+      const min = 15;
+      if (this.units === "F") {
+        return celsius2fahrenheit(min);
+      }
+
+      return min;
+    },
+
+    lampMax(): number {
+      const max = 30;
+      if (this.units === "F") {
+        return celsius2fahrenheit(max);
+      }
+
+      return max;
+    },
+
+    dayPressure(): number {
       return (
         vaporPressureDeficit(
-          parseFloat(this.profile.lampontemperature),
+          this.profile.lampontemperature,
           0.6,
-          parseFloat(this.profile.lamponhumidity) / 100
+          this.profile.lamponhumidity / 100
         ) / 1000
       );
     },
 
-    lampoffPressure(): number {
+    nightPressure(): number {
       return (
         vaporPressureDeficit(
-          parseFloat(this.profile.lampofftemperature),
+          this.profile.lampofftemperature,
           -0.6,
-          parseFloat(this.profile.lampoffhumidity) / 100
+          this.profile.lampoffhumidity / 100
         ) / 1000
       );
-    },
-
-    profileUpdatedAt(): Date {
-      return new Date(Date.parse(this.profile.updatedAt));
     }
   },
 
@@ -353,9 +352,9 @@ const ProfileRow = Vue.extend({
         lampstart: `${hourString}:${start[1]}`,
         lampduration: `${this.lampduration} hours`,
         lampontemperature: ontemp,
-        lamponhumidity: parseFloat(this.lamponhumidity),
+        lamponhumidity: this.lamponhumidity,
         lampofftemperature: offtemp,
-        lampoffhumidity: parseFloat(this.lampoffhumidity)
+        lampoffhumidity: this.lampoffhumidity
       };
 
       this.edit(profile);

@@ -8,7 +8,15 @@ export const actions: ActionTree<ProfilesState, RootState> = {
     const json = JSON.stringify(payload);
     HTTP.post("/profiles", json).then(
       response => {
-        commit("ADD", response.data);
+        const profile = Object.assign(new Profile(), response.data);
+        profile.lampontemperature = parseFloat(response.data.lampontemperature);
+        profile.lamponhumidity = parseFloat(response.data.lamponhumidity);
+        profile.lampofftemperature = parseFloat(
+          response.data.lampofftemperature
+        );
+        profile.lampoffhumidity = parseFloat(response.data.lampoffhumidity);
+
+        commit("ADD", profile);
       },
       error => {
         console.log(error);
@@ -20,7 +28,14 @@ export const actions: ActionTree<ProfilesState, RootState> = {
     const json = JSON.stringify(payload);
     HTTP.put(`/profiles/${payload.id}`, json).then(
       response => {
-        commit("EDIT", response.data);
+        const profile = Object.assign(new Profile(), response.data);
+        profile.lampontemperature = parseFloat(response.data.lampontemperature);
+        profile.lamponhumidity = parseFloat(response.data.lamponhumidity);
+        profile.lampofftemperature = parseFloat(
+          response.data.lampofftemperature
+        );
+        profile.lampoffhumidity = parseFloat(response.data.lampoffhumidity);
+        commit("EDIT", profile);
       },
       error => {
         console.log(error);
@@ -31,7 +46,18 @@ export const actions: ActionTree<ProfilesState, RootState> = {
   fetchData({ commit }) {
     HTTP.get("/profiles").then(
       response => {
-        const payload: Profile[] = response && response.data;
+        const payload: Profile[] = [];
+        response.data.forEach((data: object) => {
+          const profile = Object.assign(new Profile(), data);
+          const clone = JSON.parse(JSON.stringify(data));
+
+          profile.lampontemperature = parseFloat(clone.lampontemperature);
+          profile.lamponhumidity = parseFloat(clone.lamponhumidity);
+          profile.lampofftemperature = parseFloat(clone.lampofftemperature);
+          profile.lampoffhumidity = parseFloat(clone.lampoffhumidity);
+
+          payload.push(profile);
+        });
         commit("SET", payload);
       },
       error => {
@@ -41,7 +67,7 @@ export const actions: ActionTree<ProfilesState, RootState> = {
     );
   },
   remove({ commit }, payload: Profile) {
-    HTTP.delete(`/profiles/${profile.id}`);
+    HTTP.delete(`/profiles/${payload.id}`);
     commit("REMOVE", payload);
   }
 };

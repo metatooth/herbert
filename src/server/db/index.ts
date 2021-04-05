@@ -1,7 +1,9 @@
 import { Pool, Result } from "pg";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
+  max: 30,
+  ssl: { rejectUnauthorized: false }
 });
 
 export async function query(text, params): Promise<Result> {
@@ -23,7 +25,10 @@ export async function readProfile(id) {
 }
 
 export async function readDevice(id) {
-  const res = await query("SELECT * FROM devices WHERE device = $1", [id]);
+  const res = await query(
+    "SELECT * FROM devices WHERE device = $1 ORDER BY devicetype, nickname, device",
+    [id]
+  );
 
   const device = await res.rows[0];
 
@@ -108,9 +113,10 @@ export async function readZoneDevices(device: string) {
 
   const {
     rows
-  } = await query("SELECT zoneid as id FROM zone_devices WHERE device = $1", [
-    device
-  ]);
+  } = await query(
+    "SELECT d.id FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.device = $1 ORDER BY d.devicetype",
+    [device]
+  );
 
   rows.forEach(row => {
     const z = readZone(row.id);
@@ -182,6 +188,7 @@ export async function workerStatus(macaddr, inet) {
 export async function createReading(meter, temperature, humidity, pressure) {
   query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
     if (res.rowCount !== 0) {
+      query("UPDATE devices SET deleted = false WHERE device = $1", [meter]);
       query(
         "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
         [meter, temperature, humidity, pressure]
@@ -193,6 +200,7 @@ export async function createReading(meter, temperature, humidity, pressure) {
 export async function createStatus(device, status) {
   query("SELECT * FROM devices WHERE device = $1", [device]).then(res => {
     if (res.rowCount !== 0) {
+      query("UPDATE devices SET deleted = false WHERE device = $1", [device]);
       query("INSERT INTO statuses (device, status) VALUES ($1, $2)", [
         device,
         status
