@@ -156,6 +156,7 @@ export async function reading(device: string) {
   );
   return rows[0];
 }
+
 export async function registerDevice(macaddr, manufacturer) {
   query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
@@ -163,6 +164,17 @@ export async function registerDevice(macaddr, manufacturer) {
         macaddr,
         manufacturer
       ]);
+    }
+  });
+}
+
+export async function registerMeter(macaddr, manufacturer) {
+  query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
+    if (res.rowCount === 0) {
+      query(
+        "INSERT INTO devices (device, devicetype, manufacturer) VALUES ($1, 'meter', $2)",
+        [macaddr, manufacturer]
+      );
     }
   });
 }
@@ -188,7 +200,10 @@ export async function workerStatus(macaddr, inet) {
 export async function createReading(meter, temperature, humidity, pressure) {
   query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
     if (res.rowCount !== 0) {
-      query("UPDATE devices SET deleted = false WHERE device = $1", [meter]);
+      query(
+        "UPDATE devices SET devicetype = 'meter', deleted = false WHERE device = $1",
+        [meter]
+      );
       query(
         "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
         [meter, temperature, humidity, pressure]
