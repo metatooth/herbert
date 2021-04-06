@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ devicesCount }} {{ devicesName }}</h2>
+    <h2 class="title">{{ switchesCount }} {{ devicesName }}</h2>
     <table class="table">
       <thead>
         <tr>
@@ -13,7 +13,7 @@
       </thead>
       <tbody>
         <device-row
-          v-for="device in devices"
+          v-for="device in switches"
           v-bind:key="device.device"
           v-bind:device="device"
           v-bind:units="units"
@@ -38,10 +38,10 @@ const Devices = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("devices", ["devices", "devicesCount"]),
+    ...mapGetters("devices", ["switches", "switchesCount"]),
 
     devicesName() {
-      if (this.devicesCount === 1) {
+      if (this.switchesCount === 1) {
         return "Device";
       } else {
         return "Devices";

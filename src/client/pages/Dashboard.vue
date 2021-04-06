@@ -6,6 +6,9 @@
           <li :class="is('overview')" @click="pick('overview')">
             <a>Overview</a>
           </li>
+          <li :class="is('meters')" @click="pick('meters')">
+            <a>Meters</a>
+          </li>
           <li :class="is('devices')" @click="pick('devices')">
             <a>Devices</a>
           </li>
@@ -26,6 +29,7 @@
 
       <overview v-if="is('overview')" @child-picked="pick" />
       <devices v-if="is('devices')" v-bind:units="units" />
+      <meters v-if="is('meters')" v-bind:units="units" />
       <profiles v-if="is('profiles')" v-bind:units="units" />
       <workers v-if="is('workers')" />
       <zones v-if="is('zones')" v-bind:units="units" />
@@ -55,6 +59,7 @@ import Vue from "vue";
 import Overview from "@/components/Overview.vue";
 import UnitsSelector from "@/components/UnitsSelector.vue";
 import Devices from "@/components/Devices.vue";
+import Meters from "@/components/Meters.vue";
 import Profiles from "@/components/Profiles.vue";
 import Workers from "@/components/Workers.vue";
 import Zones from "@/components/Zones.vue";
@@ -73,6 +78,7 @@ const Dashboard = Vue.extend({
   components: {
     Devices,
     Overview,
+    Meters,
     Profiles,
     UnitsSelector,
     Timestamp,
