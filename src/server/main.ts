@@ -8,6 +8,7 @@ import {
   readZones,
   reading,
   registerDevice,
+  registerMeter,
   createReading,
   createStatus,
   workerStatus
