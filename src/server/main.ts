@@ -94,11 +94,7 @@ wss.on("connection", function(ws: WebSocket) {
     if (data.type === "STATUS") {
       if (data.payload.device && data.payload.type === "meter") {
         console.log("Status message from meter", data.payload);
-        registerDevice(
-          data.payload.device,
-          data.payload.manufacturer,
-          data.payload.type
-        );
+        registerDevice(data.payload.device, data.payload.manufacturer);
         createReading(
           data.payload.device,
           data.payload.temperature,
@@ -107,11 +103,7 @@ wss.on("connection", function(ws: WebSocket) {
         );
       } else if (data.payload.device) {
         console.log("Status message from switch", data.payload);
-        registerDevice(
-          data.payload.device,
-          data.payload.manufacturer,
-          data.payload.type
-        );
+        registerDevice(data.payload.device, data.payload.manufacturer);
         createStatus(data.payload.device, data.payload.status);
       }
 

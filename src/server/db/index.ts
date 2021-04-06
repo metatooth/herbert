@@ -156,13 +156,13 @@ export async function reading(device: string) {
   );
   return rows[0];
 }
-export async function registerDevice(macaddr, manufacturer, type) {
+export async function registerDevice(macaddr, manufacturer) {
   query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
-      query(
-        "INSERT INTO devices (device, manufacturer, deviceType) VALUES ($1, $2, $3)",
-        [macaddr, manufacturer, type]
-      );
+      query("INSERT INTO devices (device, manufacturer) VALUES ($1, $2)", [
+        macaddr,
+        manufacturer
+      ]);
     }
   });
 }

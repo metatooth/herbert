@@ -42,6 +42,7 @@ const SelectDeviceType = Vue.extend({
   watch: {
     selected(val: string) {
       console.log("selected", val, this.selected);
+      this.$emit("select-devicetype", val);
     }
   },
 
