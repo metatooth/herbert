@@ -165,8 +165,7 @@ async function run() {
 
       const monthnbr = now.getMonth() + 1;
 
-      const month =
-        monthnbr < 10 ? `0${monthnbr}` : monthnbr.toString();
+      const month = monthnbr < 10 ? `0${monthnbr}` : monthnbr.toString();
       const date =
         now.getDate() < 10 ? `0${now.getDate()}` : now.getDate().toString();
 

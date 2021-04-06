@@ -100,7 +100,7 @@ const MeterRow = Vue.extend({
   computed: {
     meterClass(): string {
       const found = this.notifications.find((n: Notification) => {
-        return n.id === this.meter.meter;
+        return n.id === this.meter.device;
       });
       if (found || this.meter.status === "disconnected") {
         return "has-text-danger";
@@ -117,9 +117,6 @@ const MeterRow = Vue.extend({
         return "times";
       }
       return null;
-    },
-    isMeter(): boolean {
-      return this.meter.metertype === "meter";
     },
     meterReadingHumidity(): number {
       return 100 * (this.meter.humidity || 35);
@@ -162,15 +159,6 @@ const MeterRow = Vue.extend({
     cancel() {
       this.nickname = this.meter.nickname;
       this.editing = false;
-    },
-
-    toggle() {
-      this.updating = true;
-      if (this.meter.status === "off") {
-        this.on(this.meter.meter);
-      } else if (this.meter.status === "on") {
-        this.off(this.meter.meter);
-      }
     },
 
     trash() {
