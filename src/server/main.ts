@@ -104,7 +104,9 @@ wss.on("connection", function(ws: WebSocket) {
       } else if (data.payload.device) {
         console.log("Status message from switch", data.payload);
         registerDevice(data.payload.device, data.payload.manufacturer);
+        console.log("Registered!");
         createStatus(data.payload.device, data.payload.status);
+        console.log("Status saved!");
       }
 
       if (data.payload.worker) {
