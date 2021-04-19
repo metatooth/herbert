@@ -1,21 +1,22 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ switchesCount }} {{ devicesName }}</h2>
+    <h2 class="title">{{ metersCount }} {{ metersName }}</h2>
     <table class="table">
       <thead>
         <tr>
           <th>Status</th>
           <th>Name</th>
+          <th>Last Update</th>
           <th>History</th>
           <th>MAC</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
-        <device-row
-          v-for="device in switches"
-          v-bind:key="device.device"
-          v-bind:device="device"
+        <meter-row
+          v-for="meter in meters"
+          v-bind:key="meter.meter"
+          v-bind:meter="meter"
           v-bind:units="units"
         />
       </tbody>
@@ -25,30 +26,30 @@
 
 <script lang="ts">
 import Vue from "vue";
-import DeviceRow from "@/components/DeviceRow.vue";
+import MeterRow from "@/components/MeterRow.vue";
 import { mapGetters } from "vuex";
 
-const Devices = Vue.extend({
+const Meters = Vue.extend({
   props: {
     units: String
   },
 
   components: {
-    DeviceRow
+    MeterRow
   },
 
   computed: {
-    ...mapGetters("devices", ["switches", "switchesCount"]),
+    ...mapGetters("devices", ["meters", "metersCount"]),
 
-    devicesName() {
-      if (this.switchesCount === 1) {
-        return "Device";
+    metersName() {
+      if (this.metersCount === 1) {
+        return "Meter";
       } else {
-        return "Devices";
+        return "Meters";
       }
     }
   }
 });
 
-export default Devices;
+export default Meters;
 </script>

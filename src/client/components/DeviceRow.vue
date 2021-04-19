@@ -24,7 +24,10 @@
         </div>
 
         <div class="control">
-          <select-device-type :devicetype="device.devicetype" />
+          <select-device-type
+            :devicetype="device.devicetype"
+            @select-devicetype="saveDeviceType"
+          />
         </div>
       </div>
     </td>

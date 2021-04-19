@@ -4,23 +4,29 @@
       <div class="tile is-ancestor has-text-centered">
         <div class="tile is-parent">
           <article class="tile is-child box">
-            <p class="title">{{ devicesCount }}</p>
+            <p class="title">{{ metersCount }}</p>
+            <p class="subtitle"><a @click="picked('meters')">Meters</a></p>
+          </article>
+        </div>
+        <div class="tile is-parent">
+          <article class="tile is-child box">
+            <p class="title">{{ switchesCount }}</p>
             <p class="subtitle"><a @click="picked('devices')">Devices</a></p>
           </article>
         </div>
-        <div class="tile is-parent" @click="picked('profiles')">
+        <div class="tile is-parent">
           <article class="tile is-child box">
             <p class="title">{{ profilesCount }}</p>
             <p class="subtitle"><a @click="picked('profiles')">Profiles</a></p>
           </article>
         </div>
-        <div class="tile is-parent" @click="picked('zones')">
+        <div class="tile is-parent">
           <article class="tile is-child box">
             <p class="title">{{ zonesCount }}</p>
             <p class="subtitle"><a @click="picked('zones')">Zones</a></p>
           </article>
         </div>
-        <div class="tile is-parent" @click="picked('workers')">
+        <div class="tile is-parent">
           <article class="tile is-child box">
             <p class="title">{{ workersCount }}</p>
             <p class="subtitle"><a @click="picked('workers')">Herberts</a></p>
@@ -60,7 +66,7 @@ const Overview = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("devices", ["devices", "devicesCount"]),
+    ...mapGetters("devices", ["devices", "metersCount", "switchesCount"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
     ...mapGetters("profiles", ["profilesCount"]),
     ...mapGetters("workers", ["workersCount"]),
