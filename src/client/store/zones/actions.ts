@@ -2,6 +2,7 @@ import { ActionTree } from "vuex";
 import HTTP from "@/api/http";
 import { ZonesState, Zone } from "./types";
 import { Device } from "../devices/types";
+import { Meter } from "../meters/types";
 import { RootState } from "../types";
 
 export const actions: ActionTree<ZonesState, RootState> = {
@@ -62,11 +63,19 @@ export const actions: ActionTree<ZonesState, RootState> = {
             );
           }
           const devices: Device[] = [];
+          const meters: Meter[] = [];
           clone.devices.forEach((d: object) => {
-            devices.push(new Device(JSON.stringify(d)));
+            const device = new Device(JSON.stringify(d));
+            if (device.devicetype === "meter") {
+              const meter = new Meter(JSON.stringify(d));
+              meters.push(meter);
+            } else {
+              devices.push(device);
+            }
           });
-
           zone.devices = devices;
+          zone.meters = meters;
+
           payload.push(zone);
         });
         commit("SET", payload);

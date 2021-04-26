@@ -21,6 +21,7 @@ import {
   faPencilAlt,
   faPlus,
   faPlusCircle,
+  faSnowflake,
   faSun,
   faSync,
   faTachometerAlt,
@@ -48,6 +49,7 @@ library.add(faMoon);
 library.add(faPencilAlt);
 library.add(faPlus);
 library.add(faPlusCircle);
+library.add(faSnowflake);
 library.add(faSun);
 library.add(faSync);
 library.add(faTachometerAlt);

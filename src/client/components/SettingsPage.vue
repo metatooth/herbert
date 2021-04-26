@@ -116,7 +116,8 @@ const SettingsPage = Vue.extend({
       units: this.settings.units,
       refresh: this.settings.refresh / 1000,
       timeout: this.settings.timeout / 1000,
-      name: ""
+      name: "",
+      filedata: ""
     };
   },
 
@@ -126,10 +127,11 @@ const SettingsPage = Vue.extend({
   },
 
   computed: {
-    changed() {
+    changed(): boolean {
       if (
         this.settings.title !== this.title ||
-        this.settings.logo !== this.logo ||
+        this.name !== "" ||
+        this.filedata !== "" ||
         this.settings.locale !== this.locale ||
         this.settings.timezone !== this.timezone ||
         this.settings.units !== this.units ||
@@ -141,12 +143,12 @@ const SettingsPage = Vue.extend({
       return false;
     },
 
-    filename() {
+    filename(): string {
       return this.name ? this.name : "None selected.";
     },
 
-    url() {
-      return process.env.VUE_APP_API_URL;
+    url(): string {
+      return process.env.VUE_APP_API_URL || "http://localhost:5000";
     }
   },
 
@@ -162,24 +164,38 @@ const SettingsPage = Vue.extend({
     },
 
     pick() {
-      this.$refs.file.click();
+      const element = this.$refs.file as HTMLInputElement;
+      element.click();
     },
 
-    picked(event) {
-      const files = event.target.files;
-      this.name = files[0].name;
-      const fileReader = new FileReader();
-      fileReader.addEventListener("load", () => {
-        this.logo = fileReader.result;
-      });
-      fileReader.readAsDataURL(files[0]);
+    picked(event: Event) {
+      const element = event.currentTarget as HTMLInputElement;
+      const files: FileList | null = element.files;
+
+      if (files) {
+        this.name = files[0].name;
+
+        const fileReader = new FileReader();
+        fileReader.addEventListener("load", () => {
+          console.log(typeof fileReader.result);
+
+          this.filedata = (fileReader.result as string) || "";
+        });
+
+        fileReader.readAsDataURL(files[0]);
+      }
     },
 
     save() {
+      let logo = new Uint8Array();
+      if (this.filedata) {
+        logo = Buffer.from(this.filedata);
+      }
+
       const data: Settings = {
         id: this.settings.id,
         title: this.title,
-        logo: this.logo,
+        logo: logo,
         locale: this.locale,
         timezone: this.timezone,
         units: this.units,

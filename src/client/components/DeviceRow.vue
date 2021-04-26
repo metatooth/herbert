@@ -45,7 +45,7 @@
       </div>
     </td>
     <td>
-      <timestamp v-bind:timestamp="new Date(Date.parse(device.timestamp))" />
+      <timestamp v-bind:timestamp="device.timestamp" />
     </td>
     <td>
       <router-link
@@ -75,7 +75,6 @@ import Vue from "vue";
 import { mapState, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
-import { celsius2fahrenheit } from "../../shared/utils";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Timestamp from "@/components/Timestamp.vue";
 
