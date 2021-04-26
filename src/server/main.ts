@@ -217,6 +217,7 @@ async function run() {
           blower.isOn(min * 60 + sec) || directives.temperature === "cool"
         ],
         ["heater", directives.temperature === "heat"],
+        ["cooler", directives.temperature === "cool"],
         ["dehumidifer", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],
         ["fan", 1 === 1]

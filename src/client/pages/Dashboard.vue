@@ -109,6 +109,7 @@ const Dashboard = Vue.extend({
 
     refresh() {
       this["devices/fetchData"]();
+      this["meters/fetchData"]();
       this["profiles/fetchData"]();
       this["workers/fetchData"]();
       this["zones/fetchData"]();
@@ -125,6 +126,7 @@ const Dashboard = Vue.extend({
 
     ...mapActions([
       "devices/fetchData",
+      "meters/fetchData",
       "profiles/fetchData",
       "workers/fetchData",
       "zones/fetchData",

@@ -9,7 +9,7 @@ export const actions: ActionTree<DevicesState, RootState> = {
     HTTP.put(`/devices/${payload.device}`, json).then(
       response => {
         console.log("EDIT", response.data);
-        commit("EDIT", Object.assign(new Device(), response.data));
+        commit("EDIT", Object.assign(new Device(response.data)));
       },
       error => {
         console.log(error);
@@ -22,7 +22,10 @@ export const actions: ActionTree<DevicesState, RootState> = {
       response => {
         const payload: Device[] = [];
         response.data.forEach((json: object) => {
-          payload.push(Object.assign(new Device(), json));
+          const obj = new Device(JSON.stringify(json));
+          if (obj.devicetype !== "meter") {
+            payload.push(obj);
+          }
         });
         commit("SET", payload);
       },
@@ -34,12 +37,12 @@ export const actions: ActionTree<DevicesState, RootState> = {
   },
   off({ commit }, payload: string) {
     HTTP.put(`/devices/${payload}/off`).then(response => {
-      commit("OFF", Object.assign(new Device(), response.data));
+      commit("OFF", Object.assign(new Device(response.data)));
     });
   },
   on({ commit }, payload: string) {
     HTTP.put(`/devices/${payload}/on`).then(response => {
-      commit("ON", Object.assign(new Device(), response.data));
+      commit("ON", Object.assign(new Device(response.data)));
     });
   },
   remove({ commit }, payload: Device) {

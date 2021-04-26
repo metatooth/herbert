@@ -14,7 +14,7 @@
         <router-link
           :to="{
             name: 'readings',
-            params: { name: device.nickname, device: device.device }
+            params: { name: meter.nickname, device: meter.device }
           }"
         >
           &gt;&gt;&gt;
@@ -22,7 +22,7 @@
       </span>
       <span class="tag is-medium has-text-light has-background-dark">
         {{ linkName }}
-        <button class="delete" v-on:click="remove(device.device)" />
+        <button class="delete" v-on:click="remove(meter.device)" />
       </span>
     </div>
   </div>
@@ -31,41 +31,41 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapState } from "vuex";
-import { Device } from "@/store/devices/types";
+import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const MeterWidget = Vue.extend({
   props: {
-    device: Device,
+    meter: Meter,
     units: String
   },
 
   computed: {
     temperature(): number {
       if (this.units === "C") {
-        return this.device.temperature || 23;
+        return this.meter.temperature;
       } else if (this.units === "F") {
-        return celsius2fahrenheit(this.device.temperature || 23);
+        return celsius2fahrenheit(this.meter.temperature);
       } else {
-        return celsius2kelvin(this.device.temperature || 23);
+        return celsius2kelvin(this.meter.temperature);
       }
     },
 
     humidity(): number {
-      return 100 * (this.device.humidity || 35);
+      return 100 * this.meter.humidity;
     },
 
     linkName(): string {
-      return this.device.nickname || this.device.device;
+      return this.meter.nickname || this.meter.device;
     },
 
     meterClass(): string {
       const found = this.notifications.find((n: Notification) => {
-        return n.id === this.device.device;
+        return n.id === this.meter.device;
       });
 
-      if (found || this.device.status === "disconnected") {
+      if (found) {
         return "has-text-danger";
       } else {
         return "has-text-success";

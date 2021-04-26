@@ -19,9 +19,11 @@ export const actions: ActionTree<SettingsState, RootState> = {
   fetchData({ commit }) {
     HTTP.get("/settings").then(
       response => {
-        let logo = "data:image/png;base64,";
-        logo += btoa(String.fromCharCode(...response.data.logo.data));
-        response.data.logo = logo;
+        if (response.data.log) {
+          let logo = "data:image/png;base64,";
+          logo += btoa(String.fromCharCode(...response.data.logo.data));
+          response.data.logo = logo;
+        }
         commit("SET", Object.assign(new Settings(), response.data));
       },
       error => {

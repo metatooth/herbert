@@ -15,7 +15,7 @@
       <tbody>
         <meter-row
           v-for="meter in meters"
-          v-bind:key="meter.meter"
+          v-bind:key="meter.device"
           v-bind:meter="meter"
           v-bind:units="units"
         />
@@ -39,7 +39,7 @@ const Meters = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("devices", ["meters", "metersCount"]),
+    ...mapGetters("meters", ["meters", "metersCount"]),
 
     metersName() {
       if (this.metersCount === 1) {

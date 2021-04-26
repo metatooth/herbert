@@ -5,6 +5,7 @@ import { zones } from "./zones";
 import { notifications } from "./notifications";
 import { profiles } from "./profiles";
 import { devices } from "./devices";
+import { meters } from "./meters";
 import { workers } from "./workers";
 import { settings } from "./settings";
 
@@ -20,6 +21,7 @@ const store: StoreOptions<RootState> = {
     notifications,
     profiles,
     devices,
+    meters,
     workers,
     settings
   }

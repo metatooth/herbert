@@ -68,14 +68,14 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapState, mapActions } from "vuex";
-import { Device } from "@/store/devices/types";
+import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 import Timestamp from "@/components/Timestamp.vue";
 
 const MeterRow = Vue.extend({
   props: {
-    meter: Device,
+    meter: Meter,
     units: String
   },
 
@@ -102,36 +102,22 @@ const MeterRow = Vue.extend({
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.meter.device;
       });
-      if (found || this.meter.status === "disconnected") {
+      if (found) {
         return "has-text-danger";
       }
 
       return "has-text-success";
     },
-    meterIcon(): string | null {
-      if (this.meter.status === "on") {
-        return "circle";
-      } else if (this.meter.status === "off") {
-        return "circle";
-      } else if (this.meter.status === "disconnected") {
-        return "times";
-      }
-      return null;
-    },
     meterReadingHumidity(): number {
-      return 100 * (this.meter.humidity || 35);
+      return 100 * this.meter.humidity;
     },
     meterReadingTemperature(): number {
-      const temp = this.meter.temperature || 23;
       if (this.units === "C") {
-        return parseFloat(temp);
+        return this.meter.temperature;
       } else if (this.units === "F") {
-        return celsius2fahrenheit(temp);
+        return celsius2fahrenheit(this.meter.temperature);
       }
-      return celsius2kelvin(temp);
-    },
-    switchStatus(): string {
-      return this.meter.status || "off";
+      return celsius2kelvin(this.meter.temperature);
     },
     unitsWithDegrees(): string {
       return "°" + this.units;
@@ -171,7 +157,7 @@ const MeterRow = Vue.extend({
       }
     },
 
-    ...mapActions("meters", ["edit", "remove", "on", "off"])
+    ...mapActions("meters", ["edit", "remove"])
   }
 });
 

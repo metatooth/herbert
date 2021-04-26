@@ -2,8 +2,11 @@
   <div class="container">
     <nav class="navbar">
       <div class="navbar-brand">
-        <router-link :to="{ name: 'dashboard' }" class="navbar-item has-text-success is-size-3">
-          <font-awesome-icon icon="cannabis" v-if="!logo"/>
+        <router-link
+          :to="{ name: 'dashboard' }"
+          class="navbar-item has-text-success is-size-3"
+        >
+          <font-awesome-icon icon="cannabis" v-if="!logo" />
           <img v-else :src="logo" width="48" height="48" />
         </router-link>
         <div class="navbar-item">

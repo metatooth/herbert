@@ -90,8 +90,8 @@
         icon="times"
         :show="changed"
         @on-click="cancel"
-      /> 
-   </div>
+      />
+    </div>
   </section>
 </template>
 
@@ -142,7 +142,7 @@ const SettingsPage = Vue.extend({
     },
 
     filename() {
-      return (this.name) ? this.name : "No selected.";
+      return this.name ? this.name : "None selected.";
     },
 
     url() {
@@ -171,7 +171,6 @@ const SettingsPage = Vue.extend({
       const fileReader = new FileReader();
       fileReader.addEventListener("load", () => {
         this.logo = fileReader.result;
-        console.log("IMAGE", this.logo);
       });
       fileReader.readAsDataURL(files[0]);
     },

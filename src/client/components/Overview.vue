@@ -10,7 +10,7 @@
         </div>
         <div class="tile is-parent">
           <article class="tile is-child box">
-            <p class="title">{{ switchesCount }}</p>
+            <p class="title">{{ devicesCount }}</p>
             <p class="subtitle"><a @click="picked('devices')">Devices</a></p>
           </article>
         </div>
@@ -60,7 +60,8 @@ const Overview = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("devices", ["devices", "metersCount", "switchesCount"]),
+    ...mapGetters("meters", ["meters", "metersCount"]),
+    ...mapGetters("devices", ["devices", "devicesCount"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
     ...mapGetters("profiles", ["profilesCount"]),
     ...mapGetters("workers", ["workersCount"]),

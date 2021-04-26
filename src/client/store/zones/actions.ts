@@ -63,7 +63,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
           }
           const devices: Device[] = [];
           clone.devices.forEach((d: object) => {
-            devices.push(Object.assign(new Device(), d));
+            devices.push(new Device(JSON.stringify(d)));
           });
 
           zone.devices = devices;

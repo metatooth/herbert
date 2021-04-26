@@ -11,25 +11,5 @@ export const getters: GetterTree<DevicesState, RootState> = {
   devicesCount(state): number {
     const { devices } = state;
     return devices.length;
-  },
-
-  meters(state): Device[] {
-    const { devices } = state;
-    return devices.filter(d => d.devicetype === "meter");
-  },
-
-  metersCount(state): number {
-    const { devices } = state;
-    return devices.filter(d => d.devicetype === "meter").length;
-  },
-
-  switches(state): Device[] {
-    const { devices } = state;
-    return devices.filter(d => d.devicetype !== "meter");
-  },
-
-  switchesCount(state): number {
-    const { devices } = state;
-    return devices.filter(d => d.devicetype !== "meter").length;
   }
 };
