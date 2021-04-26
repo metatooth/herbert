@@ -9,7 +9,7 @@ import { Switch } from "./switch";
 import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
-import { IRSendBot } from "./i-r-send-bot";
+import { IRSend } from "./i-r-send";
 
 import Switchbot from "node-switchbot";
 import Wyze from "wyze-node";
@@ -137,7 +137,7 @@ export class App {
             new SM8relay(dev.id, parseInt(dev.board), parseInt(dev.channel))
           );
         } else if (dev.remote) {
-          switches.push(new IRSendBot(dev.id, dev.remote));
+          switches.push(new IRSend(dev.id, dev.remote));
         }
       } else if (dev.manufacturer === "mockbot") {
         meters.push(new MockMeter());
