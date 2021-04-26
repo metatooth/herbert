@@ -6,6 +6,7 @@ import { notifications } from "./notifications";
 import { profiles } from "./profiles";
 import { devices } from "./devices";
 import { workers } from "./workers";
+import { settings } from "./settings";
 
 Vue.use(Vuex);
 
@@ -19,7 +20,8 @@ const store: StoreOptions<RootState> = {
     notifications,
     profiles,
     devices,
-    workers
+    workers,
+    settings
   }
 };
 

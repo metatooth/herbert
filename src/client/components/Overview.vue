@@ -26,12 +26,6 @@
             <p class="subtitle"><a @click="picked('zones')">Zones</a></p>
           </article>
         </div>
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <p class="title">{{ workersCount }}</p>
-            <p class="subtitle"><a @click="picked('workers')">Herberts</a></p>
-          </article>
-        </div>
       </div>
     </section>
     <section class="section">
@@ -70,7 +64,8 @@ const Overview = Vue.extend({
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
     ...mapGetters("profiles", ["profilesCount"]),
     ...mapGetters("workers", ["workersCount"]),
-    ...mapGetters("zones", ["zonesCount"])
+    ...mapGetters("zones", ["zonesCount"]),
+    ...mapGetters("settings", ["settings"])
   },
 
   mounted() {
@@ -135,7 +130,7 @@ const Overview = Vue.extend({
         }
       });
 
-      setTimeout(this.checkDeviceHealth, 30000);
+      setTimeout(this.checkDeviceHealth, this.settings.refresh);
     },
 
     deleteNotification(n: Notification): void {

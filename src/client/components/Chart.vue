@@ -29,7 +29,7 @@ const Chart = Vue.extend({
     const ctx = document.getElementById(this.id);
 
     this.chart = new ChartJS(ctx, {
-      type: "line",
+      type: "scatter",
       data: {
         datasets: [
           {
@@ -141,7 +141,7 @@ const Chart = Vue.extend({
               time: {
                 parser: "yyyy-MM-dd HH:mm:ss",
                 unit: "minute",
-                unitStepSize: 1,
+                unitStepSize: 5,
                 displayFormats: {
                   minute: "HH:mm"
                 }

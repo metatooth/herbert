@@ -33,7 +33,7 @@ import Vue from "vue";
 import { mapState } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
-import { celsius2fahrenheit } from "../../shared/utils";
+import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const MeterWidget = Vue.extend({
   props: {
@@ -43,10 +43,12 @@ const MeterWidget = Vue.extend({
 
   computed: {
     temperature(): number {
-      if (this.units === "F") {
+      if (this.units === "C") {
+        return this.device.temperature || 23;
+      } else if (this.units === "F") {
         return celsius2fahrenheit(this.device.temperature || 23);
       } else {
-        return this.device.temperature || 23;
+        return celsius2kelvin(this.device.temperature || 23);
       }
     },
 

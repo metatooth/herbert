@@ -20,7 +20,7 @@
           v-for="profile in profiles"
           v-bind:key="profile.id"
           v-bind:profile="profile"
-          v-bind:units="units"
+          v-bind:units="settings.units"
         />
 
         <tr>
@@ -146,25 +146,23 @@ import { mapState, mapGetters, mapActions } from "vuex";
 import { Profile } from "@/store/profiles/types";
 import ProfileRow from "@/components/ProfileRow.vue";
 import AddControls from "@/components/AddControls.vue";
-import { celsius2fahrenheit, fahrenheit2celsius } from "../../shared/utils";
+import {
+  celsius2fahrenheit,
+  celsius2kelvin,
+  fahrenheit2celsius,
+  kelvin2celsius
+} from "../../shared/utils";
 
 const Profiles = Vue.extend({
-  props: {
-    units: String
-  },
-
   data() {
-    const on = this.units === "C" ? 23 : celsius2fahrenheit(23);
-    const off = this.units === "C" ? 18 : celsius2fahrenheit(18);
-
     return {
       profile: "",
       timezone: "America/New_York",
       start: "08:00",
       duration: 12,
-      lampontemperature: on,
+      lampontemperature: 23,
       lamponhumidity: 25,
-      lampofftemperature: off,
+      lampofftemperature: 18,
       lampoffhumidity: 25,
       adding: false
     };
@@ -185,16 +183,36 @@ const Profiles = Vue.extend({
     },
 
     tempMin(): number {
-      return this.units === "F" ? 50 : 15;
+      let min = 15;
+      if (this.settings.units === "F") {
+        min = celsius2fahrenheit(min);
+      } else {
+        min = celsius2kelvin(min);
+      }
+
+      return min;
     },
 
     tempMax(): number {
-      return this.units === "F" ? 80 : 30;
+      let max = 30;
+      if (this.settings.units === "F") {
+        max = celsius2fahrenheit(max);
+      } else {
+        max = celsius2kelvin(max);
+      }
+
+      return max;
     },
 
     ...mapState("profiles", ["profiles"]),
 
-    ...mapGetters("profiles", ["profilesCount"])
+    ...mapGetters("profiles", ["profilesCount"]),
+
+    ...mapGetters("settings", ["settings"])
+  },
+
+  mounted() {
+    this.reset();
   },
 
   methods: {
@@ -219,11 +237,14 @@ const Profiles = Vue.extend({
       profile.profile = this.profile;
       profile.lampstart = `${hourString}:${start[1]}`;
       profile.lampduration = { hours: this.duration };
-      if (this.units === "F") {
+      if (this.settings.units === "F") {
         profile.lampontemperature = fahrenheit2celsius(this.lampontemperature);
         profile.lampofftemperature = fahrenheit2celsius(
           this.lampofftemperature
         );
+      } else if (this.settings.units === "K") {
+        profile.lampontemperature = kelvin2celsius(this.lampontemperature);
+        profile.lampofftemperature = kelvin2celsius(this.lampofftemperature);
       } else {
         profile.lampontemperature = this.lampontemperature;
         profile.lampofftemperature = this.lampofftemperature;
@@ -237,8 +258,21 @@ const Profiles = Vue.extend({
     },
 
     cancel() {
-      const on = this.units === "C" ? 23 : celsius2fahrenheit(23);
-      const off = this.units === "C" ? 18 : celsius2fahrenheit(18);
+      this.reset();
+      this.adding = false;
+    },
+
+    reset() {
+      let on = 23;
+      let off = 18;
+
+      if (this.settings.units === "F") {
+        on = celsius2fahrenheit(on);
+        off = celsius2fahrenheit(off);
+      } else if (this.settings.units === "K") {
+        on = celsius2kelvin(on);
+        off = celsius2kelvin(off);
+      }
 
       this.profile = "";
       this.timezone = "America/New_York";
@@ -248,7 +282,6 @@ const Profiles = Vue.extend({
       this.lamponhumidity = 25;
       this.lampofftemperature = off;
       this.lampoffhumidity = 25;
-      this.adding = false;
     },
 
     ...mapActions("profiles", ["add"])

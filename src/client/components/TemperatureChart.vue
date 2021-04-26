@@ -8,16 +8,15 @@
       v-bind:suggestedMin="suggestedMin"
       v-bind:suggestedMax="suggestedMax"
       v-bind:stepSize="stepSize"
-      v-bind:units="units"
+      v-bind:units="settings.units"
     />
-    <units-selector :units="units" @change-units="changeUnits" />
   </div>
 </template>
 
 <script>
 import Vue from "vue";
+import { mapGetters } from "vuex";
 import Chart from "@/components/Chart.vue";
-import UnitsSelector from "@/components/UnitsSelector.vue";
 import "chartjs-adapter-date-fns";
 
 const TemperatureChart = Vue.extend({
@@ -30,18 +29,25 @@ const TemperatureChart = Vue.extend({
     return {
       display: [],
       stepSize: 0.5,
-      units: "F",
-      label: "Fahrenheit (°F)",
       minmax: [100, 0]
     };
   },
 
   components: {
-    Chart,
-    UnitsSelector
+    Chart
   },
 
   computed: {
+    label() {
+      if (this.settings.units === "C") {
+        return "Celsius (°C)";
+      } else if (this.settings.units === "F") {
+        return "Fahrenheit (°F)";
+      }
+
+      return "Kelvin (°K)";
+    },
+
     suggestedMin() {
       if (this.minmax[0] === 0) {
         this.calcminmax();
@@ -54,7 +60,9 @@ const TemperatureChart = Vue.extend({
         this.calcminmax();
       }
       return this.minmax[1];
-    }
+    },
+
+    ...mapGetters("settings", ["settings"])
   },
 
   watch: {
@@ -63,10 +71,12 @@ const TemperatureChart = Vue.extend({
       let x, y;
       this.data.forEach(d => {
         x = d.x;
-        if (this.units == "F") {
+        if (this.settings.units === "C") {
+          y = d.y;
+        } else if (this.settings.units === "F") {
           y = (d.y * 9) / 5 + 32;
         } else {
-          y = d.y;
+          y = d.y + 273.15;
         }
 
         if (y < this.minmax[0]) {
@@ -94,33 +104,6 @@ const TemperatureChart = Vue.extend({
           this.minmax[1] = d.y;
         }
       });
-    },
-
-    changeUnits(units) {
-      this.units = units;
-      if (this.units === "C") {
-        this.label = "Celsius (°C)";
-        this.suggestedMin = 15;
-        this.suggestedMax = 30;
-        this.stepSize = 0.1;
-
-        this.display = [];
-        this.data.forEach(d => {
-          this.display.push({ x: d.x, y: d.y });
-        });
-      } else {
-        this.label = "Fahrenheit (°F)";
-        this.suggestedMin = 60;
-        this.suggestedMax = 85;
-        this.stepSize = 0.5;
-
-        this.display = [];
-        let y;
-        this.data.forEach(d => {
-          y = (d.y * 9) / 5 + 32;
-          this.display.push({ x: d.x, y: y });
-        });
-      }
     }
   }
 });

@@ -7,11 +7,8 @@ export class Device {
   updatedat: Date;
   deleted: boolean;
   deletedat?: Date;
-  temperature?: number;
-  humidity?: number;
-  pressure?: number;
-  status?: string;
-  timestamp?: Date;
+  status: string;
+  timestamp: Date;
 
   constructor() {
     this.device = "";
@@ -23,6 +20,7 @@ export class Device {
     this.deleted = false;
   }
 }
+
 
 export class DevicesState {
   devices: Device[];

@@ -1,5 +1,14 @@
 /**
  * Convert Celius to Fahrenheit.
+ * @param {number} T temperature in Kelvin
+ * @return {number} temperature in Celsius
+ */
+export function celsius2kelvin(T: number) {
+  return T + 271.15;
+}
+
+/**
+ * Convert Celius to Fahrenheit.
  * @param {number} T temperature in Celsius
  * @return {number} temperature in Fahrenheit
  */
@@ -14,6 +23,15 @@ export function celsius2fahrenheit(T: number) {
  */
 export function fahrenheit2celsius(T: number) {
   return ((T - 32) * 5) / 9;
+}
+
+/**
+ * Convert Kelvin to Celius.
+ * @param {number} T temperature in Kelvin
+ * @return {number} temperature in Celsius
+ */
+export function kelvin2celsius(T: number) {
+  return T - 271.15;
 }
 
 /**

@@ -70,7 +70,7 @@ import Vue from "vue";
 import { mapState, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
-import { celsius2fahrenheit } from "../../shared/utils";
+import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 import Timestamp from "@/components/Timestamp.vue";
 
 const MeterRow = Vue.extend({
@@ -122,9 +122,13 @@ const MeterRow = Vue.extend({
       return 100 * (this.meter.humidity || 35);
     },
     meterReadingTemperature(): number {
-      return this.units === "F"
-        ? celsius2fahrenheit(this.meter.temperature || 23)
-        : this.meter.temperature || 23;
+      const temp = this.meter.temperature || 23;
+      if (this.units === "C") {
+        return parseFloat(temp);
+      } else if (this.units === "F") {
+        return celsius2fahrenheit(temp);
+      }
+      return celsius2kelvin(temp);
     },
     switchStatus(): string {
       return this.meter.status || "off";

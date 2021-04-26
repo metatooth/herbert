@@ -58,6 +58,9 @@
       </div>
     </td>
     <td>
+      <timestamp v-bind:timestamp="new Date(Date.parse(device.timestamp))" />
+    </td>
+    <td>
       <router-link
         :to="{
           name: linkName,
@@ -87,6 +90,7 @@ import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit } from "../../shared/utils";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
+import Timestamp from "@/components/Timestamp.vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -103,7 +107,8 @@ const DeviceRow = Vue.extend({
   },
 
   components: {
-    SelectDeviceType
+    SelectDeviceType,
+    Timestamp
   },
 
   watch: {

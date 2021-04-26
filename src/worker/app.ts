@@ -9,6 +9,7 @@ import { Switch } from "./switch";
 import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
+import { IRSendBot } from "./i-r-send-bot";
 
 import Switchbot from "node-switchbot";
 import Wyze from "wyze-node";
@@ -129,11 +130,15 @@ export class App {
 
         this.wyze = new Wyze(options);
       } else if (dev.manufacturer === "herbert") {
-        switches.push(new Herbert(dev.id, parseInt(dev.pin)));
-      } else if (dev.manufacturer === "sm-8relay") {
-        switches.push(
-          new SM8relay(dev.id, parseInt(dev.board), parseInt(dev.channel))
-        );
+        if (dev.pin) {
+          switches.push(new Herbert(dev.id, parseInt(dev.pin)));
+        } else if (dev.board && dev.channel) {
+          switches.push(
+            new SM8relay(dev.id, parseInt(dev.board), parseInt(dev.channel))
+          );
+        } else if (dev.remote) {
+          switches.push(new IRSendBot(dev.id, dev.remote));
+        }
       } else if (dev.manufacturer === "mockbot") {
         meters.push(new MockMeter());
       }

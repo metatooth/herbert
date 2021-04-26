@@ -6,6 +6,7 @@
         <tr>
           <th>Status</th>
           <th>Name</th>
+          <th>Last Update</th>
           <th>History</th>
           <th>MAC</th>
           <th></th>

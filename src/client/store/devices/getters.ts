@@ -5,7 +5,6 @@ import { RootState } from "../types";
 export const getters: GetterTree<DevicesState, RootState> = {
   devices(state): Device[] {
     const { devices } = state;
-    devices.sort((a, b) => a.device.localeCompare(b.device));
     return devices;
   },
 
@@ -16,9 +15,7 @@ export const getters: GetterTree<DevicesState, RootState> = {
 
   meters(state): Device[] {
     const { devices } = state;
-    const meters = devices.filter(d => d.devicetype === "meter");
-    meters.sort((a, b): number => a.device.localeCompare(b.device));
-    return meters;
+    return devices.filter(d => d.devicetype === "meter");
   },
 
   metersCount(state): number {
@@ -28,9 +25,7 @@ export const getters: GetterTree<DevicesState, RootState> = {
 
   switches(state): Device[] {
     const { devices } = state;
-    const switches = devices.filter(d => d.devicetype !== "meter");
-    switches.sort((a, b) => a.device.localeCompare(b.device));
-    return switches;
+    return devices.filter(d => d.devicetype !== "meter");
   },
 
   switchesCount(state): number {

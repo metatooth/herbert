@@ -30,6 +30,7 @@ import {
   faTint,
   faTintSlash,
   faTrash,
+  faUpload,
   faWind
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -56,6 +57,7 @@ library.add(faTimesCircle);
 library.add(faTint);
 library.add(faTintSlash);
 library.add(faTrash);
+library.add(faUpload);
 library.add(faWind);
 
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
