@@ -246,10 +246,8 @@ async function run() {
       });
     }
   });
-
-  setTimeout(run, config.get("interval") * 1000);
 }
 
 (async () => {
-  run();
+  setInterval(run, config.get("interval") * 1000);
 })();
