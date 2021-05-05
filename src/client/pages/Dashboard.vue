@@ -28,14 +28,16 @@
       </div>
 
       <overview v-if="is('overview')" @child-picked="pick" />
-      <devices v-if="is('devices')" v-bind:units="units" />
-      <meters v-if="is('meters')" v-bind:units="units" />
-      <profiles v-if="is('profiles')" v-bind:units="units" />
+      <devices v-if="is('devices')" v-bind:units="settings.units" />
+      <meters v-if="is('meters')" v-bind:units="settings.units" />
+      <profiles v-if="is('profiles')" v-bind:units="settings.units" />
       <workers v-if="is('workers')" />
-      <zones v-if="is('zones')" v-bind:units="units" />
-      <div v-if="is('settings')">
-        <units-selector v-bind:units="units" @change-units="changeUnits" />
-      </div>
+      <zones v-if="is('zones')" v-bind:units="settings.units" />
+      <settings-page
+        v-if="is('settings')"
+        v-bind:settings="settings"
+        @save-settings="saveSettings"
+      />
     </section>
 
     <section class="section">
@@ -57,20 +59,19 @@
 <script lang="ts">
 import Vue from "vue";
 import Overview from "@/components/Overview.vue";
-import UnitsSelector from "@/components/UnitsSelector.vue";
 import Devices from "@/components/Devices.vue";
 import Meters from "@/components/Meters.vue";
 import Profiles from "@/components/Profiles.vue";
 import Workers from "@/components/Workers.vue";
 import Zones from "@/components/Zones.vue";
+import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 
 const Dashboard = Vue.extend({
   data() {
     return {
       picked: "overview",
-      units: "F",
       ts: new Date()
     };
   },
@@ -80,10 +81,14 @@ const Dashboard = Vue.extend({
     Overview,
     Meters,
     Profiles,
-    UnitsSelector,
     Timestamp,
     Workers,
-    Zones
+    Zones,
+    SettingsPage
+  },
+
+  computed: {
+    ...mapGetters("settings", ["settings"])
   },
 
   mounted() {
@@ -91,10 +96,6 @@ const Dashboard = Vue.extend({
   },
 
   methods: {
-    changeUnits(units: string) {
-      this.units = units;
-    },
-
     is(section: string) {
       if (this.picked === section) {
         return "is-active";
@@ -108,20 +109,29 @@ const Dashboard = Vue.extend({
 
     refresh() {
       this["devices/fetchData"]();
+      this["meters/fetchData"]();
       this["profiles/fetchData"]();
       this["workers/fetchData"]();
       this["zones/fetchData"]();
+      this["settings/fetchData"]();
 
       this.ts = new Date();
 
-      setTimeout(this.refresh, 30000);
+      setTimeout(this.refresh, this.settings.refresh);
+    },
+
+    saveSettings(settings: string) {
+      this["settings/edit"](JSON.parse(settings));
     },
 
     ...mapActions([
       "devices/fetchData",
+      "meters/fetchData",
       "profiles/fetchData",
       "workers/fetchData",
-      "zones/fetchData"
+      "zones/fetchData",
+      "settings/fetchData",
+      "settings/edit"
     ])
   }
 });

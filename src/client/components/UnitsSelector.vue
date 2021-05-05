@@ -1,10 +1,5 @@
 <template>
-  <form class="control">
-    <label for="kelvin" class="radio">
-      <input id="kelvin" v-model="selected" type="radio" value="K" />
-      Kelvin
-    </label>
-    &nbsp;
+  <div class="control">
     <label for="celsius" class="radio">
       <input id="celsius" v-model="selected" type="radio" value="C" />
       Celsius
@@ -14,7 +9,12 @@
       <input id="fahrenheit" v-model="selected" type="radio" value="F" />
       Fahrenheit
     </label>
-  </form>
+    &nbsp;
+    <label for="kelvin" class="radio">
+      <input id="kelvin" v-model="selected" type="radio" value="K" />
+      Kelvin
+    </label>
+  </div>
 </template>
 
 <script>

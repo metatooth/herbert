@@ -81,7 +81,6 @@ const Readings = Vue.extend({
       temperatures: [] as MeterReading[],
       humidities: [] as MeterReading[],
       pressures: [] as MeterReading[],
-      units: "F",
       min: 100,
       max: 0
     };
@@ -103,10 +102,6 @@ const Readings = Vue.extend({
   },
 
   methods: {
-    changeUnits(units: string) {
-      this.units = units;
-    },
-
     refresh() {
       const xhr = new XMLHttpRequest();
       const url = process.env.VUE_APP_API_URL;

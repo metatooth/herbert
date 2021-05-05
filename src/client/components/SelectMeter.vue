@@ -1,7 +1,7 @@
 <template>
   <div class="field is-horizontal">
     <div class="field-label">
-      <label class="label">{{ label }}</label>
+      <label class="label">Meters</label>
     </div>
     <div class="field-body">
       <div class="field has-addons">
@@ -9,11 +9,11 @@
           <div class="select">
             <select v-model="selected">
               <option
-                v-for="device in devices"
-                v-bind:key="device.device"
-                v-bind:value="device.device"
+                v-for="meter in meters"
+                v-bind:key="meter.device"
+                v-bind:value="meter.device"
               >
-                {{ device.nickname || device.device }}
+                {{ meter.nickname || meter.device }}
               </option>
             </select>
           </div>
@@ -30,28 +30,28 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapGetters } from "vuex";
 
-const SelectDevice = Vue.extend({
-  props: {
-    label: String,
-    devices: Array
-  },
-
+const SelectMeter = Vue.extend({
   data() {
     return {
       selected: ""
     };
   },
 
+  computed: {
+    ...mapGetters("meters", ["meters"])
+  },
+
   methods: {
     select() {
       console.log("HERE");
       console.log("SELECT METER", this.selected);
-      this.$emit("select-device", this.selected);
+      this.$emit("select-meter", this.selected);
       this.selected = "";
     }
   }
 });
 
-export default SelectDevice;
+export default SelectMeter;
 </script>

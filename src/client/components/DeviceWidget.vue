@@ -49,6 +49,8 @@ const DeviceWidget = Vue.extend({
         return "lightbulb";
       } else if (this.device.devicetype === "blower") {
         return "wind";
+      } else if (this.device.devicetype === "cooler") {
+        return "snowflake";
       } else if (this.device.devicetype === "fan") {
         return "fan";
       } else {

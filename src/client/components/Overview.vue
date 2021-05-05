@@ -10,7 +10,7 @@
         </div>
         <div class="tile is-parent">
           <article class="tile is-child box">
-            <p class="title">{{ switchesCount }}</p>
+            <p class="title">{{ devicesCount }}</p>
             <p class="subtitle"><a @click="picked('devices')">Devices</a></p>
           </article>
         </div>
@@ -24,12 +24,6 @@
           <article class="tile is-child box">
             <p class="title">{{ zonesCount }}</p>
             <p class="subtitle"><a @click="picked('zones')">Zones</a></p>
-          </article>
-        </div>
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <p class="title">{{ workersCount }}</p>
-            <p class="subtitle"><a @click="picked('workers')">Herberts</a></p>
           </article>
         </div>
       </div>
@@ -66,16 +60,20 @@ const Overview = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("devices", ["devices", "metersCount", "switchesCount"]),
+    ...mapGetters("meters", ["meters", "metersCount"]),
+    ...mapGetters("devices", ["devices", "devicesCount"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
     ...mapGetters("profiles", ["profilesCount"]),
     ...mapGetters("workers", ["workersCount"]),
-    ...mapGetters("zones", ["zonesCount"])
+    ...mapGetters("zones", ["zonesCount"]),
+    ...mapGetters("settings", ["settings"])
   },
 
   mounted() {
     console.log("Starting connection to WebSocket server...");
-    const ws = new WebSocket(process.env.VUE_APP_WS_URL);
+    const ws = new WebSocket(
+      process.env.VUE_APP_WS_URL || "ws://localhost:5000"
+    );
 
     ws.addEventListener("open", (ev: Event) => {
       console.log(ev);
@@ -135,7 +133,7 @@ const Overview = Vue.extend({
         }
       });
 
-      setTimeout(this.checkDeviceHealth, 30000);
+      setTimeout(this.checkDeviceHealth, this.settings.refresh);
     },
 
     deleteNotification(n: Notification): void {

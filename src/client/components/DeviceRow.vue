@@ -1,19 +1,6 @@
 <template>
   <tr>
-    <td class="has-text-centered" v-if="isMeter">
-      <div class="tags has-addons">
-        <span class="tag has-background-dark" :class="meterClass">
-          <font-awesome-icon icon="tachometer-alt" />
-        </span>
-        <span class="tag has-text-light has-background-dark">
-          {{ meterReadingTemperature.toFixed(1) }} {{ unitsWithDegrees }}
-        </span>
-        <span class="tag has-text-light has-background-dark">
-          {{ meterReadingHumidity.toFixed(0) }} %
-        </span>
-      </div>
-    </td>
-    <td class="has-text-centered" v-else>
+    <td class="has-text-centered">
       <div class="field is-grouped">
         <div class="control">
           <button class="button is-small" :class="deviceClass" @click="toggle">
@@ -58,9 +45,12 @@
       </div>
     </td>
     <td>
+      <timestamp v-bind:timestamp="device.timestamp" />
+    </td>
+    <td>
       <router-link
         :to="{
-          name: linkName,
+          name: 'statuses',
           params: { name: device.nickname, device: device.device }
         }"
       >
@@ -85,8 +75,8 @@ import Vue from "vue";
 import { mapState, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
-import { celsius2fahrenheit } from "../../shared/utils";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
+import Timestamp from "@/components/Timestamp.vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -103,7 +93,8 @@ const DeviceRow = Vue.extend({
   },
 
   components: {
-    SelectDeviceType
+    SelectDeviceType,
+    Timestamp
   },
 
   watch: {
@@ -143,39 +134,6 @@ const DeviceRow = Vue.extend({
         return "times";
       }
       return null;
-    },
-    isMeter(): boolean {
-      return this.device.devicetype === "meter";
-    },
-    linkName(): string {
-      if (this.device.devicetype === "meter") {
-        return "readings";
-      }
-      return "statuses";
-    },
-    meterClass(): string {
-      const found = this.notifications.find((n: Notification) => {
-        return n.id === this.device.device;
-      });
-      if (found || this.device.status === "disconnected") {
-        return "has-text-danger";
-      }
-
-      return "has-text-success";
-    },
-    meterReadingHumidity(): number {
-      return 100 * (this.device.humidity || 35);
-    },
-    meterReadingTemperature(): number {
-      return this.units === "F"
-        ? celsius2fahrenheit(this.device.temperature || 23)
-        : this.device.temperature || 23;
-    },
-    switchStatus(): string {
-      return this.device.status || "off";
-    },
-    unitsWithDegrees(): string {
-      return "°" + this.units;
     },
 
     ...mapState("notifications", ["notifications"])

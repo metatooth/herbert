@@ -78,9 +78,9 @@
       <div class="card-content">
         <div class="field is-grouped is-grouped-multiline">
           <meter-widget
-            v-for="device in zoneMeters"
-            :key="device.device"
-            :device="device"
+            v-for="meter in zone.meters"
+            :key="meter.device"
+            :meter="meter"
             :units="units"
             @remove-device="remove"
           />
@@ -90,7 +90,7 @@
       <div class="card-content">
         <div class="field is-grouped is-grouped-multiline">
           <device-widget
-            v-for="device in zoneSwitches"
+            v-for="device in zone.devices"
             :key="device.device"
             :device="device"
             @remove-device="remove"
@@ -99,17 +99,13 @@
       </div>
 
       <div class="card-content">
-        <select-device
-          label="Meters"
-          v-bind:devices="meters"
-          @select-device="add"
-        />
+        <select-meter @select-meter="add" />
       </div>
 
       <div class="card-content">
         <select-device
           label="Switches"
-          v-bind:devices="switches"
+          v-bind:devices="devices"
           @select-device="add"
         />
       </div>
@@ -127,6 +123,7 @@
 import EditText from "@/components/EditText.vue";
 import HTTP from "@/api/http";
 import SelectDevice from "@/components/SelectDevice.vue";
+import SelectMeter from "@/components/SelectMeter.vue";
 import SelectProfile from "@/components/SelectProfile.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
@@ -140,7 +137,7 @@ import {
   fahrenheit2celsius,
   vaporPressureDeficit
 } from "../../shared/utils";
-import { mapState, mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 
 class Reading {
@@ -186,6 +183,7 @@ const ZoneDetail = Vue.extend({
     EditText,
     MeterWidget,
     SelectDevice,
+    SelectMeter,
     SelectProfile,
     Target,
     Timestamp
@@ -311,26 +309,9 @@ const ZoneDetail = Vue.extend({
       return "°" + this.units;
     },
 
-    zoneMeters(): Device[] {
-      const result = this.zone.devices;
-      const filter = (event: Device) => {
-        return event.devicetype === "meter";
-      };
-      return result.filter(filter);
-    },
-
-    zoneSwitches(): Device[] {
-      const result = this.zone.devices;
-      const filter = (event: Device) => {
-        return event.devicetype !== "meter";
-      };
-      return result.filter(filter);
-    },
-
-    ...mapState("devices", ["devices"]),
-    ...mapState("profiles", ["profiles"]),
-    ...mapState("zones", ["zones"]),
-    ...mapGetters("devices", ["meters", "switches"])
+    ...mapGetters("devices", ["devices"]),
+    ...mapGetters("meters", ["meters"]),
+    ...mapGetters("profiles", ["profiles"])
   },
 
   mounted() {
@@ -341,6 +322,7 @@ const ZoneDetail = Vue.extend({
   methods: {
     add(selected: string) {
       const payload = { zone: this.zone, device: selected };
+      console.log("ADD WITH", payload);
       this.addDevice(payload);
       this.fetchData();
     },

@@ -45,6 +45,7 @@ router.delete("/:id", async (req, res) => {
 
 router.post("/:id/devices", async (req, res) => {
   const { id } = req.params;
+  console.log("ZONE", id, "DEVICE", req.body.device);
   try {
     await query("INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)", [
       id,
