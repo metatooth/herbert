@@ -1,4 +1,4 @@
-export class Device {
+export class Meter {
   device: string;
   devicetype: string;
   manufacturer: string;
@@ -7,7 +7,9 @@ export class Device {
   updatedat: Date;
   deleted: boolean;
   deletedat?: Date;
-  status: string;
+  temperature: number;
+  humidity: number;
+  pressure: number;
   timestamp: Date;
 
   constructor(json: string) {
@@ -16,7 +18,9 @@ export class Device {
     this.devicetype = obj["devicetype"];
     this.manufacturer = obj["manufacturer"];
     this.nickname = obj["nickname"];
-    this.status = obj["status"];
+    this.temperature = parseFloat(obj["temperature"]);
+    this.humidity = parseFloat(obj["humidity"]);
+    this.pressure = parseFloat(obj["pressure"]);
     this.timestamp = new Date(Date.parse(obj["timestamp"]));
     this.createdat = new Date(Date.parse(obj["createdat"]));
     this.updatedat = new Date(Date.parse(obj["updatedat"]));
@@ -27,12 +31,12 @@ export class Device {
   }
 }
 
-export class DevicesState {
-  devices: Device[];
+export class MetersState {
+  meters: Meter[];
   error: boolean;
 
   constructor() {
-    this.devices = [];
+    this.meters = [];
     this.error = false;
   }
 }

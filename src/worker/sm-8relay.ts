@@ -6,7 +6,7 @@ export class SM8relay extends Switch {
   channel: number;
 
   constructor(device: string, board: number, channel: number) {
-    super(device, "sm-8relay");
+    super(device, "herbert");
     this.board = board;
     this.channel = channel;
   }

@@ -21,6 +21,7 @@ import {
   faPencilAlt,
   faPlus,
   faPlusCircle,
+  faSnowflake,
   faSun,
   faSync,
   faTachometerAlt,
@@ -30,6 +31,7 @@ import {
   faTint,
   faTintSlash,
   faTrash,
+  faUpload,
   faWind
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -47,6 +49,7 @@ library.add(faMoon);
 library.add(faPencilAlt);
 library.add(faPlus);
 library.add(faPlusCircle);
+library.add(faSnowflake);
 library.add(faSun);
 library.add(faSync);
 library.add(faTachometerAlt);
@@ -56,6 +59,7 @@ library.add(faTimesCircle);
 library.add(faTint);
 library.add(faTintSlash);
 library.add(faTrash);
+library.add(faUpload);
 library.add(faWind);
 
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);

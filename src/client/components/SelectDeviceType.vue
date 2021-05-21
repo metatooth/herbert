@@ -30,6 +30,7 @@ const SelectDeviceType = Vue.extend({
       devicetypes: [
         "lamp",
         "blower",
+        "cooler",
         "humidifier",
         "heater",
         "dehumidifier",
@@ -52,6 +53,8 @@ const SelectDeviceType = Vue.extend({
         return "lightbulb";
       } else if (this.selected === "blower") {
         return "wind";
+      } else if (this.selected === "cooler") {
+        return "snowflake";
       } else if (this.selected === "dehumidifier") {
         return "tint-slash";
       } else if (this.selected === "heater") {

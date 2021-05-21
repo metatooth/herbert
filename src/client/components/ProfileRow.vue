@@ -168,7 +168,13 @@ import Vue from "vue";
 import { mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 import EditControls from "@/components/EditControls.vue";
-import { celsius2fahrenheit, vaporPressureDeficit } from "../../shared/utils";
+import {
+  celsius2fahrenheit,
+  celsius2kelvin,
+  fahrenheit2celsius,
+  kelvin2celsius,
+  vaporPressureDeficit
+} from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 
 const ProfileRow = Vue.extend({
@@ -196,6 +202,9 @@ const ProfileRow = Vue.extend({
     if (this.units === "F") {
       lampon = celsius2fahrenheit(lampon);
       lampoff = celsius2fahrenheit(lampoff);
+    } else if (this.units === "K") {
+      lampon = celsius2kelvin(lampon);
+      lampoff = celsius2kelvin(lampoff);
     }
 
     return {
@@ -245,6 +254,8 @@ const ProfileRow = Vue.extend({
     dayTemperature(): number {
       if (this.units === "F") {
         return celsius2fahrenheit(this.profile.lampontemperature);
+      } else if (this.units === "K") {
+        return celsius2kelvin(this.profile.lampontemperature);
       }
 
       return this.profile.lampontemperature;
@@ -253,6 +264,8 @@ const ProfileRow = Vue.extend({
     nightTemperature(): number {
       if (this.units === "F") {
         return celsius2fahrenheit(this.profile.lampofftemperature);
+      } else if (this.units === "K") {
+        return celsius2kelvin(this.profile.lampofftemperature);
       }
 
       return this.profile.lampofftemperature;
@@ -267,18 +280,22 @@ const ProfileRow = Vue.extend({
     },
 
     lampMin(): number {
-      const min = 15;
+      let min = 15;
       if (this.units === "F") {
-        return celsius2fahrenheit(min);
+        min = celsius2fahrenheit(min);
+      } else if (this.units === "K") {
+        min = celsius2kelvin(min);
       }
 
       return min;
     },
 
     lampMax(): number {
-      const max = 30;
+      let max = 30;
       if (this.units === "F") {
-        return celsius2fahrenheit(max);
+        max = celsius2fahrenheit(max);
+      } else if (this.units === "K") {
+        max = celsius2kelvin(max);
       }
 
       return max;
@@ -302,18 +319,6 @@ const ProfileRow = Vue.extend({
           this.profile.lampoffhumidity / 100
         ) / 1000
       );
-    }
-  },
-
-  watch: {
-    units(val) {
-      if (val === "F") {
-        this.lampontemperature = (this.lampontemperature * 9) / 5 + 32;
-        this.lampofftemperature = (this.lampofftemperature * 9) / 5 + 32;
-      } else {
-        this.lampontemperature = ((this.lampontemperature - 32) * 5) / 9;
-        this.lampofftemperature = ((this.lampofftemperature - 32) * 5) / 9;
-      }
     }
   },
 
@@ -342,9 +347,13 @@ const ProfileRow = Vue.extend({
       let ontemp = this.lampontemperature;
       let offtemp = this.lampofftemperature;
       if (this.units === "F") {
-        ontemp = ((ontemp - 32) * 5) / 9;
-        offtemp = ((offtemp - 32) * 5) / 9;
+        ontemp = fahrenheit2celsius(ontemp);
+        offtemp = fahrenheit2celsius(offtemp);
+      } else if (this.units === "K") {
+        ontemp = kelvin2celsius(ontemp);
+        offtemp = kelvin2celsius(offtemp);
       }
+
       console.log("lampstart", `${hourString}:${start[1]}`);
       const profile = {
         id: this.profile.id,
