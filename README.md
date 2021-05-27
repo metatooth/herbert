@@ -10,7 +10,7 @@ Using Ubuntu 20.04 or Raspberry Pi OS Lite 5.4 2020-08-09
 $ sudo apt remove npm nodejs
 $ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 $ sudo apt-get install -y nodejs
-$ sudo apt-get install bluetooth bluez libbluetooth-dev libudev-dev -y
+$ sudo apt-get install -y git bluetooth bluez libbluetooth-dev libudev-dev
 $ git clone https://github.com/metatooth/herbert.git
 ```
 
@@ -55,6 +55,8 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
 
 ```
 $ sudo cp scripts/herbert /etc/init.d/herbert
+$ sudo nano /etc/init.d/herbert
+$ sudo chmod 755 /etc/init.d/herbert
 $ sudo update-rc.d herbert defaults
 $ sudo /etc/init.d/herbert start
 $ sudo /etc/init.d/herbert status
