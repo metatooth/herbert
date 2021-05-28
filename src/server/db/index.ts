@@ -25,10 +25,7 @@ export async function readProfile(id) {
 }
 
 export async function readDevice(id) {
-  const res = await query(
-    "SELECT * FROM devices WHERE device = $1",
-    [id]
-  );
+  const res = await query("SELECT * FROM devices WHERE device = $1", [id]);
 
   const device = await res.rows[0];
 
@@ -215,7 +212,10 @@ export async function createReading(meter, temperature, humidity, pressure) {
 export async function createStatus(device, status) {
   query("SELECT * FROM devices WHERE device = $1", [device]).then(res => {
     if (res.rowCount !== 0) {
-      query("UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2", [status, device]);
+      query(
+        "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
+        [status, device]
+      );
       query("INSERT INTO statuses (device, status) VALUES ($1, $2)", [
         device,
         status
