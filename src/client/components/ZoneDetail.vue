@@ -129,6 +129,7 @@ import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
 import { Device } from "@/store/devices/types";
 import { LampTimer } from "../../shared/lamp-timer";
+import { Meter } from "@/store/meters/types";
 import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
 import DeviceWidget from "@/components/DeviceWidget.vue";
