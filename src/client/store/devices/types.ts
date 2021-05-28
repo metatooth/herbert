@@ -10,18 +10,19 @@ export class Device {
   status: string;
   timestamp: Date;
 
-  constructor(json: object) {
-    this.device = json["device"];
-    this.devicetype = json["devicetype"];
-    this.manufacturer = json["manufacturer"];
-    this.nickname = json["nickname"];
-    this.status = json["status"];
-    this.timestamp = new Date(Date.parse(json["timestamp"]));
-    this.createdat = new Date(Date.parse(json["createdat"]));
-    this.updatedat = new Date(Date.parse(json["updatedat"]));
-    this.deleted = json["deleted"];
-    if (json["deletedat"]) {
-      this.deletedat = new Date(Date.parse(json["deletedat"]));
+  constructor(json: string) {
+    const obj = JSON.parse(json);
+    this.device = obj["device"];
+    this.devicetype = obj["devicetype"];
+    this.manufacturer = obj["manufacturer"];
+    this.nickname = obj["nickname"];
+    this.status = obj["status"];
+    this.timestamp = new Date(Date.parse(obj["timestamp"]));
+    this.createdat = new Date(Date.parse(obj["createdat"]));
+    this.updatedat = new Date(Date.parse(obj["updatedat"]));
+    this.deleted = obj["deleted"];
+    if (obj["deletedat"]) {
+      this.deletedat = new Date(Date.parse(obj["deletedat"]));
     }
   }
 }
