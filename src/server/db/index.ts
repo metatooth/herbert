@@ -26,7 +26,7 @@ export async function readProfile(id) {
 
 export async function readDevice(id) {
   const res = await query(
-    "SELECT * FROM devices WHERE device = $1 ORDER BY devicetype, nickname, device",
+    "SELECT * FROM devices WHERE device = $1",
     [id]
   );
 
@@ -36,7 +36,7 @@ export async function readDevice(id) {
     const {
       rows
     } = await query(
-      "SELECT d.*, r.temperature, r.humidity, r.pressure, r.createdat as timestamp FROM devices d INNER JOIN readings r ON d.device = r.meter WHERE d.device = $1 ORDER BY r.id DESC LIMIT 1",
+      "SELECT device, devicetype, manufacturer, nickname, temperature, humidity, pressure, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
       [id]
     );
     return rows[0];
@@ -44,7 +44,7 @@ export async function readDevice(id) {
     const {
       rows
     } = await query(
-      "SELECT d.*, s.status, s.createdat as timestamp FROM devices d INNER JOIN statuses s ON d.device = s.device WHERE d.device = $1 ORDER BY s.id DESC LIMIT 1",
+      "SELECT device, devicetype, manufacturer, nickname, status, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
       [id]
     );
     return rows[0];
@@ -201,8 +201,8 @@ export async function createReading(meter, temperature, humidity, pressure) {
   query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
     if (res.rowCount !== 0) {
       query(
-        "UPDATE devices SET devicetype = 'meter', deleted = false WHERE device = $1",
-        [meter]
+        "UPDATE devices SET temperature = $1, humidity = $2, pressure = $3, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $4",
+        [temperature, humidity, pressure, meter]
       );
       query(
         "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
@@ -215,7 +215,7 @@ export async function createReading(meter, temperature, humidity, pressure) {
 export async function createStatus(device, status) {
   query("SELECT * FROM devices WHERE device = $1", [device]).then(res => {
     if (res.rowCount !== 0) {
-      query("UPDATE devices SET deleted = false WHERE device = $1", [device]);
+      query("UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2", [status, device]);
       query("INSERT INTO statuses (device, status) VALUES ($1, $2)", [
         device,
         status
