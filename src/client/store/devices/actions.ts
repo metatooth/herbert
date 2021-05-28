@@ -22,7 +22,7 @@ export const actions: ActionTree<DevicesState, RootState> = {
       response => {
         const payload: Device[] = [];
         response.data.forEach((json: object) => {
-          const obj = new Device(json);
+          const obj = new Device(JSON.stringify(json));
           if (obj.devicetype !== "meter") {
             payload.push(obj);
           }

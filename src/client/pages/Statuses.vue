@@ -38,6 +38,7 @@
           v-bind:data="statuses"
           label="Device Status"
           title="Duty Cycle"
+          type="line"
         />
       </div>
       <div class="column is-half" />
