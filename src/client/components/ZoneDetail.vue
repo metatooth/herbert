@@ -334,26 +334,20 @@ const ZoneDetail = Vue.extend({
         this.readings = [];
         this.statuses = [];
 
+        this.zone.meters.forEach((meter: Meter) => {
+          HTTP.get(`/readings?meter=${meter.device}&last=one`).then(res => {
+            const reading = Object.assign(new Reading(), res.data);
+            reading.temperature = parseFloat(res.data.temperature);
+            reading.humidity = parseFloat(res.data.humidity);
+            reading.pressure = parseFloat(res.data.humidity);
+            this.readings.push(reading);
+          });
+        });
+
         this.zone.devices.forEach((device: Device) => {
-          if (device) {
-            if (device.devicetype === "meter") {
-              HTTP.get(`/readings?meter=${device.device}&last=one`).then(
-                res => {
-                  const reading = Object.assign(new Reading(), res.data);
-                  reading.temperature = parseFloat(res.data.temperature);
-                  reading.humidity = parseFloat(res.data.humidity);
-                  reading.pressure = parseFloat(res.data.humidity);
-                  this.readings.push(reading);
-                }
-              );
-            } else {
-              HTTP.get(`/statuses?device=${device.device}&last=one`).then(
-                res => {
-                  this.statuses.push(Object.assign(new Status(), res.data));
-                }
-              );
-            }
-          }
+          HTTP.get(`/statuses?device=${device.device}&last=one`).then(res => {
+            this.statuses.push(Object.assign(new Status(), res.data));
+          });
         });
       }
       setTimeout(this.refresh, 30000);
