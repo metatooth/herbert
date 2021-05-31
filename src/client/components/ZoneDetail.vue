@@ -121,15 +121,12 @@
 
 <script lang="ts">
 import EditText from "@/components/EditText.vue";
-import HTTP from "@/api/http";
 import SelectDevice from "@/components/SelectDevice.vue";
 import SelectMeter from "@/components/SelectMeter.vue";
 import SelectProfile from "@/components/SelectProfile.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { Device } from "@/store/devices/types";
 import { LampTimer } from "../../shared/lamp-timer";
-import { Meter } from "@/store/meters/types";
 import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
 import DeviceWidget from "@/components/DeviceWidget.vue";
@@ -141,30 +138,6 @@ import {
 import { mapGetters, mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 
-class Reading {
-  temperature: number;
-  humidity: number;
-  pressure: number;
-  createdat: Date;
-
-  constructor() {
-    this.temperature = 0;
-    this.humidity = 0;
-    this.pressure = 0;
-    this.createdat = new Date();
-  }
-}
-
-class Status {
-  state: number;
-  createdat: Date;
-
-  constructor() {
-    this.state = 0;
-    this.createdat = new Date();
-  }
-}
-
 const ZoneDetail = Vue.extend({
   props: {
     zone: Zone,
@@ -173,8 +146,6 @@ const ZoneDetail = Vue.extend({
 
   data() {
     return {
-      readings: [] as Reading[],
-      statuses: [] as Status[],
       timestamp: new Date()
     };
   },
@@ -213,19 +184,19 @@ const ZoneDetail = Vue.extend({
 
     meanTemperature(): number {
       let sum = 0;
-      this.readings.forEach(reading => {
-        sum = sum + reading.temperature;
+      this.zone.meters.forEach(meter => {
+        sum = sum + meter.temperature;
       });
-      const mean = sum / this.readings.length;
+      const mean = sum / this.zone.meters.length;
       return this.units === "F" ? celsius2fahrenheit(mean) : mean;
     },
 
     meanHumidity(): number {
       let sum = 0;
-      this.readings.forEach(reading => {
-        sum = sum + 100 * reading.humidity;
+      this.zone.meters.forEach(meter => {
+        sum = sum + 100 * meter.humidity;
       });
-      return sum / this.readings.length;
+      return sum / this.zone.meters.length;
     },
 
     meanPressure(): number {
@@ -317,7 +288,6 @@ const ZoneDetail = Vue.extend({
 
   mounted() {
     setTimeout(() => this.scrollFix(this.$route.hash), 1);
-    this.refresh();
   },
 
   methods: {
@@ -326,32 +296,6 @@ const ZoneDetail = Vue.extend({
       console.log("ADD WITH", payload);
       this.addDevice(payload);
       this.fetchData();
-    },
-
-    refresh() {
-      if (this.zone) {
-        this.timestamp = new Date();
-
-        this.readings = [];
-        this.statuses = [];
-
-        this.zone.meters.forEach((meter: Meter) => {
-          HTTP.get(`/readings?meter=${meter.device}&last=one`).then(res => {
-            const reading = Object.assign(new Reading(), res.data);
-            reading.temperature = parseFloat(res.data.temperature);
-            reading.humidity = parseFloat(res.data.humidity);
-            reading.pressure = parseFloat(res.data.humidity);
-            this.readings.push(reading);
-          });
-        });
-
-        this.zone.devices.forEach((device: Device) => {
-          HTTP.get(`/statuses?device=${device.device}&last=one`).then(res => {
-            this.statuses.push(Object.assign(new Status(), res.data));
-          });
-        });
-      }
-      setTimeout(this.refresh, 30000);
     },
 
     remove(selected: string) {
