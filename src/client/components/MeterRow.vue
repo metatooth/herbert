@@ -53,7 +53,7 @@
       </router-link>
     </td>
     <td>
-      {{ meter.meter }}
+      {{ meter.device }}
     </td>
     <td>
       <div class="control">

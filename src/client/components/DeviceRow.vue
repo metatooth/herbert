@@ -125,15 +125,14 @@ const DeviceRow = Vue.extend({
 
       return style;
     },
+
     deviceIcon(): string | null {
       if (this.device.status === "on") {
         return "circle";
       } else if (this.device.status === "off") {
         return "circle";
-      } else if (this.device.status === "disconnected") {
-        return "times";
       }
-      return null;
+      return "times";
     },
 
     ...mapState("notifications", ["notifications"])

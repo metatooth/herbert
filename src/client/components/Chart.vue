@@ -10,6 +10,7 @@ import "chartjs-adapter-date-fns";
 const Chart = Vue.extend({
   props: {
     id: { type: String },
+    type: { type: String, default: "scatter" },
     data: { type: Array },
     title: { type: String },
     label: { type: String },
@@ -29,7 +30,7 @@ const Chart = Vue.extend({
     const ctx = document.getElementById(this.id);
 
     this.chart = new ChartJS(ctx, {
-      type: "scatter",
+      type: this.type,
       data: {
         datasets: [
           {

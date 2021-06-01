@@ -38,6 +38,7 @@
           v-bind:data="statuses"
           label="Device Status"
           title="Duty Cycle"
+          type="line"
         />
       </div>
       <div class="column is-half" />
@@ -47,6 +48,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { mapGetters } from "vuex";
 import Chart from "@/components/Chart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
@@ -60,6 +62,10 @@ const Statuses = Vue.extend({
       range: "hour",
       statuses: [] as { x: Date; y: number }[]
     };
+  },
+
+  computed: {
+    ...mapGetters("settings", ["settings"])
   },
 
   components: {
@@ -90,9 +96,10 @@ const Statuses = Vue.extend({
         const data = JSON.parse(xhr.response);
         if (!data.error) {
           this.statuses = [];
-          const timeZone = "Etc/UTC";
           data.forEach((d: { createdat: Date; status: string }) => {
-            const ts = convertToLocalTime(d.createdat, { timeZone });
+            const ts = convertToLocalTime(d.createdat, {
+              timeZone: this.settings.timezone
+            });
             const status = {
               x: ts,
               y: d.status === "on" ? 1 : 0
