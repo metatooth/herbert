@@ -23,6 +23,11 @@ try {
   }
 }
 
+const isMockWorker = (): boolean => {
+  const envVar = process.env.NODE_ENV;
+  return envVar && envVar.toLowerCase() === 'docker'
+}
+
 import { configure, getLogger, Logger } from "log4js";
 configure("./config/log4js.json");
 const logger: Logger = getLogger("app");
@@ -104,18 +109,24 @@ export class App {
     logger.info("== Herbert Worker = Starting up... ==");
     logger.info("=====================================");
 
-    console.log("network interfaces", networkInterfaces());
-    let net = networkInterfaces()["wlo1"];
-    console.log("wlo1", net);
+    const ifaces = networkInterfaces()
+    console.log("network interfaces", ifaces);
+
+    let net = ifaces["wlo1"];
+
     if (!net) {
-      net = networkInterfaces()["wlan0"];
-      console.log("wlan0", net);
+      net = ifaces["wlan0"];
     }
 
+    if (!net) {
+      net = ifaces["eth0"];
+    }
+
+    console.log("net", net);
     this.macaddr = net[0]["mac"];
     this.inet = net[0]["address"];
 
-    console.log("wlan0", this.macaddr, this.inet);
+    console.log("device network info", this.macaddr, this.inet);
 
     const meters = this.meters;
     const switches = this.switches;
@@ -288,13 +299,15 @@ export class App {
     const polling: number = 1000 * parseInt(config.get("polling"));
     const interval: number = 1000 * parseInt(config.get("interval"));
 
-    logger.debug("Start SwitchBot scan %dms ...", polling);
-    const switchbot = new Switchbot();
-    switchbot.onadvertisement = app.handler;
-    switchbot.startScan();
-    switchbot.wait(polling);
-    switchbot.stopScan();
-    logger.debug("Done switchbot scan.");
+    if (!isMockWorker()) {
+      logger.debug("Start SwitchBot scan %dms ...", polling);
+      const switchbot = new Switchbot();
+      switchbot.onadvertisement = app.handler;
+      switchbot.startScan();
+      switchbot.wait(polling);
+      switchbot.stopScan();
+      logger.debug("Done switchbot scan.");
+    }
 
     if (app.wyze) {
       logger.debug("Check on WYZE plugs...");

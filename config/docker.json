@@ -1,0 +1,8 @@
+{
+  "ws-url": "ws://server:5000",
+  "devices": [
+    {
+      "manufacturer": "mockbot"
+    }
+  ]
+}
