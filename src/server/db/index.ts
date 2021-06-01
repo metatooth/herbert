@@ -155,25 +155,40 @@ export async function reading(device: string) {
 }
 
 export async function registerDevice(macaddr, manufacturer) {
-  query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
-    if (res.rowCount === 0) {
-      query("INSERT INTO devices (device, manufacturer) VALUES ($1, $2)", [
-        macaddr,
-        manufacturer
-      ]);
-    }
-  });
+  const { rows } = await query("SELECT * FROM devices WHERE device = $1", [
+    macaddr
+  ]);
+
+  if (rows.length === 1) {
+    return rows[0];
+  } else {
+    await query("INSERT INTO devices (device, manufacturer) VALUES ($1, $2)", [
+      macaddr,
+      manufacturer
+    ]);
+    const { rows } = await query("SELECT * FROM devices WHERE device = $1", [
+      macaddr
+    ]);
+    return rows[0];
+  }
 }
 
 export async function registerMeter(macaddr, manufacturer) {
-  query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
-    if (res.rowCount === 0) {
-      query(
-        "INSERT INTO devices (device, devicetype, manufacturer) VALUES ($1, 'meter', $2)",
-        [macaddr, manufacturer]
-      );
-    }
-  });
+  const { rows } = await query("SELECT * FROM devices WHERE device = $1", [
+    macaddr
+  ]);
+  if (rows.length === 1) {
+    return rows[0];
+  } else {
+    await query(
+      "INSERT INTO devices (device, devicetype, manufacturer) VALUES ($1, 'meter', $2)",
+      [macaddr, manufacturer]
+    );
+    const { rows } = await query("SELECT * FROM devices WHERE device = $1", [
+      macaddr
+    ]);
+    return rows[0];
+  }
 }
 
 export async function workerStatus(macaddr, inet) {

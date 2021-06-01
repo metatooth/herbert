@@ -93,22 +93,36 @@ wss.on("connection", function(ws: WebSocket) {
     }
 
     if (data.type === "STATUS") {
-      if (data.payload.device && data.payload.type === "meter") {
-        console.log("Status message from meter", data.payload);
-        registerMeter(data.payload.device, data.payload.manufacturer);
-        createReading(
-          data.payload.device,
-          data.payload.temperature,
-          data.payload.humidity,
-          data.payload.pressure
-        );
-      } else if (data.payload.device) {
-        console.log("Status message from switch", data.payload);
-        registerDevice(data.payload.device, data.payload.manufacturer);
-        createStatus(data.payload.device, data.payload.status);
-      }
+      if (data.payload.device) {
+        if (data.payload.type === "meter") {
+          const meter = await registerMeter(
+            data.payload.device,
+            data.payload.manufacturer
+          );
+          console.log("Got meter", meter);
+          if (
+            meter.temperature != data.payload.temperature &&
+            meter.humidity != data.payload.humidity
+          ) {
+            createReading(
+              data.payload.device,
+              data.payload.temperature,
+              data.payload.humidity,
+              data.payload.pressure
+            );
+          }
+        } else {
+          const device = await registerDevice(
+            data.payload.device,
+            data.payload.manufacturer
+          );
+          console.log("Got device", device);
 
-      if (data.payload.worker) {
+          if (device.status != data.payload.status) {
+            createStatus(data.payload.device, data.payload.status);
+          }
+        }
+      } else if (data.payload.worker) {
         console.log("Status message from worker", data.payload);
         workerStatus(data.payload.worker, data.payload.inet);
       }
