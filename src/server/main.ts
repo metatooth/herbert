@@ -108,7 +108,8 @@ wss.on("connection", function(ws: WebSocket) {
               data.payload.device,
               data.payload.temperature,
               data.payload.humidity,
-              data.payload.pressure
+              data.payload.pressure,
+              data.payload.timestamp
             );
           }
         } else {
@@ -119,7 +120,11 @@ wss.on("connection", function(ws: WebSocket) {
           console.log("Got device", device);
 
           if (device.status != data.payload.status) {
-            createStatus(data.payload.device, data.payload.status);
+            createStatus(
+              data.payload.device,
+              data.payload.status,
+              data.payload.timestamp
+            );
           }
         }
       } else if (data.payload.worker) {

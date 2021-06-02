@@ -96,8 +96,8 @@ const Statuses = Vue.extend({
         const data = JSON.parse(xhr.response);
         if (!data.error) {
           this.statuses = [];
-          data.forEach((d: { createdat: Date; status: string }) => {
-            const ts = convertToLocalTime(d.createdat, {
+          data.forEach((d: { observedat: Date; status: string }) => {
+            const ts = convertToLocalTime(d.observedat, {
               timeZone: this.settings.timezone
             });
             const status = {

@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM statuses WHERE device = $1 AND createdat > $2 ORDER BY id DESC",
+      "SELECT * FROM statuses WHERE device = $1 AND observedat > $2 ORDER BY id DESC",
       [req.query.device, start]
     );
     res.status(200).json(rows);
@@ -53,7 +53,7 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM statuses WHERE createdat > $1 ORDER BY id DESC",
+      "SELECT * FROM statuses WHERE observedat > $1 ORDER BY id DESC",
       [start]
     );
     res.status(200).json(rows);

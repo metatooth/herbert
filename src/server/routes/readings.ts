@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM readings WHERE meter = $1 AND createdat > $2 ORDER BY id DESC",
+      "SELECT * FROM readings WHERE meter = $1 AND observedat > $2 ORDER BY id DESC",
       [req.query.meter, start]
     );
     res.status(200).json(rows);
@@ -53,7 +53,7 @@ router.get("/", async (req, res) => {
     const {
       rows
     } = await query(
-      "SELECT * FROM readings WHERE createdat > $1 ORDER BY id DESC",
+      "SELECT * FROM readings WHERE observedat > $1 ORDER BY id DESC",
       [start]
     );
     res.status(200).json(rows);

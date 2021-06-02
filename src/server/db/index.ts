@@ -127,7 +127,7 @@ export async function readDevices() {
   const devices = [];
 
   const { rows } = await query(
-    "SELECT device FROM devices WHERE deleted <> true",
+    "SELECT device FROM devices WHERE deleted <> true ORDER BY nickname",
     []
   );
 
@@ -209,7 +209,7 @@ export async function workerStatus(macaddr, inet) {
   });
 }
 
-export async function createReading(meter, temperature, humidity, pressure) {
+export async function createReading(meter, temperature, humidity, pressure, ts) {
   query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
     if (res.rowCount !== 0) {
       query(
@@ -217,24 +217,23 @@ export async function createReading(meter, temperature, humidity, pressure) {
         [temperature, humidity, pressure, meter]
       );
       query(
-        "INSERT INTO readings (meter, temperature, humidity, pressure) VALUES ($1, $2, $3, $4)",
-        [meter, temperature, humidity, pressure]
+        "INSERT INTO readings (meter, temperature, humidity, pressure, observedat) VALUES ($1, $2, $3, $4, $5)",
+        [meter, temperature, humidity, pressure, ts]
       );
     }
   });
 }
 
-export async function createStatus(device, status) {
+export async function createStatus(device, status, ts) {
   query("SELECT * FROM devices WHERE device = $1", [device]).then(res => {
     if (res.rowCount !== 0) {
       query(
         "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
         [status, device]
       );
-      query("INSERT INTO statuses (device, status) VALUES ($1, $2)", [
-        device,
-        status
-      ]);
+      query("INSERT INTO statuses (device, status, observedat) VALUES ($1, $2, $3)",
+            [device, status, ts]
+           );
     }
   });
 }
