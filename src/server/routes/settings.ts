@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
 router.put("/", async (req, res) => {
   console.log("PUT /settings", req.body);
 
-  if (Object.keys(req.body.logo).length === 0) {
+  if (Object.keys(req.body.logo).length !== 0) {
     const arr = req.body.logo.split(",");
     console.log("IMAGE", arr[0]);
     console.log("DATA", arr[1]);
