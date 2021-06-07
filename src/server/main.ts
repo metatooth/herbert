@@ -197,7 +197,7 @@ async function run() {
 
       const lamp = new LampTimer(utc.getHours(), duration);
 
-      const blower = new BlowerTimer(60, 180); // WARNING!!
+      const blower = new BlowerTimer(config.get("blower"), 180); // WARNING!!
 
       let target;
       let delta;
