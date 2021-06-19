@@ -1,5 +1,6 @@
 import Router from "express-promise-router";
 import WebSocket from "ws";
+import { Device } from "../../shared/types";
 import { query, readDevice, readDevices } from "../db";
 
 const router = Router();
@@ -15,9 +16,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const {
-    rows
-  } = await query(
+  const { rows } = await query<Device>(
     "UPDATE devices SET nickname = $1, devicetype = $2, updatedat = CURRENT_TIMESTAMP WHERE device = $3 RETURNING device",
     [req.body.nickname, req.body.devicetype, id]
   );

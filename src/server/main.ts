@@ -6,7 +6,6 @@ import http from "http";
 import mountRoutes from "./routes";
 import {
   readZones,
-  reading,
   registerDevice,
   registerMeter,
   createReading,
@@ -248,5 +247,5 @@ async function run() {
 }
 
 (async () => {
-  setInterval(run, config.get("interval") * 1000);
+  setInterval(run, (config.get("interval") as number) * 1000);
 })();
