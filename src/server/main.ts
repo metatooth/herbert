@@ -150,23 +150,22 @@ async function run() {
     const sec = now.getUTCSeconds();
 
     if (zone.profile) {
-      console.log("command for zone", zone.nickname);
       let temperature = 0;
       let humidity = 0;
       const count = 0;
       await Promise.all(
         zone.devices.map(async device => {
           if (device.devicetype === "meter") {
-            const rdg = await reading(device.device);
-            console.log("lastest reading", rdg);
-            temperature = (count * temperature + rdg.temperature) / (count + 1);
-            humidity = (count * humidity + 100 * rdg.humidity) / (count + 1);
+            temperature = (count * temperature + device.temperature) / (count + 1);
+            humidity = (count * humidity + 100 * device.humidity) / (count + 1);
           }
         })
       );
 
+      console.log("command for zone", zone.nickname);
       console.log("profile", zone.profile);
-      console.log("state", hour, temperature, humidity);
+      console.log("profile", zone.profile);
+      console.log("hour", hour, "temp", temperature, "humi", humidity);
 
       const now = new Date();
       console.log("now", now);
