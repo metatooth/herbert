@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: bar
+      POSTGRES_USER: postgres
+      POSTGRES_DB: herbert
+    volumes:
+      - ./scripts/db:/docker-entrypoint-initdb.d
+    ports:
+      - '5432:5432'
+
+  server:
+    image: herbert_node:latest
+    build: .
+    command: npm run serve:server
+    environment:
+      DATABASE_URL: postgresql://postgres:bar@db:5432/herbert?sslmode=disable
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    ports:
+      - '5000:5000'
+    depends_on:
+      - db
+
+  client:
+    image: herbert_node:latest
+    build: .
+    command: npm run serve:client
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    depends_on:
+      - server
+    ports:
+      - '8080:8080'
+
+  worker:
+    image: herbert_node:latest
+    build: .
+    command: npm run serve:worker
+    environment:
+      MOCK_WORKER: 'true'
+      NODE_ENV: docker
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    depends_on:
+      - server
