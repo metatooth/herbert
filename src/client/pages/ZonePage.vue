@@ -4,7 +4,7 @@
       v-for="zone in zones"
       v-bind:key="zone.id"
       v-bind:zone="zone"
-      v-bind:units="units"
+      v-bind:units="settings.units"
     />
   </section>
 </template>
@@ -17,8 +17,7 @@ import { mapGetters } from "vuex";
 const ZonePage = Vue.extend({
   data() {
     return {
-      selected: this.$route.params.id,
-      units: this.$route.params.units
+      selected: this.$route.params.id
     };
   },
 
@@ -27,6 +26,7 @@ const ZonePage = Vue.extend({
   },
 
   computed: {
+    ...mapGetters("settings", ["settings"]),
     ...mapGetters("zones", ["zones"])
   }
 });

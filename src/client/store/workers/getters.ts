@@ -3,7 +3,7 @@ import { Worker, WorkersState } from "./types";
 import { RootState } from "../types";
 
 export const getters: GetterTree<WorkersState, RootState> = {
-  allWorkers(state): Worker[] {
+  workers(state): Worker[] {
     const { workers } = state;
     return workers;
   },

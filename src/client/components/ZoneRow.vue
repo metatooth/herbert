@@ -44,6 +44,12 @@
       </div>
     </td>
     <td>
+      {{ zone.active ? "on" : "off" }}
+    </td>
+    <td>
+      <meter-actual :zone="zone" :units="settings.units" />
+    </td>
+    <td>
       <timestamp :timestamp="new Date(Date.parse(zone.updatedat))" />
     </td>
     <td>
@@ -63,6 +69,7 @@ import Timestamp from "@/components/Timestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 import { mapGetters, mapActions } from "vuex";
 import { Zone } from "@/store/zones/types";
+import MeterActual from "@/components/MeterActual.vue";
 
 const ZoneRow = Vue.extend({
   props: {
@@ -79,8 +86,9 @@ const ZoneRow = Vue.extend({
   },
 
   components: {
-    Timestamp,
-    EditControls
+    EditControls,
+    MeterActual,
+    Timestamp
   },
 
   computed: {
@@ -88,7 +96,8 @@ const ZoneRow = Vue.extend({
       return `#zone-details-${this.zone.id}`;
     },
 
-    ...mapGetters("profiles", ["profiles"])
+    ...mapGetters("profiles", ["profiles"]),
+    ...mapGetters("settings", ["settings"])
   },
 
   methods: {
