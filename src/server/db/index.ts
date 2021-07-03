@@ -105,6 +105,22 @@ export async function readZones() {
   return Promise.all(zones);
 }
 
+export async function readActiveZones() {
+  const zones = [];
+
+  const { rows } = await query(
+    "SELECT id FROM zones WHERE deleted <> true AND active <> false ORDER BY nickname",
+    []
+  );
+
+  rows.forEach(row => {
+    const z = readZone(row.id);
+    zones.push(z);
+  });
+
+  return Promise.all(zones);
+}
+
 export async function readZoneDevices(device: string) {
   const zones = [];
 

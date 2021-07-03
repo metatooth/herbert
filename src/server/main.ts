@@ -5,7 +5,7 @@ import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import {
-  readZones,
+  readActiveZones,
   reading,
   registerDevice,
   registerMeter,
@@ -142,7 +142,7 @@ wss.on("connection", function(ws: WebSocket) {
 });
 
 async function run() {
-  const zones = await readZones();
+  const zones = await readActiveZones();
   zones.forEach(async zone => {
     const now = new Date();
     const hour = now.getUTCHours();
