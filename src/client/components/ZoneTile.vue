@@ -99,7 +99,7 @@ const ZoneTile = Vue.extend({
       };
 
       this.edit(zone);
-    }
+    },
 
     ...mapActions("zones", ["edit"])
   }
