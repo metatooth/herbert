@@ -4,8 +4,11 @@ export class Mockbot {
   id: string;
   onadvertisement: Function;
 
-  constructor(id: string) {
-    this.id = id;
+  constructor(id?: string) {
+    this.id = id || "mockbot";
+    this.onadvertisement = () => {
+      // Initialize to empty function
+    };
   }
 
   public async startScan(): Promise<boolean> {

@@ -1,11 +1,12 @@
 import Router from "express-promise-router";
+import { Worker } from "../../shared/types";
 
 import { query, readWorker } from "../db";
 
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const { rows } = await query(
+  const { rows } = await query<Worker>(
     "SELECT * FROM workers ORDER BY createdAt DESC",
     []
   );
@@ -19,9 +20,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const {
-    rows
-  } = await query(
+  const { rows } = await query<Worker>(
     "UPDATE workers SET nickname = $1 WHERE worker = $2 RETURNING worker",
     [req.body.nickname, id]
   );

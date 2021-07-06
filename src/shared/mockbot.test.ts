@@ -2,5 +2,5 @@ import { Mockbot } from "./mockbot";
 
 test("mockbot", () => {
   const mockbot = new Mockbot();
-  expect(mockbot).toEqual({});
+  expect(mockbot.id).toEqual("mockbot");
 });
