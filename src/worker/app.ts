@@ -216,7 +216,7 @@ export class App {
 
             console.log("Check other devices...");
             app.switches.forEach(plug => {
-              if (plug.device === data.payload.device) {
+              if (plug.device === mac) {
                 if (data.payload.action === "on") {
                   console.log(plug.device, "on");
                   plug.on();

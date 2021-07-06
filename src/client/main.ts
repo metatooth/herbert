@@ -13,14 +13,19 @@ import {
   faCheckCircle,
   faCircle,
   faCloud,
+  faCog,
   faEdit,
   faFan,
   faFireAlt,
+  faGripHorizontal,
   faLightbulb,
   faMoon,
   faPencilAlt,
   faPlus,
   faPlusCircle,
+  faPlug,
+  faSearch,
+  faSeedling,
   faSnowflake,
   faSun,
   faSync,
@@ -30,6 +35,8 @@ import {
   faTimesCircle,
   faTint,
   faTintSlash,
+  faToggleOff,
+  faToggleOn,
   faTrash,
   faUpload,
   faWind
@@ -41,14 +48,19 @@ library.add(faCheck);
 library.add(faCheckCircle);
 library.add(faCircle);
 library.add(faCloud);
+library.add(faCog);
 library.add(faEdit);
 library.add(faFan);
 library.add(faFireAlt);
+library.add(faGripHorizontal);
 library.add(faLightbulb);
 library.add(faMoon);
 library.add(faPencilAlt);
 library.add(faPlus);
 library.add(faPlusCircle);
+library.add(faPlug);
+library.add(faSearch);
+library.add(faSeedling);
 library.add(faSnowflake);
 library.add(faSun);
 library.add(faSync);
@@ -58,6 +70,8 @@ library.add(faTimes);
 library.add(faTimesCircle);
 library.add(faTint);
 library.add(faTintSlash);
+library.add(faToggleOff);
+library.add(faToggleOn);
 library.add(faTrash);
 library.add(faUpload);
 library.add(faWind);

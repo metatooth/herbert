@@ -52,7 +52,7 @@ export async function readZone(id) {
   const promises = [];
 
   const res = await query(
-    "SELECT z.id, z.nickname, p.id as profileid, z.updatedat FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
+    "SELECT z.id, z.nickname, p.id as profileid, z.updatedat, z.active FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
     [id]
   );
 
@@ -93,7 +93,23 @@ export async function readZones() {
   const zones = [];
 
   const { rows } = await query(
-    "SELECT id FROM zones WHERE deleted <> true",
+    "SELECT id FROM zones WHERE deleted <> true ORDER BY nickname",
+    []
+  );
+
+  rows.forEach(row => {
+    const z = readZone(row.id);
+    zones.push(z);
+  });
+
+  return Promise.all(zones);
+}
+
+export async function readActiveZones() {
+  const zones = [];
+
+  const { rows } = await query(
+    "SELECT id FROM zones WHERE deleted <> true AND active <> false ORDER BY nickname",
     []
   );
 
@@ -209,7 +225,13 @@ export async function workerStatus(macaddr, inet) {
   });
 }
 
-export async function createReading(meter, temperature, humidity, pressure, ts) {
+export async function createReading(
+  meter,
+  temperature,
+  humidity,
+  pressure,
+  ts
+) {
   query("SELECT * FROM devices WHERE device = $1", [meter]).then(res => {
     if (res.rowCount !== 0) {
       query(
@@ -231,9 +253,10 @@ export async function createStatus(device, status, ts) {
         "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
         [status, device]
       );
-      query("INSERT INTO statuses (device, status, observedat) VALUES ($1, $2, $3)",
-            [device, status, ts]
-           );
+      query(
+        "INSERT INTO statuses (device, status, observedat) VALUES ($1, $2, $3)",
+        [device, status, ts]
+      );
     }
   });
 }

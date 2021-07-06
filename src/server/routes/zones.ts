@@ -30,8 +30,8 @@ router.put("/:id", async (req, res) => {
   const {
     rows
   } = await query(
-    "UPDATE zones SET nickname = $1, profileid = $2, updatedat = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id",
-    [req.body.nickname, req.body.profileid, id]
+    "UPDATE zones SET nickname = $1, profileid = $2, active = $3, updatedat = CURRENT_TIMESTAMP WHERE id = $4 RETURNING id",
+    [req.body.nickname, req.body.profileid, req.body.active, id]
   );
   const zone = await readZone(rows[0].id);
   res.status(200).json(zone);

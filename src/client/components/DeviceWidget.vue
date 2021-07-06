@@ -1,7 +1,11 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <div class="tag is-medium has-background-dark" :class="tagClass" @click="toggle">
+      <div
+        class="tag is-medium has-background-dark"
+        :class="tagClass"
+        @click="toggle"
+      >
         <font-awesome-icon :icon="iconClass" />
       </div>
       <span class="tag is-medium has-text-light has-background-dark">
