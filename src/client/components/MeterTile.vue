@@ -8,7 +8,8 @@
             type="text"
             placeHolder="Name this meter"
             v-model="nickname"
-            @keyup.esc="cancel" />
+            @keyup.esc="cancel"
+          />
         </span>
         <span v-else>{{ meter.nickname || meter.device }}</span>
       </p>
@@ -16,7 +17,7 @@
         <span class="icon" :class="meterClass">
           <font-awesome-icon icon="tachometer-alt" />
         </span>
-        <span class="tag is-medium">{{  meter.device }}</span>
+        <span class="tag is-medium">{{ meter.device }}</span>
       </p>
       <div class="content">
         <meter-actual :meter="meter" />
@@ -27,10 +28,10 @@
       <div class="content">
         <router-link
           :to="{
-               name: 'readings',
-               params: { name: meter.nickname, device: meter.device }
-               }"
-          >
+            name: 'readings',
+            params: { name: meter.nickname, device: meter.device }
+          }"
+        >
           history
         </router-link>
       </div>
@@ -38,7 +39,8 @@
         @on-edit="editable"
         @on-save="save"
         @on-destroy="destroy"
-        @on-cancel="cancel" />
+        @on-cancel="cancel"
+      />
     </div>
   </div>
 </template>
@@ -48,7 +50,6 @@ import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 import MeterActual from "@/components/MeterActual.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import EditControls from "@/components/EditControls.vue";
@@ -65,7 +66,7 @@ const MeterTile = Vue.extend({
       editing: false
     };
   },
-  
+
   components: {
     EditControls,
     MeterActual,
@@ -77,7 +78,7 @@ const MeterTile = Vue.extend({
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.meter.device;
       });
-      
+
       if (found) {
         return "has-text-danger";
       }

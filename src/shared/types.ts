@@ -1,19 +1,19 @@
-interface Manufacturer {
+export interface Manufacturer {
   manufacturer: string;
   username: string;
   passwordDigest: string;
   timestamp: Date;
 }
 
-interface Device {
+export interface Device {
   device: string;
-  deviceType: string;
+  devicetype: string;
   manufacturer: string;
   nickname: string;
   timestamp: Date;
 }
 
-interface Notification {
+export interface Notification {
   id: string;
   plug: string;
   action: string;
@@ -22,8 +22,8 @@ interface Notification {
   timestamp: Date;
 }
 
-interface Profile {
-  id: numeric;
+export interface Profile {
+  id: string;
   profile: string;
   lampStart: number;
   lampDuration: number;
@@ -34,27 +34,25 @@ interface Profile {
   timestamp: Date;
 }
 
-interface Reading {
-  id: numeric;
+export interface Reading {
+  id: string;
   meter: string;
-  temperature: numeric;
-  humidity: numeric;
-  pressure: numeric;
+  temperature: number;
+  humidity: number;
+  pressure: number;
   timestamp: Date;
 }
 
-interface Worker {
+export interface Worker {
   worker: string;
   nickname: string;
   timestamp: Date;
 }
 
-interface Zone {
-  id: numeric;
+export interface Zone {
+  id: string;
   nickname: string;
   parent: string;
   profile: string;
   timestamp: Date;
 }
-
-export = { Manufacturer, Device, Notification, Profile, Reading, Worker, Zone };

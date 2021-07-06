@@ -1,31 +1,31 @@
- <template>
+<template>
   <section class="sectioon">
     <div class="level">
       <span class="title">{{ devicesCount }} {{ devicesName }}</span>
     </div>
-  <div class="tile is-ancestor">
-    <div class="tile is-4 is-vertical">
-      <device-tile
-        v-for="device in left"
-        :key="device.device"
-        :device="device"
+    <div class="tile is-ancestor">
+      <div class="tile is-4 is-vertical">
+        <device-tile
+          v-for="device in left"
+          :key="device.device"
+          :device="device"
         />
-    </div>
-    <div class="tile is-4 is-vertical">
-      <device-tile
-        v-for="device in middle"
-        :key="device.device"
-        :device="device"
+      </div>
+      <div class="tile is-4 is-vertical">
+        <device-tile
+          v-for="device in middle"
+          :key="device.device"
+          :device="device"
         />
-    </div>
-    <div class="tile is-4 is-vertical">
-      <device-tile
-        v-for="device in right"
-        :key="device.device"
-        :device="device"
+      </div>
+      <div class="tile is-4 is-vertical">
+        <device-tile
+          v-for="device in right"
+          :key="device.device"
+          :device="device"
         />
+      </div>
     </div>
-  </div>
   </section>
 </template>
 
@@ -70,7 +70,7 @@ const Devices = Vue.extend({
       }
       return devices;
     },
-    
+
     right() {
       const devices = [];
       for (let i = 2; i < this.devicesCount; i = i + 3) {

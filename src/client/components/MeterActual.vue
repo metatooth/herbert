@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapGetters } from "vuex";  
+import { mapGetters } from "vuex";
 import { Meter } from "@/store/meters/types";
 import Target from "@/components/Target.vue";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
@@ -69,7 +69,7 @@ const MeterActual = Vue.extend({
       return "°" + this.settings.units;
     },
 
-    ...mapGetters("settings", ["settings"])    
+    ...mapGetters("settings", ["settings"])
   }
 });
 

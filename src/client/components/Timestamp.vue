@@ -1,10 +1,12 @@
 <template>
   <div>
-    <span v-if="timeago"><em>{{ lapsed  }} ago</em></span>
+    <span v-if="timeago"
+      ><em>{{ lapsed }} ago</em></span
+    >
     <span v-else class="is-family-code">
       {{ hhmm }}<span class="is-size-7">{{ ss }}</span>
     </span>
-  </div>        
+  </div>
 </template>
 
 <script lang="ts">
@@ -23,10 +25,10 @@ const Timestamp = Vue.extend({
       timeago: this.readable
     };
   },
- 
+
   computed: {
     lapsed(): string {
-      const diff = (new Date()) - this.timestamp;
+      const diff = new Date() - this.timestamp;
       if (diff < 30000) {
         return "seconds";
       } else if (diff < 60000) {

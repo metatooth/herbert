@@ -6,7 +6,6 @@ import http from "http";
 import mountRoutes from "./routes";
 import {
   readActiveZones,
-  reading,
   registerDevice,
   registerMeter,
   createReading,
@@ -156,7 +155,8 @@ async function run() {
       await Promise.all(
         zone.devices.map(async device => {
           if (device.devicetype === "meter") {
-            temperature = (count * temperature + device.temperature) / (count + 1);
+            temperature =
+              (count * temperature + device.temperature) / (count + 1);
             humidity = (count * humidity + 100 * device.humidity) / (count + 1);
           }
         })
@@ -267,5 +267,5 @@ async function run() {
 }
 
 (async () => {
-  setInterval(run, config.get("interval") * 1000);
+  setInterval(run, (config.get("interval") as number) * 1000);
 })();

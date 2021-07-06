@@ -16,7 +16,7 @@ export class Zone {
   deleted: boolean;
   deletedat?: Date;
   active: boolean;
-  
+
   constructor() {
     this.id = 0;
     this.nickname = "";

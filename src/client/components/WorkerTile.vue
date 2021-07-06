@@ -3,7 +3,13 @@
     <div class="tile is-child box">
       <p class="title">
         <span v-if="editing">
-          <input class="input" type="text" placeHolder="Name this worker" v-model="nickname" @keyup.esc="cancel" />
+          <input
+            class="input"
+            type="text"
+            placeHolder="Name this worker"
+            v-model="nickname"
+            @keyup.esc="cancel"
+          />
         </span>
         <span v-else>{{ worker.nickname || worker.worker }}</span>
       </p>
@@ -19,11 +25,8 @@
       <div class="content">
         <timestamp :timestamp="lastupdate" :readable="readable" />
       </div>
-      <edit-controls
-        @on-edit="editable"
-        @on-save="save"
-        @on-cancel="cancel" />
-    </div>      
+      <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
+    </div>
   </div>
 </template>
 
@@ -56,7 +59,7 @@ const WorkerTile = Vue.extend({
   mounted() {
     console.log("mounted", this.worker);
   },
-  
+
   methods: {
     editable() {
       this.editing = true;

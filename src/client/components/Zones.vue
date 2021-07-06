@@ -5,25 +5,13 @@
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
-        <zone-tile
-          v-for="zone in left"
-          :key="zone.id"
-          :zone="zone"
-          />
+        <zone-tile v-for="zone in left" :key="zone.id" :zone="zone" />
       </div>
       <div class="tile is-3 is-vertical">
-        <zone-tile
-          v-for="zone in middle"
-          :key="zone.id"
-          :zone="zone"
-          />
+        <zone-tile v-for="zone in middle" :key="zone.id" :zone="zone" />
       </div>
       <div class="tile is-3 is-vertical">
-        <zone-tile
-          v-for="zone in right"
-          :key="zone.id"
-          :zone="zone"
-          />
+        <zone-tile v-for="zone in right" :key="zone.id" :zone="zone" />
         <div class="tile is-parent">
           <div class="tile is-child box">
             <p class="title">
@@ -31,7 +19,7 @@
                 @on-add="editable"
                 @on-save="save"
                 @on-cancel="cancel"
-                />
+              />
             </p>
             <div class="content" v-if="editing">
               <div class="field is-grouped is-grouped-multiline">
@@ -41,7 +29,7 @@
                     type="text"
                     v-model="nickname"
                     placeHolder="Name for zone"
-                    />  
+                  />
                 </div>
 
                 <div class="select">
@@ -50,13 +38,12 @@
                       v-for="profile in profiles"
                       :key="profile.id"
                       :value="profile.id"
-                      >
+                    >
                       {{ profile.profile }}
                     </option>
                   </select>
                 </div>
               </div>
-              
             </div>
           </div>
         </div>
@@ -97,7 +84,7 @@ const Zones = Vue.extend({
         return "Zones";
       }
     },
-    
+
     left() {
       const zones = [];
       for (let i = 0; i < this.zonesCount; i = i + 3) {
@@ -117,7 +104,7 @@ const Zones = Vue.extend({
       }
       return zones;
     },
-    
+
     right() {
       const zones = [];
       for (let i = 2; i < this.zonesCount; i = i + 3) {

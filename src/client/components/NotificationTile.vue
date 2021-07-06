@@ -3,7 +3,7 @@
     <p class="title">
       <timestamp :timestamp="timestamp" :readable="true" />
     </p>
-    <p class="subtitle">{{ plug }}</p>    
+    <p class="subtitle">{{ plug }}</p>
     <p class="content">{{ message }}</p>
     <button class="delete" @click="$emit('delete-notification')" />
   </div>

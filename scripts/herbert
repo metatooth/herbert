@@ -13,7 +13,7 @@ NAME=herbert
 RUN_DIRECTORY=/home/pi/$NAME
 INSTALL_DIR=/home/pi/$NAME
 DAEMON_PID=/var/run/$NAME.pid
-DAEMON="/usr/bin/node $INSTALL_DIR/src/client.js"
+DAEMON="/usr/bin/node $INSTALL_DIR/dist/worker/main.js"
 LOGDIR=/var/log
 
 . /lib/lsb/init-functions

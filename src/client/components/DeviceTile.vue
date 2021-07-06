@@ -5,24 +5,25 @@
         <span v-if="editing">
           <div class="field is-grouped">
             <div class="control">
-            <input
-              class="input"
-              type="text"
-              placeHolder="Name this device"
-              v-model="nickname"
-              @keyup.esc="cancel" />
+              <input
+                class="input"
+                type="text"
+                placeHolder="Name this device"
+                v-model="nickname"
+                @keyup.esc="cancel"
+              />
             </div>
             <div class="control">
               <select-device-type
                 :devicetype="device.devicetype"
-                @select-devicetype="selected" />
+                @select-devicetype="selected"
+              />
             </div>
           </div>
         </span>
-       
-          <span v-else>{{ device.nickname || device.device }}</span>
-        
-      </div> 
+
+        <span v-else>{{ device.nickname || device.device }}</span>
+      </div>
       <p class="subtitle">
         <span>
           <button class="button is-small" @click="toggle">
@@ -37,23 +38,24 @@
         <timestamp :timestamp="device.updatedat" :readable="readable" />
       </div>
       <div class="content">
-<router-link
-        :to="{
-          name: 'statuses',
-          params: { name: device.nickname, device: device.device }
-        }"
-      >
-        history
-      </router-link>
-  </div>
-  <div class="content">
-        <edit-controls class="edit-controls"
-        @on-edit="editable"
-        @on-save="save"
-        @on-destroy="destroy"
-        @on-cancel="cancel" />
-    </div>
-
+        <router-link
+          :to="{
+            name: 'statuses',
+            params: { name: device.nickname, device: device.device }
+          }"
+        >
+          history
+        </router-link>
+      </div>
+      <div class="content">
+        <edit-controls
+          class="edit-controls"
+          @on-edit="editable"
+          @on-save="save"
+          @on-destroy="destroy"
+          @on-cancel="cancel"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -113,7 +115,7 @@ const DeviceTile = Vue.extend({
 
     deviceIcon(): string {
       console.log(this.device.devicetype);
-      
+
       if (this.device.status !== "on" && this.device.status !== "off") {
         return "times";
       }
@@ -137,32 +139,26 @@ const DeviceTile = Vue.extend({
       return "circle";
     },
 
-         
-statusClass() {
-if (this.device.status === "on" ||
-this.device.status === "1") {
-return "has-text-success";
+    statusClass() {
+      if (this.device.status === "on" || this.device.status === "1") {
+        return "has-text-success";
       } else {
-return "has-text-info";
+        return "has-text-info";
       }
+    },
 
-},
-
-statusIcon() {
-if (this.device.status === "on" ||
-this.device.status === "1") {
+    statusIcon() {
+      if (this.device.status === "on" || this.device.status === "1") {
         return "toggle-on";
       } else {
         return "toggle-off";
       }
-
-},
+    },
     ...mapGetters("notifications", ["notifications"]),
     ...mapGetters("settings", ["settings"])
   },
 
   methods: {
-
     toggle() {
       console.log("toggle", this.device.device, this.device.status);
       this.updating = true;
@@ -173,7 +169,7 @@ this.device.status === "1") {
       }
     },
 
-        editable() {
+    editable() {
       this.editing = true;
     },
 

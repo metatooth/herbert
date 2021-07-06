@@ -6,25 +6,13 @@
           <p class="title has-text-centered">No zones!</p>
         </div>
         <div class="tile is-4 is-vertical">
-          <zone-tile
-            v-for="zone in left"
-            :key="zone.id"
-            :zone="zone"
-            />
+          <zone-tile v-for="zone in left" :key="zone.id" :zone="zone" />
         </div>
         <div class="tile is-3 is-vertical">
-          <zone-tile
-            v-for="zone in middle"
-            :key="zone.id"
-            :zone="zone"
-            />
+          <zone-tile v-for="zone in middle" :key="zone.id" :zone="zone" />
         </div>
         <div class="tile is-3 is-vertical">
-          <zone-tile
-            v-for="zone in right"
-            :key="zone.id"
-            :zone="zone"
-            />
+          <zone-tile v-for="zone in right" :key="zone.id" :zone="zone" />
         </div>
       </div>
     </section>
@@ -38,7 +26,7 @@
           v-bind:key="notification.id"
           v-bind="notification"
           @delete-notification="deleteNotification(notification)"
-          />
+        />
       </div>
     </section>
   </div>
@@ -79,7 +67,7 @@ const Overview = Vue.extend({
       }
       return zones;
     },
-    
+
     right() {
       const zones = [];
       for (let i = 2; i < this.zonesCount; i = i + 3) {
