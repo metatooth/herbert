@@ -53,5 +53,4 @@ test("Five times per day for 420 seconds each", () => {
   expect(timer.isOn(69540)).toBe(false);
   expect(timer.isOn(69545)).toBe(false);
   expect(timer.isOn(69620)).toBe(false);
-
 });

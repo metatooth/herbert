@@ -15,7 +15,7 @@ export class IrrigationTimer {
     const cycle = 86400 / this.runs;
 
     for (let i = 0; i < this.runs; i++) {
-      if (seconds >= i*cycle && seconds < i*cycle + this.active) {
+      if (seconds >= i * cycle && seconds < i * cycle + this.active) {
         result = true;
       }
     }

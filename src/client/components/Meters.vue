@@ -7,10 +7,10 @@
       <div class="tile is-4 is-vertical">
         <meter-tile v-for="meter in left" :key="meter.id" :meter="meter" />
       </div>
-      <div class="tile is-3 is-vertical">
+      <div class="tile is-4 is-vertical">
         <meter-tile v-for="meter in middle" :key="meter.id" :meter="meter" />
       </div>
-      <div class="tile is-3 is-vertical">
+      <div class="tile is-4 is-vertical">
         <meter-tile v-for="meter in right" :key="meter.id" :meter="meter" />
       </div>
     </div>

@@ -131,7 +131,7 @@ const DeviceTile = Vue.extend({
       } else if (this.device.devicetype === "cooler") {
         return "snowflake";
       } else if (this.device.devicetype === "irrigator") {
-        return "cloud-rain"; 
+        return "cloud-rain";
       } else if (this.device.devicetype === "fan") {
         return "fan";
       }

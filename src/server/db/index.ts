@@ -24,12 +24,6 @@ export async function readProfile(id: string): Promise<Profile> {
 }
 
 export async function readDevice(id: string): Promise<Device> {
-  const res = await query<Device>("SELECT * FROM devices WHERE device = $1 AND devicetype != 'meter'", [
-    id
-  ]);
-
-  const device = res.rows[0];
-  
   const { rows } = await query<Device>(
     "SELECT device, devicetype, manufacturer, nickname, status, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
     [id]
@@ -38,12 +32,6 @@ export async function readDevice(id: string): Promise<Device> {
 }
 
 export async function readMeter(id: string): Promise<Meter> {
-  const res = await query<Meter>("SELECT * FROM devices WHERE device = $1 AND devicetype = 'meter'", [
-    id
-  ]);
-
-  const meter = res.rows[0];
-  
   const { rows } = await query<Meter>(
     "SELECT device, devicetype, manufacturer, nickname, temperature, humidity, pressure, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
     [id]
