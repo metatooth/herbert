@@ -1,5 +1,5 @@
 import { Pool, QueryResult } from "pg";
-import { Device, Profile, Zone } from "../../shared/types";
+import { Device, Meter, Profile, Zone } from "../../shared/types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -8,10 +8,10 @@ const pool = new Pool({
 });
 
 export async function query<T>(text, params): Promise<QueryResult<T>> {
-  const start = Date.now();
+  //const start = Date.now();
   const res = await pool.query<T>(text, params);
-  const duration = Date.now() - start;
-  console.log("executed query", { text, duration, rows: res.rowCount });
+  //const duration = Date.now() - start;
+  //console.log("executed query", { text, duration, rows: res.rowCount });
   return res;
 }
 
@@ -24,25 +24,31 @@ export async function readProfile(id: string): Promise<Profile> {
 }
 
 export async function readDevice(id: string): Promise<Device> {
-  const res = await query<Device>("SELECT * FROM devices WHERE device = $1", [
+  const res = await query<Device>("SELECT * FROM devices WHERE device = $1 AND devicetype != 'meter'", [
     id
   ]);
 
   const device = res.rows[0];
+  
+  const { rows } = await query<Device>(
+    "SELECT device, devicetype, manufacturer, nickname, status, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
+    [id]
+  );
+  return rows[0];
+}
 
-  if (device.devicetype === "meter") {
-    const { rows } = await query<Device>(
-      "SELECT device, devicetype, manufacturer, nickname, temperature, humidity, pressure, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
-      [id]
-    );
-    return rows[0];
-  } else {
-    const { rows } = await query<Device>(
-      "SELECT device, devicetype, manufacturer, nickname, status, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
-      [id]
-    );
-    return rows[0];
-  }
+export async function readMeter(id: string): Promise<Meter> {
+  const res = await query<Meter>("SELECT * FROM devices WHERE device = $1 AND devicetype = 'meter'", [
+    id
+  ]);
+
+  const meter = res.rows[0];
+  
+  const { rows } = await query<Meter>(
+    "SELECT device, devicetype, manufacturer, nickname, temperature, humidity, pressure, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
+    [id]
+  );
+  return rows[0];
 }
 
 export async function readZone(id: string) {

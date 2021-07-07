@@ -94,7 +94,6 @@ const TemperatureChart = Vue.extend({
 
   methods: {
     calcminmax() {
-      console.log("at calcminmax");
       this.data.forEach(d => {
         if (d.y < this.minmax[0]) {
           this.minmax[0] = d.y;

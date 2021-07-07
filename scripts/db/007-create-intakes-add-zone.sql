@@ -1,6 +1,6 @@
 begin;
 
-create table edges (
+create table intakes (
   a integer references zones(id),
   b integer references zones(id),
   createdat timestamp default current_timestamp,

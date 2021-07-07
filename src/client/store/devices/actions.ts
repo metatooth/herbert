@@ -6,34 +6,21 @@ import { RootState } from "../types";
 export const actions: ActionTree<DevicesState, RootState> = {
   edit({ commit }, payload: Device) {
     const json = JSON.stringify(payload);
-    HTTP.put(`/devices/${payload.device}`, json).then(
-      response => {
-        console.log("EDIT", response.data);
-        commit("EDIT", Object.assign(new Device(response.data)));
-      },
-      error => {
-        console.log(error);
-        commit("DEVICE_ERROR");
-      }
-    );
+    HTTP.put(`/devices/${payload.device}`, json).then(response => {
+      commit("EDIT", Object.assign(new Device(response.data)));
+    });
   },
   fetchData({ commit }) {
-    HTTP.get("/devices").then(
-      response => {
-        const payload: Device[] = [];
-        response.data.forEach((json: object) => {
-          const obj = new Device(JSON.stringify(json));
-          if (obj.devicetype !== "meter") {
-            payload.push(obj);
-          }
-        });
-        commit("SET", payload);
-      },
-      error => {
-        console.log(error);
-        commit("DEVICES_ERROR");
-      }
-    );
+    HTTP.get("/devices").then(response => {
+      const payload: Device[] = [];
+      response.data.forEach((json: object) => {
+        const obj = new Device(JSON.stringify(json));
+        if (obj.devicetype !== "meter") {
+          payload.push(obj);
+        }
+      });
+      commit("SET", payload);
+    });
   },
   off({ commit }, payload: string) {
     HTTP.put(`/devices/${payload}/off`).then(response => {

@@ -11,6 +11,18 @@ export interface Device {
   manufacturer: string;
   nickname: string;
   timestamp: Date;
+  status: string;
+}
+
+export interface Meter {
+  device: string;
+  devicetype: string;
+  manufacturer: string;
+  nickname: string;
+  timestamp: Date;
+  temperature: number;
+  humidity: number;
+  pressure: number;
 }
 
 export interface Notification {

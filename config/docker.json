@@ -2,7 +2,10 @@
   "ws-url": "ws://server:5000",
   "devices": [
     {
-      "manufacturer": "mockbot"
+      "manufacturer": "mockmeter"
+    },
+    {
+      "manufacturer": "mockplug"
     }
   ]
 }

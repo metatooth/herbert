@@ -329,12 +329,10 @@ const ProfileRow = Vue.extend({
 
     save() {
       const start = this.lampstart.split(":");
-      console.log("start", start);
       let hourInt = parseInt(start[0]);
       if (hourInt > 24) {
         hourInt = hourInt - 24;
       }
-      console.log("hour int", hourInt);
 
       let hourString;
       if (hourInt < 10) {
@@ -342,7 +340,6 @@ const ProfileRow = Vue.extend({
       } else {
         hourString = hourInt.toString();
       }
-      console.log("hour string", hourString);
 
       let ontemp = this.lampontemperature;
       let offtemp = this.lampofftemperature;
@@ -354,7 +351,6 @@ const ProfileRow = Vue.extend({
         offtemp = kelvin2celsius(offtemp);
       }
 
-      console.log("lampstart", `${hourString}:${start[1]}`);
       const profile = {
         id: this.profile.id,
         profile: this.name,

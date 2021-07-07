@@ -13,6 +13,7 @@ import {
   faCheckCircle,
   faCircle,
   faCloud,
+  faCloudRain,
   faCog,
   faEdit,
   faFan,
@@ -48,6 +49,7 @@ library.add(faCheck);
 library.add(faCheckCircle);
 library.add(faCircle);
 library.add(faCloud);
+library.add(faCloudRain);
 library.add(faCog);
 library.add(faEdit);
 library.add(faFan);

@@ -45,8 +45,6 @@ const SelectDevice = Vue.extend({
 
   methods: {
     select() {
-      console.log("HERE");
-      console.log("SELECT METER", this.selected);
       this.$emit("select-device", this.selected);
       this.selected = "";
     }

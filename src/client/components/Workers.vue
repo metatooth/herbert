@@ -57,7 +57,6 @@ const Workers = Vue.extend({
           workers.push(this.workers[i]);
         }
       }
-      console.log(workers);
       return workers;
     },
 

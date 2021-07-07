@@ -116,7 +116,6 @@ const ZoneDetail = Vue.extend({
   methods: {
     add(selected: string) {
       const payload = { zone: this.zone, device: selected };
-      console.log("ADD WITH", payload);
       this.addDevice(payload);
       this.fetchData();
     },

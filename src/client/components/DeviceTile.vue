@@ -114,8 +114,6 @@ const DeviceTile = Vue.extend({
     },
 
     deviceIcon(): string {
-      console.log(this.device.devicetype);
-
       if (this.device.status !== "on" && this.device.status !== "off") {
         return "times";
       }
@@ -132,6 +130,8 @@ const DeviceTile = Vue.extend({
         return "wind";
       } else if (this.device.devicetype === "cooler") {
         return "snowflake";
+      } else if (this.device.devicetype === "irrigator") {
+        return "cloud-rain"; 
       } else if (this.device.devicetype === "fan") {
         return "fan";
       }
@@ -160,7 +160,6 @@ const DeviceTile = Vue.extend({
 
   methods: {
     toggle() {
-      console.log("toggle", this.device.device, this.device.status);
       this.updating = true;
       if (this.device.status === "off" || this.device.status === "0") {
         this.on(this.device.device);

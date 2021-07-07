@@ -5,6 +5,7 @@ import { networkInterfaces } from "os";
 
 import { Meter } from "./meter";
 import { MockMeter } from "./mock-meter";
+import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
@@ -161,8 +162,12 @@ export class App {
         } else if (dev.remote) {
           switches.push(new IRSend(dev.id, dev.remote));
         }
-      } else if (dev.manufacturer === "mockbot") {
+      } else if (dev.manufacturer === "mockmeter") {
         meters.push(new MockMeter());
+      } else if (dev.manufacturer === "mockplug") {
+        const plug = new MockPlug();
+        plug.off();
+        switches.push(plug);
       }
     });
 

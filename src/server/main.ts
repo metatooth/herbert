@@ -5,12 +5,14 @@ import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import {
+  createReading,
+  createStatus,
   readActiveZones,
   registerDevice,
   registerMeter,
-  createReading,
-  createStatus,
-  workerStatus
+  workerStatus,
+  readDevice,
+  readMeter
 } from "./db";
 
 import path from "path";
@@ -18,6 +20,7 @@ import favicon from "serve-favicon";
 
 import { AirDirectives } from "../shared/air-directives";
 import { BlowerTimer } from "../shared/blower-timer";
+import { IrrigationTimer } from "../shared/irrigation-timer";
 import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
@@ -94,10 +97,8 @@ wss.on("connection", function(ws: WebSocket) {
     if (data.type === "STATUS") {
       if (data.payload.device) {
         if (data.payload.type === "meter") {
-          const meter = await registerMeter(
-            data.payload.device,
-            data.payload.manufacturer
-          );
+          await registerMeter(data.payload.device, data.payload.manufacturer);
+          const meter = await readMeter(data.payload.device);
           console.log("Got meter", meter);
           if (
             meter.temperature != data.payload.temperature &&
@@ -112,11 +113,9 @@ wss.on("connection", function(ws: WebSocket) {
             );
           }
         } else {
-          const device = await registerDevice(
-            data.payload.device,
-            data.payload.manufacturer
-          );
-          console.log("Got device", device);
+          console.log(data.payload);
+          await registerDevice(data.payload.device, data.payload.manufacturer);
+          const device = await readDevice(data.payload.device);
 
           if (device.status != data.payload.status) {
             createStatus(
@@ -164,14 +163,14 @@ async function run() {
 
       console.log("command for zone", zone.nickname);
       console.log("profile", zone.profile);
-      console.log("profile", zone.profile);
       console.log("hour", hour, "temp", temperature, "humi", humidity);
 
       const now = new Date();
       console.log("now", now);
+      const ms = now.getMilliseconds();
+      console.log("ms", ms);
 
       console.log(now.getMonth());
-
       console.log(now.getDate());
 
       const monthnbr = now.getMonth() + 1;
@@ -197,6 +196,8 @@ async function run() {
       const lamp = new LampTimer(utc.getHours(), duration);
 
       const blower = new BlowerTimer(config.get("blower"), 180); // WARNING!!
+
+      const irrigator = new IrrigationTimer(96, 210); // WARNING!!
 
       let target;
       let delta;
@@ -238,6 +239,7 @@ async function run() {
         ["cooler", directives.temperature === "cool"],
         ["dehumidifer", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],
+        ["irrigator", irrigator.isOn((ms / 1000) % 86400)],
         ["fan", 1 === 1]
       ]);
 

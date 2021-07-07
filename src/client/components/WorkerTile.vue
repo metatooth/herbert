@@ -56,10 +56,6 @@ const WorkerTile = Vue.extend({
     Timestamp
   },
 
-  mounted() {
-    console.log("mounted", this.worker);
-  },
-
   methods: {
     editable() {
       this.editing = true;
