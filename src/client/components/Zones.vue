@@ -1,68 +1,60 @@
 <template>
   <section class="section">
-    <h2 id="zones" class="title">{{ zonesCount }} {{ zonesName }}</h2>
-    <table class="table is-fullwidth is-striped">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Profile</th>
-          <th>Updated</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <zone-row
-          v-for="zone in zones"
-          v-bind:key="zone.id"
-          v-bind:units="units"
-          v-bind:zone="zone"
-        />
-        <tr>
-          <td>
-            <div class="control" v-if="editing">
-              <input
-                class="input"
-                type="text"
-                v-model="nickname"
-                placeHolder="zone name"
+    <div class="level">
+      <span class="title">{{ zonesCount }} {{ zonesName }}</span>
+    </div>
+    <div class="tile is-ancestor">
+      <div class="tile is-4 is-vertical">
+        <zone-tile v-for="zone in left" :key="zone.id" :zone="zone" />
+      </div>
+      <div class="tile is-3 is-vertical">
+        <zone-tile v-for="zone in middle" :key="zone.id" :zone="zone" />
+      </div>
+      <div class="tile is-3 is-vertical">
+        <zone-tile v-for="zone in right" :key="zone.id" :zone="zone" />
+        <div class="tile is-parent">
+          <div class="tile is-child box">
+            <p class="title">
+              <add-controls
+                @on-add="editable"
+                @on-save="save"
+                @on-cancel="cancel"
               />
-            </div>
-          </td>
+            </p>
+            <div class="content" v-if="editing">
+              <div class="field is-grouped is-grouped-multiline">
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="nickname"
+                    placeHolder="Name for zone"
+                  />
+                </div>
 
-          <td>
-            <div class="control" v-if="editing">
-              <div class="select">
-                <select v-model="profileid">
-                  <option
-                    v-for="profile in profiles"
-                    :key="profile.id"
-                    :value="profile.id"
-                  >
-                    {{ profile.profile }}
-                  </option>
-                </select>
+                <div class="select">
+                  <select v-model="profileid">
+                    <option
+                      v-for="profile in profiles"
+                      :key="profile.id"
+                      :value="profile.id"
+                    >
+                      {{ profile.profile }}
+                    </option>
+                  </select>
+                </div>
               </div>
             </div>
-          </td>
-
-          <td></td>
-
-          <td>
-            <add-controls
-              @on-add="editable"
-              @on-save="save"
-              @on-cancel="cancel"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import ZoneRow from "@/components/ZoneRow.vue";
+import ZoneTile from "@/components/ZoneTile.vue";
 import AddControls from "@/components/AddControls.vue";
 import { mapGetters, mapActions } from "vuex";
 
@@ -81,7 +73,7 @@ const Zones = Vue.extend({
 
   components: {
     AddControls,
-    ZoneRow
+    ZoneTile
   },
 
   computed: {
@@ -92,7 +84,39 @@ const Zones = Vue.extend({
         return "Zones";
       }
     },
+
+    left() {
+      const zones = [];
+      for (let i = 0; i < this.zonesCount; i = i + 3) {
+        if (this.zones[i]) {
+          zones.push(this.zones[i]);
+        }
+      }
+      return zones;
+    },
+
+    middle() {
+      const zones = [];
+      for (let i = 1; i < this.zonesCount; i = i + 3) {
+        if (this.zones[i]) {
+          zones.push(this.zones[i]);
+        }
+      }
+      return zones;
+    },
+
+    right() {
+      const zones = [];
+      for (let i = 2; i < this.zonesCount; i = i + 3) {
+        if (this.zones[i]) {
+          zones.push(this.zones[i]);
+        }
+      }
+      return zones;
+    },
+
     ...mapGetters("profiles", ["profiles"]),
+
     ...mapGetters("zones", ["zones", "zonesCount"])
   },
 

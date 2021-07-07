@@ -1,47 +1,33 @@
 <template>
   <div id="overview">
     <section class="section">
-      <div class="tile is-ancestor has-text-centered">
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <p class="title">{{ metersCount }}</p>
-            <p class="subtitle"><a @click="picked('meters')">Meters</a></p>
-          </article>
+      <div class="tile is-ancestor">
+        <div class="tile" v-if="zonesCount === 0">
+          <p class="title has-text-centered">No zones!</p>
         </div>
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <p class="title">{{ devicesCount }}</p>
-            <p class="subtitle"><a @click="picked('devices')">Devices</a></p>
-          </article>
+        <div class="tile is-4 is-vertical">
+          <zone-tile v-for="zone in left" :key="zone.id" :zone="zone" />
         </div>
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <p class="title">{{ profilesCount }}</p>
-            <p class="subtitle"><a @click="picked('profiles')">Profiles</a></p>
-          </article>
+        <div class="tile is-3 is-vertical">
+          <zone-tile v-for="zone in middle" :key="zone.id" :zone="zone" />
         </div>
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <p class="title">{{ zonesCount }}</p>
-            <p class="subtitle"><a @click="picked('zones')">Zones</a></p>
-          </article>
+        <div class="tile is-3 is-vertical">
+          <zone-tile v-for="zone in right" :key="zone.id" :zone="zone" />
         </div>
       </div>
     </section>
     <section class="section">
-      <table class="table is-fullwidth is-bordered">
-        <tbody>
-          <tr v-if="notificationsCount === 0">
-            <td class="has-text-centered" colspan="4">None!</td>
-          </tr>
-          <notification-row
-            v-for="notification in notifications"
-            v-bind:key="notification.id"
-            v-bind="notification"
-            @delete-notification="deleteNotification(notification)"
-          />
-        </tbody>
-      </table>
+      <div class="tile is-ancestor">
+        <div class="tile" v-if="notificationsCount === 0">
+          <p class="title has-text-centered">No notifications!</p>
+        </div>
+        <notification-tile
+          v-for="notification in notifications"
+          v-bind:key="notification.id"
+          v-bind="notification"
+          @delete-notification="deleteNotification(notification)"
+        />
+      </div>
     </section>
   </div>
 </template>
@@ -49,36 +35,62 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
-import NotificationRow from "@/components/NotificationRow.vue";
+import NotificationTile from "@/components/NotificationTile.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
+import ZoneTile from "@/components/ZoneTile.vue";
 
 const Overview = Vue.extend({
   components: {
-    NotificationRow
+    NotificationTile,
+    ZoneTile
   },
 
   computed: {
+    left() {
+      const zones = [];
+      for (let i = 0; i < this.zonesCount; i = i + 3) {
+        if (this.zones[i]) {
+          zones.push(this.zones[i]);
+        }
+      }
+      return zones;
+    },
+
+    middle() {
+      const zones = [];
+      for (let i = 1; i < this.zonesCount; i = i + 3) {
+        if (this.zones[i]) {
+          zones.push(this.zones[i]);
+        }
+      }
+      return zones;
+    },
+
+    right() {
+      const zones = [];
+      for (let i = 2; i < this.zonesCount; i = i + 3) {
+        if (this.zones[i]) {
+          zones.push(this.zones[i]);
+        }
+      }
+      return zones;
+    },
+
     ...mapGetters("meters", ["meters", "metersCount"]),
     ...mapGetters("devices", ["devices", "devicesCount"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
     ...mapGetters("profiles", ["profilesCount"]),
     ...mapGetters("workers", ["workersCount"]),
-    ...mapGetters("zones", ["zonesCount"]),
+    ...mapGetters("zones", ["zones", "zonesCount"]),
     ...mapGetters("settings", ["settings"])
   },
 
   mounted() {
-    console.log("Starting connection to WebSocket server...");
     const ws = new WebSocket(
       process.env.VUE_APP_WS_URL || "ws://localhost:5000"
     );
-
-    ws.addEventListener("open", (ev: Event) => {
-      console.log(ev);
-      console.log("Connection open success!");
-    });
 
     ws.addEventListener("message", (ev: MessageEvent) => {
       const data = JSON.parse(ev.data);
@@ -104,8 +116,6 @@ const Overview = Vue.extend({
         this.add(n);
       }
     });
-
-    this.checkDeviceHealth();
   },
 
   methods: {
@@ -116,9 +126,7 @@ const Overview = Vue.extend({
           timeZone: "America/New_York"
         });
         const diff = check - local.getTime();
-        console.log("check health", d.device, d.timestamp, diff);
         if (diff > 5 * 60 * 1000) {
-          console.log("TOO LONG!");
           const formatted = this.pretty(local);
 
           const n: Notification = {

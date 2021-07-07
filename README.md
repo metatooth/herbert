@@ -20,7 +20,7 @@ $ git clone https://github.com/metatooth/herbert.git
 # install dependencies
 npm install
 
-# compile and watch the server 
+# compile and watch the server
 npm run serve:server
 
 # compile and watch the worker
@@ -60,6 +60,26 @@ $ sudo chmod 755 /etc/init.d/herbert
 $ sudo update-rc.d herbert defaults
 $ sudo /etc/init.d/herbert start
 $ sudo /etc/init.d/herbert status
+```
+
+## Docker / Docker Compose
+
+If you want to spin up the entire ecosystem locally for development you can
+use the included "docker compose" setup.
+
+Install Docker for Mac: https://docs.docker.com/docker-for-mac/install/
+
+Bring up all containers
+
+```bash
+docker compose up
+# Then navigate to http://localhost:8080 in your browser
+```
+
+Tear down all containers
+
+```
+docker compose down
 ```
 
 ## License

@@ -1,4 +1,5 @@
 import Router from "express-promise-router";
+import { Zone } from "../../shared/types";
 
 import { query, readZones, readZone } from "../db";
 
@@ -10,9 +11,7 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const {
-    rows
-  } = await query(
+  const { rows } = await query<Zone>(
     "INSERT INTO zones (nickname, profileid) VALUES ($1, $2) RETURNING id",
     [req.body.nickname, req.body.profileid]
   );
@@ -27,11 +26,9 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const {
-    rows
-  } = await query(
-    "UPDATE zones SET nickname = $1, profileid = $2, updatedat = CURRENT_TIMESTAMP WHERE id = $3 RETURNING id",
-    [req.body.nickname, req.body.profileid, id]
+  const { rows } = await query<Zone>(
+    "UPDATE zones SET nickname = $1, profileid = $2, active = $3, updatedat = CURRENT_TIMESTAMP WHERE id = $4 RETURNING id",
+    [req.body.nickname, req.body.profileid, req.body.active, id]
   );
   const zone = await readZone(rows[0].id);
   res.status(200).json(zone);

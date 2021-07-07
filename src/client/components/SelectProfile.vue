@@ -69,8 +69,6 @@ const SelectProfile = Vue.extend({
 
   methods: {
     select() {
-      console.log("SELECT SELECT!");
-      console.log("SELECT", this.selected);
       this.$emit("select-profile", this.selected);
     }
   }

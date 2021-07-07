@@ -18,7 +18,7 @@ const Target = Vue.extend({
     value: Number,
     precision: Number,
     units: String,
-    color: { type: String, default: "black" },
+    color: { type: String, default: "grey" },
     size: { type: String, default: "medium" }
   },
 

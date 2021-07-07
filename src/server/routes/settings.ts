@@ -11,15 +11,16 @@ router.get("/", async (req, res) => {
 router.put("/", async (req, res) => {
   console.log("PUT /settings", req.body);
 
-  if (req.body.logo) {
+  if (Object.keys(req.body.logo).length !== 0) {
     const arr = req.body.logo.split(",");
     console.log("IMAGE", arr[0]);
     console.log("DATA", arr[1]);
     await query(
-      "UPDATE accounts SET units = $1, refresh = $2, locale = $3, timezone = $4, title = $5, logo = decode($6, 'base64'), updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
+      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, locale = $4, timezone = $5, title = $6, logo = decode($7, 'base64'), updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
       [
         req.body.units,
         req.body.refresh,
+        req.body.timeout,
         req.body.locale,
         req.body.timezone,
         req.body.title || "",
@@ -28,10 +29,11 @@ router.put("/", async (req, res) => {
     );
   } else {
     await query(
-      "UPDATE accounts SET units = $1, refresh = $2, locale = $3, timezone = $4, title = $5, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
+      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, locale = $4, timezone = $5, title = $6, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
       [
         req.body.units,
         req.body.refresh,
+        req.body.timeout,
         req.body.locale,
         req.body.timezone,
         req.body.title

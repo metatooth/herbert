@@ -1,7 +1,11 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <div class="tag is-medium has-background-dark" :class="tagClass">
+      <div
+        class="tag is-medium has-background-dark"
+        :class="tagClass"
+        @click="toggle"
+      >
         <font-awesome-icon :icon="iconClass" />
       </div>
       <span class="tag is-medium has-text-light has-background-dark">
@@ -28,13 +32,25 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 
 const DeviceWidget = Vue.extend({
   props: {
     device: Device
+  },
+
+  data() {
+    return {
+      updating: false
+    };
+  },
+
+  watch: {
+    device() {
+      this.updating = false;
+    }
   },
 
   computed: {
@@ -53,6 +69,8 @@ const DeviceWidget = Vue.extend({
         return "snowflake";
       } else if (this.device.devicetype === "fan") {
         return "fan";
+      } else if (this.device.devicetype === "irrigator") {
+        return "cloud-rain";
       } else {
         return "circle";
       }
@@ -79,7 +97,18 @@ const DeviceWidget = Vue.extend({
   methods: {
     remove(device: string) {
       this.$emit("remove-device", device);
-    }
+    },
+
+    toggle() {
+      this.updating = true;
+      if (this.device.status === "off") {
+        this.on(this.device.device);
+      } else if (this.device.status === "on") {
+        this.off(this.device.device);
+      }
+    },
+
+    ...mapActions("devices", ["on", "off"])
   }
 });
 

@@ -45,8 +45,6 @@ const SelectMeter = Vue.extend({
 
   methods: {
     select() {
-      console.log("HERE");
-      console.log("SELECT METER", this.selected);
       this.$emit("select-meter", this.selected);
       this.selected = "";
     }

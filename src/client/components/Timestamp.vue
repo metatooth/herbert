@@ -1,7 +1,12 @@
 <template>
-  <span class="is-family-code">
-    {{ hhmm }}<span class="is-size-7">{{ ss }}</span>
-  </span>
+  <div>
+    <span v-if="timeago"
+      ><em>{{ lapsed }} ago</em></span
+    >
+    <span v-else class="is-family-code">
+      {{ hhmm }}<span class="is-size-7">{{ ss }}</span>
+    </span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -11,10 +16,42 @@ import { convertToLocalTime } from "date-fns-timezone";
 const Timestamp = Vue.extend({
   props: {
     timestamp: { default: new Date(), type: Date },
-    timezone: { default: "America/New_York", type: String }
+    timezone: { default: "America/New_York", type: String },
+    readable: { default: false, type: Boolean }
+  },
+
+  data() {
+    return {
+      timeago: this.readable
+    };
   },
 
   computed: {
+    lapsed(): string {
+      const diff = new Date() - this.timestamp;
+      if (diff < 30000) {
+        return "seconds";
+      } else if (diff < 60000) {
+        return `${(diff / 1000).toFixed(0)} secs`;
+      } else if (diff < 3600000) {
+        const mins = diff / 60000;
+        if (mins < 2) {
+          return "1 minute";
+        } else {
+          return `${mins.toFixed(0)} mins`;
+        }
+      } else if (diff < 86400000) {
+        const hrs = diff / 3600000;
+        if (hrs < 2) {
+          return "1 hour";
+        } else {
+          return `${hrs.toFixed(0)} hrs`;
+        }
+      } else {
+        return "a long time";
+      }
+    },
+
     local(): Date {
       return convertToLocalTime(this.timestamp, { timeZone: this.timezone });
     },

@@ -5,67 +5,9 @@
         <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
       </div>
 
-      <div class="card-content">
-        <div class="field is-grouped">
-          <div class="control">
-            <span class="tag is-medium">Actual</span>
-          </div>
-          <target
-            icon="thermometer-half"
-            :value="meanTemperature"
-            :precision="1"
-            :units="unitsWithDegree"
-            :color="meanTemperatureColor"
-          />
+      <meter-actual :zone="zone" :units="units" />
 
-          <target
-            icon="tint"
-            :value="meanHumidity"
-            :precision="0"
-            units="%"
-            :color="meanHumidityColor"
-          />
-
-          <target
-            icon="cloud"
-            :value="meanPressure"
-            :precision="1"
-            units="hPa"
-            :color="meanPressureColor"
-          />
-        </div>
-      </div>
-
-      <div class="card-content">
-        <div class="field is-grouped">
-          <div class="control">
-            <span class="tag is-medium">Target</span>
-          </div>
-          <target
-            icon="thermometer-half"
-            :value="targetTemperature"
-            :precision="1"
-            :units="unitsWithDegree"
-            :color="targetColor"
-          />
-
-          <target
-            icon="tint"
-            :value="targetHumidity"
-            :precision="0"
-            units="%"
-            :color="targetColor"
-          />
-
-          <target
-            icon="cloud"
-            :value="targetPressure"
-            :precision="1"
-            units="hPa"
-            :color="targetColor"
-          />
-        </div>
-      </div>
+      <meter-target :zone="zone" :units="units" />
 
       <div class="card-content">
         <select-profile
@@ -126,17 +68,12 @@ import SelectMeter from "@/components/SelectMeter.vue";
 import SelectProfile from "@/components/SelectProfile.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
-import { LampTimer } from "../../shared/lamp-timer";
 import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
 import DeviceWidget from "@/components/DeviceWidget.vue";
-import {
-  celsius2fahrenheit,
-  fahrenheit2celsius,
-  vaporPressureDeficit
-} from "../../shared/utils";
 import { mapGetters, mapActions } from "vuex";
-import Target from "@/components/Target.vue";
+import MeterActual from "@/components/MeterActual.vue";
+import MeterTarget from "@/components/MeterTarget.vue";
 
 const ZoneDetail = Vue.extend({
   props: {
@@ -153,132 +90,18 @@ const ZoneDetail = Vue.extend({
   components: {
     DeviceWidget,
     EditText,
+    MeterActual,
+    MeterTarget,
     MeterWidget,
     SelectDevice,
     SelectMeter,
     SelectProfile,
-    Target,
     Timestamp
   },
 
   computed: {
-    isDay(): boolean {
-      let day = true;
-
-      if (this.zone.profile) {
-        const start = this.zone.profile.lampstart.split(":");
-        const duration = this.zone.profile.lampduration["hours"];
-
-        const lamp = new LampTimer(parseInt(start[0]), duration);
-
-        const hour = this.timestamp.getHours();
-        day = lamp.isOn(hour);
-      }
-
-      return day;
-    },
-
     linkto(): string {
       return `zone-details-${this.zone.id}`;
-    },
-
-    meanTemperature(): number {
-      let sum = 0;
-      this.zone.meters.forEach(meter => {
-        sum = sum + meter.temperature;
-      });
-      const mean = sum / this.zone.meters.length;
-      return this.units === "F" ? celsius2fahrenheit(mean) : mean;
-    },
-
-    meanHumidity(): number {
-      let sum = 0;
-      this.zone.meters.forEach(meter => {
-        sum = sum + 100 * meter.humidity;
-      });
-      return sum / this.zone.meters.length;
-    },
-
-    meanPressure(): number {
-      const delta = this.isDay ? -0.6 : 0.6;
-      let temp = this.meanTemperature;
-      if (this.units === "F") {
-        temp = fahrenheit2celsius(temp);
-      }
-
-      return vaporPressureDeficit(temp, delta, this.meanHumidity / 100) / 1000;
-    },
-
-    meanTemperatureColor(): string {
-      if (this.meanTemperature < this.targetTemperature) {
-        return "info";
-      } else if (this.meanTemperature > this.targetTemperature) {
-        return "danger";
-      } else {
-        return "success";
-      }
-    },
-
-    meanHumidityColor(): string {
-      if (this.meanHumidity < this.targetHumidity) {
-        return "info";
-      } else if (this.meanHumidity > this.targetHumidity) {
-        return "danger";
-      } else {
-        return "success";
-      }
-    },
-
-    meanPressureColor(): string {
-      if (this.meanPressure < this.targetPressure) {
-        return "info";
-      } else if (this.meanPressure > this.targetPressure) {
-        return "danger";
-      } else {
-        return "success";
-      }
-    },
-
-    targetColor(): string {
-      return this.isDay ? "warning" : "info";
-    },
-
-    targetTemperature(): number {
-      let target = 20;
-      if (this.zone.profile) {
-        target = this.isDay
-          ? this.zone.profile.lampontemperature
-          : this.zone.profile.lampofftemperature;
-      }
-
-      return this.units === "F" ? celsius2fahrenheit(target) : target;
-    },
-
-    targetHumidity(): number {
-      let target = 35;
-      if (this.zone.profile) {
-        target = this.isDay
-          ? this.zone.profile.lamponhumidity
-          : this.zone.profile.lampoffhumidity;
-      }
-
-      return target;
-    },
-
-    targetPressure(): number {
-      const delta = this.isDay ? -0.6 : 0.6;
-      let temp = this.targetTemperature;
-      if (this.units === "F") {
-        temp = fahrenheit2celsius(temp);
-      }
-
-      return (
-        vaporPressureDeficit(temp, delta, this.targetHumidity / 100) / 1000
-      );
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.units;
     },
 
     ...mapGetters("devices", ["devices"]),
@@ -293,7 +116,6 @@ const ZoneDetail = Vue.extend({
   methods: {
     add(selected: string) {
       const payload = { zone: this.zone, device: selected };
-      console.log("ADD WITH", payload);
       this.addDevice(payload);
       this.fetchData();
     },

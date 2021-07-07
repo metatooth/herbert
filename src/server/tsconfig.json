@@ -1,21 +1,7 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2019",
-    "sourceMap": true,
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "declaration": true,
-    "resolveJsonModule": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": true,
-    "skipLibCheck": true,
-    "outDir": "../../server",
-    "lib": ["ES2019"],
-    "moduleResolution": "node",
-    "types": ["node"],
-    "incremental": true,
+    "outDir": "../../dist/server",
     "composite": true
   },
   "include": ["**/*.ts"],

@@ -119,12 +119,12 @@ const Readings = Vue.extend({
           const timeZone = "America/New_York";
           data.forEach(
             (d: {
-              createdat: Date;
+              observedat: Date;
               temperature: number;
               humidity: number;
               pressure: number;
             }) => {
-              const ts = convertToLocalTime(d.createdat, { timeZone });
+              const ts = convertToLocalTime(d.observedat, { timeZone });
               const temperature = {
                 x: ts,
                 y: d.temperature as number
