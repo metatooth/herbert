@@ -3,23 +3,23 @@
     <span class="title">{{ profilesCount }} {{ profilesName }}</span>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
-        <profile-tile v-for="profile in left" :key="profile.id" :profile="profile" />
+        <profile-tile v-for="profile in left" :key="profile.id" :profile="profile" :units="settings.units" />
       </div>
       <div class="tile is-4 is-vertical">
-        <profile-tile v-for="profile in middle" :key="profile.id" :profile="profile" />
+        <profile-tile v-for="profile in middle" :key="profile.id" :profile="profile" :units="settings.units" />
       </div>
       <div class="tile is-4 is-vertical">
-        <profile-tile v-for="profile in right" :key="profile.id" :profile="profile" />
+        <profile-tile v-for="profile in right" :key="profile.id" :profile="profile" :units="settings.units" />
         <div class="tile is-parent">
           <div class="tile is-child box">
             <p class="title">
               <add-controls
-                @on-add="editable"
+                @on-add="addable"
                 @on-save="save"
                 @on-cancel="cancel"
               />
             </p>
-            <div class="content" v-if="editing">
+            <div class="content" v-if="adding">
               <div class="field is-grouped is-grouped-multiline">
                 <div class="control">
                   <input
@@ -52,7 +52,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { Profile } from "@/store/profiles/types";
 import ProfileTile from "@/components/ProfileTile.vue";
 import AddControls from "@/components/AddControls.vue";
@@ -84,6 +84,36 @@ const Profiles = Vue.extend({
   },
 
   computed: {
+    left() {
+      const profiles = [];
+      for (let i = 0; i < this.profilesCount; i = i + 3) {
+        if (this.profiles[i]) {
+          profiles.push(this.profiles[i]);
+        }
+      }
+      return profiles;
+    },
+
+    middle() {
+      const profiles = [];
+      for (let i = 1; i < this.profilesCount; i = i + 3) {
+        if (this.profiles[i]) {
+          profiles.push(this.profiles[i]);
+        }
+      }
+      return profiles;
+    },
+
+    right() {
+      const profiles = [];
+      for (let i = 2; i < this.profilesCount; i = i + 3) {
+        if (this.profiles[i]) {
+          profiles.push(this.profiles[i]);
+        }
+      }
+      return profiles;
+    },
+
     profilesName(): string {
       if (this.profilesCount === 1) {
         return "Profile";
@@ -114,9 +144,7 @@ const Profiles = Vue.extend({
       return max;
     },
 
-    ...mapState("profiles", ["profiles"]),
-
-    ...mapGetters("profiles", ["profilesCount"]),
+    ...mapGetters("profiles", ["profilesCount", "profiles"]),
 
     ...mapGetters("settings", ["settings"])
   },
