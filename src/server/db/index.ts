@@ -132,7 +132,7 @@ export async function readDevices() {
   const devices = [];
 
   const { rows } = await query<Device>(
-    "SELECT device FROM devices WHERE deleted <> true ORDER BY nickname",
+    "SELECT device FROM devices WHERE devicetype != 'meter' AND deleted <> true",
     []
   );
 
@@ -142,6 +142,22 @@ export async function readDevices() {
   });
 
   return Promise.all(devices);
+}
+
+export async function readMeters() {
+  const meters = [];
+
+  const { rows } = await query<Device>(
+    "SELECT device FROM devices WHERE devicetype = 'meter' AND deleted <> true",
+    []
+  );
+
+  rows.forEach(row => {
+    const d = readMeter(row.device);
+    meters.push(d);
+  });
+
+  return Promise.all(meters);
 }
 
 export async function readWorker(id: string) {
