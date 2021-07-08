@@ -1,28 +1,30 @@
 <template>
-  <div class="field is-grouped is-grouped-multiline">
-    <target
-      icon="thermometer-half"
-      :value="temperature"
-      :precision="1"
-      :units="unitsWithDegree"
-      :color="temperatureColor"
-    />
+  <div class="card-content">
+    <div class="field is-grouped is-grouped-multiline">
+      <target
+        icon="thermometer-half"
+        :value="temperature"
+        :precision="1"
+        :units="unitsWithDegree"
+        :color="temperatureColor"
+        />
+      
+      <target
+        icon="tint"
+        :value="humidity"
+        :precision="0"
+        units="%"
+        :color="humidityColor"
+        />
 
-    <target
-      icon="tint"
-      :value="humidity"
-      :precision="0"
-      units="%"
-      :color="humidityColor"
-    />
-
-    <target
-      icon="cloud"
-      :value="pressure"
-      :precision="1"
-      units="hPa"
-      :color="pressureColor"
-    />
+      <target
+        icon="cloud"
+        :value="pressure"
+        :precision="1"
+        units="hPa"
+        :color="pressureColor"
+        />
+    </div>
   </div>
 </template>
 
@@ -31,6 +33,7 @@ import Vue from "vue";
 import { Zone } from "@/store/zones/types";
 import Target from "@/components/Target.vue";
 import { mapGetters } from "vuex";
+import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const ZoneActual = Vue.extend({
   props: {
@@ -49,7 +52,13 @@ const ZoneActual = Vue.extend({
 
   computed: {
     temperature(): number {
-      return this.zone.meanTemperature();
+      const mean = this.zone.meanTemperature(); 
+      if (this.settings.units === "F") {
+        return celsius2fahrenheit(mean);
+      } else if (this.settings.units === "K") {
+        return celsius2kelvin(mean);
+      }
+      return mean;
     },
 
     humidity(): number {

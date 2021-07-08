@@ -16,7 +16,16 @@ export const actions: ActionTree<ZonesState, RootState> = {
   addDevice({ commit }, payload: { zone: Zone; device: string }) {
     const json = JSON.stringify({ device: payload.device });
     HTTP.post(`/zones/${payload.zone.id}/devices`, json).then(response => {
-      commit("ADD_DEVICE", Object.assign(new Zone(), response.data));
+      const device = response.data.devices.find(el => el.device === payload.device);
+      if (device) {
+        commit("ADD_DEVICE", { zone: payload.zone, device: Object.assign(new Device(), device) });
+      } 
+
+      const meter = response.data.meters.find(el => el.device === payload.device);
+      if (meter) {
+        commit("ADD_METER", { zone: payload.zone, meter: Object.assign(new Meter(), meter) });
+      } 
+
     });
   },
 
@@ -51,15 +60,17 @@ export const actions: ActionTree<ZonesState, RootState> = {
         }
         const devices: Device[] = [];
         const meters: Meter[] = [];
+
         clone.devices.forEach((d: object) => {
           const device = new Device(JSON.stringify(d));
-          if (device.devicetype === "meter") {
-            const meter = new Meter(JSON.stringify(d));
-            meters.push(meter);
-          } else {
-            devices.push(device);
-          }
+          devices.push(device);
         });
+
+        clone.meters.forEach((m: object) => {
+          const meter = new Meter(JSON.stringify(m));
+          meters.push(meter);
+        });
+
         zone.devices = devices;
         zone.meters = meters;
 
@@ -76,6 +87,11 @@ export const actions: ActionTree<ZonesState, RootState> = {
 
   removeDevice({ commit }, payload: { zone: Zone; device: string }) {
     HTTP.delete(`/zones/${payload.zone.id}/devices/${payload.device}`);
-    commit("REMOVE_DEVICE", payload.zone);
+    commit("REMOVE_DEVICE", payload);
+  },
+
+  removeMeter({ commit }, payload: { zone: Zone; meter: string }) {
+    HTTP.delete(`/zones/${payload.zone.id}/devices/${payload.meter}`);
+    commit("REMOVE_METER", payload);
   }
 };

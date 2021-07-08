@@ -58,7 +58,7 @@ export async function readZone(id: string) {
   }
 
   const devices = await query<Device>(
-    "SELECT d.device FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE zd.zoneid = $1",
+    "SELECT d.device FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.devicetype != 'meter' AND zd.zoneid = $1",
     [id]
   );
 
@@ -68,11 +68,27 @@ export async function readZone(id: string) {
     });
   }
 
+  const meters = await query<Meter>(
+    "SELECT d.device FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.devicetype = 'meter' AND zd.zoneid = $1",
+    [id]
+  );
+
+  if (meters.rowCount > 0) {
+    meters.rows.forEach(row => {
+      promises.push(readMeter(row.device));
+    });
+  }
+
   return await Promise.all(promises).then(values => {
     values[0].devices = [];
+    values[0].meters = [];
     values.forEach(value => {
       if (value.device) {
-        values[0].devices.push(value);
+        if (value.devicetype == 'meter') {
+          values[0].meters.push(value);
+        } else {
+          values[0].devices.push(value);
+        }
       }
     });
 
@@ -84,7 +100,7 @@ export async function readZones() {
   const zones = [];
 
   const { rows } = await query<Zone>(
-    "SELECT id FROM zones WHERE deleted <> true ORDER BY nickname",
+    "SELECT id FROM zones WHERE deleted <> true",
     []
   );
 
@@ -100,7 +116,7 @@ export async function readActiveZones() {
   const zones = [];
 
   const { rows } = await query<Zone>(
-    "SELECT id FROM zones WHERE deleted <> true AND active <> false ORDER BY nickname",
+    "SELECT id FROM zones WHERE deleted <> true AND active <> false",
     []
   );
 
@@ -132,7 +148,7 @@ export async function readDevices() {
   const devices = [];
 
   const { rows } = await query<Device>(
-    "SELECT device FROM devices WHERE deleted <> true ORDER BY nickname",
+    "SELECT device FROM devices WHERE devicetype != 'meter' AND deleted <> true",
     []
   );
 
@@ -142,6 +158,22 @@ export async function readDevices() {
   });
 
   return Promise.all(devices);
+}
+
+export async function readMeters() {
+  const meters = [];
+
+  const { rows } = await query<Device>(
+    "SELECT device FROM devices WHERE devicetype = 'meter' AND deleted <> true",
+    []
+  );
+
+  rows.forEach(row => {
+    const d = readMeter(row.device);
+    meters.push(d);
+  });
+
+  return Promise.all(meters);
 }
 
 export async function readWorker(id: string) {

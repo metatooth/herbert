@@ -13,6 +13,13 @@ export const mutations: MutationTree<ZonesState> = {
       }
     });
   },
+  ADD_METER(state, payload: { zone: Zone; meter: Meter }) {
+    state.zones.find((el: Zone) => {
+      if (el.id === payload.zone.id) {
+        el.meters.push(payload.meter);
+      }
+    });
+  },
   EDIT(state, zone: Zone) {
     const found = state.zones.find((el: Zone) => {
       return el.id === zone.id;
@@ -31,11 +38,19 @@ export const mutations: MutationTree<ZonesState> = {
       state.zones.splice(index, 1);
     }
   },
-  REMOVE_DEVICE(state, payload: { zone: Zone; device: Device }) {
+  REMOVE_DEVICE(state, payload: { zone: Zone; device: string }) {
     state.zones.find((el: Zone) => {
       if (el.id === payload.zone.id) {
         const index = el.devices.indexOf(payload.device);
-        state.zones.splice(index, 1);
+        el.devices.splice(index, 1);
+      }
+    });
+  },
+  REMOVE_METER(state, payload: { zone: Zone; meter: string }) {
+    state.zones.find((el: Zone) => {
+      if (el.id === payload.zone.id) {
+        const index = el.meters.indexOf(payload.meter);
+        el.meters.splice(index, 1);
       }
     });
   },

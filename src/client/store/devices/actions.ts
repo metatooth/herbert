@@ -14,10 +14,7 @@ export const actions: ActionTree<DevicesState, RootState> = {
     HTTP.get("/devices").then(response => {
       const payload: Device[] = [];
       response.data.forEach((json: object) => {
-        const obj = new Device(JSON.stringify(json));
-        if (obj.devicetype !== "meter") {
-          payload.push(obj);
-        }
+        payload.push(new Device(JSON.stringify(json)));        
       });
       commit("SET", payload);
     });

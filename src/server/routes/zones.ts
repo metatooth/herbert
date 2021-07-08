@@ -52,9 +52,7 @@ router.post("/:id/devices", async (req, res) => {
     console.log("ERROR", err);
   }
 
-  await query("SELECT * FROM zone_devices WHERE zoneid = $1", [id]);
-
-  res.status(200).json({});
+  res.status(200).json(await readZone(id));
 });
 
 router.delete("/:id/devices/:device", async (req, res) => {

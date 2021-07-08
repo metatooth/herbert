@@ -363,7 +363,7 @@ export class App {
 
     logger.debug("Other meters...");
     app.meters.forEach(meter => {
-      if (meter.manufacturer === "mockbot") {
+      if (meter.manufacturer === "mockmeter") {
         const now = new Date().getTime();
         meter.clime.temperature = 23.9 + Math.sin((2 * 3.14 * now) / 3600000);
         meter.clime.humidity =
