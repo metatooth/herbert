@@ -5,9 +5,9 @@
         <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
       </div>
 
-      <meter-actual :zone="zone" :units="units" />
+      <zone-actual :zone="zone" :units="units" />
 
-      <meter-target :zone="zone" :units="units" />
+      <zone-target :zone="zone" :units="units" />
 
       <div class="card-content">
         <select-profile
@@ -72,8 +72,8 @@ import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
 import DeviceWidget from "@/components/DeviceWidget.vue";
 import { mapGetters, mapActions } from "vuex";
-import MeterActual from "@/components/MeterActual.vue";
-import MeterTarget from "@/components/MeterTarget.vue";
+import ZoneActual from "@/components/ZoneActual.vue";
+import ZoneTarget from "@/components/ZoneTarget.vue";
 
 const ZoneDetail = Vue.extend({
   props: {
@@ -90,8 +90,8 @@ const ZoneDetail = Vue.extend({
   components: {
     DeviceWidget,
     EditText,
-    MeterActual,
-    MeterTarget,
+    ZoneActual,
+    ZoneTarget,
     MeterWidget,
     SelectDevice,
     SelectMeter,
