@@ -18,12 +18,11 @@
         <span v-else>{{ profile.profile }}</span>
       </div>
       <div v-if="editing" class="content">
- 
-        <div class="field is-grouped">       
+        <div class="field is-grouped">
           <div class="control">
             <input class="input" type="time" v-model="lampstart" />
           </div>
-          
+
           <div class="control">
             <input
               class="input"
@@ -32,11 +31,10 @@
               min="0"
               max="24"
               size="2"
-              />
+            />
           </div>
         </div>
-        
-        
+
         <div class="field is-grouped">
           <div class="control has-icons-left">
             <input
@@ -47,7 +45,7 @@
               max="lampMax"
               size="4"
               step="0.1"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="thermometer-half" class="is-left" />
             </span>
@@ -60,13 +58,13 @@
               min="0"
               max="100"
               size="2"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="tint" class="is-left" />
             </span>
           </div>
         </div>
-        
+
         <div class="field is-grouped">
           <div class="control has-icons-left">
             <input
@@ -77,7 +75,7 @@
               max="tempMax"
               step="0.1"
               size="4"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="thermometer-half" class="is-left" />
             </span>
@@ -90,7 +88,7 @@
               min="0"
               max="100"
               size="2"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="tint" class="is-left" />
             </span>
@@ -106,7 +104,7 @@
               min="0"
               max="180"
               size="3"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="wind" class="is-left" />
             </span>
@@ -119,13 +117,13 @@
               min="30"
               max="864000000"
               size="3"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="wind" class="is-left" />
             </span>
           </div>
         </div>
-        
+
         <div class="field is-grouped">
           <div class="control has-icons-left">
             <input
@@ -135,7 +133,7 @@
               min="0"
               max="3600"
               size="3"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="cloud-rain" class="is-left" />
             </span>
@@ -148,24 +146,23 @@
               min="0"
               max="24"
               size="2"
-              />
+            />
             <span class="icon is-left">
               <font-awesome-icon icon="cloud-rain" class="is-left" />
             </span>
           </div>
         </div>
-        
       </div>
       <div v-else class="content">
         <div class="tags has-addons">
           <span class="tag is-small is-dark has-text-warning">
-            <font-awesome-icon icon="lightbulb"/>
+            <font-awesome-icon icon="lightbulb" />
           </span>
           <span class="tag is-small is-family-code is-warning">
             {{ lamponHour }}:{{ lamponMinute }} {{ durationWithUnits }}
           </span>
         </div>
-        
+
         <div class="field is-grouped">
           <target
             icon="thermometer-half"
@@ -174,7 +171,7 @@
             :units="unitsWithDegree"
             size="small"
             color="warning"
-            />
+          />
           <target
             icon="tint"
             :value="dayHumidity"
@@ -182,7 +179,7 @@
             units="%"
             size="small"
             color="warning"
-            />
+          />
           <target
             icon="cloud"
             :value="dayPressure"
@@ -190,7 +187,7 @@
             units="hPa"
             size="small"
             color="warning"
-            />
+          />
         </div>
         <div class="field is-grouped">
           <target
@@ -200,15 +197,15 @@
             :units="unitsWithDegree"
             size="small"
             color="info"
-            />
+          />
           <target
-          icon="tint"
+            icon="tint"
             :value="nightHumidity"
             :precision="0"
             units="%"
             size="small"
             color="info"
-            />
+          />
           <target
             icon="cloud"
             :value="nightPressure"
@@ -216,20 +213,26 @@
             units="hPa"
             size="small"
             color="info"
-            />
+          />
         </div>
         <div class="tags has-addons">
           <span class="tag is-small has-text-success is-dark">
             <font-awesome-icon icon="wind" />
           </span>
-          <span class="tag is-small has-text-dark is-success">{{ bloweractive }}s / {{ blowercycle }}s</span>
+          <span class="tag is-small has-text-dark is-success"
+            >{{ bloweractive }}s / {{ blowercycle }}s</span
+          >
         </div>
         <div class="tags has-addons">
           <span class="tag is-small has-text-success is-dark">
             <font-awesome-icon icon="cloud-rain" />
           </span>
-          <span class="tag is-small has-text-dark is-success">{{ irrigationduration }}s</span>
-          <span class="tag is-small has-text-dark is-success">{{ irrigationperday }} / day</span>
+          <span class="tag is-small has-text-dark is-success"
+            >{{ irrigationduration }}s</span
+          >
+          <span class="tag is-small has-text-dark is-success"
+            >{{ irrigationperday }} / day</span
+          >
         </div>
       </div>
       <div class="content">
@@ -241,7 +244,7 @@
           @on-save="save"
           @on-destroy="destroy"
           @on-cancel="cancel"
-          />
+        />
       </div>
     </div>
   </div>

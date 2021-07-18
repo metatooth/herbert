@@ -113,10 +113,11 @@ wss.on("connection", function(ws: WebSocket) {
             );
           }
         } else {
+          console.log("this must be a device");
           console.log(data.payload);
           await registerDevice(data.payload.device, data.payload.manufacturer);
           const device = await readDevice(data.payload.device);
-
+          console.log("got device", device);
           if (device.status != data.payload.status) {
             createStatus(
               data.payload.device,
@@ -195,9 +196,15 @@ async function run() {
 
       const lamp = new LampTimer(utc.getHours(), duration);
 
-      const blower = new BlowerTimer(config.get("blower"), 180); // WARNING!!
+      const blower = new BlowerTimer(
+        zone.profile.bloweractive,
+        zone.profile.blowercycle
+      );
 
-      const irrigator = new IrrigationTimer(96, 210); // WARNING!!
+      const irrigator = new IrrigationTimer(
+        zone.profile.irrigationperday,
+        zone.profile.irrigationduration
+      );
 
       let target;
       let delta;

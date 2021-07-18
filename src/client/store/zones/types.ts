@@ -11,6 +11,7 @@ export class Zone {
   profile?: Profile;
   devices: Device[];
   meters: Meter[];
+  children: number[];
   createdat: Date;
   updatedat: Date;
   deleted: boolean;
@@ -22,6 +23,7 @@ export class Zone {
     this.nickname = "";
     this.devices = [];
     this.meters = [];
+    this.children = [];
     this.createdat = new Date();
     this.updatedat = new Date();
     this.deleted = false;

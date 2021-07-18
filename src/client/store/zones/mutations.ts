@@ -20,6 +20,13 @@ export const mutations: MutationTree<ZonesState> = {
       }
     });
   },
+  ADD_CHILD(state, payload: { zone: Zone; child: number }) {
+    state.zones.find((el: Zone) => {
+      if (el.id === payload.zone.id) {
+        el.children.push(payload.child);
+      }
+    });
+  },
   EDIT(state, zone: Zone) {
     const found = state.zones.find((el: Zone) => {
       return el.id === zone.id;
@@ -51,6 +58,14 @@ export const mutations: MutationTree<ZonesState> = {
       if (el.id === payload.zone.id) {
         const index = el.meters.indexOf(payload.meter);
         el.meters.splice(index, 1);
+      }
+    });
+  },
+  REMOVE_CHILD(state, payload: { zone: Zone; child: number }) {
+    state.zones.find((el: Zone) => {
+      if (el.id === payload.zone.id) {
+        const index = el.children.indexOf(payload.child);
+        el.children.splice(index, 1);
       }
     });
   },

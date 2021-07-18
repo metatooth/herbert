@@ -79,16 +79,31 @@ export async function readZone(id: string) {
     });
   }
 
+  const children = await query<Number>(
+    "SELECT e.b FROM zones z INNER JOIN edges e ON z.id = e.a WHERE z.id = $1",
+    [id]
+  );
+
+  if (children.rowCount > 0) {
+    children.rows.forEach(row => {
+      promises.push(row);
+    });
+  }
+  
   return await Promise.all(promises).then(values => {
     values[0].devices = [];
     values[0].meters = [];
+    values[0].children = [];
+
     values.forEach(value => {
       if (value.device) {
-        if (value.devicetype == 'meter') {
+        if (value.devicetype == "meter") {
           values[0].meters.push(value);
         } else {
           values[0].devices.push(value);
         }
+      } else if (!value.profileid) {
+        values[0].children.push(value.b);
       }
     });
 
@@ -148,7 +163,7 @@ export async function readDevices() {
   const devices = [];
 
   const { rows } = await query<Device>(
-    "SELECT device FROM devices WHERE devicetype != 'meter' AND deleted <> true",
+    "SELECT device FROM devices WHERE (devicetype is null OR devicetype != 'meter') AND deleted <> true",
     []
   );
 

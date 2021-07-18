@@ -64,4 +64,23 @@ router.delete("/:id/devices/:device", async (req, res) => {
   res.status(204).json({});
 });
 
+router.post("/:id/children", async (req, res) => {
+  const { id } = req.params;
+  await query("INSERT INTO edges (a, b) VALUES ($1, $2)", [
+    id,
+    req.body.child
+  ]);
+            
+  res.status(200).json(await readZone(id));
+});
+
+router.delete("/:id/children/:child", async (req, res) => {
+  const { id, child } = req.params;
+  await query("DELETE FROM edges WHERE a = $1 AND b = $2", [
+    id,
+    child
+  ]);
+  res.status(204).json({});
+});
+
 export default router;

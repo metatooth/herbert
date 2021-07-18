@@ -19,6 +19,16 @@
 
       <div class="card-content">
         <div class="field is-grouped is-grouped-multiline">
+          <child-widget
+            v-for="child in zone.children"
+            :key="child"
+            :id="child"
+            @remove-child="removeChildZone"/>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <div class="field is-grouped is-grouped-multiline">
           <meter-widget
             v-for="meter in zone.meters"
             :key="meter.device"
@@ -38,6 +48,10 @@
             @remove-device="remove"
           />
         </div>
+      </div>
+
+      <div class="card-content">
+        <select-zone :exclude="zone" @select-zone="addZone" />
       </div>
 
       <div class="card-content">
@@ -65,6 +79,7 @@
 import EditText from "@/components/EditText.vue";
 import SelectDevice from "@/components/SelectDevice.vue";
 import SelectMeter from "@/components/SelectMeter.vue";
+import SelectZone from "@/components/SelectZone.vue";
 import SelectProfile from "@/components/SelectProfile.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
@@ -74,6 +89,7 @@ import DeviceWidget from "@/components/DeviceWidget.vue";
 import { mapGetters, mapActions } from "vuex";
 import ZoneActual from "@/components/ZoneActual.vue";
 import ZoneTarget from "@/components/ZoneTarget.vue";
+import ChildWidget from "@/components/ChildWidget.vue";
 
 const ZoneDetail = Vue.extend({
   props: {
@@ -88,6 +104,7 @@ const ZoneDetail = Vue.extend({
   },
 
   components: {
+    ChildWidget,
     DeviceWidget,
     EditText,
     ZoneActual,
@@ -96,6 +113,7 @@ const ZoneDetail = Vue.extend({
     SelectDevice,
     SelectMeter,
     SelectProfile,
+    SelectZone,
     Timestamp
   },
 
@@ -106,7 +124,8 @@ const ZoneDetail = Vue.extend({
 
     ...mapGetters("devices", ["devices"]),
     ...mapGetters("meters", ["meters"]),
-    ...mapGetters("profiles", ["profiles"])
+    ...mapGetters("profiles", ["profiles"]),
+    ...mapGetters("zones", ["zones"]),
   },
 
   mounted() {
@@ -120,9 +139,31 @@ const ZoneDetail = Vue.extend({
       this.fetchData();
     },
 
+    addZone(selected: string) {
+      const payload = { zone: this.zone, child: selected };
+      this.addChild(payload);
+      this.fetchData();
+    },
+
+    child(id: number) {
+      let child = null;
+      this.zones.forEach((zone) => {
+        if (zone.id === id) {
+          child = zone;
+        }
+      });
+      return child;
+    },
+
     remove(selected: string) {
       const payload = { zone: this.zone, device: selected };
       this.removeDevice(payload);
+      this.fetchData();
+    },
+
+    removeChildZone(selected: number) {
+      const payload = { zone: this.zone, child: selected };
+      this.removeChild(payload);
       this.fetchData();
     },
 
@@ -149,8 +190,15 @@ const ZoneDetail = Vue.extend({
     scrollFix(hashbang: string) {
       location.hash = hashbang;
     },
-
-    ...mapActions("zones", ["addDevice", "edit", "fetchData", "removeDevice"])
+    
+    ...mapActions("zones", [
+      "addDevice",
+      "addChild",
+      "edit",
+      "fetchData",
+      "removeDevice",
+      "removeChild"
+    ])
   }
 });
 

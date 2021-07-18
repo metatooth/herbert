@@ -16,16 +16,32 @@ export const actions: ActionTree<ZonesState, RootState> = {
   addDevice({ commit }, payload: { zone: Zone; device: string }) {
     const json = JSON.stringify({ device: payload.device });
     HTTP.post(`/zones/${payload.zone.id}/devices`, json).then(response => {
-      const device = response.data.devices.find(el => el.device === payload.device);
+      const device = response.data.devices.find(
+        el => el.device === payload.device
+      );
       if (device) {
-        commit("ADD_DEVICE", { zone: payload.zone, device: Object.assign(new Device(), device) });
-      } 
+        commit("ADD_DEVICE", {
+          zone: payload.zone,
+          device: Object.assign(new Device(), device)
+        });
+      }
 
-      const meter = response.data.meters.find(el => el.device === payload.device);
+      const meter = response.data.meters.find(
+        el => el.device === payload.device
+      );
       if (meter) {
-        commit("ADD_METER", { zone: payload.zone, meter: Object.assign(new Meter(), meter) });
-      } 
+        commit("ADD_METER", {
+          zone: payload.zone,
+          meter: Object.assign(new Meter(), meter)
+        });
+      }
+    });
+  },
 
+  addChild({ commit }, payload: { zone: Zone; child: string }) {
+    const json = JSON.stringify({ child: payload.child });
+    HTTP.post(`/zones/${payload.zone.id}/children`, json).then(response => {
+      commit("ADD_CHILD", payload );
     });
   },
 
@@ -42,6 +58,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
       response.data.forEach((json: object) => {
         const zone = Object.assign(new Zone(), json);
         const clone = JSON.parse(JSON.stringify(json));
+
         if (zone.profile) {
           zone.profile.lampontemperature = parseFloat(
             clone.profile.lampontemperature
@@ -60,6 +77,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
         }
         const devices: Device[] = [];
         const meters: Meter[] = [];
+        const children: number[] = [];
 
         clone.devices.forEach((d: object) => {
           const device = new Device(JSON.stringify(d));
@@ -71,8 +89,13 @@ export const actions: ActionTree<ZonesState, RootState> = {
           meters.push(meter);
         });
 
+        clone.children.forEach((i: number) => {
+          children.push(i); 
+        });
+
         zone.devices = devices;
         zone.meters = meters;
+        zone.children = children;
 
         payload.push(zone);
       });
@@ -93,5 +116,12 @@ export const actions: ActionTree<ZonesState, RootState> = {
   removeMeter({ commit }, payload: { zone: Zone; meter: string }) {
     HTTP.delete(`/zones/${payload.zone.id}/devices/${payload.meter}`);
     commit("REMOVE_METER", payload);
-  }
+  },
+
+  removeChild({ commit }, payload: { zone: Zone; child: string }) {
+    const json = JSON.stringify({ child: payload.child });
+    HTTP.delete(`/zones/${payload.zone.id}/children/${payload.child}`, json);
+    commit("REMOVE_CHILD", payload);
+  },
+
 };
