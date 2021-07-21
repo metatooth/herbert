@@ -1,4 +1,8 @@
 <template>
+<div id="statuses">
+<section class="section">
+<back-to-dashboard />
+</section>
   <section class="section">
     <h2 class="title">{{ $route.params.name }} Switch Status</h2>
     <h2 class="subtitle">{{ $route.params.device }}</h2>
@@ -44,6 +48,7 @@
       <div class="column is-half" />
     </div>
   </section>
+</div>
 </template>
 
 <script lang="ts">
@@ -51,10 +56,16 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 import Chart from "@/components/Chart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
+import BackToDashboard from "@/components/BackToDashboard.vue";
 
 const Statuses = Vue.extend({
   props: {
     name: { type: String, default: "" }
+  },
+
+  components: {
+    BackToDashboard,
+    Chart
   },
 
   data() {
@@ -66,10 +77,6 @@ const Statuses = Vue.extend({
 
   computed: {
     ...mapGetters("settings", ["settings"])
-  },
-
-  components: {
-    Chart
   },
 
   mounted() {

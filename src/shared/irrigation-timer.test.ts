@@ -1,56 +1,56 @@
 import { IrrigationTimer } from "./irrigation-timer";
 
 test("Twice per day for 3 1/2 minutes each", () => {
-  const timer = new IrrigationTimer(2, 210);
+  const timer = new IrrigationTimer(2, 210000);
   expect(timer.isOn(0)).toBe(true);
-  expect(timer.isOn(100)).toBe(true);
-  expect(timer.isOn(205)).toBe(true);
-  expect(timer.isOn(210)).toBe(false);
-  expect(timer.isOn(215)).toBe(false);
-  expect(timer.isOn(300)).toBe(false);
+  expect(timer.isOn(100000)).toBe(true);
+  expect(timer.isOn(205000)).toBe(true);
+  expect(timer.isOn(210000)).toBe(false);
+  expect(timer.isOn(215000)).toBe(false);
+  expect(timer.isOn(300000)).toBe(false);
 
-  expect(timer.isOn(43200)).toBe(true);
-  expect(timer.isOn(43300)).toBe(true);
-  expect(timer.isOn(43405)).toBe(true);
-  expect(timer.isOn(43410)).toBe(false);
-  expect(timer.isOn(43415)).toBe(false);
-  expect(timer.isOn(43420)).toBe(false);
+  expect(timer.isOn(43200000)).toBe(true);
+  expect(timer.isOn(43300000)).toBe(true);
+  expect(timer.isOn(43405000)).toBe(true);
+  expect(timer.isOn(43410000)).toBe(false);
+  expect(timer.isOn(43415000)).toBe(false);
+  expect(timer.isOn(43420000)).toBe(false);
 });
 
 test("Five times per day for 420 seconds each", () => {
-  const timer = new IrrigationTimer(5, 420);
+  const timer = new IrrigationTimer(5, 420000);
   expect(timer.isOn(0)).toBe(true);
-  expect(timer.isOn(100)).toBe(true);
-  expect(timer.isOn(415)).toBe(true);
-  expect(timer.isOn(420)).toBe(false);
-  expect(timer.isOn(425)).toBe(false);
-  expect(timer.isOn(500)).toBe(false);
+  expect(timer.isOn(100000)).toBe(true);
+  expect(timer.isOn(415000)).toBe(true);
+  expect(timer.isOn(420000)).toBe(false);
+  expect(timer.isOn(425000)).toBe(false);
+  expect(timer.isOn(500000)).toBe(false);
 
-  expect(timer.isOn(17280)).toBe(true);
-  expect(timer.isOn(17380)).toBe(true);
-  expect(timer.isOn(17695)).toBe(true);
-  expect(timer.isOn(17700)).toBe(false);
-  expect(timer.isOn(17705)).toBe(false);
-  expect(timer.isOn(17780)).toBe(false);
+  expect(timer.isOn(17280000)).toBe(true);
+  expect(timer.isOn(17380000)).toBe(true);
+  expect(timer.isOn(17695000)).toBe(true);
+  expect(timer.isOn(17700000)).toBe(false);
+  expect(timer.isOn(17705000)).toBe(false);
+  expect(timer.isOn(17780000)).toBe(false);
 
-  expect(timer.isOn(34560)).toBe(true);
-  expect(timer.isOn(34660)).toBe(true);
-  expect(timer.isOn(34975)).toBe(true);
-  expect(timer.isOn(34980)).toBe(false);
-  expect(timer.isOn(34985)).toBe(false);
-  expect(timer.isOn(35060)).toBe(false);
+  expect(timer.isOn(34560000)).toBe(true);
+  expect(timer.isOn(34660000)).toBe(true);
+  expect(timer.isOn(34975000)).toBe(true);
+  expect(timer.isOn(34980000)).toBe(false);
+  expect(timer.isOn(34985000)).toBe(false);
+  expect(timer.isOn(35060000)).toBe(false);
 
-  expect(timer.isOn(51840)).toBe(true);
-  expect(timer.isOn(51940)).toBe(true);
-  expect(timer.isOn(52255)).toBe(true);
-  expect(timer.isOn(52260)).toBe(false);
-  expect(timer.isOn(52265)).toBe(false);
-  expect(timer.isOn(52340)).toBe(false);
+  expect(timer.isOn(51840000)).toBe(true);
+  expect(timer.isOn(51940000)).toBe(true);
+  expect(timer.isOn(52255000)).toBe(true);
+  expect(timer.isOn(52260000)).toBe(false);
+  expect(timer.isOn(52265000)).toBe(false);
+  expect(timer.isOn(52340000)).toBe(false);
 
-  expect(timer.isOn(69120)).toBe(true);
-  expect(timer.isOn(69220)).toBe(true);
-  expect(timer.isOn(69535)).toBe(true);
-  expect(timer.isOn(69540)).toBe(false);
-  expect(timer.isOn(69545)).toBe(false);
-  expect(timer.isOn(69620)).toBe(false);
+  expect(timer.isOn(69120000)).toBe(true);
+  expect(timer.isOn(69220000)).toBe(true);
+  expect(timer.isOn(69535000)).toBe(true);
+  expect(timer.isOn(69540000)).toBe(false);
+  expect(timer.isOn(69545000)).toBe(false);
+  expect(timer.isOn(69620000)).toBe(false);
 });

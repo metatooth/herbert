@@ -3,13 +3,28 @@
     <span class="title">{{ profilesCount }} {{ profilesName }}</span>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
-        <profile-tile v-for="profile in left" :key="profile.id" :profile="profile" :units="settings.units" />
+        <profile-tile
+          v-for="profile in left"
+          :key="profile.id"
+          :profile="profile"
+          :units="settings.units"
+        />
       </div>
       <div class="tile is-4 is-vertical">
-        <profile-tile v-for="profile in middle" :key="profile.id" :profile="profile" :units="settings.units" />
+        <profile-tile
+          v-for="profile in middle"
+          :key="profile.id"
+          :profile="profile"
+          :units="settings.units"
+        />
       </div>
       <div class="tile is-4 is-vertical">
-        <profile-tile v-for="profile in right" :key="profile.id" :profile="profile" :units="settings.units" />
+        <profile-tile
+          v-for="profile in right"
+          :key="profile.id"
+          :profile="profile"
+          :units="settings.units"
+        />
         <div class="tile is-parent">
           <div class="tile is-child box">
             <p class="title">
@@ -25,21 +40,9 @@
                   <input
                     class="input"
                     type="text"
-                    v-model="nickname"
-                    placeHolder="Name for zone"
+                    v-model="profile"
+                    placeHolder="Name for profile"
                   />
-                </div>
-
-                <div class="select">
-                  <select v-model="profileid">
-                    <option
-                      v-for="profile in profiles"
-                      :key="profile.id"
-                      :value="profile.id"
-                    >
-                      {{ profile.profile }}
-                    </option>
-                  </select>
                 </div>
               </div>
             </div>

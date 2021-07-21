@@ -12,7 +12,8 @@ import {
   registerMeter,
   workerStatus,
   readDevice,
-  readMeter
+  readMeter,
+  readZone
 } from "./db";
 
 import path from "path";
@@ -113,10 +114,11 @@ wss.on("connection", function(ws: WebSocket) {
             );
           }
         } else {
+          console.log("this must be a device");
           console.log(data.payload);
           await registerDevice(data.payload.device, data.payload.manufacturer);
           const device = await readDevice(data.payload.device);
-
+          console.log("got device", device);
           if (device.status != data.payload.status) {
             createStatus(
               data.payload.device,
@@ -167,7 +169,7 @@ async function run() {
 
       const now = new Date();
       console.log("now", now);
-      const ms = now.getMilliseconds();
+      const ms = now.getTime();
       console.log("ms", ms);
 
       console.log(now.getMonth());
@@ -195,9 +197,15 @@ async function run() {
 
       const lamp = new LampTimer(utc.getHours(), duration);
 
-      const blower = new BlowerTimer(config.get("blower"), 180); // WARNING!!
+      const blower = new BlowerTimer(
+        zone.profile.bloweractive,
+        zone.profile.blowercycle
+      );
 
-      const irrigator = new IrrigationTimer(96, 210); // WARNING!!
+      const irrigator = new IrrigationTimer(
+        zone.profile.irrigationperday,
+        parseInt(zone.profile.irrigationduration)
+      );
 
       let target;
       let delta;
@@ -226,8 +234,8 @@ async function run() {
 
       console.log(directives);
 
-      console.log("blower is on", min, sec, blower.isOn(min * 60 + sec));
-      console.log("blower is cooling", directives.temperature === "cool");
+      console.log("blower is on?", min, sec, blower.isOn(min * 60 + sec));
+      console.log("blower is cooling?", directives.temperature === "cool");
 
       const systems = new Map([
         ["lamp", lamp.isOn(hour)],
@@ -239,11 +247,10 @@ async function run() {
         ["cooler", directives.temperature === "cool"],
         ["dehumidifer", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],
-        ["irrigator", irrigator.isOn((ms / 1000) % 86400)],
         ["fan", 1 === 1]
       ]);
 
-      console.log("SYSTEMS!", systems);
+      console.log("ZONE SYSTEMS!", systems);
 
       systems.forEach((value, key) => {
         zone.devices.map(device => {
@@ -262,6 +269,37 @@ async function run() {
               client.send(JSON.stringify(data));
             });
           }
+        });
+      });
+
+      console.log("irrigator is on?", ms, ms % 86400000, irrigator.isOn(ms % 86400000));
+
+      const children = new Map([
+        ["irrigator", irrigator.isOn(ms % 86400000)]
+      ]);
+
+      console.log("CHILD SYSTEMS!", children);
+
+      children.forEach(async (value, key) => {
+        zone.children.forEach(async child => {
+          const zone = await readZone(child);
+          zone.devices.forEach(device => {
+            if (device.devicetype === key) {
+              const action = value ? "on" : "off";
+              const data = {
+                type: "COMMAND",
+                payload: {
+                  device: device.device,
+                  action: action,
+                  timestamp: new Date()
+                }
+              };
+              console.log("sending...", data);
+              wss.clients.forEach(client => {
+                client.send(JSON.stringify(data));
+              });
+            }
+          });
         });
       });
     }

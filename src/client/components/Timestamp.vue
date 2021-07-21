@@ -5,7 +5,9 @@
     >
     <div v-else class="is-family-code">
       <span v-if="dayold">{{ monthday }} - </span>
-      <span>{{ hhmm }}<span class="is-size-7">{{ ss }}</span></span>
+      <span
+        >{{ hhmm }}<span class="is-size-7">{{ ss }}</span></span
+      >
     </div>
   </div>
 </template>
@@ -66,9 +68,9 @@ const Timestamp = Vue.extend({
     },
 
     monthday(): string {
-      const mon = this.local.toLocaleString("default", {month: "short"});
+      const mon = this.local.toLocaleString("default", { month: "short" });
 
-      return ( mon + " " + this.local.getDay() );
+      return mon + " " + this.local.getDay();
     },
 
     hhmm(): string {

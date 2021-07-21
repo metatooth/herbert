@@ -37,12 +37,17 @@ export interface Notification {
 export interface Profile {
   id: string;
   profile: string;
+  timezone: string;
   lampStart: number;
   lampDuration: number;
   lampOnTemperature: number;
   lampOnHumidity: number;
   lampOffTemperature: number;
   lampOffHumidity: number;
+  bloweractive: number;
+  blowercycle: number;
+  irrigationperday: number;
+  irrigationduration: number;
   timestamp: Date;
 }
 
@@ -64,6 +69,7 @@ export interface Worker {
 export interface Zone {
   id: string;
   nickname: string;
+  maxirrigators: number;
   parent: string;
   profile: string;
   timestamp: Date;

@@ -1,9 +1,17 @@
 <template>
   <div class="field is-horizontal">
     <div class="field-body">
+      <div class="field">
+        <div class="tags has-addons">
+          <span class="tag">
+            <font-awesome-icon :icon="icon" />
+          </span>
+          <span class="tag">{{ this.label }}</span>
+        </div>
+      </div>
       <div class="field" v-if="!editing">
-        <span v-bind:class="valueClass">{{ text || "undefined" }}</span>
-        <button class="button" @click="edit">
+        <span v-bind:class="valueClass">{{ this.edited || "undefined" }}</span>
+        <button v-bind:class="buttonClass" @click="edit">
           <font-awesome-icon icon="edit" />
         </button>
       </div>
@@ -11,10 +19,12 @@
         <div class="control">
           <input
             class="input"
-            type="text"
+            type="number"
             v-model="edited"
+            min="1"
+            size="2"
             @keyup.enter="save"
-            @keyup.esc="cancel"
+            @keyup.esc="cancel"            
           />
         </div>
         <herbert-button label="" :show="true" icon="check" @on-click="save" />
@@ -28,12 +38,12 @@
 import Vue from "vue";
 import HerbertButton from "@/components/Button.vue";
 
-const EditText = Vue.extend({
+const EditNumber = Vue.extend({
   props: {
-    text: String,
+    num: Number,
     size: String,
     label: String,
-    icon: String
+icon: String
   },
 
   components: {
@@ -42,18 +52,21 @@ const EditText = Vue.extend({
 
   data() {
     return {
-      edited: this.text,
+      edited: this.num,
       editing: false
     };
   },
 
   computed: {
+    buttonClass() {
+      return `${name} is-${this.size}`;
+    },
+
     valueClass() {
-      let name = "title";
       if (this.size === "medium") {
-        name = "text";
+        return "text";
       }
-      return name;
+      return "title";
     }
   },
 
@@ -63,21 +76,25 @@ const EditText = Vue.extend({
     },
 
     save() {
-      this.$emit("edit-text", this.edited);
+      this.$emit("edit-number", this.edited);
       this.editing = false;
     },
 
     cancel() {
-      this.edited = this.text;
+      this.edited = this.num;
       this.editing = false;
     }
   }
 });
-export default EditText;
+export default EditNumber;
 </script>
 
 <style scoped>
 .title {
+  margin: 0px 20px;
+}
+
+.text {
   margin: 0px 20px;
 }
 </style>

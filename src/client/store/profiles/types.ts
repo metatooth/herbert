@@ -7,6 +7,11 @@ export class Profile {
   lamponhumidity: number;
   lampofftemperature: number;
   lampoffhumidity: number;
+  bloweractive: number;
+  blowercycle: number;
+  irrigationperday: number;
+  irrigationduration: number;
+  maxirrigators: number;
   createdat: Date;
   updatedat: Date;
   deleted: boolean;

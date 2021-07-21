@@ -7,15 +7,15 @@
         :precision="1"
         :units="unitsWithDegree"
         :color="temperatureColor"
-        />
-      
+      />
+
       <target
         icon="tint"
         :value="humidity"
         :precision="0"
         units="%"
         :color="humidityColor"
-        />
+      />
 
       <target
         icon="cloud"
@@ -23,7 +23,7 @@
         :precision="1"
         units="hPa"
         :color="pressureColor"
-        />
+      />
     </div>
   </div>
 </template>
@@ -52,7 +52,7 @@ const ZoneActual = Vue.extend({
 
   computed: {
     temperature(): number {
-      const mean = this.zone.meanTemperature(); 
+      const mean = this.zone.meanTemperature();
       if (this.settings.units === "F") {
         return celsius2fahrenheit(mean);
       } else if (this.settings.units === "K") {

@@ -27,8 +27,8 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { rows } = await query<Zone>(
-    "UPDATE zones SET nickname = $1, profileid = $2, active = $3, updatedat = CURRENT_TIMESTAMP WHERE id = $4 RETURNING id",
-    [req.body.nickname, req.body.profileid, req.body.active, id]
+    "UPDATE zones SET nickname = $1, profileid = $2, active = $3, maxirrigators = $4, updatedat = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id",
+    [req.body.nickname, req.body.profileid, req.body.active, req.body.maxirrigators, id]
   );
   const zone = await readZone(rows[0].id);
   res.status(200).json(zone);
@@ -61,6 +61,19 @@ router.delete("/:id/devices/:device", async (req, res) => {
     id,
     device
   ]);
+  res.status(204).json({});
+});
+
+router.post("/:id/children", async (req, res) => {
+  const { id } = req.params;
+  await query("INSERT INTO edges (a, b) VALUES ($1, $2)", [id, req.body.child]);
+
+  res.status(200).json(await readZone(id));
+});
+
+router.delete("/:id/children/:child", async (req, res) => {
+  const { id, child } = req.params;
+  await query("DELETE FROM edges WHERE a = $1 AND b = $2", [id, child]);
   res.status(204).json({});
 });
 

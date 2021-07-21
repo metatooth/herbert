@@ -57,7 +57,7 @@ const ZoneTarget = Vue.extend({
 
     temperature(): number {
       const target = this.zone.targetTemperature(this.ts);
-      if (this.units === "F") {        
+      if (this.units === "F") {
         return celsius2fahrenheit(target);
       } else if (this.units === "K") {
         return celsius2kelvin(target);

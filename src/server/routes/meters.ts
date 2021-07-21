@@ -1,5 +1,4 @@
 import Router from "express-promise-router";
-import WebSocket from "ws";
 import { Meter } from "../../shared/types";
 import { query, readMeter, readMeters } from "../db";
 
