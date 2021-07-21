@@ -1,4 +1,8 @@
 <template>
+<div id="readings">
+<section class="section">
+<back-to-dashboard />
+</section>
   <section class="section">
     <h2 class="title">{{ $route.params.name }} Meter Reading</h2>
     <h2 class="subtitle">{{ $route.params.device }}</h2>
@@ -61,6 +65,7 @@
       </div>
     </div>
   </section>
+</div>
 </template>
 
 <script lang="ts">
@@ -68,6 +73,7 @@ import Vue from "vue";
 import Chart from "@/components/Chart.vue";
 import TemperatureChart from "@/components/TemperatureChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
+import BackToDashboard from "@/components/BackToDashboard.vue";
 
 interface MeterReading {
   x: Date;
@@ -87,6 +93,7 @@ const Readings = Vue.extend({
   },
 
   components: {
+    BackToDashboard,
     Chart,
     TemperatureChart
   },

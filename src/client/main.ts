@@ -11,6 +11,7 @@ import {
   faCannabis,
   faCheck,
   faCheckCircle,
+  faChevronCircleLeft,
   faCircle,
   faCloud,
   faCloudRain,
@@ -47,6 +48,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 library.add(faCannabis);
 library.add(faCheck);
 library.add(faCheckCircle);
+library.add(faChevronCircleLeft);
 library.add(faCircle);
 library.add(faCloud);
 library.add(faCloudRain);

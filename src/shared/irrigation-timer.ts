@@ -10,12 +10,13 @@ export class IrrigationTimer {
     this.active = active;
   }
 
-  isOn(seconds: number): boolean {
+  isOn(microseconds: number): boolean {
     let result = false;
-    const cycle = 86400 / this.runs;
+    const cycle = 86400000 / this.runs;
 
     for (let i = 0; i < this.runs; i++) {
-      if (seconds >= i * cycle && seconds < i * cycle + this.active) {
+      console.log(i*cycle, microseconds, i*cycle+this.active);
+      if (microseconds >= i * cycle && microseconds < i * cycle + this.active) {
         result = true;
       }
     }

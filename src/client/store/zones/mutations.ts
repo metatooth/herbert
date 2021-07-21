@@ -21,9 +21,14 @@ export const mutations: MutationTree<ZonesState> = {
     });
   },
   ADD_CHILD(state, payload: { zone: Zone; child: number }) {
-    state.zones.find((el: Zone) => {
-      if (el.id === payload.zone.id) {
-        el.children.push(payload.child);
+    state.zones.find((zone: Zone) => {
+      if (zone.id === payload.zone.id) {
+        const found = zone.children.find((z: Zone) => {
+          return z.id === child;
+        });
+        if (!found) {
+          zone.children.push(payload.child);
+        }
       }
     });
   },

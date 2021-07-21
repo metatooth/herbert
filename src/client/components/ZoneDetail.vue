@@ -18,12 +18,24 @@
       </div>
 
       <div class="card-content">
+        <edit-number
+          :num="zone.maxirrigators"
+          label="Max Irrigators"
+          icon="cloud-rain"
+          size="medium"
+          @edit-number="saveMaxIrrigators"
+        />
+      </div>
+
+      <div class="card-content">
         <div class="field is-grouped is-grouped-multiline">
           <child-widget
             v-for="child in zone.children"
             :key="child"
             :id="child"
-            @remove-child="removeChildZone"/>
+            @remove-child="removeChildZone"
+            @jump="jump"
+          />
         </div>
       </div>
 
@@ -77,6 +89,7 @@
 
 <script lang="ts">
 import EditText from "@/components/EditText.vue";
+import EditNumber from "@/components/EditNumber.vue";
 import SelectDevice from "@/components/SelectDevice.vue";
 import SelectMeter from "@/components/SelectMeter.vue";
 import SelectZone from "@/components/SelectZone.vue";
@@ -99,6 +112,8 @@ const ZoneDetail = Vue.extend({
 
   data() {
     return {
+      nickname: this.zone.nickname,
+      profileid: this.zone.profileid,
       timestamp: new Date()
     };
   },
@@ -106,6 +121,7 @@ const ZoneDetail = Vue.extend({
   components: {
     ChildWidget,
     DeviceWidget,
+    EditNumber,
     EditText,
     ZoneActual,
     ZoneTarget,
@@ -125,7 +141,7 @@ const ZoneDetail = Vue.extend({
     ...mapGetters("devices", ["devices"]),
     ...mapGetters("meters", ["meters"]),
     ...mapGetters("profiles", ["profiles"]),
-    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   mounted() {
@@ -147,7 +163,7 @@ const ZoneDetail = Vue.extend({
 
     child(id: number) {
       let child = null;
-      this.zones.forEach((zone) => {
+      this.zones.forEach(zone => {
         if (zone.id === id) {
           child = zone;
         }
@@ -179,9 +195,17 @@ const ZoneDetail = Vue.extend({
 
     saveProfile(profile: number) {
       const zone = {
-        id: this.zone.id,
-        nickname: this.zone.nickname,
+        ...this.zone,
         profileid: profile
+      };
+
+      this.edit(zone);
+    },
+
+    saveMaxIrrigators(max: number) {
+      const zone = {
+        ...this.zone,
+        maxirrigators: max
       };
 
       this.edit(zone);
@@ -190,7 +214,11 @@ const ZoneDetail = Vue.extend({
     scrollFix(hashbang: string) {
       location.hash = hashbang;
     },
-    
+
+    jump() {
+      setTimeout(() => this.scrollFix(this.$route.hash), 1);
+    },
+
     ...mapActions("zones", [
       "addDevice",
       "addChild",

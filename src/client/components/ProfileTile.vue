@@ -449,12 +449,16 @@ const ProfileTile = Vue.extend({
       const profile = {
         id: this.profile.id,
         profile: this.name,
-        lampstart: `${hourString}:${start[1]}`,
+        lampstart: `${hourString}:${start[1]}:00`,
         lampduration: `${this.lampduration} hours`,
         lampontemperature: ontemp,
         lamponhumidity: this.lamponhumidity,
         lampofftemperature: offtemp,
-        lampoffhumidity: this.lampoffhumidity
+        lampoffhumidity: this.lampoffhumidity,
+        bloweractive: this.bloweractive * 1000,
+        blowercycle: this.blowercycle * 1000,
+        irrigationperday: this.profile.irrigationperday,
+        irrigationduration: this.irrigationduration * 1000
       };
 
       this.edit(profile);

@@ -40,24 +40,18 @@ export const actions: ActionTree<ZonesState, RootState> = {
 
   addChild({ commit }, payload: { zone: Zone; child: string }) {
     const json = JSON.stringify({ child: payload.child });
-    HTTP.post(`/zones/${payload.zone.id}/children`, json).then(response => {
-      commit("ADD_CHILD", payload );
+    HTTP.post(`/zones/${payload.zone.id}/children`, json).then(() => {
+      commit("ADD_CHILD", payload);
     });
   },
 
   edit({ commit }, payload: Zone) {
     const json = JSON.stringify(payload);
     HTTP.put(`/zones/${payload.id}`, json).then(response => {
-      commit("EDIT", Object.assign(new Zone(), response.data));
-    });
-  },
+      const zone = Object.assign(new Zone(), response.data);
+      const clone = JSON.parse(JSON.stringify(response.data));
 
-  fetchData({ commit }) {
-    HTTP.get("/zones").then(response => {
-      const payload: Zone[] = [];
-      response.data.forEach((json: object) => {
-        const zone = Object.assign(new Zone(), json);
-        const clone = JSON.parse(JSON.stringify(json));
+      zone.maxirrigators = parseInt(clone.maxirrigators);
 
         if (zone.profile) {
           zone.profile.lampontemperature = parseFloat(
@@ -75,6 +69,38 @@ export const actions: ActionTree<ZonesState, RootState> = {
             clone.profile.lampoffhumidity
           );
         }
+
+
+      commit("EDIT", zone);
+    });
+  },
+
+  fetchData({ commit }) {
+    HTTP.get("/zones").then(response => {
+      const payload: Zone[] = [];
+      response.data.forEach((json: object) => {
+        const zone = Object.assign(new Zone(), json);
+        const clone = JSON.parse(JSON.stringify(json));
+
+        zone.maxirrigators = parseInt(clone.maxirrigators);
+
+        if (zone.profile) {
+          zone.profile.lampontemperature = parseFloat(
+            clone.profile.lampontemperature
+          );
+
+          zone.profile.lamponhumidity = parseFloat(
+            clone.profile.lamponhumidity
+          );
+          zone.profile.lampofftemperature = parseFloat(
+            clone.profile.lampofftemperature
+          );
+
+          zone.profile.lampoffhumidity = parseFloat(
+            clone.profile.lampoffhumidity
+          );
+        }
+
         const devices: Device[] = [];
         const meters: Meter[] = [];
         const children: number[] = [];
@@ -90,7 +116,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
         });
 
         clone.children.forEach((i: number) => {
-          children.push(i); 
+          children.push(i);
         });
 
         zone.devices = devices;
@@ -122,6 +148,5 @@ export const actions: ActionTree<ZonesState, RootState> = {
     const json = JSON.stringify({ child: payload.child });
     HTTP.delete(`/zones/${payload.zone.id}/children/${payload.child}`, json);
     commit("REMOVE_CHILD", payload);
-  },
-
+  }
 };

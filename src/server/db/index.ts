@@ -43,7 +43,7 @@ export async function readZone(id: string) {
   const promises = [];
 
   const res = await query<Zone & Profile>(
-    "SELECT z.id, z.nickname, p.id as profileid, z.updatedat, z.active FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
+    "SELECT z.id, z.nickname, p.id as profileid, z.maxirrigators, z.updatedat, z.active FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
     [id]
   );
 
@@ -79,7 +79,7 @@ export async function readZone(id: string) {
     });
   }
 
-  const children = await query<Number>(
+  const children = await query<number>(
     "SELECT e.b FROM zones z INNER JOIN edges e ON z.id = e.a WHERE z.id = $1",
     [id]
   );
@@ -89,7 +89,7 @@ export async function readZone(id: string) {
       promises.push(row);
     });
   }
-  
+
   return await Promise.all(promises).then(values => {
     values[0].devices = [];
     values[0].meters = [];

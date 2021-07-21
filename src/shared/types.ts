@@ -69,6 +69,7 @@ export interface Worker {
 export interface Zone {
   id: string;
   nickname: string;
+  maxirrigators: number;
   parent: string;
   profile: string;
   timestamp: Date;

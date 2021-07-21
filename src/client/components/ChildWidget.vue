@@ -5,7 +5,15 @@
         <font-awesome-icon icon="grip-horizontal" />
       </span>
       <span class="tag is-medium has-background-success has-text-dark">
-        {{ child.nickname }}
+        <router-link
+          :to="{
+               name: 'zone',
+               hash: linkto,
+               params: { id: child.id }
+               }"
+          >
+          {{ child.nickname }}
+        </router-link>
         <button class="delete" v-on:click="remove(child.id)" />
       </span>
     </div>
@@ -29,7 +37,7 @@ const ChildWidget = Vue.extend({
   },
 
   mounted() {
-    this.zones.forEach((zone) => {
+    this.zones.forEach(zone => {
       if (zone.id === this.id) {
         this.child = zone;
       }
@@ -37,8 +45,8 @@ const ChildWidget = Vue.extend({
   },
 
   computed: {
-    linkName(): string {
-      return "zone-detail-" + this.id;
+    linkto(): string {
+      return `#zone-details-${this.id}`;
     },
 
     ...mapGetters("zones", ["zones"])

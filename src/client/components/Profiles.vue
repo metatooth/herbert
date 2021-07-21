@@ -40,21 +40,9 @@
                   <input
                     class="input"
                     type="text"
-                    v-model="nickname"
-                    placeHolder="Name for zone"
+                    v-model="profile"
+                    placeHolder="Name for profile"
                   />
-                </div>
-
-                <div class="select">
-                  <select v-model="profileid">
-                    <option
-                      v-for="profile in profiles"
-                      :key="profile.id"
-                      :value="profile.id"
-                    >
-                      {{ profile.profile }}
-                    </option>
-                  </select>
                 </div>
               </div>
             </div>

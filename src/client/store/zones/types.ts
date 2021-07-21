@@ -7,6 +7,7 @@ import { vaporPressureDeficit } from "../../../shared/utils";
 export class Zone {
   id: number;
   nickname: string;
+  maxirrigators: number;
   profileid?: number;
   profile?: Profile;
   devices: Device[];
@@ -21,6 +22,7 @@ export class Zone {
   constructor() {
     this.id = 0;
     this.nickname = "";
+    this.maxirrigators = 3;
     this.devices = [];
     this.meters = [];
     this.children = [];
