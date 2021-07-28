@@ -2,6 +2,6 @@
   "nickname": "HERBERT",
   "polling": 5,
   "interval": 30,
-  "blower": 60,
+  "reporting-period": 210,
   "ws-url": "ws://localhost:5000"
 }

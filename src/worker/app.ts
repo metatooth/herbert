@@ -90,17 +90,14 @@ export class App {
       app.meters.push(meter);
     }
 
-    if (
-      meter.clime.temperature !== ad.serviceData.temperature.c ||
-      meter.clime.humidity !== ad.serviceData.humidity / 100.0
-    ) {
-      meter.clime.temperature = ad.serviceData.temperature.c;
-      meter.clime.delta = 0.6; // WARNING!
-      meter.clime.humidity = ad.serviceData.humidity / 100.0;
-      meter.clime.timestamp = new Date();
-      logger.debug(meter.device, meter.clime);
-      app.meterStatus(meter);
-    }
+    meter.clime.temperature = ad.serviceData.temperature.c;
+    meter.clime.delta = 0.6; // WARNING!
+    meter.clime.humidity = ad.serviceData.humidity / 100.0;
+    meter.clime.timestamp = new Date();
+
+    logger.debug(meter.device, meter.clime);
+
+    app.meterStatus(meter);
 
     return Promise.resolve(true);
   }

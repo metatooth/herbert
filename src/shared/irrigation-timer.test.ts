@@ -85,5 +85,4 @@ test("Twice per day for 3 1/2 minutes each in two tranches", () => {
   expect(timer.isOn(43415000, 6)).toBe(true);
   expect(timer.isOn(43420000, 6)).toBe(true);
   expect(timer.isOn(43620000, 6)).toBe(false);
-
 });

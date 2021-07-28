@@ -53,23 +53,20 @@ export const actions: ActionTree<ZonesState, RootState> = {
 
       zone.maxirrigators = parseInt(clone.maxirrigators);
 
-        if (zone.profile) {
-          zone.profile.lampontemperature = parseFloat(
-            clone.profile.lampontemperature
-          );
+      if (zone.profile) {
+        zone.profile.lampontemperature = parseFloat(
+          clone.profile.lampontemperature
+        );
 
-          zone.profile.lamponhumidity = parseFloat(
-            clone.profile.lamponhumidity
-          );
-          zone.profile.lampofftemperature = parseFloat(
-            clone.profile.lampofftemperature
-          );
+        zone.profile.lamponhumidity = parseFloat(clone.profile.lamponhumidity);
+        zone.profile.lampofftemperature = parseFloat(
+          clone.profile.lampofftemperature
+        );
 
-          zone.profile.lampoffhumidity = parseFloat(
-            clone.profile.lampoffhumidity
-          );
-        }
-
+        zone.profile.lampoffhumidity = parseFloat(
+          clone.profile.lampoffhumidity
+        );
+      }
 
       commit("EDIT", zone);
     });

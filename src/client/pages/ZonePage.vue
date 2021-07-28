@@ -9,13 +9,13 @@
         v-bind:key="zone.id"
         v-bind:zone="zone"
         v-bind:units="settings.units"
-        />
+      />
     </section>
   </div>
 </template>
 
 <script lang="ts">
-  import Vue from "vue";
+import Vue from "vue";
 import ZoneDetail from "@/components/ZoneDetail.vue";
 import BackToDashboard from "@/components/BackToDashboard.vue";
 import { mapGetters } from "vuex";

@@ -24,7 +24,7 @@
             min="1"
             size="2"
             @keyup.enter="save"
-            @keyup.esc="cancel"            
+            @keyup.esc="cancel"
           />
         </div>
         <herbert-button label="" :show="true" icon="check" @on-click="save" />
@@ -43,7 +43,7 @@ const EditNumber = Vue.extend({
     num: Number,
     size: String,
     label: String,
-icon: String
+    icon: String
   },
 
   components: {

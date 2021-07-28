@@ -97,13 +97,18 @@ wss.on("connection", function(ws: WebSocket) {
 
     if (data.type === "STATUS") {
       if (data.payload.device) {
+        const limit = (config.get("reporting-period") as number) * 1000;
         if (data.payload.type === "meter") {
           await registerMeter(data.payload.device, data.payload.manufacturer);
           const meter = await readMeter(data.payload.device);
           console.log("Got meter", meter);
+          const diff =
+            Date.parse(data.payload.timestamp) - meter.timestamp.getTime();
+          console.log("SO MANY seconds", Math.round(diff / 1000), limit / 1000);
           if (
-            meter.temperature != data.payload.temperature &&
-            meter.humidity != data.payload.humidity
+            meter.temperature != data.payload.temperature ||
+            meter.humidity != data.payload.humidity ||
+            diff > limit
           ) {
             createReading(
               data.payload.device,
@@ -119,7 +124,10 @@ wss.on("connection", function(ws: WebSocket) {
           await registerDevice(data.payload.device, data.payload.manufacturer);
           const device = await readDevice(data.payload.device);
           console.log("got device", device);
-          if (device.status != data.payload.status) {
+          const diff =
+            Date.parse(data.payload.timestamp) - device.timestamp.getTime();
+          console.log("SO MANY seconds", Math.round(diff / 1000), limit / 1000);
+          if (device.status != data.payload.status || diff > limit) {
             createStatus(
               data.payload.device,
               data.payload.status,
@@ -282,8 +290,9 @@ async function run() {
         const zone = await readZone(child);
         zone.devices.forEach(device => {
           if (device.devicetype === "irrigator") {
-            const action = 
-              irrigator.isOn(ms % 86400000, ++counter) ? "on" : "off";
+            const action = irrigator.isOn(ms % 86400000, ++counter)
+              ? "on"
+              : "off";
             const data = {
               type: "COMMAND",
               payload: {
