@@ -311,7 +311,7 @@ const ProfileTile = Vue.extend({
       lampoffhumidity: this.profile.lampoffhumidity,
       bloweractive: this.profile.bloweractive / 1000,
       blowercycle: this.profile.blowercycle / 1000,
-      irrigationperday: this.profile.irrigationperday,
+      irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
       editing: false,
@@ -457,7 +457,7 @@ const ProfileTile = Vue.extend({
         lampoffhumidity: this.lampoffhumidity,
         bloweractive: this.bloweractive * 1000,
         blowercycle: this.blowercycle * 1000,
-        irrigationperday: this.profile.irrigationperday,
+        irrigationperday: this.irrigationperday,
         irrigationduration: this.irrigationduration * 1000
       };
 

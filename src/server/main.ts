@@ -152,13 +152,14 @@ async function run() {
     if (zone.profile) {
       let temperature = 0;
       let humidity = 0;
-      const count = 0;
+      let count = 0;
       await Promise.all(
         zone.devices.map(async device => {
           if (device.devicetype === "meter") {
             temperature =
               (count * temperature + device.temperature) / (count + 1);
             humidity = (count * humidity + 100 * device.humidity) / (count + 1);
+            count++;
           }
         })
       );
@@ -200,11 +201,6 @@ async function run() {
       const blower = new BlowerTimer(
         zone.profile.bloweractive,
         zone.profile.blowercycle
-      );
-
-      const irrigator = new IrrigationTimer(
-        zone.profile.irrigationperday,
-        parseInt(zone.profile.irrigationduration)
       );
 
       let target;
@@ -272,34 +268,35 @@ async function run() {
         });
       });
 
-      console.log("irrigator is on?", ms, ms % 86400000, irrigator.isOn(ms % 86400000));
+      const irrigator = new IrrigationTimer(
+        parseInt(zone.profile.irrigationperday),
+        parseInt(zone.profile.irrigationduration),
+        zone.children.length,
+        parseInt(zone.maxirrigators)
+      );
 
-      const children = new Map([
-        ["irrigator", irrigator.isOn(ms % 86400000)]
-      ]);
+      console.log("irr", irrigator);
 
-      console.log("CHILD SYSTEMS!", children);
-
-      children.forEach(async (value, key) => {
-        zone.children.forEach(async child => {
-          const zone = await readZone(child);
-          zone.devices.forEach(device => {
-            if (device.devicetype === key) {
-              const action = value ? "on" : "off";
-              const data = {
-                type: "COMMAND",
-                payload: {
-                  device: device.device,
-                  action: action,
-                  timestamp: new Date()
-                }
-              };
-              console.log("sending...", data);
-              wss.clients.forEach(client => {
-                client.send(JSON.stringify(data));
-              });
-            }
-          });
+      let counter = 0;
+      zone.children.forEach(async child => {
+        const zone = await readZone(child);
+        zone.devices.forEach(device => {
+          if (device.devicetype === "irrigator") {
+            const action = 
+              irrigator.isOn(ms % 86400000, ++counter) ? "on" : "off";
+            const data = {
+              type: "COMMAND",
+              payload: {
+                device: device.device,
+                action: action,
+                timestamp: new Date()
+              }
+            };
+            console.log("sending...", data);
+            wss.clients.forEach(client => {
+              client.send(JSON.stringify(data));
+            });
+          }
         });
       });
     }

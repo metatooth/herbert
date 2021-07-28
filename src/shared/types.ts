@@ -67,10 +67,10 @@ export interface Worker {
 }
 
 export interface Zone {
-  id: string;
+  id: number;
   nickname: string;
   maxirrigators: number;
-  parent: string;
-  profile: string;
+  profile: Profile;
+  children: Zone[];
   timestamp: Date;
 }

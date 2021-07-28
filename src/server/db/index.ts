@@ -39,7 +39,7 @@ export async function readMeter(id: string): Promise<Meter> {
   return rows[0];
 }
 
-export async function readZone(id: string) {
+export async function readZone(id: number) {
   const promises = [];
 
   const res = await query<Zone & Profile>(

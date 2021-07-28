@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  res.status(200).json(await readZone(id));
+  res.status(200).json(await readZone(parseInt(id)));
 });
 
 router.put("/:id", async (req, res) => {
@@ -52,7 +52,7 @@ router.post("/:id/devices", async (req, res) => {
     console.log("ERROR", err);
   }
 
-  res.status(200).json(await readZone(id));
+  res.status(200).json(await readZone(parseInt(id)));
 });
 
 router.delete("/:id/devices/:device", async (req, res) => {
@@ -68,7 +68,7 @@ router.post("/:id/children", async (req, res) => {
   const { id } = req.params;
   await query("INSERT INTO edges (a, b) VALUES ($1, $2)", [id, req.body.child]);
 
-  res.status(200).json(await readZone(id));
+  res.status(200).json(await readZone(parseInt(id)));
 });
 
 router.delete("/:id/children/:child", async (req, res) => {
