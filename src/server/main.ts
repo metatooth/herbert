@@ -101,10 +101,8 @@ wss.on("connection", function(ws: WebSocket) {
         if (data.payload.type === "meter") {
           await registerMeter(data.payload.device, data.payload.manufacturer);
           const meter = await readMeter(data.payload.device);
-          console.log("Got meter", meter);
           const diff =
             Date.parse(data.payload.timestamp) - meter.timestamp.getTime();
-          console.log("SO MANY seconds", Math.round(diff / 1000), limit / 1000);
           if (
             meter.temperature != data.payload.temperature ||
             meter.humidity != data.payload.humidity ||
@@ -119,14 +117,10 @@ wss.on("connection", function(ws: WebSocket) {
             );
           }
         } else {
-          console.log("this must be a device");
-          console.log(data.payload);
           await registerDevice(data.payload.device, data.payload.manufacturer);
           const device = await readDevice(data.payload.device);
-          console.log("got device", device);
           const diff =
             Date.parse(data.payload.timestamp) - device.timestamp.getTime();
-          console.log("SO MANY seconds", Math.round(diff / 1000), limit / 1000);
           if (device.status != data.payload.status || diff > limit) {
             createStatus(
               data.payload.device,
@@ -136,7 +130,6 @@ wss.on("connection", function(ws: WebSocket) {
           }
         }
       } else if (data.payload.worker) {
-        console.log("Status message from worker", data.payload);
         workerStatus(data.payload.worker, data.payload.inet);
       }
     }
@@ -172,35 +165,18 @@ async function run() {
         })
       );
 
-      console.log("command for zone", zone.nickname);
-      console.log("profile", zone.profile);
-      console.log("hour", hour, "temp", temperature, "humi", humidity);
-
       const now = new Date();
-      console.log("now", now);
       const ms = now.getTime();
-      console.log("ms", ms);
-
-      console.log(now.getMonth());
-      console.log(now.getDate());
-
       const monthnbr = now.getMonth() + 1;
-
       const month = monthnbr < 10 ? `0${monthnbr}` : monthnbr.toString();
       const date =
         now.getDate() < 10 ? `0${now.getDate()}` : now.getDate().toString();
-
-      console.log("month", month, "date", date);
 
       const startat = `${now.getFullYear()}-${month}-${date} ${
         zone.profile.lampstart
       }`;
 
-      console.log("startat", startat);
-
       const utc = zonedTimeToUtc(startat, zone.profile.timezone);
-
-      console.log("UTC", utc);
 
       const duration = zone.profile.lampduration["hours"];
 
@@ -254,8 +230,6 @@ async function run() {
         ["fan", 1 === 1]
       ]);
 
-      console.log("ZONE SYSTEMS!", systems);
-
       systems.forEach((value, key) => {
         zone.devices.map(device => {
           if (device.devicetype === key) {
@@ -268,7 +242,6 @@ async function run() {
                 timestamp: new Date()
               }
             };
-            console.log("sending...", data);
             wss.clients.forEach(client => {
               client.send(JSON.stringify(data));
             });
@@ -280,7 +253,8 @@ async function run() {
         parseInt(zone.profile.irrigationperday),
         parseInt(zone.profile.irrigationduration),
         zone.children.length,
-        parseInt(zone.maxirrigators)
+        parseInt(zone.maxirrigators),
+        utc.getHours()
       );
 
       console.log("irr", irrigator);
@@ -301,7 +275,6 @@ async function run() {
                 timestamp: new Date()
               }
             };
-            console.log("sending...", data);
             wss.clients.forEach(client => {
               client.send(JSON.stringify(data));
             });

@@ -1,7 +1,7 @@
 import { IrrigationTimer } from "./irrigation-timer";
 
 test("Twice per day for 3 1/2 minutes each", () => {
-  const timer = new IrrigationTimer(2, 210000, 10, 10);
+  const timer = new IrrigationTimer(2, 210000, 10, 10, 0);
   expect(timer.isOn(0, 1)).toBe(true);
   expect(timer.isOn(100000, 1)).toBe(true);
   expect(timer.isOn(205000, 1)).toBe(true);
@@ -18,7 +18,7 @@ test("Twice per day for 3 1/2 minutes each", () => {
 });
 
 test("Five times per day for 420 seconds each", () => {
-  const timer = new IrrigationTimer(5, 420000, 10, 10);
+  const timer = new IrrigationTimer(5, 420000, 10, 10, 0);
   expect(timer.isOn(0, 1)).toBe(true);
   expect(timer.isOn(100000, 1)).toBe(true);
   expect(timer.isOn(415000, 1)).toBe(true);
@@ -56,7 +56,7 @@ test("Five times per day for 420 seconds each", () => {
 });
 
 test("Twice per day for 3 1/2 minutes each in two tranches", () => {
-  const timer = new IrrigationTimer(2, 210000, 10, 5);
+  const timer = new IrrigationTimer(2, 210000, 10, 5, 0);
   expect(timer.isOn(0, 1)).toBe(true);
   expect(timer.isOn(100000, 1)).toBe(true);
   expect(timer.isOn(205000, 1)).toBe(true);
@@ -85,4 +85,13 @@ test("Twice per day for 3 1/2 minutes each in two tranches", () => {
   expect(timer.isOn(43415000, 6)).toBe(true);
   expect(timer.isOn(43420000, 6)).toBe(true);
   expect(timer.isOn(43620000, 6)).toBe(false);
+});
+
+test("Once per day for 1 minute, start at 12 hours UTC", () => {
+  const timer = new IrrigationTimer(1, 60000, 1, 1, 12);
+  expect(timer.isOn(0, 1)).toBe(false);
+  expect(timer.isOn(43200000, 1)).toBe(true);
+  expect(timer.isOn(43220000, 1)).toBe(true);
+  expect(timer.isOn(43240000, 1)).toBe(true);
+  expect(timer.isOn(43260000, 1)).toBe(false);
 });
