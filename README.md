@@ -45,22 +45,116 @@ npm run build:worker
 npm test
 ```
 
+## Re-imaging script
+
+A script is provided to add some initial configuration when setting up
+a raspberry pi for the herbert system for the first time. Once your SD card
+is mounted, run `scripts/reimage.sh` and follow the prompts. This script will
+set a static IP, hostname, and configure wifi settings. When prompted for the
+block device to image, be sure to enter the parent block device not a partition.
+Also, only enter the block device name not the full path.</br>
+Block Device: sdb -> Good</br>
+Block Device: /dev/sdb -> Bad
+
+Note: This script has only been tested on linux, more work may be needed to
+get this to work on OSX.
+
+## Deployment Prequisites
+
+The following must be installed in order to run ansible deployments:
+
+- Python3
+- Ansible
+    - pip install ansible
+- Ansible Role Dependencies
+    - `ansible-galaxy install geerlingguy.postgresql`
+    - `ansible-galaxy install geerlingguy.nodejs`
+
+## Deployment Inventory
+
+We are currently using ansible for deployments. To get started you need to
+create an inventory file. A sample inventory file has been provided in
+`ci/ansible/inventory.sample`. First copy the sample file to
+`ci/ansible/inventory`.
+
+- Set the SSH user, password, ans herbert_version in the [all:vars] section
+    - If you want to deploy a local version of herbert, set
+      `herbert_version=local`
+- Add IPs / hosts for databases
+    - Set vars listed under [databases:vars]
+- Add IPs / hosts for servers
+    - Set the vars listed under [servers:vars]
+- Add IPs / hosts for clients
+    - Set the vars listed under [clients:vars]
+- Add IPs / hosts for workers
+    - Set config_path and config_name per worker IP
+
+## Database Deployment
+
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+
+- Image database using `scripts/reimage.sh` script
+- Update `ci/ansible/inventory`
+    - Add database IP under `[databases]` section
+    - Set vars under `[databases:vars]` section
+- Run ansible databases deployment
+    - `cd ci/ansible && ansible-playbook -i inventory database.yml`
+
+## Server Deployment
+
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+
+- Image server using `scripts/reimage.sh` script
+- Update `ci/ansible/inventory`
+    - Add server IP under `[servers]` section
+    - Set vars under `[servers:vars]` section
+- Run ansible servers deployment
+    - `cd ci/ansible && ansible-playbook -i inventory server.yml`
+
 ## Worker Deployment
 
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
 
-- Add device configuration to ~/herbert/config/production.json
-- Install script and add to system defaults
-- Start and check status
+- Image worker using `scripts/reimage.sh` script
+- Create configuration json file for worker
+- Update `ci/ansible/inventory`
+    - Add worker IP under `[workers]` section
+    - Set `config_path` and `config_name` for this worker
+    - config_path should be path to configuration file created above
+    - config_name should be the filename minus the extension in the path above
+- Run ansible workers deployment
+    - `cd ci/ansible && ansible-playbook -i inventory worker.yml`
+
+Deploying to a single worker via ansible can be accomplished via the following:
 
 ```
-$ sudo cp scripts/herbert /etc/init.d/herbert
-$ sudo nano /etc/init.d/herbert
-$ sudo chmod 755 /etc/init.d/herbert
-$ sudo update-rc.d herbert defaults
-$ sudo /etc/init.d/herbert start
-$ sudo /etc/init.d/herbert status
+cd ci/ansible
+ansible-playbook --limit <target_worker_host_ip> worker.yml
 ```
+
+TODO: In the future we can probably use a jinja2 template for configs similar
+to what we are doing for service definition files now
+
+## Client Deployment
+
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+
+- Image client using `scripts/reimage.sh` script
+- Update `ci/ansible/inventory`
+    - Add client IP under `[clients]` section
+    - Set vars under `[clients:vars]` section
+- Run ansible clients deployment
+    - `cd ci/ansible && ansible-playbook -i inventory client.yml`
+
+## Deployment Logs
+Logs for production deployments are all managed by journald. Each service's
+logs can be accessed by running the command `journalctl -u <service_name>`
+i.e. `journalctl -u herbert-worker`
+
+Current production services:
+    - herbert-server
+    - herbert-worker
+    - herbert-client
 
 ## Docker / Docker Compose
 

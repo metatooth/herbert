@@ -1,0 +1,63 @@
+- hosts: servers
+  become: yes
+
+  vars:
+    - homeDir: "/home/{{ansible_user}}"
+    - appDir: "{{homeDir}}/herbert"
+    - nodejs_version: "14.x"
+    - nodejs_package_json_path: "{{appDir}}"
+    - service_description: "Main server for the herbert system"
+    - service_user: root
+    - service_file: dist/server/main.js
+
+  tasks:
+    - name: Install System Dependencies
+      apt: name={{ item }} update_cache=yes state=latest
+      with_items:
+        - bluetooth
+        - bluez
+        - libbluetooth-dev
+        - libudev-dev
+        - git
+        - gcc
+        - g++
+        - make
+
+    - name: Git Clone Repo
+      become: no
+      when: herbert_version != "local"
+      git:
+        repo: https://github.com/metatooth/herbert.git
+        dest: "{{appDir}}"
+        version: "{{herbert_version}}"
+        force: yes
+
+    - name: Sync local herbert repo
+      become: no
+      when: herbert_version == "local"
+      synchronize:
+        src: ../../../herbert
+        dest: "{{homeDir}}"
+
+    - name: Install nodejs {{nodejs_version}} and node_modules
+      include_role:
+        name: geerlingguy.nodejs
+
+    - name: Build server
+      become: no
+      command: "chdir={{appDir}} npm run build:server"
+
+    - name: Install server service
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/herbert-server.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start herbert-server service
+      systemd:
+        name: herbert-server
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

@@ -1,0 +1,16 @@
+[Unit]
+Description={{ service_description }}
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node {{ service_file }}
+WorkingDirectory={{ appDir }}
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User={{ service_user }}
+Environment=DATABASE_URL={{ dburl | default("")}}
+Environment=NODE_ENV={{ node_env | default("")}}
+
+[Install]
+WantedBy=multi-user.target
