@@ -47,14 +47,19 @@ npm test
 
 ## Re-imaging script
 
+```bash
+# Prerequisite
+sudo apt update && sudo apt install -y qemu-user-static
+```
+
 A script is provided to add some initial configuration when setting up
 a raspberry pi for the herbert system for the first time. Once your SD card
 is mounted, run `scripts/reimage.sh` and follow the prompts. This script will
 set a static IP, hostname, and configure wifi settings. When prompted for the
 block device to image, be sure to enter the parent block device not a partition.
-Also, only enter the block device name not the full path.</br>
-Block Device: sdb -> Good</br>
-Block Device: /dev/sdb -> Bad
+
+You can also pass in each option as a command line argument instead of being
+prompted for input. See `scripts/reimage.sh -h` for details.
 
 Note: This script has only been tested on linux, more work may be needed to
 get this to work on OSX.
@@ -91,7 +96,7 @@ create an inventory file. A sample inventory file has been provided in
 
 ## Database Deployment
 
-Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image database using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
@@ -102,7 +107,7 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
 
 ## Server Deployment
 
-Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image server using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
@@ -113,7 +118,7 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
 
 ## Worker Deployment
 
-Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image worker using `scripts/reimage.sh` script
 - Create configuration json file for worker
@@ -137,7 +142,7 @@ to what we are doing for service definition files now
 
 ## Client Deployment
 
-Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.4 2020-08-20
+Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image client using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
