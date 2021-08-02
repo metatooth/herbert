@@ -63,6 +63,7 @@ export interface Reading {
 export interface Worker {
   worker: string;
   nickname: string;
+  config: string;
   timestamp: Date;
 }
 

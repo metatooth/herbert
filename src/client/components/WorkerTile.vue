@@ -9,6 +9,7 @@
             placeHolder="Name this worker"
             v-model="nickname"
             @keyup.esc="cancel"
+            @keyup.enter="save"
           />
         </span>
         <span v-else>{{ worker.nickname || worker.worker }}</span>
@@ -19,6 +20,18 @@
         </span>
         <span class="tag">{{ worker.worker }}</span>
       </p>
+      <div class="content">
+        <span v-if="editing">
+          <textarea
+            class="textarea"
+            v-model="config"
+            @keyup.esc="cancel"
+          />
+        </span>
+        <span class="is-family-code" v-else>
+          {{ this.worker.config }}
+        </span>
+      </div>
       <div class="content">
         <span class="is-family-code">{{ worker.inet }}</span>
       </div>
@@ -47,6 +60,7 @@ const WorkerTile = Vue.extend({
     return {
       nickname: this.worker.nickname,
       timestamp: new Date(Date.parse(this.worker.updatedat)),
+      config: JSON.stringify(this.worker.config),
       readable: true,
       editing: false
     };
@@ -57,6 +71,12 @@ const WorkerTile = Vue.extend({
     Timestamp
   },
 
+  computed: {
+    lastupdate() {
+      return new Date(Date.parse(this.worker.updatedat));
+    }
+  },
+
   methods: {
     editable() {
       this.editing = true;
@@ -65,13 +85,15 @@ const WorkerTile = Vue.extend({
     save() {
       this.edit({
         ...this.worker,
-        nickname: this.nickname
+        nickname: this.nickname,
+        config: this.config
       });
       this.editing = false;
     },
 
     cancel() {
       this.nickname = this.worker.nickname;
+      this.config = JSON.stringify(this.worker.config);
       this.editing = false;
     },
 

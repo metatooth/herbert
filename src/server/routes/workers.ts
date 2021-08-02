@@ -7,7 +7,7 @@ const router = Router();
 
 router.get("/", async (req, res) => {
   const { rows } = await query<Worker>(
-    "SELECT * FROM workers ORDER BY createdAt DESC",
+    "SELECT * FROM workers ORDER BY createdat DESC",
     []
   );
   res.status(200).json(rows);
@@ -21,8 +21,8 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { rows } = await query<Worker>(
-    "UPDATE workers SET nickname = $1 WHERE worker = $2 RETURNING worker",
-    [req.body.nickname, id]
+    "UPDATE workers SET nickname = $1, config = $2, updatedat = CURRENT_TIMESTAMP WHERE worker = $3 RETURNING worker",
+    [req.body.nickname, req.body.config, id]
   );
 
   res.status(200).json(await readWorker(rows[0].worker));
