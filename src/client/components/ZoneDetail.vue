@@ -5,9 +5,9 @@
         <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
       </div>
 
-      <meter-actual :zone="zone" :units="units" />
+      <zone-actual :zone="zone" :units="units" />
 
-      <meter-target :zone="zone" :units="units" />
+      <zone-target :zone="zone" :units="units" />
 
       <div class="card-content">
         <select-profile
@@ -15,6 +15,28 @@
           v-bind:zone="zone"
           @select-profile="saveProfile"
         />
+      </div>
+
+      <div class="card-content">
+        <edit-number
+          :num="zone.maxirrigators"
+          label="Max Irrigators"
+          icon="cloud-rain"
+          size="medium"
+          @edit-number="saveMaxIrrigators"
+        />
+      </div>
+
+      <div class="card-content">
+        <div class="field is-grouped is-grouped-multiline">
+          <child-widget
+            v-for="child in zone.children"
+            :key="child"
+            :id="child"
+            @remove-child="removeChildZone"
+            @jump="jump"
+          />
+        </div>
       </div>
 
       <div class="card-content">
@@ -41,6 +63,10 @@
       </div>
 
       <div class="card-content">
+        <select-zone :exclude="zone" @select-zone="addZone" />
+      </div>
+
+      <div class="card-content">
         <select-meter @select-meter="add" />
       </div>
 
@@ -63,8 +89,10 @@
 
 <script lang="ts">
 import EditText from "@/components/EditText.vue";
+import EditNumber from "@/components/EditNumber.vue";
 import SelectDevice from "@/components/SelectDevice.vue";
 import SelectMeter from "@/components/SelectMeter.vue";
+import SelectZone from "@/components/SelectZone.vue";
 import SelectProfile from "@/components/SelectProfile.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import Vue from "vue";
@@ -72,8 +100,9 @@ import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
 import DeviceWidget from "@/components/DeviceWidget.vue";
 import { mapGetters, mapActions } from "vuex";
-import MeterActual from "@/components/MeterActual.vue";
-import MeterTarget from "@/components/MeterTarget.vue";
+import ZoneActual from "@/components/ZoneActual.vue";
+import ZoneTarget from "@/components/ZoneTarget.vue";
+import ChildWidget from "@/components/ChildWidget.vue";
 
 const ZoneDetail = Vue.extend({
   props: {
@@ -83,19 +112,24 @@ const ZoneDetail = Vue.extend({
 
   data() {
     return {
+      nickname: this.zone.nickname,
+      profileid: this.zone.profileid,
       timestamp: new Date()
     };
   },
 
   components: {
+    ChildWidget,
     DeviceWidget,
+    EditNumber,
     EditText,
-    MeterActual,
-    MeterTarget,
+    ZoneActual,
+    ZoneTarget,
     MeterWidget,
     SelectDevice,
     SelectMeter,
     SelectProfile,
+    SelectZone,
     Timestamp
   },
 
@@ -106,7 +140,8 @@ const ZoneDetail = Vue.extend({
 
     ...mapGetters("devices", ["devices"]),
     ...mapGetters("meters", ["meters"]),
-    ...mapGetters("profiles", ["profiles"])
+    ...mapGetters("profiles", ["profiles"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   mounted() {
@@ -116,14 +151,35 @@ const ZoneDetail = Vue.extend({
   methods: {
     add(selected: string) {
       const payload = { zone: this.zone, device: selected };
-      console.log("ADD WITH", payload);
       this.addDevice(payload);
       this.fetchData();
+    },
+
+    addZone(selected: string) {
+      const payload = { zone: this.zone, child: selected };
+      this.addChild(payload);
+      this.fetchData();
+    },
+
+    child(id: number) {
+      let child = null;
+      this.zones.forEach(zone => {
+        if (zone.id === id) {
+          child = zone;
+        }
+      });
+      return child;
     },
 
     remove(selected: string) {
       const payload = { zone: this.zone, device: selected };
       this.removeDevice(payload);
+      this.fetchData();
+    },
+
+    removeChildZone(selected: number) {
+      const payload = { zone: this.zone, child: selected };
+      this.removeChild(payload);
       this.fetchData();
     },
 
@@ -139,9 +195,17 @@ const ZoneDetail = Vue.extend({
 
     saveProfile(profile: number) {
       const zone = {
-        id: this.zone.id,
-        nickname: this.zone.nickname,
+        ...this.zone,
         profileid: profile
+      };
+
+      this.edit(zone);
+    },
+
+    saveMaxIrrigators(max: number) {
+      const zone = {
+        ...this.zone,
+        maxirrigators: max
       };
 
       this.edit(zone);
@@ -151,7 +215,18 @@ const ZoneDetail = Vue.extend({
       location.hash = hashbang;
     },
 
-    ...mapActions("zones", ["addDevice", "edit", "fetchData", "removeDevice"])
+    jump() {
+      setTimeout(() => this.scrollFix(this.$route.hash), 1);
+    },
+
+    ...mapActions("zones", [
+      "addDevice",
+      "addChild",
+      "edit",
+      "fetchData",
+      "removeDevice",
+      "removeChild"
+    ])
   }
 });
 

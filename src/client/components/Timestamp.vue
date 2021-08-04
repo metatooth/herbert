@@ -1,10 +1,15 @@
 <template>
   <div>
-    <span v-if="timeago"><em>{{ lapsed  }} ago</em></span>
-    <span v-else class="is-family-code">
-      {{ hhmm }}<span class="is-size-7">{{ ss }}</span>
-    </span>
-  </div>        
+    <span v-if="timeago"
+      ><em>{{ lapsed }} ago</em></span
+    >
+    <div v-else class="is-family-code">
+      <span v-if="dayold">{{ monthday }} - </span>
+      <span
+        >{{ hhmm }}<span class="is-size-7">{{ ss }}</span></span
+      >
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -23,10 +28,18 @@ const Timestamp = Vue.extend({
       timeago: this.readable
     };
   },
- 
+
   computed: {
+    dayold(): boolean {
+      const diff = new Date() - this.timestamp;
+      if (diff > 86400000) {
+        return true;
+      }
+      return false;
+    },
+
     lapsed(): string {
-      const diff = (new Date()) - this.timestamp;
+      const diff = new Date() - this.timestamp;
       if (diff < 30000) {
         return "seconds";
       } else if (diff < 60000) {
@@ -52,6 +65,12 @@ const Timestamp = Vue.extend({
 
     local(): Date {
       return convertToLocalTime(this.timestamp, { timeZone: this.timezone });
+    },
+
+    monthday(): string {
+      const mon = this.local.toLocaleString("default", { month: "short" });
+
+      return mon + " " + this.local.getDay();
     },
 
     hhmm(): string {

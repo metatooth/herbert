@@ -1,150 +1,63 @@
 <template>
   <section class="section">
-    <h2 class="title">{{ profilesCount }} {{ profilesName }}</h2>
-    <table class="table is-full-width is-striped">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th colspan="2">Lamps</th>
-          <th class="has-background-warning has-text-centered">
-            <font-awesome-icon icon="sun" />
-          </th>
-          <th class="has-text-white has-background-info has-text-centered">
-            <font-awesome-icon icon="moon" />
-          </th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <profile-row
-          v-for="profile in profiles"
-          v-bind:key="profile.id"
-          v-bind:profile="profile"
-          v-bind:units="settings.units"
+    <span class="title">{{ profilesCount }} {{ profilesName }}</span>
+    <div class="tile is-ancestor">
+      <div class="tile is-4 is-vertical">
+        <profile-tile
+          v-for="profile in left"
+          :key="profile.id"
+          :profile="profile"
+          :units="settings.units"
         />
-
-        <tr>
-          <td>
-            <div class="control" v-if="adding">
-              <input
-                class="input"
-                type="text"
-                v-model="profile"
-                size="10"
-                placeHolder="profile name"
+      </div>
+      <div class="tile is-4 is-vertical">
+        <profile-tile
+          v-for="profile in middle"
+          :key="profile.id"
+          :profile="profile"
+          :units="settings.units"
+        />
+      </div>
+      <div class="tile is-4 is-vertical">
+        <profile-tile
+          v-for="profile in right"
+          :key="profile.id"
+          :profile="profile"
+          :units="settings.units"
+        />
+        <div class="tile is-parent">
+          <div class="tile is-child box">
+            <p class="title">
+              <add-controls
+                @on-add="addable"
+                @on-save="save"
+                @on-cancel="cancel"
               />
-            </div>
-          </td>
-
-          <td>
-            <div class="control" v-if="adding">
-              <input
-                class="input"
-                type="time"
-                v-model="start"
-                min="00:00"
-                max="23:59"
-                size="2"
-              />
-            </div>
-          </td>
-
-          <td>
-            <div class="control" v-if="adding">
-              <input
-                class="input"
-                type="number"
-                min="0"
-                max="24"
-                v-model="duration"
-                size="2"
-              />
-            </div>
-          </td>
-
-          <td>
-            <div class="field is-grouped">
-              <div class="control has-icons-left" v-if="adding">
-                <input
-                  class="input"
-                  type="number"
-                  v-model="lampontemperature"
-                  :min="tempMin"
-                  :max="tempMax"
-                  step="0.1"
-                  size="4"
-                />
-                <span class="icon is-left">
-                  <font-awesome-icon icon="thermometer-half" class="is-left" />
-                </span>
-              </div>
-
-              <div class="control has-icons-left" v-if="adding">
-                <input
-                  class="input"
-                  type="number"
-                  v-model="lamponhumidity"
-                  min="0"
-                  max="100"
-                  size="2"
-                />
-                <span class="icon is-left">
-                  <font-awesome-icon icon="tint" />
-                </span>
+            </p>
+            <div class="content" v-if="adding">
+              <div class="field is-grouped is-grouped-multiline">
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    v-model="profile"
+                    placeHolder="Name for profile"
+                  />
+                </div>
               </div>
             </div>
-          </td>
-
-          <td>
-            <div class="field is-grouped">
-              <div class="control has-icons-left" v-if="adding">
-                <input
-                  class="input"
-                  type="number"
-                  v-model="lampofftemperature"
-                  :min="tempMin"
-                  :max="tempMax"
-                  step="0.1"
-                  size="4"
-                />
-                <span class="icon is-left">
-                  <font-awesome-icon icon="thermometer-half" />
-                </span>
-              </div>
-              <div class="control has-icons-left" v-if="adding">
-                <input
-                  class="input"
-                  type="number"
-                  v-model="lampoffhumidity"
-                  min="0"
-                  max="100"
-                  size="2"
-                />
-                <span class="icon is-left">
-                  <font-awesome-icon icon="tint" />
-                </span>
-              </div>
-            </div>
-          </td>
-
-          <td>
-            <add-controls
-              @on-add="addable"
-              @on-save="save"
-              @on-cancel="cancel"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from "vuex";
 import { Profile } from "@/store/profiles/types";
-import ProfileRow from "@/components/ProfileRow.vue";
+import ProfileTile from "@/components/ProfileTile.vue";
 import AddControls from "@/components/AddControls.vue";
 import {
   celsius2fahrenheit,
@@ -170,10 +83,40 @@ const Profiles = Vue.extend({
 
   components: {
     AddControls,
-    ProfileRow
+    ProfileTile
   },
 
   computed: {
+    left() {
+      const profiles = [];
+      for (let i = 0; i < this.profilesCount; i = i + 3) {
+        if (this.profiles[i]) {
+          profiles.push(this.profiles[i]);
+        }
+      }
+      return profiles;
+    },
+
+    middle() {
+      const profiles = [];
+      for (let i = 1; i < this.profilesCount; i = i + 3) {
+        if (this.profiles[i]) {
+          profiles.push(this.profiles[i]);
+        }
+      }
+      return profiles;
+    },
+
+    right() {
+      const profiles = [];
+      for (let i = 2; i < this.profilesCount; i = i + 3) {
+        if (this.profiles[i]) {
+          profiles.push(this.profiles[i]);
+        }
+      }
+      return profiles;
+    },
+
     profilesName(): string {
       if (this.profilesCount === 1) {
         return "Profile";
@@ -204,9 +147,7 @@ const Profiles = Vue.extend({
       return max;
     },
 
-    ...mapState("profiles", ["profiles"]),
-
-    ...mapGetters("profiles", ["profilesCount"]),
+    ...mapGetters("profiles", ["profilesCount", "profiles"]),
 
     ...mapGetters("settings", ["settings"])
   },

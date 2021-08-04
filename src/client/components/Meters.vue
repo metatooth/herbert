@@ -5,25 +5,13 @@
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
-        <meter-tile
-          v-for="meter in left"
-          :key="meter.id"
-          :meter="meter"
-          />
+        <meter-tile v-for="meter in left" :key="meter.id" :meter="meter" />
       </div>
-      <div class="tile is-3 is-vertical">
-        <meter-tile
-          v-for="meter in middle"
-          :key="meter.id"
-          :meter="meter"
-          />
+      <div class="tile is-4 is-vertical">
+        <meter-tile v-for="meter in middle" :key="meter.id" :meter="meter" />
       </div>
-      <div class="tile is-3 is-vertical">
-      <meter-tile
-        v-for="meter in right"
-        :key="meter.id"
-        :meter="meter"
-        />
+      <div class="tile is-4 is-vertical">
+        <meter-tile v-for="meter in right" :key="meter.id" :meter="meter" />
       </div>
     </div>
   </section>
@@ -73,7 +61,7 @@ const Meters = Vue.extend({
       }
       return meters;
     },
-    
+
     right() {
       const meters = [];
       for (let i = 2; i < this.metersCount; i = i + 3) {
@@ -83,7 +71,6 @@ const Meters = Vue.extend({
       }
       return meters;
     }
-
   }
 });
 export default Meters;

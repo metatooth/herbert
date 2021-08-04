@@ -28,13 +28,14 @@ const SelectDeviceType = Vue.extend({
   data() {
     return {
       devicetypes: [
-        "lamp",
         "blower",
         "cooler",
-        "humidifier",
-        "heater",
         "dehumidifier",
-        "fan"
+        "fan",
+        "heater",
+        "humidifier",
+        "irrigator",
+        "lamp"
       ],
       selected: this.devicetype
     };
@@ -42,7 +43,6 @@ const SelectDeviceType = Vue.extend({
 
   watch: {
     selected(val: string) {
-      console.log("selected", val, this.selected);
       this.$emit("select-devicetype", val);
     }
   },
@@ -61,6 +61,8 @@ const SelectDeviceType = Vue.extend({
         return "fire-alt";
       } else if (this.selected === "humidifier") {
         return "tint";
+      } else if (this.selected === "irrigator") {
+        return "cloud-rain";
       } else if (this.selected === "fan") {
         return "fan";
       }

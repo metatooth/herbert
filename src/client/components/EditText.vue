@@ -13,6 +13,7 @@
             class="input"
             type="text"
             v-model="edited"
+            @keyup.enter="save"
             @keyup.esc="cancel"
           />
         </div>
@@ -30,7 +31,9 @@ import HerbertButton from "@/components/Button.vue";
 const EditText = Vue.extend({
   props: {
     text: String,
-    size: String
+    size: String,
+    label: String,
+    icon: String
   },
 
   components: {

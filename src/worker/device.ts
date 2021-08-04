@@ -1,7 +1,7 @@
 export class Device {
   device: string;
   manufacturer: string;
-  state: string;
+  state = "";
 
   constructor(device: string, manufacturer: string) {
     this.device = device;

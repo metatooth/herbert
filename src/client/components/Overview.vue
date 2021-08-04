@@ -6,25 +6,13 @@
           <p class="title has-text-centered">No zones!</p>
         </div>
         <div class="tile is-4 is-vertical">
-          <zone-tile
-            v-for="zone in left"
-            :key="zone.id"
-            :zone="zone"
-            />
+          <zone-tile v-for="zone in left" :key="zone.id" :zone="zone" />
         </div>
         <div class="tile is-3 is-vertical">
-          <zone-tile
-            v-for="zone in middle"
-            :key="zone.id"
-            :zone="zone"
-            />
+          <zone-tile v-for="zone in middle" :key="zone.id" :zone="zone" />
         </div>
         <div class="tile is-3 is-vertical">
-          <zone-tile
-            v-for="zone in right"
-            :key="zone.id"
-            :zone="zone"
-            />
+          <zone-tile v-for="zone in right" :key="zone.id" :zone="zone" />
         </div>
       </div>
     </section>
@@ -38,7 +26,7 @@
           v-bind:key="notification.id"
           v-bind="notification"
           @delete-notification="deleteNotification(notification)"
-          />
+        />
       </div>
     </section>
   </div>
@@ -79,7 +67,7 @@ const Overview = Vue.extend({
       }
       return zones;
     },
-    
+
     right() {
       const zones = [];
       for (let i = 2; i < this.zonesCount; i = i + 3) {
@@ -89,6 +77,7 @@ const Overview = Vue.extend({
       }
       return zones;
     },
+
     ...mapGetters("meters", ["meters", "metersCount"]),
     ...mapGetters("devices", ["devices", "devicesCount"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
@@ -99,15 +88,9 @@ const Overview = Vue.extend({
   },
 
   mounted() {
-    console.log("Starting connection to WebSocket server...");
     const ws = new WebSocket(
       process.env.VUE_APP_WS_URL || "ws://localhost:5000"
     );
-
-    ws.addEventListener("open", (ev: Event) => {
-      console.log(ev);
-      console.log("Connection open success!");
-    });
 
     ws.addEventListener("message", (ev: MessageEvent) => {
       const data = JSON.parse(ev.data);
@@ -143,9 +126,7 @@ const Overview = Vue.extend({
           timeZone: "America/New_York"
         });
         const diff = check - local.getTime();
-        console.log("check health", d.device, d.timestamp, diff);
         if (diff > 5 * 60 * 1000) {
-          console.log("TOO LONG!");
           const formatted = this.pretty(local);
 
           const n: Notification = {

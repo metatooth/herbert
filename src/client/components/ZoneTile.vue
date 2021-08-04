@@ -5,11 +5,11 @@
         <span>
           <router-link
             :to="{
-                 name: 'zone',
-                 hash: linkto,
-                 params: { id: zone.id  }
-                 }"
-            >
+              name: 'zone',
+              hash: linkto,
+              params: { id: zone.id }
+            }"
+          >
             {{ zone.nickname }}
           </router-link>
         </span>
@@ -18,10 +18,10 @@
             <font-awesome-icon :icon="statusIcon" />
           </span>
         </button>
-  </p>
-  <div class="content">
-  <span>{{ zone.profile.profile }}</span>
-</div>
+      </p>
+      <div class="content">
+        <span>{{ zone.profile.profile }}</span>
+      </div>
       <div class="content">
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
@@ -50,7 +50,7 @@ const ZoneTile = Vue.extend({
       editable: false
     };
   },
-  
+
   components: {
     Timestamp,
     ZoneActual
@@ -63,7 +63,7 @@ const ZoneTile = Vue.extend({
 
     lastupdate() {
       let last = null;
-      this.zone.meters.forEach((meter) => {
+      this.zone.meters.forEach(meter => {
         const updatedat = new Date(Date.parse(meter.updatedat));
         if (last === null || updatedat > last) {
           last = updatedat;
@@ -87,7 +87,7 @@ const ZoneTile = Vue.extend({
         return "toggle-off";
       }
     },
-    
+
     ...mapGetters("settings", ["settings"])
   },
 

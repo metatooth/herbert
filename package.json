@@ -1,21 +1,22 @@
 {
   "name": "herbert",
-  "version": "0.16.1",
+  "version": "0.18.0",
   "description": "Control your grow environment.",
   "main": "index.js",
   "engines": {
-    "node": "12.16.1"
+    "node": "14.16.1"
   },
   "scripts": {
-    "test": "jest",
-    "clean": "rm -rf dist server worker",
+    "test": "NODE_ENV=unit_test jest",
+    "clean": "rm -rf dist",
     "lint": "vue-cli-service lint",
     "serve:client": "vue-cli-service serve src/client/main.ts",
-    "serve:server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps server.js\"",
-    "serve:worker": "tsc-watch --noClear -b ./src/worker/tsconfig.json --onSuccess \"node --enable-source-maps worker.js\"",
+    "serve:server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps dist/server/main.js\"",
+    "serve:worker": "tsc-watch --noClear -b ./src/worker/tsconfig.json --onSuccess \"node --enable-source-maps dist/worker/main.js\"",
     "start": "node index.js",
+    "copy:favicon": "cp src/server/favicon.ico dist/server/",
     "build:client": "vue-cli-service build src/client/main.ts",
-    "build:server": "tsc -b src/server",
+    "build:server": "tsc -b src/server && npm run copy:favicon",
     "build:worker": "tsc -b src/worker",
     "serve": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\"  \"npm run serve:client\" \"npm run serve:server\" \"npm run serve:worker\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgRed.bold\"  \"npm run build:client\" \"npm run build:server\" \"npm run build:worker\""
@@ -59,6 +60,12 @@
     "wyze-node": "^2.0.3"
   },
   "devDependencies": {
+    "@types/config": "0.0.38",
+    "@types/cors": "^2.8.5",
+    "@types/jest": "^26.0.23",
+    "@types/pg": "^8.5.1",
+    "@types/serve-favicon": "^2.5.2",
+    "@types/ws": "^7.4.4",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -73,12 +80,13 @@
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-vue": "^6.2.2",
     "html-webpack-plugin": "^5.0.0",
-    "jest": "^26.6.3",
+    "jest": "^27.0.4",
     "node-sass": "^5.0.0",
     "prettier": "^1.19.1",
     "sass-loader": "^10.1.1",
-    "tsc-watch": "^4.2.9",
-    "typescript": "~3.9.3",
+    "ts-jest": "^27.0.3",
+    "tsc-watch": "^4.4.0",
+    "typescript": "^4.3.4",
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.46.0"
   }

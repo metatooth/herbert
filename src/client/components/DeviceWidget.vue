@@ -69,6 +69,8 @@ const DeviceWidget = Vue.extend({
         return "snowflake";
       } else if (this.device.devicetype === "fan") {
         return "fan";
+      } else if (this.device.devicetype === "irrigator") {
+        return "cloud-rain";
       } else {
         return "circle";
       }

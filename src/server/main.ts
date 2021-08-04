@@ -5,13 +5,15 @@ import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import {
-  readActiveZones,
-  reading,
-  registerDevice,
-  registerMeter,
   createReading,
   createStatus,
-  workerStatus
+  readActiveZones,
+  registerDevice,
+  registerMeter,
+  workerStatus,
+  readDevice,
+  readMeter,
+  readZone
 } from "./db";
 
 import path from "path";
@@ -19,6 +21,7 @@ import favicon from "serve-favicon";
 
 import { AirDirectives } from "../shared/air-directives";
 import { BlowerTimer } from "../shared/blower-timer";
+import { IrrigationTimer } from "../shared/irrigation-timer";
 import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
@@ -94,15 +97,16 @@ wss.on("connection", function(ws: WebSocket) {
 
     if (data.type === "STATUS") {
       if (data.payload.device) {
+        const limit = (config.get("reporting-period") as number) * 1000;
         if (data.payload.type === "meter") {
-          const meter = await registerMeter(
-            data.payload.device,
-            data.payload.manufacturer
-          );
-          console.log("Got meter", meter);
+          await registerMeter(data.payload.device, data.payload.manufacturer);
+          const meter = await readMeter(data.payload.device);
+          const diff =
+            Date.parse(data.payload.timestamp) - meter.timestamp.getTime();
           if (
-            meter.temperature != data.payload.temperature &&
-            meter.humidity != data.payload.humidity
+            meter.temperature != data.payload.temperature ||
+            meter.humidity != data.payload.humidity ||
+            diff > limit
           ) {
             createReading(
               data.payload.device,
@@ -113,13 +117,11 @@ wss.on("connection", function(ws: WebSocket) {
             );
           }
         } else {
-          const device = await registerDevice(
-            data.payload.device,
-            data.payload.manufacturer
-          );
-          console.log("Got device", device);
-
-          if (device.status != data.payload.status) {
+          await registerDevice(data.payload.device, data.payload.manufacturer);
+          const device = await readDevice(data.payload.device);
+          const diff =
+            Date.parse(data.payload.timestamp) - device.timestamp.getTime();
+          if (device.status != data.payload.status || diff > limit) {
             createStatus(
               data.payload.device,
               data.payload.status,
@@ -128,7 +130,6 @@ wss.on("connection", function(ws: WebSocket) {
           }
         }
       } else if (data.payload.worker) {
-        console.log("Status message from worker", data.payload);
         workerStatus(data.payload.worker, data.payload.inet);
       }
     }
@@ -150,54 +151,41 @@ async function run() {
     const sec = now.getUTCSeconds();
 
     if (zone.profile) {
-      console.log("command for zone", zone.nickname);
       let temperature = 0;
       let humidity = 0;
-      const count = 0;
+      let count = 0;
       await Promise.all(
         zone.devices.map(async device => {
           if (device.devicetype === "meter") {
-            const rdg = await reading(device.device);
-            console.log("lastest reading", rdg);
-            temperature = (count * temperature + rdg.temperature) / (count + 1);
-            humidity = (count * humidity + 100 * rdg.humidity) / (count + 1);
+            temperature =
+              (count * temperature + device.temperature) / (count + 1);
+            humidity = (count * humidity + 100 * device.humidity) / (count + 1);
+            count++;
           }
         })
       );
 
-      console.log("profile", zone.profile);
-      console.log("state", hour, temperature, humidity);
-
       const now = new Date();
-      console.log("now", now);
-
-      console.log(now.getMonth());
-
-      console.log(now.getDate());
-
+      const ms = now.getTime();
       const monthnbr = now.getMonth() + 1;
-
       const month = monthnbr < 10 ? `0${monthnbr}` : monthnbr.toString();
       const date =
         now.getDate() < 10 ? `0${now.getDate()}` : now.getDate().toString();
-
-      console.log("month", month, "date", date);
 
       const startat = `${now.getFullYear()}-${month}-${date} ${
         zone.profile.lampstart
       }`;
 
-      console.log("startat", startat);
-
       const utc = zonedTimeToUtc(startat, zone.profile.timezone);
-
-      console.log("UTC", utc);
 
       const duration = zone.profile.lampduration["hours"];
 
       const lamp = new LampTimer(utc.getHours(), duration);
 
-      const blower = new BlowerTimer(config.get("blower"), 180); // WARNING!!
+      const blower = new BlowerTimer(
+        zone.profile.bloweractive,
+        zone.profile.blowercycle
+      );
 
       let target;
       let delta;
@@ -226,8 +214,8 @@ async function run() {
 
       console.log(directives);
 
-      console.log("blower is on", min, sec, blower.isOn(min * 60 + sec));
-      console.log("blower is cooling", directives.temperature === "cool");
+      console.log("blower is on?", min, sec, blower.isOn(min * 60 + sec));
+      console.log("blower is cooling?", directives.temperature === "cool");
 
       const systems = new Map([
         ["lamp", lamp.isOn(hour)],
@@ -242,8 +230,6 @@ async function run() {
         ["fan", 1 === 1]
       ]);
 
-      console.log("SYSTEMS!", systems);
-
       systems.forEach((value, key) => {
         zone.devices.map(device => {
           if (device.devicetype === key) {
@@ -256,7 +242,39 @@ async function run() {
                 timestamp: new Date()
               }
             };
-            console.log("sending...", data);
+            wss.clients.forEach(client => {
+              client.send(JSON.stringify(data));
+            });
+          }
+        });
+      });
+
+      const irrigator = new IrrigationTimer(
+        parseInt(zone.profile.irrigationperday),
+        parseInt(zone.profile.irrigationduration),
+        zone.children.length,
+        parseInt(zone.maxirrigators),
+        utc.getHours()
+      );
+
+      console.log("irr", irrigator);
+
+      let counter = 0;
+      zone.children.forEach(async child => {
+        const zone = await readZone(child);
+        zone.devices.forEach(device => {
+          if (device.devicetype === "irrigator") {
+            const action = irrigator.isOn(ms % 86400000, ++counter)
+              ? "on"
+              : "off";
+            const data = {
+              type: "COMMAND",
+              payload: {
+                device: device.device,
+                action: action,
+                timestamp: new Date()
+              }
+            };
             wss.clients.forEach(client => {
               client.send(JSON.stringify(data));
             });
@@ -268,5 +286,5 @@ async function run() {
 }
 
 (async () => {
-  setInterval(run, config.get("interval") * 1000);
+  setInterval(run, (config.get("interval") as number) * 1000);
 })();

@@ -1,40 +1,9 @@
 {
-  "compilerOptions": {
-    "target": "es5",
-    "module": "es2015",
-    "strict": true,
-    "jsx": "preserve",
-    "importHelpers": true,
-    "moduleResolution": "node", 
-    "experimentalDecorators": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "types": [
-      "node",
-      "webpack-env",
-      "src/shared/@types"
-    ],
-    "paths": {
-      "@/*": [
-        "src/client/*"
-      ]
-    },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
-  },
-  "include": [
-    "src/client/**/*.ts",
-    "src/client/**/*.vue"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "references": [{ "path": "src/shared" }]
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "src/shared" },
+    { "path": "src/worker" },
+    { "path": "src/server" }
+  ]
 }

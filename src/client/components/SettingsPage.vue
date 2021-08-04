@@ -177,8 +177,6 @@ const SettingsPage = Vue.extend({
 
         const fileReader = new FileReader();
         fileReader.addEventListener("load", () => {
-          console.log(typeof fileReader.result);
-
           this.filedata = (fileReader.result as string) || "";
         });
 

@@ -4,7 +4,8 @@
       v-for="notification in notifications"
       :key="notification.id"
       v-bind="notification"
-      @delete-notification="deleteNotification(notification)" />
+      @delete-notification="deleteNotification(notification)"
+    />
   </div>
 </template>
 

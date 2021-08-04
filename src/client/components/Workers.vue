@@ -4,26 +4,26 @@
       <span class="title">{{ workersCount }} {{ workersName }}</span>
     </div>
     <div class="tile is-ancestor">
-      <div class="tile is-4 is-vertical"> 
+      <div class="tile is-4 is-vertical">
         <worker-tile
           v-for="worker in left"
           :key="worker.worker"
           :worker="worker"
         />
       </div>
-      <div class="tile is-4 is-vertical"> 
+      <div class="tile is-4 is-vertical">
         <worker-tile
           v-for="worker in middle"
           :key="worker.worker"
           :worker="worker"
-          />
+        />
       </div>
-      <div class="tile is-4 is-vertical"> 
+      <div class="tile is-4 is-vertical">
         <worker-tile
           v-for="worker in right"
           :key="worker.worker"
           :worker="worker"
-          />
+        />
       </div>
     </div>
   </section>
@@ -49,7 +49,7 @@ const Workers = Vue.extend({
         return "Herberts";
       }
     },
-    
+
     left() {
       const workers = [];
       for (let i = 0; i < this.workersCount; i = i + 3) {
@@ -57,10 +57,9 @@ const Workers = Vue.extend({
           workers.push(this.workers[i]);
         }
       }
-      console.log(workers);
       return workers;
     },
-    
+
     middle() {
       const workers = [];
       for (let i = 1; i < this.workersCount; i = i + 3) {
@@ -70,7 +69,7 @@ const Workers = Vue.extend({
       }
       return workers;
     },
-    
+
     right() {
       const workers = [];
       for (let i = 2; i < this.workersCount; i = i + 3) {
@@ -81,7 +80,6 @@ const Workers = Vue.extend({
       return workers;
     }
   }
-
 });
 
 export default Workers;
