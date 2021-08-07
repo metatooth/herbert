@@ -2,9 +2,12 @@
   become: yes
 
   vars:
+    postgresql_auth_method: scram-sha-256
     postgresql_global_config_options:
       - option: listen_addresses
         value: '*'
+      - option: password_encryption
+        value: "{{ postgresql_auth_method }}"
     postgresql_databases:
       - name: "{{dbname}}"
         owner: "{{dbuser}}"
@@ -14,7 +17,6 @@
         password: "{{dbpass}}"
         role_attr_flags: CREATEDB,CREATEROLE
         priv: ALL
-    postgresql_auth_method: scram-sha-256
     postgresql_hba_entries:
       - {type: local, database: all, user: postgres, auth_method: peer}
       - {type: local, database: all, user: all, auth_method: peer}
