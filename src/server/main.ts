@@ -10,10 +10,12 @@ import {
   readActiveZones,
   registerDevice,
   registerMeter,
-  workerStatus,
+  registerWorker,
+  updateWorker,
   readDevice,
   readMeter,
-  readZone
+  readZone,
+  readWorkers
 } from "./db";
 
 import path from "path";
@@ -130,7 +132,12 @@ wss.on("connection", function(ws: WebSocket) {
           }
         }
       } else if (data.payload.worker) {
-        workerStatus(data.payload.worker, data.payload.inet);
+        await registerWorker(
+          data.payload.worker,
+          data.payload.inet,
+          data.payload.config
+        );
+        updateWorker(data.payload.worker);
       }
     }
 
@@ -142,7 +149,26 @@ wss.on("connection", function(ws: WebSocket) {
   });
 });
 
-async function run() {
+async function updateWorkers() {
+  console.log("*** UPDATE WORKERS ***");
+  const workers = await readWorkers();
+  workers.forEach(async worker => {
+    const data = {
+      type: "CONFIGURE",
+      payload: {
+        worker: worker.worker,
+        config: JSON.stringify(worker.config),
+        timestamp: new Date()
+      }
+    };
+
+    wss.clients.forEach(client => {
+      client.send(JSON.stringify(data));
+    });
+  });
+}
+
+async function updateZones() {
   const zones = await readActiveZones();
   zones.forEach(async zone => {
     const now = new Date();
@@ -283,6 +309,11 @@ async function run() {
       });
     }
   });
+}
+
+async function run() {
+  await updateZones();
+  await updateWorkers();
 }
 
 (async () => {

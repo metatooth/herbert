@@ -22,11 +22,7 @@
       </p>
       <div class="content">
         <span v-if="editing">
-          <textarea
-            class="textarea"
-            v-model="config"
-            @keyup.esc="cancel"
-          />
+          <textarea class="textarea" v-model="config" @keyup.esc="cancel" />
         </span>
         <span class="is-family-code" v-else>
           {{ this.worker.config }}

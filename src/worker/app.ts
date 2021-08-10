@@ -109,36 +109,9 @@ export class App {
     return App._instance;
   }
 
-  public async init(): Promise<boolean> {
-    logger.info("=====================================");
-    logger.info("== Herbert Worker = Starting up... ==");
-    logger.info("=====================================");
-
-    const ifaces = networkInterfaces();
-    console.log("network interfaces", ifaces);
-
-    let net = ifaces["wlo1"];
-
-    if (!net) {
-      net = ifaces["wlan0"];
-    }
-
-    if (!net) {
-      net = ifaces["eth0"];
-    }
-
-    console.log("net", net);
-
-    if (net && net.length) {
-      this.macaddr = net[0]["mac"];
-      this.inet = net[0]["address"];
-    }
-
-    console.log("device network info", this.macaddr, this.inet);
-
+  public async initDevices(devices: ConfigDevice[]): Promise<boolean> {
     const meters = this.meters;
     const switches = this.switches;
-    const devices = (config.get("devices") || []) as ConfigDevice[];
 
     devices.forEach(dev => {
       logger.debug("DEVICE", dev);
@@ -168,6 +141,38 @@ export class App {
       }
     });
 
+    return Promise.resolve(true);
+  }
+
+  public async init(): Promise<boolean> {
+    logger.info("=====================================");
+    logger.info("== Herbert Worker = Starting up... ==");
+    logger.info("=====================================");
+
+    const ifaces = networkInterfaces();
+    console.log("network interfaces", ifaces);
+
+    let net = ifaces["wlo1"];
+
+    if (!net) {
+      net = ifaces["wlan0"];
+    }
+
+    if (!net) {
+      net = ifaces["eth0"];
+    }
+
+    console.log("net", net);
+
+    if (net && net.length) {
+      this.macaddr = net[0]["mac"];
+      this.inet = net[0]["address"];
+    }
+
+    console.log("device network info", this.macaddr, this.inet);
+
+    await this.initDevices((config.get("devices") || []) as ConfigDevice[]);
+
     this.initialized = true;
 
     return Promise.resolve(true);
@@ -193,7 +198,14 @@ export class App {
 
         app.socket.on("message", async msg => {
           const data = JSON.parse(msg.toString());
-          if (data.type === "COMMAND") {
+          if (
+            data.type === "CONFIGURE" &&
+            data.payload.worker === this.macaddr
+          ) {
+            console.log("!! CONFIGURE !!", data.payload.config);
+            const config = JSON.parse(data.payload.config);
+            await this.initDevices(config.devices as ConfigDevice[]);
+          } else if (data.type === "COMMAND") {
             console.log("action!", data.payload);
             const mac = data.payload.device.replace(/:/g, "").toUpperCase();
             console.log("MAC...", mac);
@@ -290,12 +302,13 @@ export class App {
     this.send(data);
   }
 
-  private async workerStatus(macaddr: string, inet: string) {
+  private async workerStatus() {
     const data = {
       type: "STATUS",
       payload: {
-        worker: macaddr,
-        inet: inet,
+        worker: this.macaddr,
+        inet: this.inet,
+        config: JSON.stringify(config),
         timestamp: new Date()
       }
     };
@@ -308,7 +321,7 @@ export class App {
       await app.init();
     }
 
-    app.workerStatus(this.macaddr, this.inet);
+    app.workerStatus();
 
     const polling: number = 1000 * parseInt(config.get("polling"));
     const interval: number = 1000 * parseInt(config.get("interval"));

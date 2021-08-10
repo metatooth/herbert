@@ -1,5 +1,5 @@
 import { Pool, QueryResult } from "pg";
-import { Device, Meter, Profile, Zone } from "../../shared/types";
+import { Device, Meter, Profile, Zone, Worker } from "../../shared/types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -206,6 +206,22 @@ export async function reading(device: string) {
   return rows[0];
 }
 
+export async function readWorkers() {
+  const workers = [];
+
+  const { rows } = await query<Worker>(
+    "SELECT worker FROM workers WHERE deleted <> true",
+    []
+  );
+
+  rows.forEach(row => {
+    const w = readWorker(row.worker);
+    workers.push(w);
+  });
+
+  return Promise.all(workers);
+}
+
 export async function registerDevice(macaddr: string, manufacturer: string) {
   query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
@@ -228,20 +244,29 @@ export async function registerMeter(macaddr: string, manufacturer: string) {
   });
 }
 
-export async function workerStatus(macaddr: string, inet: string) {
+export async function registerWorker(
+  macaddr: string,
+  inet: string,
+  config: string
+) {
   query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
     if (res.rowCount === 0) {
-      query("INSERT INTO workers (worker, inet) VALUES ($1, $2)", [
+      query("INSERT INTO workers (worker, inet, config) VALUES ($1, $2, $3)", [
         macaddr,
-        inet
+        inet,
+        config
       ]);
-    } else if (res.rowCount === 1) {
+    }
+  });
+}
+
+export async function updateWorker(macaddr: string) {
+  query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
+    if (res.rowCount !== 0) {
       query(
-        "UPDATE workers SET inet = $1, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
-        [inet, macaddr]
+        "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE worker = $1",
+        [macaddr]
       );
-    } else {
-      // error
     }
   });
 }
