@@ -100,9 +100,10 @@
             style="position: relative; display: inline-block; direction: ltr;"
           >
             <input
-              ref="algoliaSearch"
+              ref="herbertSearch"
               class="input is-rounded"
-              placeHolder="Search zones"
+              placeHolder="Search ..."
+              v-model="filter"
             />
           </span>
           <span class="icon is-small is-left">
@@ -113,14 +114,14 @@
     </nav>
     <section class="section">
       <overview v-if="is('overview')" @child-picked="pick" />
-      <devices v-if="is('devices')" v-bind:units="settings.units" />
-      <meters v-if="is('meters')" v-bind:units="settings.units" />
-      <profiles v-if="is('profiles')" v-bind:units="settings.units" />
+      <devices v-if="is('devices')" :filter="filter" />
+      <meters v-if="is('meters')" :units="settings.units" />
+      <profiles v-if="is('profiles')" :units="settings.units" />
       <workers v-if="is('workers')" />
-      <zones v-if="is('zones')" v-bind:units="settings.units" />
+      <zones v-if="is('zones')" :units="settings.units" />
       <settings-page
         v-if="is('settings')"
-        v-bind:settings="settings"
+        :settings="settings"
         @save-settings="saveSettings"
       />
     </section>
@@ -156,6 +157,7 @@ import { mapGetters, mapActions } from "vuex";
 const Dashboard = Vue.extend({
   data() {
     return {
+      filter: "",
       picked: "overview",
       ts: new Date()
     };
@@ -229,7 +231,7 @@ const Dashboard = Vue.extend({
       this.$refs.search.classList.toggle("herbert-is-visible");
 
       if (this.$refs.search.classList.contains("herbert-is-visible")) {
-        this.$refs.algoliaSearch.focus();
+        this.$refs.herbertSearch.focus();
       }
     },
 

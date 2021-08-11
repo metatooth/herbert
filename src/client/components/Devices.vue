@@ -35,16 +35,29 @@ import DeviceTile from "@/components/DeviceTile.vue";
 import { mapGetters } from "vuex";
 
 const Devices = Vue.extend({
+  props: {
+    filter: String
+  },
+
   components: {
     DeviceTile
   },
 
   computed: {
     ...mapGetters("devices", ["devices", "devicesCount"]),
-    ...mapGetters("settings", ["settings"]),
+
+    activeSet() {
+      return this.devices.filter(el => {
+        return true;
+      });
+    },
+
+    activeCount() {
+      return this.activeSet.length;
+    },
 
     devicesName() {
-      if (this.devicesCount === 1) {
+      if (this.activeCount === 1) {
         return "Device";
       } else {
         return "Devices";
@@ -53,7 +66,7 @@ const Devices = Vue.extend({
 
     left() {
       const devices = [];
-      for (let i = 0; i < this.devicesCount; i = i + 3) {
+      for (let i = 0; i < this.activeCount; i = i + 3) {
         if (this.devices[i]) {
           devices.push(this.devices[i]);
         }
@@ -63,7 +76,7 @@ const Devices = Vue.extend({
 
     middle() {
       const devices = [];
-      for (let i = 1; i < this.devicesCount; i = i + 3) {
+      for (let i = 1; i < this.activeCount; i = i + 3) {
         if (this.devices[i]) {
           devices.push(this.devices[i]);
         }
@@ -73,7 +86,7 @@ const Devices = Vue.extend({
 
     right() {
       const devices = [];
-      for (let i = 2; i < this.devicesCount; i = i + 3) {
+      for (let i = 2; i < this.activeCount; i = i + 3) {
         if (this.devices[i]) {
           devices.push(this.devices[i]);
         }
