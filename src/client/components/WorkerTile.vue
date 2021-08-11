@@ -23,7 +23,7 @@
         <span class="is-family-code">{{ worker.inet }}</span>
       </div>
       <div class="content">
-        <timestamp :timestamp="lastupdate" :readable="readable" />
+        <timestamp :timestamp="timestamp" :readable="readable" />
       </div>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
     </div>
@@ -46,6 +46,7 @@ const WorkerTile = Vue.extend({
   data() {
     return {
       nickname: this.worker.nickname,
+      timestamp: new Date(Date.parse(this.worker.updatedat)),
       readable: true,
       editing: false
     };
