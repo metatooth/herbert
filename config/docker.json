@@ -2,14 +2,8 @@
   "ws-url": "ws://server:5000",
   "devices": [
     {
+      "id": "aaaaaabbbbbb",
       "manufacturer": "mockmeter"
-    },
-    {
-      "manufacturer": "mockplug"
-    },
-    {
-      "manufacturer": "herbert",
-      "channels": 8
     }
   ]
 }
