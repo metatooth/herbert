@@ -133,9 +133,10 @@ export class App {
           switches.push(new IRSend(dev.id, dev.remote));
         }
       } else if (dev.manufacturer === "mockmeter") {
-        meters.push(new MockMeter());
+        const meter = new MockMeter(dev.id);
+        meters.push(meter);
       } else if (dev.manufacturer === "mockplug") {
-        const plug = new MockPlug();
+        const plug = new MockPlug(dev.id);
         plug.off();
         switches.push(plug);
       }
@@ -186,6 +187,8 @@ export class App {
 
       try {
         app.socket = new WebSocket(config.get("ws-url"));
+
+        console.log("$$ CURRENT CONFIG $$", config);
 
         app.socket.on("error", err => {
           logger.error("Caught", err);
