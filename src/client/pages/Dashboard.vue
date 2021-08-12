@@ -208,6 +208,8 @@ const Dashboard = Vue.extend({
 
     pick(section: string) {
       this.picked = section;
+      this.$refs.navbarBurger.classList.toggle("is-active");
+      this.$refs.navMenuIndex.classList.toggle("is-active");
     },
 
     refresh() {
