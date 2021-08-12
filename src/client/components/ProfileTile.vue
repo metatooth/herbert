@@ -163,7 +163,7 @@
           </span>
         </div>
 
-        <div class="field is-grouped">
+        <div class="field is-grouped is-grouped-multiline">
           <target
             icon="thermometer-half"
             :value="dayTemperature"
@@ -189,7 +189,8 @@
             color="warning"
           />
         </div>
-        <div class="field is-grouped">
+
+        <div class="field is-grouped is-grouped-multiline">
           <target
             icon="thermometer-half"
             :value="nightTemperature"
@@ -215,6 +216,7 @@
             color="info"
           />
         </div>
+
         <div class="tags has-addons">
           <span class="tag is-small has-text-success is-dark">
             <font-awesome-icon icon="wind" />
@@ -223,6 +225,7 @@
             >{{ bloweractive }}s / {{ blowercycle }}s</span
           >
         </div>
+
         <div class="tags has-addons">
           <span class="tag is-small has-text-success is-dark">
             <font-awesome-icon icon="cloud-rain" />
