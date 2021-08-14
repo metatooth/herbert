@@ -125,8 +125,7 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 - Update `ci/ansible/inventory`
     - Add worker IP under `[workers]` section
     - Set `config_path` and `config_name` for this worker
-    - config_path should be path to configuration file created above
-    - config_name should be the filename minus the extension in the path above
+    - Set vars under `[workers:vars]` section
 - Run ansible workers deployment
     - `cd ci/ansible && ansible-playbook -i inventory worker.yml`
 
@@ -166,19 +165,31 @@ Current production services:
 If you want to spin up the entire ecosystem locally for development you can
 use the included "docker compose" setup.
 
-Install Docker for Mac: https://docs.docker.com/docker-for-mac/install/
+- Install Docker for Mac: https://docs.docker.com/docker-for-mac/install/
+- Install Make
+    - Ubuntu: `sudo apt update && sudo apt install -y make`
+    - OSX: `brew install make`
 
 Bring up all containers
 
 ```bash
-docker compose up
+make docker
+make up
 # Then navigate to http://localhost:8080 in your browser
 ```
 
 Tear down all containers
 
+```bash
+make down
+# to remove all data from dockerized database
+make down-data
 ```
-docker compose down
+
+See all container logs
+
+```bash
+make logs
 ```
 
 ## License

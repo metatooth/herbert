@@ -75,3 +75,30 @@ export interface Zone {
   children: Zone[];
   timestamp: Date;
 }
+
+export enum HerbertMessageType {
+  Status    = 'STATUS',
+  Register  = 'REGISTER',
+  Command   = 'COMMAND',
+  Configure = 'CONFIGURE',
+  Error     = 'ERROR',
+}
+
+export interface HerbertSocketMessage {
+  type: HerbertMessageType;
+  payload: any;
+}
+
+export function isHerbertMessageType(t: any): t is HerbertMessageType {
+  return Object.values(HerbertMessageType).includes(t);
+}
+
+export function isHerbertSocketMessage(m: any): m is HerbertSocketMessage {
+  return (
+    typeof m === 'object' &&
+    'type' in m &&
+    isHerbertMessageType(m.type) &&
+    'payload' in m &&
+    typeof m.payload === 'object'
+  );
+}

@@ -5,15 +5,18 @@ services:
       POSTGRES_PASSWORD: bar
       POSTGRES_USER: postgres
       POSTGRES_DB: herbert
+      PGDATA: /pgdata
     volumes:
       - ./scripts/db:/docker-entrypoint-initdb.d
+      - pgdata:/pgdata
     ports:
       - '5432:5432'
 
   server:
-    image: herbert_node:latest
-    build: .
-    command: npm run serve:server
+    image: herbert_server:latest
+    build:
+      context: .
+      target: server
     environment:
       DATABASE_URL: postgresql://postgres:bar@db:5432/herbert?sslmode=disable
     volumes:
@@ -25,12 +28,11 @@ services:
       - db
 
   client:
-    image: herbert_node:latest
-    build: .
-    command: npm run serve:client
-    environment:
-      VUE_APP_API_URL: http://localhost:5000
-      VUE_APP_WS_URL: ws://localhost:5000
+    image: herbert_client:latest
+    build:
+      context: .
+      target: client
+    env_file: .env
     volumes:
       - ./src:/app/src
       - ./config:/app/config
@@ -40,14 +42,18 @@ services:
       - '8080:8080'
 
   worker:
-    image: herbert_node:latest
-    build: .
-    command: npm run serve:worker
+    image: herbert_worker:latest
+    build:
+      context: .
+      target: worker
     environment:
-      MOCK_WORKER: 'true'
       NODE_ENV: docker
+      WS_URL: ws://server:5000
     volumes:
       - ./src:/app/src
       - ./config:/app/config
     depends_on:
       - server
+
+volumes:
+  pgdata:

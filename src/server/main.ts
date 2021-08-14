@@ -5,17 +5,8 @@ import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import {
-  createReading,
-  createStatus,
   readActiveZones,
-  registerDevice,
-  registerMeter,
-  registerWorker,
-  updateWorker,
-  readDevice,
-  readMeter,
-  readZone,
-  readWorkers
+  readZone
 } from "./db";
 
 import path from "path";
@@ -28,6 +19,8 @@ import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
 import { zonedTimeToUtc } from "date-fns-tz";
+import { herbertSocket } from "./socket";
+import { HerbertMessageType, HerbertSocketMessage } from "../shared/types";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");
@@ -60,115 +53,14 @@ app.use(function(err, req, res, next) {
   next();
 });
 
-function sendError(ws: WebSocket, message: string) {
-  const messageObject = {
-    type: "ERROR",
-    payload: message
-  };
-
-  ws.send(JSON.stringify(messageObject));
-}
-
 process.env.TZ = "ETC/Utc";
 
 const server = http.createServer(app);
 server.listen(port);
 console.log("http server listening on %d", port);
+herbertSocket.init(server);
 
-const wss = new WebSocket.Server({ server: server });
-console.log("websocket server created");
-
-wss.on("connection", function(ws: WebSocket) {
-  console.log("websocket connection open");
-
-  ws.on("message", async function(msg: string) {
-    console.log("ON MESSAGE", msg);
-
-    let data;
-    try {
-      data = JSON.parse(msg);
-    } catch (e) {
-      sendError(ws, e);
-      return;
-    }
-
-    if (!data.type || !data.payload) {
-      sendError(ws, "Message must specify type & payload.");
-      return;
-    }
-
-    if (data.type === "STATUS") {
-      if (data.payload.device) {
-        const limit = (config.get("reporting-period") as number) * 1000;
-        if (data.payload.type === "meter") {
-          await registerMeter(data.payload.device, data.payload.manufacturer);
-          const meter = await readMeter(data.payload.device);
-          const diff =
-            Date.parse(data.payload.timestamp) - meter.timestamp.getTime();
-          if (
-            meter.temperature != data.payload.temperature ||
-            meter.humidity != data.payload.humidity ||
-            diff > limit
-          ) {
-            createReading(
-              data.payload.device,
-              data.payload.temperature,
-              data.payload.humidity,
-              data.payload.pressure,
-              data.payload.timestamp
-            );
-          }
-        } else {
-          await registerDevice(data.payload.device, data.payload.manufacturer);
-          const device = await readDevice(data.payload.device);
-          const diff =
-            Date.parse(data.payload.timestamp) - device.timestamp.getTime();
-          if (device.status != data.payload.status || diff > limit) {
-            createStatus(
-              data.payload.device,
-              data.payload.status,
-              data.payload.timestamp
-            );
-          }
-        }
-      } else if (data.payload.worker) {
-        await registerWorker(
-          data.payload.worker,
-          data.payload.inet,
-          data.payload.config
-        );
-        updateWorker(data.payload.worker);
-      }
-    }
-
-    wss.clients.forEach(client => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(msg);
-      }
-    });
-  });
-});
-
-async function updateWorkers() {
-  console.log("*** UPDATE WORKERS ***");
-  const workers = await readWorkers();
-  workers.forEach(async worker => {
-    const data = {
-      type: "CONFIGURE",
-      payload: {
-        worker: worker.worker,
-        config: JSON.stringify(worker.config),
-        timestamp: new Date()
-      }
-    };
-
-    wss.clients.forEach(client => {
-      client.send(JSON.stringify(data));
-    });
-  });
-}
-
-async function updateZones() {
+async function run() {
   const zones = await readActiveZones();
   zones.forEach(async zone => {
     const now = new Date();
@@ -261,16 +153,14 @@ async function updateZones() {
           if (device.devicetype === key) {
             const action = value ? "on" : "off";
             const data = {
-              type: "COMMAND",
+              type: HerbertMessageType.Command,
               payload: {
                 device: device.device,
                 action: action,
                 timestamp: new Date()
               }
             };
-            wss.clients.forEach(client => {
-              client.send(JSON.stringify(data));
-            });
+            herbertSocket.broadcastAll(data);
           }
         });
       });
@@ -294,26 +184,19 @@ async function updateZones() {
               ? "on"
               : "off";
             const data = {
-              type: "COMMAND",
+              type: HerbertMessageType.Command,
               payload: {
                 device: device.device,
                 action: action,
                 timestamp: new Date()
               }
             };
-            wss.clients.forEach(client => {
-              client.send(JSON.stringify(data));
-            });
+            herbertSocket.broadcastAll(data);
           }
         });
       });
     }
   });
-}
-
-async function run() {
-  await updateZones();
-  await updateWorkers();
 }
 
 (async () => {

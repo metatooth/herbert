@@ -6,7 +6,7 @@ ansible_python_interpreter=/usr/bin/python3
 herbert_version=<version_of_herbert_to_deploy>
 
 [databases]
-<add_db_ip_addresses>
+<add_db_hosts>
 
 [databases:vars]
 dbname=<add_db_name>
@@ -15,19 +15,20 @@ dbuser=<add_db_user>
 db_allowed_cidr=<add_allowed_cidr>
 
 [servers]
-<add_server_ip_addresses>
+<add_server_hosts>
 
 [servers:vars]
 dburl=postgresql://<dbuser>:<dbpass>@<db_ip>:5432/<dbname>
 
 [clients]
-<add_client_ip_addresses>
+<add_client_hosts>
 
 [clients:vars]
 api_host=<server_api_host>
 api_port=<server_api_port>
 
 [workers]
-<worker_1_ip_address> config_path=<path_to_worker_1_config.json> config_name=<worker1_config_filename>
-<worker_2_ip_address> config_path=<path_to_worker_2_config.json> config_name=<worker2_config_filename>
-<worker_3_ip_address> config_path=<path_to_worker_3_config.json> config_name=<worker3_config_filename>
+<add_worker_hosts>
+
+[workers:vars]
+ws_url=ws://<server_host>:<server_port>
