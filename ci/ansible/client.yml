@@ -2,8 +2,8 @@
   become: yes
 
   vars:
-    - homeDir: "/home/{{ansible_user}}"
-    - appDir: "{{homeDir}}/herbert"
+    - buildDir: "/etc/opt"
+    - appDir: "{{ buildDir }}/herbert"
     - nodejs_version: "14.x"
     - nodejs_package_json_path: "{{appDir}}"
     - service_description: "Herbert client dashboard service"
@@ -25,7 +25,7 @@
       when: herbert_version == "local"
       synchronize:
         src: ../../../herbert
-        dest: "{{homeDir}}"
+        dest: "{{buildDir}}"
 
     - name: Install nodejs {{nodejs_version}} and node_modules
       include_role:

@@ -10,7 +10,17 @@ import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
-import {HerbertSocketMessage, HerbertMessageType, isHerbertMessageType, isHerbertSocketMessage } from '../shared/types';
+import { AnySocketMessage, CommandPayload } from "../shared/types";
+import { isSocketMessage, messageIsFrom} from "../shared/util";
+import {
+  makeCommandMessage,
+  makeConfigureMessage,
+  makeErrorMessage,
+  makeMeterStatusMessage,
+  makeSwitchStatusMessage,
+  makeWorkerRegisterMessage,
+  makeWorkerStatusMessage,
+} from "../shared/message-creators";
 
 import Switchbot, { WoSensorTH } from "node-switchbot";
 import Wyze, { WyzeDevice } from "wyze-node";
@@ -59,7 +69,7 @@ export class App {
   switches: Array<Switch> = [];
   macaddr = "";
   inet = "";
-  heldMessages: HerbertSocketMessage[] = [];
+  heldMessages: AnySocketMessage[] = [];
   wyze?: Wyze;
   switchbot: Switchbot | undefined;
   runTimeout: NodeJS.Timeout | undefined;
@@ -104,13 +114,11 @@ export class App {
           clearInterval(i);
           return resolve();
         }
-        this.send({
-          type: HerbertMessageType.Register,
-          payload: {
-            worker: this.macaddr,
-            inet: this.inet,
-          },
-        });
+        const msg = makeWorkerRegisterMessage({
+          worker: this.macaddr,
+          inet: this.inet,
+        })
+        this.send(msg);
       }, 2000);
     });
   }
@@ -141,17 +149,13 @@ export class App {
       const wyzes = await this.wyze.getDeviceList();
       wyzes.forEach(async (wyze: WyzeDevice) => {
         if (wyze.conn_state === 0) {
-          const data = {
-            type: HerbertMessageType.Error,
-            payload: {
-              id: wyze.mac,
-              device: wyze.mac,
-              message: "disconnected",
-              timestamp: new Date()
-            }
-          };
-
-          this.send(data);
+          const msg = makeErrorMessage({
+            id: wyze.mac,
+            device: wyze.mac,
+            message: "disconnected",
+            timestamp: new Date().toString(),
+          });
+          this.send(msg);
         }
 
         const plug = new WyzeSwitch(wyze.mac);
@@ -259,6 +263,7 @@ export class App {
 
     devices.forEach(dev => {
       logger.debug("DEVICE", dev);
+      const mac = this.formatMacAddress(dev.id);
       if (dev.manufacturer === "WYZE") {
         const options = {
           username: dev.username,
@@ -268,19 +273,19 @@ export class App {
         this.wyze = new Wyze(options);
       } else if (dev.manufacturer === "herbert") {
         if (dev.pin) {
-          switches.push(new Herbert(dev.id, parseInt(dev.pin)));
+          switches.push(new Herbert(mac, parseInt(dev.pin)));
         } else if (dev.board && dev.channel) {
           switches.push(
-            new SM8relay(dev.id, parseInt(dev.board), parseInt(dev.channel))
+            new SM8relay(mac, parseInt(dev.board), parseInt(dev.channel))
           );
         } else if (dev.remote) {
-          switches.push(new IRSend(dev.id, dev.remote));
+          switches.push(new IRSend(mac, dev.remote));
         }
       } else if (dev.manufacturer === "mockmeter") {
-        const meter = new MockMeter(dev.id);
+        const meter = new MockMeter(mac);
         meters.push(meter);
       } else if (dev.manufacturer === "mockplug") {
-        const plug = new MockPlug(dev.id);
+        const plug = new MockPlug(mac);
         plug.off();
         switches.push(plug);
       }
@@ -319,39 +324,41 @@ export class App {
     await this.run();
   }
 
-  private readonly handleSocketMessage = async (msg: HerbertSocketMessage) => {
+  private readonly handleSocketMessage = async (
+    msg: AnySocketMessage
+  ) => {
     try {
       const data = JSON.parse(msg.toString());
 
-      if (!isHerbertSocketMessage(data)) {
+      if (!isSocketMessage(data)) {
         logger.warn('unknown message format:', data);
         return;
       }
 
-      switch (data.type) {
-        case HerbertMessageType.Configure:
-          if (data.payload.worker === this.macaddr) {
-            logger.info("!! CONFIGURE !!", data.payload.config);
-            this.config = JSON.parse(data.payload.config);
-            this.initDevices();
-          }
-          break;
-        case HerbertMessageType.Command:
-          logger.info("action!", data.payload);
-          await this.updateWYZE(data);
-          this.updateSwitches(data);
-          logger.info("Done.");
-          break;
-        default:
-          logger.warn("Unknown socket message type:", data.type);
-          break;
+      if (messageIsFrom(makeConfigureMessage, data)) {
+        if (data.payload.worker === this.macaddr) {
+          logger.info("!! CONFIGURE !!", data.payload.config);
+          this.config = JSON.parse(data.payload.config);
+          this.initDevices();
+        }
+        return;
       }
+
+      if (messageIsFrom(makeCommandMessage, data)) {
+        logger.info("!! ACTION !!", data.payload);
+        await this.updateWYZE(data.payload);
+        this.updateSwitches(data.payload);
+        logger.info("Done.");
+        return
+      }
+
+      logger.warn("unhandled socket message", data);
     } catch (e) {
       logger.error("socket message error:", e);
     }
   }
 
-  private async send(data: HerbertSocketMessage) {
+  private async send(data: AnySocketMessage) {
     if (this.socket === undefined || this.socket.readyState !== 1) {
       this.heldMessages.push(data);
       return;
@@ -373,46 +380,43 @@ export class App {
     }
   }
 
-  private async updateWYZE(data: any) {
+  private async updateWYZE(data: CommandPayload) {
     if (this.wyze) {
-      const mac = this.macFromData(data);
+      const mac = this.formatMacAddress(data.device);
       logger.info("MAC...", mac);
       const device = await this.wyze.getDeviceByMac(mac);
       if (device) {
         logger.info("Found.");
         let result;
-        if (data.payload.action === "on") {
+        if (data.action === "on") {
           result = await this.wyze.turnOn(device);
         } else {
           result = await this.wyze.turnOff(device);
         }
         if (result.code !== "1") {
           logger.error(
-            `ERROR ${result.code} ${device.nickname} ${data.payload.action} - ${result}`
+            `ERROR ${result.code} ${device.nickname} ${data.action} - ${result}`
           );
-          const reply = {
-            type: HerbertMessageType.Error,
-            payload: {
-              worker: this.macaddr,
-              device: data.payload.device,
-              action: data.payload.action,
-              code: result.code,
-              message: result.msg,
-              timestamp: new Date()
-            }
-          };
+          const reply = makeErrorMessage({
+            message: result.msg,
+            worker: this.macaddr,
+            device: data.device,
+            action: data.action,
+            code: result.code,
+            timestamp: new Date().toString(),
+          });
           this.heldMessages.push(reply);
         }
       }
     }
   }
 
-  private updateSwitches(data: any) {
+  private updateSwitches(data: CommandPayload) {
     logger.info("Check switches...");
-    const mac = this.macFromData(data);
+    const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
-      if (plug.device === mac) {
-        if (data.payload.action === "on") {
+      if (this.formatMacAddress(plug.device) === mac) {
+        if (data.action === "on") {
           logger.info(plug.device, "on");
           plug.on();
         } else {
@@ -424,52 +428,55 @@ export class App {
   }
 
   private async meterStatus(meter: Meter) {
-    const data = {
-      type: HerbertMessageType.Status,
-      payload: {
-        device: meter.device,
-        type: "meter",
-        manufacturer: meter.manufacturer,
-        temperature: meter.clime.temperature,
-        humidity: meter.clime.humidity,
-        pressure: meter.clime.vpd(),
-        timestamp: new Date()
-      }
-    };
-    this.send(data);
+    const msg = makeMeterStatusMessage({
+      device: meter.device,
+      type: "meter",
+      manufacturer: meter.manufacturer,
+      temperature: meter.clime.temperature,
+      humidity: meter.clime.humidity,
+      pressure: meter.clime.vpd(),
+      timestamp: new Date().toString(),
+    });
+    this.send(msg);
   }
 
   private async switchStatus(switcher: Switch) {
-    const data = {
-      type: HerbertMessageType.Status,
-      payload: {
-        device: switcher.device,
-        manufacturer: switcher.manufacturer,
-        status: switcher.state,
-        timestamp: new Date()
-      }
-    };
-    this.send(data);
+    const msg = makeSwitchStatusMessage({
+      device: switcher.device,
+      manufacturer: switcher.manufacturer,
+      status: switcher.state,
+      timestamp: new Date().toString(),
+    });
+    this.send(msg);
   }
 
   private async workerStatus() {
-    const data = {
-      type: HerbertMessageType.Status,
-      payload: {
-        worker: this.macaddr,
-        inet: this.inet,
-        config: JSON.stringify(this.config),
-        timestamp: new Date()
-      }
-    };
-    this.send(data);
+    const msg = makeWorkerStatusMessage({
+      worker: this.macaddr,
+      inet: this.inet,
+      config: JSON.stringify(this.config),
+      timestamp: new Date().toString(),
+    });
+    this.send(msg);
   }
 
-  private macFromData(data: any): string {
-    let mac = '';
-    if (data && data.payload && data.payload.device) {
-      mac = data.payload.device.replace(/:/g, "").toUpperCase();
+  private formatMacAddress(id: string) {
+    if (!id) {
+      return '';
     }
-    return mac;
+
+    if (id.length !=12 && id.length != 17) {
+      console.warn('bad format for mac address:', id);
+      return ''
+    }
+
+    // Remove all but alphanumeric characters
+    let mac = id.replace(/\W/ig, '');
+
+    // Append a colon after every two characters
+    mac = mac.replace(/(.{2})/g, "$1:");
+
+    // remove trailing colon
+    return mac.split(":").slice(0, -1).join(":");
   }
 }

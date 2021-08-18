@@ -8,6 +8,7 @@ import { devices } from "./devices";
 import { meters } from "./meters";
 import { workers } from "./workers";
 import { settings } from "./settings";
+import { configs } from "./configs";
 
 Vue.use(Vuex);
 
@@ -23,7 +24,8 @@ const store: StoreOptions<RootState> = {
     devices,
     meters,
     workers,
-    settings
+    settings,
+    configs,
   }
 };
 

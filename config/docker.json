@@ -3,6 +3,15 @@
     {
       "id": "aaaaaabbbbbb",
       "manufacturer": "mockmeter"
+    },
+    {
+      "id": "bbbbbbcccccc",
+      "manufacturer": "mockplug"
+    },
+    {
+      "id": "ddddddeeeeee",
+      "manufacturer": "herbert",
+      "channels": 8
     }
   ]
 }

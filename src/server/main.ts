@@ -20,7 +20,7 @@ import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
 import { zonedTimeToUtc } from "date-fns-tz";
 import { herbertSocket } from "./socket";
-import { HerbertMessageType, HerbertSocketMessage } from "../shared/types";
+import { makeCommandMessage } from "../shared/message-creators";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");
@@ -152,15 +152,12 @@ async function run() {
         zone.devices.map(device => {
           if (device.devicetype === key) {
             const action = value ? "on" : "off";
-            const data = {
-              type: HerbertMessageType.Command,
-              payload: {
-                device: device.device,
-                action: action,
-                timestamp: new Date()
-              }
-            };
-            herbertSocket.broadcastAll(data);
+            const msg = makeCommandMessage({
+              device: device.device,
+              action: action,
+              timestamp: new Date().toString(),
+            })
+            herbertSocket.broadcastAll(msg);
           }
         });
       });
@@ -183,15 +180,12 @@ async function run() {
             const action = irrigator.isOn(ms % 86400000, ++counter)
               ? "on"
               : "off";
-            const data = {
-              type: HerbertMessageType.Command,
-              payload: {
-                device: device.device,
-                action: action,
-                timestamp: new Date()
-              }
-            };
-            herbertSocket.broadcastAll(data);
+            const msg = makeCommandMessage({
+              device: device.device,
+              action: action,
+              timestamp: new Date().toString(),
+            });
+            herbertSocket.broadcastAll(msg);
           }
         });
       });

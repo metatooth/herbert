@@ -2,10 +2,14 @@ import config from "config";
 import http from "http";
 import WebSocket from 'ws';
 import {
-  HerbertMessageType,
-  HerbertSocketMessage,
-  isHerbertSocketMessage
-} from "../shared/types";
+  makeConfigureMessage,
+  makeErrorMessage,
+  makeMeterStatusMessage,
+  makeSwitchStatusMessage,
+  makeWorkerRegisterMessage,
+} from "../shared/message-creators";
+import { AnySocketMessage } from "../shared/types";
+import { isSocketMessage, messageIsFrom } from "../shared/util";
 import {
   createReading,
   createStatus,
@@ -16,6 +20,11 @@ import {
   registerMeter,
   registerWorker
 } from "./db";
+
+interface CustomSocket extends WebSocket {
+  id: string;
+  devices: Set<string>;
+}
 
 class HerbertSocket {
   private static instance: HerbertSocket;
@@ -35,10 +44,26 @@ class HerbertSocket {
     }
   }
 
-  public broadcastAll(msg: HerbertSocketMessage) {
+  public broadcastAll(msg: AnySocketMessage) {
     this.wss.clients.forEach((c) => {
       if (c.readyState === WebSocket.OPEN) {
         this.send(c, msg);
+      }
+    });
+  }
+
+  public sendByDeviceID(deviceID: string, msg: AnySocketMessage) {
+    this.wss.clients.forEach((c) => {
+      if ((c as CustomSocket).devices.has(deviceID.toLowerCase())) {
+        c.send(JSON.stringify(msg));
+      }
+    });
+  }
+
+  public sendToWorker(workerID: string, msg: AnySocketMessage) {
+    this.wss.clients.forEach((c) => {
+      if ((c as CustomSocket).id === workerID.toLowerCase()) {
+        c.send(JSON.stringify(msg));
       }
     });
   }
@@ -52,29 +77,19 @@ class HerbertSocket {
       return;
     }
 
-    const data: HerbertSocketMessage = {
-      type: HerbertMessageType.Configure,
-      payload: {
-        worker: worker.worker,
-        config: JSON.stringify(worker.config),
-        timestamp: new Date()
-      }
-    };
-
-    let ws: WebSocket;
-    this.wss.clients.forEach((c) => {
-      if ((c as any).id === id) {
-        ws = c;
-      }
+    const msg = makeConfigureMessage({
+      worker: worker.worker,
+      config: JSON.stringify(worker.config),
+      timestamp: new Date().toString(),
     });
 
-    if (ws) {
-      this.send(ws, data);
-    }
+    this.sendToWorker(id, msg);
   }
 
   private onConnection = (ws: WebSocket) => {
     console.log('websocket connection open');
+    (ws as CustomSocket).id = "";
+    (ws as CustomSocket).devices = new Set<string>();
     const onMessage = this.getOnMessageFunc(ws);
     ws.on('message', onMessage);
   }
@@ -91,7 +106,7 @@ class HerbertSocket {
         return;
       }
 
-      if (!isHerbertSocketMessage(data)) {
+      if (!isSocketMessage(data)) {
         this.sendError(ws, "Message must specify type & payload.");
         return;
       }
@@ -108,69 +123,74 @@ class HerbertSocket {
   }
 
   private sendError(ws: WebSocket, message: string) {
-    const messageObject: HerbertSocketMessage = {
-      type: HerbertMessageType.Error,
-      payload: message
-    };
+    const messageObject = makeErrorMessage({
+      message,
+      timestamp: new Date().toString(),
+    });
 
     this.send(ws, messageObject);
   }
 
-  private send(ws: WebSocket, message: HerbertSocketMessage) {
+  private send(ws: WebSocket, message: AnySocketMessage) {
     ws.send(JSON.stringify(message));
   }
 
-  private async processMessage(ws: WebSocket, msg: HerbertSocketMessage) {
-    switch (msg.type) {
-      case HerbertMessageType.Status:
-        if (msg.payload.device) {
-          const limit = (config.get("reporting-period") as number) * 1000;
-          if (msg.payload.type === "meter") {
-            await registerMeter(msg.payload.device, msg.payload.manufacturer);
-            const meter = await readMeter(msg.payload.device);
-            const diff =
-              Date.parse(msg.payload.timestamp) - meter.timestamp.getTime();
-            if (
-                meter.temperature != msg.payload.temperature ||
-                meter.humidity != msg.payload.humidity ||
-                diff > limit
-            ) {
-              createReading(
-                msg.payload.device,
-                msg.payload.temperature,
-                msg.payload.humidity,
-                msg.payload.pressure,
-                msg.payload.timestamp
-              );
-            }
-          } else {
-            await registerDevice(msg.payload.device, msg.payload.manufacturer);
-            const device = await readDevice(msg.payload.device);
-            const diff =
-              Date.parse(msg.payload.timestamp) - device.timestamp.getTime();
-            if (device.status != msg.payload.status || diff > limit) {
-              createStatus(
-                msg.payload.device,
-                msg.payload.status,
-                msg.payload.timestamp
-              );
-            }
-          }
-        }
-        break;
+  private async processMessage(ws: WebSocket, msg: AnySocketMessage) {
+    const limit = (config.get("reporting-period") as number) * 1000;
 
-      case HerbertMessageType.Register:
-        (ws as any).id = msg.payload.worker;
-        await registerWorker(
-          msg.payload.worker,
-          msg.payload.inet,
-        );
-        this.sendWorkerConfig(msg.payload.worker);
-        break;
-      default:
-        console.warn('unknown message type', msg);
-        break;
+    if (messageIsFrom(makeMeterStatusMessage, msg)) {
+      if (msg.payload.device && msg.payload.manufacturer) {
+        (ws as CustomSocket).devices.add(msg.payload.device.toLowerCase());
+        await registerMeter(msg.payload.device, msg.payload.manufacturer);
+        const meter = await readMeter(msg.payload.device);
+        const diff =
+          Date.parse(msg.payload.timestamp) - meter.timestamp.getTime();
+        if (
+            meter.temperature != msg.payload.temperature ||
+            meter.humidity != msg.payload.humidity ||
+            diff > limit
+        ) {
+          createReading(
+            msg.payload.device,
+            msg.payload.temperature,
+            msg.payload.humidity,
+            msg.payload.pressure,
+            new Date(msg.payload.timestamp),
+          );
+        }
+      }
+      return;
     }
+
+    if (messageIsFrom(makeSwitchStatusMessage, msg)) {
+      if (msg.payload.device && msg.payload.manufacturer) {
+        (ws as CustomSocket).devices.add(msg.payload.device.toLowerCase());
+        await registerDevice(msg.payload.device, msg.payload.manufacturer);
+        const device = await readDevice(msg.payload.device);
+        const diff =
+          Date.parse(msg.payload.timestamp) - device.timestamp.getTime();
+        if (device.status != msg.payload.status || diff > limit) {
+          createStatus(
+            msg.payload.device,
+            msg.payload.status,
+            new Date(msg.payload.timestamp),
+          );
+        }
+      }
+      return;
+    }
+
+    if (messageIsFrom(makeWorkerRegisterMessage, msg)) {
+      (ws as CustomSocket).id = msg.payload.worker.toLowerCase();
+      await registerWorker(
+        msg.payload.worker,
+        msg.payload.inet,
+      );
+      this.sendWorkerConfig(msg.payload.worker);
+      return
+    }
+
+    console.warn('unhandled message type', msg.type);
   }
 }
 

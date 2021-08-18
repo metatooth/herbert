@@ -21,11 +21,14 @@
         <span class="tag">{{ worker.worker }}</span>
       </p>
       <div class="content">
-        <span v-if="editing">
-          <textarea class="textarea" v-model="config" @keyup.esc="cancel" />
-        </span>
-        <span class="is-family-code" v-else>
-          {{ this.worker.config }}
+        <select v-if="editing" v-model="configname">
+          <option disabled value="">Select a config for this worker</option>
+          <option v-for="config in configs" :key="config.nickname">
+            {{ config.nickname}}
+          </option>
+        </select>
+        <span class="is-family-code">
+          {{ worker.configname }} : {{ worker.config }}
         </span>
       </div>
       <div class="content">
@@ -45,7 +48,7 @@ import Vue from "vue";
 import EditControls from "@/components/EditControls.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import { Worker } from "@/store/workers/types";
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 const WorkerTile = Vue.extend({
   props: {
@@ -55,6 +58,7 @@ const WorkerTile = Vue.extend({
   data() {
     return {
       nickname: this.worker.nickname,
+      configname: this.worker.configname,
       timestamp: new Date(Date.parse(this.worker.updatedat)),
       config: JSON.stringify(this.worker.config),
       readable: true,
@@ -70,7 +74,8 @@ const WorkerTile = Vue.extend({
   computed: {
     lastupdate() {
       return new Date(Date.parse(this.worker.updatedat));
-    }
+    },
+    ...mapState("configs", ["configs"])
   },
 
   methods: {
@@ -82,18 +87,18 @@ const WorkerTile = Vue.extend({
       this.edit({
         ...this.worker,
         nickname: this.nickname,
-        config: this.config
+        configname: this.configname,
       });
       this.editing = false;
     },
 
     cancel() {
       this.nickname = this.worker.nickname;
-      this.config = JSON.stringify(this.worker.config);
+      this.configname = this.worker.configname;
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit"])
+    ...mapActions("workers", ["edit"]),
   }
 });
 

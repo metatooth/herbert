@@ -1,5 +1,5 @@
 import { Pool, QueryResult } from "pg";
-import { Device, Meter, Profile, Zone, Worker } from "../../shared/types";
+import { Device, Meter, Profile, Zone, Worker, Config } from "../../shared/types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -191,8 +191,19 @@ export async function readMeters() {
   return Promise.all(meters);
 }
 
-export async function readWorker(id: string) {
-  const { rows } = await query("SELECT * FROM workers WHERE worker = $1", [id]);
+export async function readConfig(name: string) {
+  const { rows } = await query<Config>(
+    "SELECT * FROM worker_config WHERE nickname = $1",
+    [name]
+  );
+  return rows[0];
+}
+
+export async function readWorker(macaddr: string) {
+  const { rows } = await query(
+    "SELECT * FROM workers WHERE worker = $1",
+    [macaddr]
+  );
   return rows[0] as Worker;
 }
 
@@ -207,19 +218,19 @@ export async function reading(device: string) {
 }
 
 export async function readWorkers() {
-  const workers = [];
+  const workers: Worker[] = [];
 
   const { rows } = await query<Worker>(
     "SELECT worker FROM workers WHERE deleted <> true",
     []
   );
 
-  rows.forEach(row => {
-    const w = readWorker(row.worker);
+  rows.forEach(async row => {
+    const w = await readWorker(row.worker);
     workers.push(w);
   });
 
-  return Promise.all(workers);
+  return workers;
 }
 
 export async function registerDevice(macaddr: string, manufacturer: string) {
@@ -244,23 +255,29 @@ export async function registerMeter(macaddr: string, manufacturer: string) {
   });
 }
 
-export async function registerWorker(macaddr: string, inet: string) {
-  return query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
+export async function registerWorker(
+  macaddr: string,
+  inet: string
+) {
+  return query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(async res => {
     if (res.rowCount === 0) {
-      return query("INSERT INTO workers (worker, inet) VALUES ($1, $2)", [
-        macaddr,
-        inet,
-      ]);
+      const defaultConfig = "default"
+      const config = await readConfig(defaultConfig);
+      const jsonStr = JSON.stringify(config.config);
+      return query(
+        "INSERT INTO workers (worker, inet, configname, config) VALUES ($1, $2, $3, $4)",
+        [macaddr, inet, defaultConfig, jsonStr],
+      );
     }
   });
 }
 
-export async function updateWorker(macaddr: string) {
-  return query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(res => {
+export async function updateWorker(id: string) {
+  return query("SELECT * FROM workers WHERE worker = $1", [id]).then(res => {
     if (res.rowCount !== 0) {
       return query(
-        "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE worker = $1",
-        [macaddr]
+        "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = $1",
+        [id]
       );
     }
   });
