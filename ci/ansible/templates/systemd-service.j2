@@ -9,8 +9,9 @@ StandardOutput=inherit
 StandardError=inherit
 Restart=always
 User={{ service_user }}
-Environment=DATABASE_URL={{ dburl | default("")}}
-Environment=NODE_ENV={{ node_env | default("")}}
+Environment=DATABASE_URL={{ dburl | default("") }}
+Environment=NODE_ENV={{ node_env | default("") }}
+Environment=WS_URL={{ ws_url | default("") }}
 
 [Install]
 WantedBy=multi-user.target

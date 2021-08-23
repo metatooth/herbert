@@ -18,6 +18,7 @@ import {
   faCog,
   faEdit,
   faFan,
+  faFileCode,
   faFireAlt,
   faGripHorizontal,
   faLightbulb,
@@ -55,6 +56,7 @@ library.add(faCloudRain);
 library.add(faCog);
 library.add(faEdit);
 library.add(faFan);
+library.add(faFileCode);
 library.add(faFireAlt);
 library.add(faGripHorizontal);
 library.add(faLightbulb);

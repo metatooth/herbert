@@ -83,6 +83,16 @@
           </a>
           <a
             class="navbar-item herbert-navbar-item"
+            @click="pick('configs')"
+            :class="is('configs')"
+          >
+            <span class="icon has-text-success">
+              <font-awesome-icon icon="file-code" />
+            </span>
+            <span>Configs</span>
+          </a>
+          <a
+            class="navbar-item herbert-navbar-item"
             @click="pick('settings')"
             :class="is('settings')"
           >
@@ -118,6 +128,7 @@
       <meters v-if="is('meters')" :units="settings.units" />
       <profiles v-if="is('profiles')" :units="settings.units" />
       <workers v-if="is('workers')" />
+      <configs v-if="is('configs')" />
       <zones v-if="is('zones')" :units="settings.units" />
       <settings-page
         v-if="is('settings')"
@@ -149,6 +160,7 @@ import Devices from "@/components/Devices.vue";
 import Meters from "@/components/Meters.vue";
 import Profiles from "@/components/Profiles.vue";
 import Workers from "@/components/Workers.vue";
+import Configs from "@/components/Configs.vue";
 import Zones from "@/components/Zones.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
@@ -170,6 +182,7 @@ const Dashboard = Vue.extend({
     Profiles,
     Timestamp,
     Workers,
+    Configs,
     Zones,
     SettingsPage
   },
@@ -208,6 +221,10 @@ const Dashboard = Vue.extend({
 
     pick(section: string) {
       this.picked = section;
+      if (this.picked !== "overview") {
+        this.$refs.navbarBurger.classList.toggle("is-active");
+        this.$refs.navMenuIndex.classList.toggle("is-active");
+      }
     },
 
     refresh() {
@@ -215,6 +232,7 @@ const Dashboard = Vue.extend({
       this["meters/fetchData"]();
       this["profiles/fetchData"]();
       this["workers/fetchData"]();
+      this["configs/fetchData"]();
       this["zones/fetchData"]();
       this["settings/fetchData"]();
 
@@ -240,6 +258,7 @@ const Dashboard = Vue.extend({
       "meters/fetchData",
       "profiles/fetchData",
       "workers/fetchData",
+      "configs/fetchData",
       "zones/fetchData",
       "settings/fetchData",
       "settings/edit"

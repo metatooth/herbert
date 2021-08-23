@@ -19,15 +19,11 @@ export const actions: ActionTree<DevicesState, RootState> = {
       commit("SET", payload);
     });
   },
-  off({ commit }, payload: string) {
-    HTTP.put(`/devices/${payload}/off`).then(response => {
-      commit("OFF", Object.assign(new Device(response.data)));
-    });
+  off(context, payload: string) {
+    HTTP.put(`/devices/${payload}/off`);
   },
-  on({ commit }, payload: string) {
-    HTTP.put(`/devices/${payload}/on`).then(response => {
-      commit("ON", Object.assign(new Device(response.data)));
-    });
+  on(context, payload: string) {
+    HTTP.put(`/devices/${payload}/on`);
   },
   remove({ commit }, payload: Device) {
     HTTP.delete(`/devices/${payload.device}`);
