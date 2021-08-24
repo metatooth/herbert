@@ -27,9 +27,9 @@
             {{ config.nickname}}
           </option>
         </select>
-        <span class="is-family-code">
+        <div class="is-family-code">
           {{ worker.configname }} : {{ worker.config }}
-        </span>
+        </div>
       </div>
       <div class="content">
         <span class="is-family-code">{{ worker.inet }}</span>
