@@ -4,11 +4,11 @@ An environment control system with SwitchBot and WYZE devices.
 
 ## Getting Started
 
-Using Ubuntu 20.04 or Raspberry Pi OS Lite 5.4 2020-08-09
+Using Ubuntu 20.04 or Raspberry Pi OS Lite 5.10 2021-05-07
 
 ```
 $ sudo apt remove npm nodejs
-$ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+$ curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
 $ sudo apt-get install -y nodejs
 $ sudo apt-get install -y git bluetooth bluez libbluetooth-dev libudev-dev
 $ git clone https://github.com/metatooth/herbert.git
@@ -61,7 +61,9 @@ block device to image, be sure to enter the parent block device not a partition.
 You can also pass in each option as a command line argument instead of being
 prompted for input. See `scripts/reimage.sh -h` for details.
 
-Note: This script has only been tested on linux, more work may be needed to
+Block device must have single, free partition.
+
+Note: This script has only been tested on Linux, more work may be needed to
 get this to work on OSX.
 
 ## Deployment Prequisites
