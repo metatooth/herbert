@@ -7,7 +7,7 @@
     - nodejs_version: "14.x"
     - nodejs_package_json_path: "{{appDir}}"
     - service_description: "Herbert client dashboard service"
-    - service_user: "{{ansible_user}}"
+    - service_user: root
     - service_file: index.js
 
   tasks:
@@ -28,11 +28,13 @@
         dest: "{{buildDir}}"
 
     - name: Install nodejs {{nodejs_version}} and node_modules
+      when: herbert_version != "local"
       include_role:
         name: geerlingguy.nodejs
 
     - name: Build client
       become: no
+      when: herbert_version != "local"
       command: "chdir={{appDir}} npm run build:client"
       environment:
         VUE_APP_WS_URL: "ws://{{api_host}}:{{api_port}}"
