@@ -24,7 +24,7 @@
         <select v-if="editing" v-model="configname">
           <option disabled value="">Select a config for this worker</option>
           <option v-for="config in configs" :key="config.nickname">
-            {{ config.nickname}}
+            {{ config.nickname }}
           </option>
         </select>
         <div class="is-family-code">
@@ -87,7 +87,7 @@ const WorkerTile = Vue.extend({
       this.edit({
         ...this.worker,
         nickname: this.nickname,
-        configname: this.configname,
+        configname: this.configname
       });
       this.editing = false;
     },
@@ -98,7 +98,7 @@ const WorkerTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit"]),
+    ...mapActions("workers", ["edit"])
   }
 });
 

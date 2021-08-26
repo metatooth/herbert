@@ -25,7 +25,7 @@ const store: StoreOptions<RootState> = {
     meters,
     workers,
     settings,
-    configs,
+    configs
   }
 };
 

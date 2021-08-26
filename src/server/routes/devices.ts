@@ -3,7 +3,7 @@ import WebSocket from "ws";
 import { makeCommandMessage } from "../../shared/message-creators";
 import { Device } from "../../shared/types";
 import { query, readDevice, readDevices } from "../db";
-import { herbertSocket } from '../socket';
+import { herbertSocket } from "../socket";
 
 const router = Router();
 
@@ -32,8 +32,8 @@ router.put("/:id/:action", async (req, res) => {
   const cmd = makeCommandMessage({
     device: device.device,
     action: action,
-    timestamp: new Date().toString(),
-  })
+    timestamp: new Date().toString()
+  });
   herbertSocket.sendByDeviceID(device.device, cmd);
   res.status(200);
 });

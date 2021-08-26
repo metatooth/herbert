@@ -80,7 +80,7 @@ const ConfigTile = Vue.extend({
         ...this.config,
         nickname: this.nickname,
         config: this.configStr,
-        currentName: this.config.nickname,
+        currentName: this.config.nickname
       });
       this.editing = false;
     },

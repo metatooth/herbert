@@ -13,9 +13,7 @@ import { createMessageCreator } from "./util";
 export const makeWorkerRegisterMessage = createMessageCreator<
   SocketMessageType.Register,
   RegisterWorkerPayload
->(
-  SocketMessageType.Register
-);
+>(SocketMessageType.Register);
 
 export const makeCommandMessage = createMessageCreator<
   SocketMessageType.Command,

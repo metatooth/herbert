@@ -11,7 +11,7 @@ import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
 import { AnySocketMessage, CommandPayload } from "../shared/types";
-import { isSocketMessage, messageIsFrom} from "../shared/util";
+import { isSocketMessage, messageIsFrom } from "../shared/util";
 import {
   makeCommandMessage,
   makeConfigureMessage,
@@ -19,7 +19,7 @@ import {
   makeMeterStatusMessage,
   makeSwitchStatusMessage,
   makeWorkerRegisterMessage,
-  makeWorkerStatusMessage,
+  makeWorkerStatusMessage
 } from "../shared/message-creators";
 
 import Switchbot, { WoSensorTH } from "node-switchbot";
@@ -61,7 +61,7 @@ interface ConfigDevice {
 export class App {
   private static instance: App;
   private config: any = {};
-  private wsUrl = process.env.WS_URL || '';
+  private wsUrl = process.env.WS_URL || "";
   private closed = false;
   initialized = false;
   socket?: WebSocket = undefined;
@@ -108,7 +108,7 @@ export class App {
 
     this.createSocket();
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const i = setInterval(() => {
         if (this.initialized) {
           clearInterval(i);
@@ -116,8 +116,8 @@ export class App {
         }
         const msg = makeWorkerRegisterMessage({
           worker: this.macaddr,
-          inet: this.inet,
-        })
+          inet: this.inet
+        });
         this.send(msg);
       }, 2000);
     });
@@ -153,7 +153,7 @@ export class App {
             id: wyze.mac,
             device: wyze.mac,
             message: "disconnected",
-            timestamp: new Date().toString(),
+            timestamp: new Date().toString()
           });
           this.send(msg);
         }
@@ -198,7 +198,7 @@ export class App {
     }
 
     this.runTimeout = setTimeout(this.run, interval);
-  }
+  };
 
   public stop() {
     if (this.runTimeout) {
@@ -248,18 +248,15 @@ export class App {
     this.meterStatus(meter);
 
     return Promise.resolve(true);
-  }
+  };
 
   private initDevices() {
     const meters = [];
     const switches = [];
-    const devices = (
-      this.config &&
-      this.config.devices &&
-      Array.isArray(this.config.devices)
-    ) ?
-      this.config.devices as ConfigDevice[] :
-      [] as ConfigDevice[];
+    const devices =
+      this.config && this.config.devices && Array.isArray(this.config.devices)
+        ? (this.config.devices as ConfigDevice[])
+        : ([] as ConfigDevice[]);
 
     devices.forEach(dev => {
       logger.debug("DEVICE", dev);
@@ -289,7 +286,6 @@ export class App {
         plug.off();
         switches.push(plug);
       }
-
     });
 
     this.meters = meters;
@@ -310,28 +306,28 @@ export class App {
 
   private readonly onSocketError = (err: Error) => {
     logger.error(err);
-  }
+  };
 
   private readonly onSocketClose = () => {
-    logger.info("Socket is closed")
-    if (this.closed) { return; }
+    logger.info("Socket is closed");
+    if (this.closed) {
+      return;
+    }
     setTimeout(this.restart, 5000);
-  }
+  };
 
   private restart = async () => {
     this.stop();
     await this.init();
     await this.run();
-  }
+  };
 
-  private readonly handleSocketMessage = async (
-    msg: AnySocketMessage
-  ) => {
+  private readonly handleSocketMessage = async (msg: AnySocketMessage) => {
     try {
       const data = JSON.parse(msg.toString());
 
       if (!isSocketMessage(data)) {
-        logger.warn('unknown message format:', data);
+        logger.warn("unknown message format:", data);
         return;
       }
 
@@ -349,14 +345,14 @@ export class App {
         await this.updateWYZE(data.payload);
         this.updateSwitches(data.payload);
         logger.info("Done.");
-        return
+        return;
       }
 
       logger.warn("unhandled socket message", data);
     } catch (e) {
       logger.error("socket message error:", e);
     }
-  }
+  };
 
   private async send(data: AnySocketMessage) {
     if (this.socket === undefined || this.socket.readyState !== 1) {
@@ -375,7 +371,7 @@ export class App {
           this.socket.send(JSON.stringify(msg));
         }
       }
-    } catch(e) {
+    } catch (e) {
       logger.error("failed to send message:", e);
     }
   }
@@ -403,7 +399,7 @@ export class App {
             device: data.device,
             action: data.action,
             code: result.code,
-            timestamp: new Date().toString(),
+            timestamp: new Date().toString()
           });
           this.heldMessages.push(reply);
         }
@@ -435,7 +431,7 @@ export class App {
       temperature: meter.clime.temperature,
       humidity: meter.clime.humidity,
       pressure: meter.clime.vpd(),
-      timestamp: new Date().toString(),
+      timestamp: new Date().toString()
     });
     this.send(msg);
   }
@@ -445,7 +441,7 @@ export class App {
       device: switcher.device,
       manufacturer: switcher.manufacturer,
       status: switcher.state,
-      timestamp: new Date().toString(),
+      timestamp: new Date().toString()
     });
     this.send(msg);
   }
@@ -455,28 +451,31 @@ export class App {
       worker: this.macaddr,
       inet: this.inet,
       config: JSON.stringify(this.config),
-      timestamp: new Date().toString(),
+      timestamp: new Date().toString()
     });
     this.send(msg);
   }
 
   private formatMacAddress(id: string) {
     if (!id) {
-      return '';
+      return "";
     }
 
-    if (id.length !=12 && id.length != 17) {
-      console.warn('bad format for mac address:', id);
-      return ''
+    if (id.length != 12 && id.length != 17) {
+      console.warn("bad format for mac address:", id);
+      return "";
     }
 
     // Remove all but alphanumeric characters
-    let mac = id.replace(/\W/ig, '');
+    let mac = id.replace(/\W/gi, "");
 
     // Append a colon after every two characters
     mac = mac.replace(/(.{2})/g, "$1:");
 
     // remove trailing colon
-    return mac.split(":").slice(0, -1).join(":");
+    return mac
+      .split(":")
+      .slice(0, -1)
+      .join(":");
   }
 }

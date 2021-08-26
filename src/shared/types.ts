@@ -84,44 +84,38 @@ export interface Zone {
 
 // Represents the various socket message types
 export enum SocketMessageType {
-  WorkerStatus = 'WORKER_STATUS',
-  MeterStatus  = "METER_STATUS",
+  WorkerStatus = "WORKER_STATUS",
+  MeterStatus = "METER_STATUS",
   SwitchStatus = "SWITCH_STATUS",
-  Register     = 'REGISTER',
-  Command      = 'COMMAND',
-  Configure    = 'CONFIGURE',
-  Error        = 'ERROR',
+  Register = "REGISTER",
+  Command = "COMMAND",
+  Configure = "CONFIGURE",
+  Error = "ERROR"
 }
 
 // Represents a simple message consisting only of a type
 export interface BasicSocketMessage<T extends SocketMessageType> {
-  type: T
+  type: T;
 }
 
 // Represents a socket message with a payload
-export interface SocketMessage<
-  T extends SocketMessageType,
-  P
-> extends BasicSocketMessage<T> {
+export interface SocketMessage<T extends SocketMessageType, P>
+  extends BasicSocketMessage<T> {
   payload: P;
 }
 
 // Represents any socket message
-export interface AnySocketMessage
-  extends SocketMessage<SocketMessageType, any>{}
+export type AnySocketMessage = SocketMessage<SocketMessageType, any>;
 
 // Represents a function that creates a socket message object
-export type MessageCreator<
-  T extends SocketMessageType,
-  P
-> = (payload: P) => SocketMessage<T,P>;
+export type MessageCreator<T extends SocketMessageType, P> = (
+  payload: P
+) => SocketMessage<T, P>;
 
 // Represents an enhancement on the creator function that allows it to
 // type guard messages that match the creator's type
-export interface EnhancedMessageCreator<
-  T extends SocketMessageType,
-  P
-> extends MessageCreator<T, P> {
+export interface EnhancedMessageCreator<T extends SocketMessageType, P>
+  extends MessageCreator<T, P> {
   type: T;
   isOfType(msg: SocketMessage<T, any>): msg is SocketMessage<T, P>;
 }

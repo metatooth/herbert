@@ -1,5 +1,12 @@
 import { Pool, QueryResult } from "pg";
-import { Device, Meter, Profile, Zone, Worker, Config } from "../../shared/types";
+import {
+  Device,
+  Meter,
+  Profile,
+  Zone,
+  Worker,
+  Config
+} from "../../shared/types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -200,10 +207,9 @@ export async function readConfig(name: string) {
 }
 
 export async function readWorker(macaddr: string) {
-  const { rows } = await query(
-    "SELECT * FROM workers WHERE worker = $1",
-    [macaddr]
-  );
+  const { rows } = await query("SELECT * FROM workers WHERE worker = $1", [
+    macaddr
+  ]);
   return rows[0] as Worker;
 }
 
@@ -234,42 +240,45 @@ export async function readWorkers() {
 }
 
 export async function registerDevice(macaddr: string, manufacturer: string) {
-  return query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
-    if (res.rowCount === 0) {
-      return query("INSERT INTO devices (device, manufacturer) VALUES ($1, $2)", [
-        macaddr,
-        manufacturer
-      ]);
+  return query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(
+    res => {
+      if (res.rowCount === 0) {
+        return query(
+          "INSERT INTO devices (device, manufacturer) VALUES ($1, $2)",
+          [macaddr, manufacturer]
+        );
+      }
     }
-  });
+  );
 }
 
 export async function registerMeter(macaddr: string, manufacturer: string) {
-  return query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(res => {
-    if (res.rowCount === 0) {
-      return query(
-        "INSERT INTO devices (device, devicetype, manufacturer) VALUES ($1, 'meter', $2)",
-        [macaddr, manufacturer]
-      );
+  return query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(
+    res => {
+      if (res.rowCount === 0) {
+        return query(
+          "INSERT INTO devices (device, devicetype, manufacturer) VALUES ($1, 'meter', $2)",
+          [macaddr, manufacturer]
+        );
+      }
     }
-  });
+  );
 }
 
-export async function registerWorker(
-  macaddr: string,
-  inet: string
-) {
-  return query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(async res => {
-    if (res.rowCount === 0) {
-      const defaultConfig = "default"
-      const config = await readConfig(defaultConfig);
-      const jsonStr = JSON.stringify(config.config);
-      return query(
-        "INSERT INTO workers (worker, inet, configname, config) VALUES ($1, $2, $3, $4)",
-        [macaddr, inet, defaultConfig, jsonStr],
-      );
+export async function registerWorker(macaddr: string, inet: string) {
+  return query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(
+    async res => {
+      if (res.rowCount === 0) {
+        const defaultConfig = "default";
+        const config = await readConfig(defaultConfig);
+        const jsonStr = JSON.stringify(config.config);
+        return query(
+          "INSERT INTO workers (worker, inet, configname, config) VALUES ($1, $2, $3, $4)",
+          [macaddr, inet, defaultConfig, jsonStr]
+        );
+      }
     }
-  });
+  );
 }
 
 export async function updateWorker(id: string) {
@@ -290,31 +299,35 @@ export async function createReading(
   pressure: number,
   ts: Date
 ) {
-  return query("SELECT * FROM devices WHERE device = $1", [meter]).then(async res => {
-    if (res.rowCount !== 0) {
-      await query(
-        "UPDATE devices SET temperature = $1, humidity = $2, pressure = $3, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $4",
-        [temperature, humidity, pressure, meter]
-      );
-      return query(
-        "INSERT INTO readings (meter, temperature, humidity, pressure, observedat) VALUES ($1, $2, $3, $4, $5)",
-        [meter, temperature, humidity, pressure, ts]
-      );
+  return query("SELECT * FROM devices WHERE device = $1", [meter]).then(
+    async res => {
+      if (res.rowCount !== 0) {
+        await query(
+          "UPDATE devices SET temperature = $1, humidity = $2, pressure = $3, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $4",
+          [temperature, humidity, pressure, meter]
+        );
+        return query(
+          "INSERT INTO readings (meter, temperature, humidity, pressure, observedat) VALUES ($1, $2, $3, $4, $5)",
+          [meter, temperature, humidity, pressure, ts]
+        );
+      }
     }
-  });
+  );
 }
 
 export async function createStatus(device: string, status: string, ts: Date) {
-  return query("SELECT * FROM devices WHERE device = $1", [device]).then(async res => {
-    if (res.rowCount !== 0) {
-      await query(
-        "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
-        [status, device]
-      );
-      return query(
-        "INSERT INTO statuses (device, status, observedat) VALUES ($1, $2, $3)",
-        [device, status, ts]
-      );
+  return query("SELECT * FROM devices WHERE device = $1", [device]).then(
+    async res => {
+      if (res.rowCount !== 0) {
+        await query(
+          "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
+          [status, device]
+        );
+        return query(
+          "INSERT INTO statuses (device, status, observedat) VALUES ($1, $2, $3)",
+          [device, status, ts]
+        );
+      }
     }
-  });
+  );
 }

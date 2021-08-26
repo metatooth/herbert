@@ -58,11 +58,11 @@ const Configs = Vue.extend({
   },
 
   data() {
-    return{
+    return {
       adding: false,
       nickname: "",
       config: ""
-    }
+    };
   },
 
   computed: {
@@ -124,9 +124,7 @@ const Configs = Vue.extend({
     },
 
     cancel() {
-      this.nickname = "",
-      this.config = "",
-      this.adding = false
+      (this.nickname = ""), (this.config = ""), (this.adding = false);
     }
   }
 });
