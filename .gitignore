@@ -26,3 +26,4 @@ pnpm-debug.log*
 
 # ansible host config
 inventory
+config/development.json
