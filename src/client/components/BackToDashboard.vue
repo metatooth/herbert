@@ -1,9 +1,10 @@
 <template>
   <span class="tags has-addons">
     <span class="tag is-medium">
-      <font-awesome-icon icon="chevron-circle-left" /></span>
+      <font-awesome-icon icon="chevron-circle-left"
+    /></span>
     <span class="tag is-medium">
-      <router-link :to="{ name: 'dashboard' }" >
+      <router-link :to="{ name: 'dashboard' }">
         Back
       </router-link>
     </span>
@@ -13,8 +14,7 @@
 <script>
 import Vue from "vue";
 
-const BackToDashboard = Vue.extend({
-});
+const BackToDashboard = Vue.extend({});
 
 export default BackToDashboard;
 </script>

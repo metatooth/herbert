@@ -1,5 +1,4 @@
 import WebSocket from "ws";
-import config from "config";
 import fs from "fs";
 import { networkInterfaces } from "os";
 
@@ -11,6 +10,17 @@ import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
+import { AnySocketMessage, CommandPayload } from "../shared/types";
+import { isSocketMessage, messageIsFrom} from "../shared/util";
+import {
+  makeCommandMessage,
+  makeConfigureMessage,
+  makeErrorMessage,
+  makeMeterStatusMessage,
+  makeSwitchStatusMessage,
+  makeWorkerRegisterMessage,
+  makeWorkerStatusMessage,
+} from "../shared/message-creators";
 
 import Switchbot, { WoSensorTH } from "node-switchbot";
 import Wyze, { WyzeDevice } from "wyze-node";
@@ -37,11 +47,6 @@ import { configure, getLogger, Logger } from "log4js";
 configure("./config/log4js.json");
 const logger: Logger = getLogger("app");
 
-interface Message {
-  type: string;
-  payload: {};
-}
-
 interface ConfigDevice {
   id: string;
   manufacturer: string;
@@ -54,71 +59,33 @@ interface ConfigDevice {
 }
 
 export class App {
-  private static _instance: App;
+  private static instance: App;
+  private config: any = {};
+  private wsUrl = process.env.WS_URL || '';
+  private closed = false;
   initialized = false;
   socket?: WebSocket = undefined;
   meters: Array<Meter> = [];
   switches: Array<Switch> = [];
   macaddr = "";
   inet = "";
-  heldMessages: Array<Message> = [];
+  heldMessages: AnySocketMessage[] = [];
   wyze?: Wyze;
   switchbot: Switchbot | undefined;
   runTimeout: NodeJS.Timeout | undefined;
 
-  private constructor() {
-    console.log("process.argv", process.argv);
-
-    if (process.argv.length > 2) {
-      const arg = process.argv[2];
-      console.log("arg", arg);
-      if (arg.match(/^-C/)) {
-        console.log("matched -C!");
-      }
-    }
+  public constructor() {
+    App.instance = App.instance || this;
+    return App.instance;
   }
 
-  public async handler(ad: WoSensorTH): Promise<boolean> {
-    const app = App.instance();
-
-    let meter = app.meters.find(el => {
-      return el.device === ad.id;
-    });
-
-    if (!meter) {
-      meter = new Meter(ad.id, "SwitchBot");
-      app.meters.push(meter);
-    }
-
-    if (
-      meter.clime.temperature !== ad.serviceData.temperature.c ||
-      meter.clime.humidity !== ad.serviceData.humidity / 100.0
-    ) {
-      meter.clime.temperature = ad.serviceData.temperature.c;
-      meter.clime.delta = 0.6; // WARNING!
-      meter.clime.humidity = ad.serviceData.humidity / 100.0;
-      meter.clime.timestamp = new Date();
-      logger.debug(meter.device, meter.clime);
-      app.meterStatus(meter);
-    }
-
-    return Promise.resolve(true);
-  }
-
-  public static instance(): App {
-    if (!App._instance) {
-      App._instance = new App();
-    }
-    return App._instance;
-  }
-
-  public async init(): Promise<boolean> {
+  public init(): Promise<void> {
     logger.info("=====================================");
     logger.info("== Herbert Worker = Starting up... ==");
     logger.info("=====================================");
 
     const ifaces = networkInterfaces();
-    console.log("network interfaces", ifaces);
+    logger.info("network interfaces", ifaces);
 
     let net = ifaces["wlo1"];
 
@@ -130,196 +97,46 @@ export class App {
       net = ifaces["eth0"];
     }
 
-    console.log("net", net);
+    logger.info("net", net);
 
     if (net && net.length) {
       this.macaddr = net[0]["mac"];
       this.inet = net[0]["address"];
     }
 
-    console.log("device network info", this.macaddr, this.inet);
+    logger.info("device network info", this.macaddr, this.inet);
 
-    const meters = this.meters;
-    const switches = this.switches;
-    const devices = (config.get("devices") || []) as ConfigDevice[];
+    this.createSocket();
 
-    devices.forEach(dev => {
-      logger.debug("DEVICE", dev);
-      if (dev.manufacturer === "WYZE") {
-        const options = {
-          username: dev.username,
-          password: dev.password
-        };
-
-        this.wyze = new Wyze(options);
-      } else if (dev.manufacturer === "herbert") {
-        if (dev.pin) {
-          switches.push(new Herbert(dev.id, parseInt(dev.pin)));
-        } else if (dev.board && dev.channel) {
-          switches.push(
-            new SM8relay(dev.id, parseInt(dev.board), parseInt(dev.channel))
-          );
-        } else if (dev.remote) {
-          switches.push(new IRSend(dev.id, dev.remote));
+    return new Promise((resolve) => {
+      const i = setInterval(() => {
+        if (this.initialized) {
+          clearInterval(i);
+          return resolve();
         }
-      } else if (dev.manufacturer === "mockmeter") {
-        meters.push(new MockMeter());
-      } else if (dev.manufacturer === "mockplug") {
-        const plug = new MockPlug();
-        plug.off();
-        switches.push(plug);
-      }
+        const msg = makeWorkerRegisterMessage({
+          worker: this.macaddr,
+          inet: this.inet,
+        })
+        this.send(msg);
+      }, 2000);
     });
-
-    this.initialized = true;
-
-    return Promise.resolve(true);
   }
 
-  private async send(data: Message) {
-    const app = App.instance();
-
-    if (app.socket === undefined) {
-      app.heldMessages.push(data);
-
-      try {
-        app.socket = new WebSocket(config.get("ws-url"));
-
-        app.socket.on("error", err => {
-          logger.error("Caught", err);
-        });
-
-        app.socket.on("close", () => {
-          logger.info("SOCKET IS CLOSED");
-          app.socket = undefined;
-        });
-
-        app.socket.on("message", async msg => {
-          const data = JSON.parse(msg.toString());
-          if (data.type === "COMMAND") {
-            console.log("action!", data.payload);
-            const mac = data.payload.device.replace(/:/g, "").toUpperCase();
-            console.log("MAC...", mac);
-            if (this.wyze) {
-              const device = await this.wyze.getDeviceByMac(mac);
-              if (device) {
-                console.log("Found.");
-                let result;
-                if (data.payload.action === "on") {
-                  result = await this.wyze.turnOn(device);
-                } else {
-                  result = await this.wyze.turnOff(device);
-                }
-                if (result.code !== "1") {
-                  logger.error(
-                    `ERROR ${result.code} ${device.nickname} ${data.payload.action} - ${result}`
-                  );
-                  const reply = {
-                    type: "ERROR",
-                    payload: {
-                      worker: app.macaddr,
-                      device: data.payload.device,
-                      action: data.payload.action,
-                      code: result.code,
-                      message: result.msg,
-                      timestamp: new Date()
-                    }
-                  };
-                  app.heldMessages.push(reply);
-                }
-              }
-            }
-
-            console.log("Check other devices...");
-            app.switches.forEach(plug => {
-              if (plug.device === mac) {
-                if (data.payload.action === "on") {
-                  console.log(plug.device, "on");
-                  plug.on();
-                } else {
-                  console.log(plug.device, "off");
-                  plug.off();
-                }
-              }
-            });
-            console.log("Done.");
-          }
-        });
-      } catch (e) {
-        logger.error("Caught", e);
-      }
-    } else if (app.socket.readyState !== 1) {
-      app.heldMessages.push(data);
-    } else {
-      logger.debug("Sending data", data);
-      app.socket.send(JSON.stringify(data));
-
-      for (let i = 0; i < app.heldMessages.length; ++i) {
-        if (app.socket) {
-          const msg = app.heldMessages.shift();
-          logger.debug("Sending held message", msg);
-          app.socket.send(JSON.stringify(msg));
-        }
-      }
-    }
-  }
-
-  private async meterStatus(meter: Meter) {
-    const data = {
-      type: "STATUS",
-      payload: {
-        device: meter.device,
-        type: "meter",
-        manufacturer: meter.manufacturer,
-        temperature: meter.clime.temperature,
-        humidity: meter.clime.humidity,
-        pressure: meter.clime.vpd(),
-        timestamp: new Date()
-      }
-    };
-    this.send(data);
-  }
-
-  private async switchStatus(switcher: Switch) {
-    const data = {
-      type: "STATUS",
-      payload: {
-        device: switcher.device,
-        manufacturer: switcher.manufacturer,
-        status: switcher.state,
-        timestamp: new Date()
-      }
-    };
-    this.send(data);
-  }
-
-  private async workerStatus(macaddr: string, inet: string) {
-    const data = {
-      type: "STATUS",
-      payload: {
-        worker: macaddr,
-        inet: inet,
-        timestamp: new Date()
-      }
-    };
-    this.send(data);
-  }
-
-  public async run(): Promise<boolean> {
-    const app = App.instance();
-    if (!app.initialized) {
-      await app.init();
+  public readonly run = async (): Promise<void> => {
+    if (!this.initialized) {
+      return Promise.reject("app is not initialized");
     }
 
-    app.workerStatus(this.macaddr, this.inet);
+    this.workerStatus();
 
-    const polling: number = 1000 * parseInt(config.get("polling"));
-    const interval: number = 1000 * parseInt(config.get("interval"));
+    const polling: number = 1000 * parseInt(this.config.polling || 5);
+    const interval: number = 1000 * parseInt(this.config.interval || 30);
 
     if (!isMockWorker()) {
       logger.debug("Start SwitchBot scan %dms ...", polling);
       const switchbot = new Switchbot();
-      switchbot.onadvertisement = app.handler;
+      switchbot.onadvertisement = this.switchBotHandler;
       switchbot.startScan();
       switchbot.wait(polling);
       switchbot.stopScan();
@@ -327,22 +144,18 @@ export class App {
       logger.debug("Done switchbot scan.");
     }
 
-    if (app.wyze) {
+    if (this.wyze) {
       logger.debug("Check on WYZE plugs...");
-      const wyzes = await app.wyze.getDeviceList();
+      const wyzes = await this.wyze.getDeviceList();
       wyzes.forEach(async (wyze: WyzeDevice) => {
         if (wyze.conn_state === 0) {
-          const data = {
-            type: "ERROR",
-            payload: {
-              id: wyze.mac,
-              device: wyze.mac,
-              message: "disconnected",
-              timestamp: new Date()
-            }
-          };
-
-          app.send(data);
+          const msg = makeErrorMessage({
+            id: wyze.mac,
+            device: wyze.mac,
+            message: "disconnected",
+            timestamp: new Date().toString(),
+          });
+          this.send(msg);
         }
 
         const plug = new WyzeSwitch(wyze.mac);
@@ -355,27 +168,27 @@ export class App {
           plug.state = "off";
         }
 
-        app.switchStatus(plug);
+        this.switchStatus(plug);
       });
     }
 
     logger.debug("Done.");
 
     logger.debug("Other meters...");
-    app.meters.forEach(meter => {
+    this.meters.forEach(meter => {
       if (meter.manufacturer === "mockmeter") {
         const now = new Date().getTime();
         meter.clime.temperature = 23.9 + Math.sin((2 * 3.14 * now) / 3600000);
         meter.clime.humidity =
           0.55 + 0.02 * Math.cos((2 * 3.14 * now) / 3600000);
       }
-      app.meterStatus(meter);
+      this.meterStatus(meter);
     });
     logger.debug("Done.");
 
     logger.debug("Herbert switches...");
-    app.switches.forEach(plug => {
-      app.switchStatus(plug.status());
+    this.switches.forEach(plug => {
+      this.switchStatus(plug.status());
     });
     logger.debug("Done.");
 
@@ -384,12 +197,10 @@ export class App {
       this.runTimeout = undefined;
     }
 
-    this.runTimeout = setTimeout(app.run, interval);
-
-    return Promise.resolve(true);
+    this.runTimeout = setTimeout(this.run, interval);
   }
 
-  public stop(): void {
+  public stop() {
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
       this.runTimeout = undefined;
@@ -401,11 +212,271 @@ export class App {
     }
 
     if (this.socket) {
+      this.socket.removeAllListeners();
       this.socket.close();
       this.socket = undefined;
     }
 
     this.initialized = false;
-    App._instance = undefined;
+  }
+
+  public close() {
+    this.closed = true;
+    this.stop();
+    App.instance = undefined;
+  }
+
+  private readonly switchBotHandler = async (
+    ad: WoSensorTH
+  ): Promise<boolean> => {
+    let meter = this.meters.find(el => {
+      return el.device === ad.id;
+    });
+
+    if (!meter) {
+      meter = new Meter(ad.id, "SwitchBot");
+      this.meters.push(meter);
+    }
+
+    meter.clime.temperature = ad.serviceData.temperature.c;
+    meter.clime.delta = 0.6; // WARNING!
+    meter.clime.humidity = ad.serviceData.humidity / 100.0;
+    meter.clime.timestamp = new Date();
+
+    logger.debug(meter.device, meter.clime);
+
+    this.meterStatus(meter);
+
+    return Promise.resolve(true);
+  }
+
+  private initDevices() {
+    const meters = [];
+    const switches = [];
+    const devices = (
+      this.config &&
+      this.config.devices &&
+      Array.isArray(this.config.devices)
+    ) ?
+      this.config.devices as ConfigDevice[] :
+      [] as ConfigDevice[];
+
+    devices.forEach(dev => {
+      logger.debug("DEVICE", dev);
+      const mac = this.formatMacAddress(dev.id);
+      if (dev.manufacturer === "WYZE") {
+        const options = {
+          username: dev.username,
+          password: dev.password
+        };
+
+        this.wyze = new Wyze(options);
+      } else if (dev.manufacturer === "herbert") {
+        if (dev.pin) {
+          switches.push(new Herbert(mac, parseInt(dev.pin)));
+        } else if (dev.board && dev.channel) {
+          switches.push(
+            new SM8relay(mac, parseInt(dev.board), parseInt(dev.channel))
+          );
+        } else if (dev.remote) {
+          switches.push(new IRSend(mac, dev.remote));
+        }
+      } else if (dev.manufacturer === "mockmeter") {
+        const meter = new MockMeter(mac);
+        meters.push(meter);
+      } else if (dev.manufacturer === "mockplug") {
+        const plug = new MockPlug(mac);
+        plug.off();
+        switches.push(plug);
+      }
+
+    });
+
+    this.meters = meters;
+    this.switches = switches;
+    this.initialized = true;
+  }
+
+  private async createSocket(): Promise<void> {
+    if (this.socket) {
+      this.stop();
+    }
+
+    this.socket = new WebSocket(this.wsUrl);
+    this.socket.on("error", this.onSocketError);
+    this.socket.on("close", this.onSocketClose);
+    this.socket.on("message", this.handleSocketMessage);
+  }
+
+  private readonly onSocketError = (err: Error) => {
+    logger.error(err);
+  }
+
+  private readonly onSocketClose = () => {
+    logger.info("Socket is closed")
+    if (this.closed) { return; }
+    setTimeout(this.restart, 5000);
+  }
+
+  private restart = async () => {
+    this.stop();
+    await this.init();
+    await this.run();
+  }
+
+  private readonly handleSocketMessage = async (
+    msg: AnySocketMessage
+  ) => {
+    try {
+      const data = JSON.parse(msg.toString());
+
+      if (!isSocketMessage(data)) {
+        logger.warn('unknown message format:', data);
+        return;
+      }
+
+      if (messageIsFrom(makeConfigureMessage, data)) {
+        if (data.payload.worker === this.macaddr) {
+          logger.info("!! CONFIGURE !!", data.payload.config);
+          this.config = JSON.parse(data.payload.config);
+          this.initDevices();
+        }
+        return;
+      }
+
+      if (messageIsFrom(makeCommandMessage, data)) {
+        logger.info("!! ACTION !!", data.payload);
+        await this.updateWYZE(data.payload);
+        this.updateSwitches(data.payload);
+        logger.info("Done.");
+        return
+      }
+
+      logger.warn("unhandled socket message", data);
+    } catch (e) {
+      logger.error("socket message error:", e);
+    }
+  }
+
+  private async send(data: AnySocketMessage) {
+    if (this.socket === undefined || this.socket.readyState !== 1) {
+      this.heldMessages.push(data);
+      return;
+    }
+
+    try {
+      logger.debug("Sending data", data);
+      this.socket.send(JSON.stringify(data));
+
+      for (let i = 0; i < this.heldMessages.length; ++i) {
+        if (this.socket) {
+          const msg = this.heldMessages.shift();
+          logger.debug("Sending held message", msg);
+          this.socket.send(JSON.stringify(msg));
+        }
+      }
+    } catch(e) {
+      logger.error("failed to send message:", e);
+    }
+  }
+
+  private async updateWYZE(data: CommandPayload) {
+    if (this.wyze) {
+      const mac = this.formatMacAddress(data.device);
+      logger.info("MAC...", mac);
+      const device = await this.wyze.getDeviceByMac(mac);
+      if (device) {
+        logger.info("Found.");
+        let result;
+        if (data.action === "on") {
+          result = await this.wyze.turnOn(device);
+        } else {
+          result = await this.wyze.turnOff(device);
+        }
+        if (result.code !== "1") {
+          logger.error(
+            `ERROR ${result.code} ${device.nickname} ${data.action} - ${result}`
+          );
+          const reply = makeErrorMessage({
+            message: result.msg,
+            worker: this.macaddr,
+            device: data.device,
+            action: data.action,
+            code: result.code,
+            timestamp: new Date().toString(),
+          });
+          this.heldMessages.push(reply);
+        }
+      }
+    }
+  }
+
+  private updateSwitches(data: CommandPayload) {
+    logger.info("Check switches...");
+    const mac = this.formatMacAddress(data.device);
+    this.switches.forEach(plug => {
+      if (this.formatMacAddress(plug.device) === mac) {
+        if (data.action === "on") {
+          logger.info(plug.device, "on");
+          plug.on();
+        } else {
+          logger.info(plug.device, "off");
+          plug.off();
+        }
+      }
+    });
+  }
+
+  private async meterStatus(meter: Meter) {
+    const msg = makeMeterStatusMessage({
+      device: meter.device,
+      type: "meter",
+      manufacturer: meter.manufacturer,
+      temperature: meter.clime.temperature,
+      humidity: meter.clime.humidity,
+      pressure: meter.clime.vpd(),
+      timestamp: new Date().toString(),
+    });
+    this.send(msg);
+  }
+
+  private async switchStatus(switcher: Switch) {
+    const msg = makeSwitchStatusMessage({
+      device: switcher.device,
+      manufacturer: switcher.manufacturer,
+      status: switcher.state,
+      timestamp: new Date().toString(),
+    });
+    this.send(msg);
+  }
+
+  private async workerStatus() {
+    const msg = makeWorkerStatusMessage({
+      worker: this.macaddr,
+      inet: this.inet,
+      config: JSON.stringify(this.config),
+      timestamp: new Date().toString(),
+    });
+    this.send(msg);
+  }
+
+  private formatMacAddress(id: string) {
+    if (!id) {
+      return '';
+    }
+
+    if (id.length !=12 && id.length != 17) {
+      console.warn('bad format for mac address:', id);
+      return ''
+    }
+
+    // Remove all but alphanumeric characters
+    let mac = id.replace(/\W/ig, '');
+
+    // Append a colon after every two characters
+    mac = mac.replace(/(.{2})/g, "$1:");
+
+    // remove trailing colon
+    return mac.split(":").slice(0, -1).join(":");
   }
 }

@@ -21,14 +21,20 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
-  res.status(200).json(await readZone(id));
+  res.status(200).json(await readZone(parseInt(id)));
 });
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { rows } = await query<Zone>(
     "UPDATE zones SET nickname = $1, profileid = $2, active = $3, maxirrigators = $4, updatedat = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id",
-    [req.body.nickname, req.body.profileid, req.body.active, req.body.maxirrigators, id]
+    [
+      req.body.nickname,
+      req.body.profileid,
+      req.body.active,
+      req.body.maxirrigators,
+      id
+    ]
   );
   const zone = await readZone(rows[0].id);
   res.status(200).json(zone);
@@ -52,7 +58,7 @@ router.post("/:id/devices", async (req, res) => {
     console.log("ERROR", err);
   }
 
-  res.status(200).json(await readZone(id));
+  res.status(200).json(await readZone(parseInt(id)));
 });
 
 router.delete("/:id/devices/:device", async (req, res) => {
@@ -68,7 +74,7 @@ router.post("/:id/children", async (req, res) => {
   const { id } = req.params;
   await query("INSERT INTO edges (a, b) VALUES ($1, $2)", [id, req.body.child]);
 
-  res.status(200).json(await readZone(id));
+  res.status(200).json(await readZone(parseInt(id)));
 });
 
 router.delete("/:id/children/:child", async (req, res) => {

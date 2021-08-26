@@ -5,14 +5,7 @@ import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
 import {
-  createReading,
-  createStatus,
   readActiveZones,
-  registerDevice,
-  registerMeter,
-  workerStatus,
-  readDevice,
-  readMeter,
   readZone
 } from "./db";
 
@@ -26,6 +19,8 @@ import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
 import { zonedTimeToUtc } from "date-fns-tz";
+import { herbertSocket } from "./socket";
+import { makeCommandMessage } from "../shared/message-creators";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");
@@ -58,88 +53,12 @@ app.use(function(err, req, res, next) {
   next();
 });
 
-function sendError(ws: WebSocket, message: string) {
-  const messageObject = {
-    type: "ERROR",
-    payload: message
-  };
-
-  ws.send(JSON.stringify(messageObject));
-}
-
 process.env.TZ = "ETC/Utc";
 
 const server = http.createServer(app);
 server.listen(port);
 console.log("http server listening on %d", port);
-
-const wss = new WebSocket.Server({ server: server });
-console.log("websocket server created");
-
-wss.on("connection", function(ws: WebSocket) {
-  console.log("websocket connection open");
-
-  ws.on("message", async function(msg: string) {
-    console.log("ON MESSAGE", msg);
-
-    let data;
-    try {
-      data = JSON.parse(msg);
-    } catch (e) {
-      sendError(ws, e);
-      return;
-    }
-
-    if (!data.type || !data.payload) {
-      sendError(ws, "Message must specify type & payload.");
-      return;
-    }
-
-    if (data.type === "STATUS") {
-      if (data.payload.device) {
-        if (data.payload.type === "meter") {
-          await registerMeter(data.payload.device, data.payload.manufacturer);
-          const meter = await readMeter(data.payload.device);
-          console.log("Got meter", meter);
-          if (
-            meter.temperature != data.payload.temperature &&
-            meter.humidity != data.payload.humidity
-          ) {
-            createReading(
-              data.payload.device,
-              data.payload.temperature,
-              data.payload.humidity,
-              data.payload.pressure,
-              data.payload.timestamp
-            );
-          }
-        } else {
-          console.log("this must be a device");
-          console.log(data.payload);
-          await registerDevice(data.payload.device, data.payload.manufacturer);
-          const device = await readDevice(data.payload.device);
-          console.log("got device", device);
-          if (device.status != data.payload.status) {
-            createStatus(
-              data.payload.device,
-              data.payload.status,
-              data.payload.timestamp
-            );
-          }
-        }
-      } else if (data.payload.worker) {
-        console.log("Status message from worker", data.payload);
-        workerStatus(data.payload.worker, data.payload.inet);
-      }
-    }
-
-    wss.clients.forEach(client => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(msg);
-      }
-    });
-  });
-});
+herbertSocket.init(server);
 
 async function run() {
   const zones = await readActiveZones();
@@ -152,46 +71,30 @@ async function run() {
     if (zone.profile) {
       let temperature = 0;
       let humidity = 0;
-      const count = 0;
+      let count = 0;
       await Promise.all(
         zone.devices.map(async device => {
           if (device.devicetype === "meter") {
             temperature =
               (count * temperature + device.temperature) / (count + 1);
             humidity = (count * humidity + 100 * device.humidity) / (count + 1);
+            count++;
           }
         })
       );
 
-      console.log("command for zone", zone.nickname);
-      console.log("profile", zone.profile);
-      console.log("hour", hour, "temp", temperature, "humi", humidity);
-
       const now = new Date();
-      console.log("now", now);
       const ms = now.getTime();
-      console.log("ms", ms);
-
-      console.log(now.getMonth());
-      console.log(now.getDate());
-
       const monthnbr = now.getMonth() + 1;
-
       const month = monthnbr < 10 ? `0${monthnbr}` : monthnbr.toString();
       const date =
         now.getDate() < 10 ? `0${now.getDate()}` : now.getDate().toString();
-
-      console.log("month", month, "date", date);
 
       const startat = `${now.getFullYear()}-${month}-${date} ${
         zone.profile.lampstart
       }`;
 
-      console.log("startat", startat);
-
       const utc = zonedTimeToUtc(startat, zone.profile.timezone);
-
-      console.log("UTC", utc);
 
       const duration = zone.profile.lampduration["hours"];
 
@@ -200,11 +103,6 @@ async function run() {
       const blower = new BlowerTimer(
         zone.profile.bloweractive,
         zone.profile.blowercycle
-      );
-
-      const irrigator = new IrrigationTimer(
-        zone.profile.irrigationperday,
-        parseInt(zone.profile.irrigationduration)
       );
 
       let target;
@@ -250,56 +148,45 @@ async function run() {
         ["fan", 1 === 1]
       ]);
 
-      console.log("ZONE SYSTEMS!", systems);
-
       systems.forEach((value, key) => {
         zone.devices.map(device => {
           if (device.devicetype === key) {
             const action = value ? "on" : "off";
-            const data = {
-              type: "COMMAND",
-              payload: {
-                device: device.device,
-                action: action,
-                timestamp: new Date()
-              }
-            };
-            console.log("sending...", data);
-            wss.clients.forEach(client => {
-              client.send(JSON.stringify(data));
-            });
+            const msg = makeCommandMessage({
+              device: device.device,
+              action: action,
+              timestamp: new Date().toString(),
+            })
+            herbertSocket.broadcastAll(msg);
           }
         });
       });
 
-      console.log("irrigator is on?", ms, ms % 86400000, irrigator.isOn(ms % 86400000));
+      const irrigator = new IrrigationTimer(
+        parseInt(zone.profile.irrigationperday),
+        parseInt(zone.profile.irrigationduration),
+        zone.children.length,
+        parseInt(zone.maxirrigators),
+        utc.getHours()
+      );
 
-      const children = new Map([
-        ["irrigator", irrigator.isOn(ms % 86400000)]
-      ]);
+      console.log("irr", irrigator);
 
-      console.log("CHILD SYSTEMS!", children);
-
-      children.forEach(async (value, key) => {
-        zone.children.forEach(async child => {
-          const zone = await readZone(child);
-          zone.devices.forEach(device => {
-            if (device.devicetype === key) {
-              const action = value ? "on" : "off";
-              const data = {
-                type: "COMMAND",
-                payload: {
-                  device: device.device,
-                  action: action,
-                  timestamp: new Date()
-                }
-              };
-              console.log("sending...", data);
-              wss.clients.forEach(client => {
-                client.send(JSON.stringify(data));
-              });
-            }
-          });
+      let counter = 0;
+      zone.children.forEach(async child => {
+        const zone = await readZone(child);
+        zone.devices.forEach(device => {
+          if (device.devicetype === "irrigator") {
+            const action = irrigator.isOn(ms % 86400000, ++counter)
+              ? "on"
+              : "off";
+            const msg = makeCommandMessage({
+              device: device.device,
+              action: action,
+              timestamp: new Date().toString(),
+            });
+            herbertSocket.broadcastAll(msg);
+          }
         });
       });
     }

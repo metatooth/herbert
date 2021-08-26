@@ -1,6 +1,40 @@
-FROM node:14.6
+FROM node:14.17.4 as base
 
 WORKDIR /app
+
+COPY package.json package-lock.json ./
+
+RUN npm install --unsafe-perms
+
+FROM base as client
+
+COPY src/client ./src/client
+COPY src/shared src/shared
+COPY tsconfig.json \
+  tsconfig.base.json \
+  babel.config.js \
+  .eslintrc.js \
+  .eslintignore \
+  jest.config.js \
+  vue.config.js \
+  ./
+
+RUN npm run build:client
+
+CMD ["npm", "run", "serve:client"]
+
+FROM base as server
+
+COPY config ./config
+COPY src/server ./src/server
+COPY src/shared src/shared
+COPY tsconfig.json tsconfig.base.json ./
+
+RUN npm run build:server
+
+CMD ["npm", "run", "serve:server"]
+
+FROM base as worker
 
 RUN apt update \
   && apt install -y \
@@ -9,8 +43,10 @@ RUN apt update \
   libbluetooth-dev \
   libudev-dev
 
-COPY . .
+COPY src/worker ./src/worker
+COPY src/shared src/shared
+COPY tsconfig.json tsconfig.base.json ./
 
-RUN npm install --unsafe-perms
+RUN npm run build:worker
 
-RUN npm run build
+CMD ["npm", "run", "serve:worker"]

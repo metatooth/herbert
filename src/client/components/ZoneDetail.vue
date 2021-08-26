@@ -2,7 +2,7 @@
   <div :id="linkto" class="level">
     <div class="card">
       <div class="card-content">
-        <edit-text v-bind:text="zone.nickname" @edit-text="saveNickname" />
+        <edit-text :text="nickname" @edit-text="saveNickname" />
       </div>
 
       <zone-actual :zone="zone" :units="units" />
@@ -12,14 +12,14 @@
       <div class="card-content">
         <select-profile
           label="Growing"
-          v-bind:zone="zone"
+          :zone="zone"
           @select-profile="saveProfile"
         />
       </div>
 
       <div class="card-content">
         <edit-number
-          :num="zone.maxirrigators"
+          :num="maxirrigators"
           label="Max Irrigators"
           icon="cloud-rain"
           size="medium"
@@ -73,7 +73,7 @@
       <div class="card-content">
         <select-device
           label="Switches"
-          v-bind:devices="devices"
+          :devices="devices"
           @select-device="add"
         />
       </div>
@@ -114,6 +114,7 @@ const ZoneDetail = Vue.extend({
     return {
       nickname: this.zone.nickname,
       profileid: this.zone.profileid,
+      maxirrigators: this.zone.maxirrigators,
       timestamp: new Date()
     };
   },
@@ -185,9 +186,8 @@ const ZoneDetail = Vue.extend({
 
     saveNickname(nickname: string) {
       const zone = {
-        id: this.zone.id,
-        nickname: nickname,
-        profileid: this.zone.profileid
+        ...this.zone,
+        nickname: nickname
       };
 
       this.edit(zone);

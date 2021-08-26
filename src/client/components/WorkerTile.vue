@@ -9,6 +9,7 @@
             placeHolder="Name this worker"
             v-model="nickname"
             @keyup.esc="cancel"
+            @keyup.enter="save"
           />
         </span>
         <span v-else>{{ worker.nickname || worker.worker }}</span>
@@ -20,10 +21,21 @@
         <span class="tag">{{ worker.worker }}</span>
       </p>
       <div class="content">
+        <select v-if="editing" v-model="configname">
+          <option disabled value="">Select a config for this worker</option>
+          <option v-for="config in configs" :key="config.nickname">
+            {{ config.nickname}}
+          </option>
+        </select>
+        <div class="is-family-code">
+          {{ worker.configname }} : {{ worker.config }}
+        </div>
+      </div>
+      <div class="content">
         <span class="is-family-code">{{ worker.inet }}</span>
       </div>
       <div class="content">
-        <timestamp :timestamp="lastupdate" :readable="readable" />
+        <timestamp :timestamp="timestamp" :readable="readable" />
       </div>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
     </div>
@@ -36,7 +48,7 @@ import Vue from "vue";
 import EditControls from "@/components/EditControls.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import { Worker } from "@/store/workers/types";
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 const WorkerTile = Vue.extend({
   props: {
@@ -46,6 +58,9 @@ const WorkerTile = Vue.extend({
   data() {
     return {
       nickname: this.worker.nickname,
+      configname: this.worker.configname,
+      timestamp: new Date(Date.parse(this.worker.updatedat)),
+      config: JSON.stringify(this.worker.config),
       readable: true,
       editing: false
     };
@@ -56,6 +71,13 @@ const WorkerTile = Vue.extend({
     Timestamp
   },
 
+  computed: {
+    lastupdate() {
+      return new Date(Date.parse(this.worker.updatedat));
+    },
+    ...mapState("configs", ["configs"])
+  },
+
   methods: {
     editable() {
       this.editing = true;
@@ -64,17 +86,19 @@ const WorkerTile = Vue.extend({
     save() {
       this.edit({
         ...this.worker,
-        nickname: this.nickname
+        nickname: this.nickname,
+        configname: this.configname,
       });
       this.editing = false;
     },
 
     cancel() {
       this.nickname = this.worker.nickname;
+      this.configname = this.worker.configname;
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit"])
+    ...mapActions("workers", ["edit"]),
   }
 });
 

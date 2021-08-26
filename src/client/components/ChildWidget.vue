@@ -7,11 +7,11 @@
       <span class="tag is-medium has-background-success has-text-dark">
         <router-link
           :to="{
-               name: 'zone',
-               hash: linkto,
-               params: { id: child.id }
-               }"
-          >
+            name: 'zone',
+            hash: linkto,
+            params: { id: child.id }
+          }"
+        >
           {{ child.nickname }}
         </router-link>
         <button class="delete" v-on:click="remove(child.id)" />

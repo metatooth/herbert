@@ -1,0 +1,50 @@
+- hosts: databases
+  become: yes
+
+  vars:
+    postgresql_auth_method: scram-sha-256
+    postgresql_global_config_options:
+      - option: listen_addresses
+        value: '*'
+      - option: password_encryption
+        value: "{{ postgresql_auth_method }}"
+    postgresql_databases:
+      - name: "{{dbname}}"
+        owner: "{{dbuser}}"
+    postgresql_users:
+      - name: "{{dbuser}}"
+        db: "{{dbname}}"
+        password: "{{dbpass}}"
+        role_attr_flags: CREATEDB,CREATEROLE
+        priv: ALL
+    postgresql_hba_entries:
+      - {type: local, database: all, user: postgres, auth_method: peer}
+      - {type: local, database: all, user: all, auth_method: peer}
+      - {type: host, database: all, user: all, address: '127.0.0.1/32', auth_method: "{{ postgresql_auth_method }}"}
+      - {type: host, database: all, user: all, address: '::1/128', auth_method: "{{ postgresql_auth_method }}"}
+      - {type: host, database: "{{dbname}}", user: "{{dbuser}}", address: "{{db_allowed_cidr}}", auth_method: "{{ postgresql_auth_method }}"}
+
+  tasks:
+    - name: Install System Dependencies
+      include_role:
+        name: geerlingguy.postgresql
+
+    - name: Sync init scripts
+      become: no
+      synchronize:
+        src: ../../scripts/db
+        dest: "/home/{{ansible_user}}"
+
+    - name: Find sql files
+      find:
+        paths: "/home/{{ansible_user}}/db"
+        patterns: "*.sql"
+      register: sql_glob
+
+    - name: Initialize Database
+      become: no
+      command: "psql -U {{dbuser}} -h localhost -d {{dbname}} -f {{item}} -w"
+      environment:
+        PGPASSWORD: "{{dbpass}}"
+      with_items:
+        - "{{sql_glob.files | map(attribute='path') | sort}}"

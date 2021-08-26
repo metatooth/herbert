@@ -1,7 +1,9 @@
 import Router from "express-promise-router";
 import WebSocket from "ws";
+import { makeCommandMessage } from "../../shared/message-creators";
 import { Device } from "../../shared/types";
 import { query, readDevice, readDevices } from "../db";
+import { herbertSocket } from '../socket';
 
 const router = Router();
 
@@ -27,25 +29,13 @@ router.put("/:id", async (req, res) => {
 router.put("/:id/:action", async (req, res) => {
   const { id, action } = req.params;
   const device = await readDevice(id);
-
-  const url = `ws://localhost:${process.env.PORT || 5000}`;
-  const ws = new WebSocket(url);
-
-  ws.addEventListener("open", ev => {
-    console.log("event", ev);
-    const data = {
-      type: "COMMAND",
-      payload: {
-        device: device.device,
-        action: action,
-        timestamp: new Date()
-      }
-    };
-
-    ws.send(JSON.stringify(data));
-  });
-
-  res.status(200).json(device);
+  const cmd = makeCommandMessage({
+    device: device.device,
+    action: action,
+    timestamp: new Date().toString(),
+  })
+  herbertSocket.sendByDeviceID(device.device, cmd);
+  res.status(200);
 });
 
 router.delete("/:id", async (req, res) => {

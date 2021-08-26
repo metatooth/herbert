@@ -3,7 +3,7 @@
     <div class="tile is-child box">
       <div class="title">
         <span v-if="editing">
-          <div class="field is-grouped">
+          <div class="field is-grouped is-grouped-multiline">
             <div class="control">
               <input
                 class="input"
