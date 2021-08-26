@@ -4,10 +4,7 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import {
-  readActiveZones,
-  readZone
-} from "./db";
+import { readActiveZones, readZone } from "./db";
 
 import path from "path";
 import favicon from "serve-favicon";
@@ -155,8 +152,8 @@ async function run() {
             const msg = makeCommandMessage({
               device: device.device,
               action: action,
-              timestamp: new Date().toString(),
-            })
+              timestamp: new Date().toString()
+            });
             herbertSocket.broadcastAll(msg);
           }
         });
@@ -183,7 +180,7 @@ async function run() {
             const msg = makeCommandMessage({
               device: device.device,
               action: action,
-              timestamp: new Date().toString(),
+              timestamp: new Date().toString()
             });
             herbertSocket.broadcastAll(msg);
           }

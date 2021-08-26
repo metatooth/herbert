@@ -9,28 +9,28 @@ beforeEach(() => {
   server = new WebSocket.Server({
     port: 5000
   });
-  server.on('connection', (ws: WebSocket) => {
-    ws.on('message', (msg) => {
+  server.on("connection", (ws: WebSocket) => {
+    ws.on("message", msg => {
       const data = JSON.parse(msg.toString());
-      if (data.type === 'REGISTER') {
+      if (data.type === "REGISTER") {
         const config = JSON.stringify({
           devices: [
             {
               id: "aaaaaabbbbbb",
-              manufacturer: 'mockmeter',
-            },
-          ],
+              manufacturer: "mockmeter"
+            }
+          ]
         });
         const returnMsg = {
-          type: 'CONFIGURE',
+          type: "CONFIGURE",
           payload: {
             worker: data.payload.worker,
-            config,
-          },
+            config
+          }
         };
         ws.send(JSON.stringify(returnMsg));
       }
-    })
+    });
   });
 
   app = new App();
@@ -42,8 +42,8 @@ afterEach(() => {
 });
 
 test("does run", async () => {
-  app.macaddr = '98765';
-  app.inet = '172.10.10.10';
+  app.macaddr = "98765";
+  app.inet = "172.10.10.10";
   await app.init();
   app.run().then(() => {
     expect(true).toBe(true);
@@ -51,8 +51,8 @@ test("does run", async () => {
 });
 
 test("successfully initializes", () => {
-  app.macaddr = '123456';
-  app.inet = '172.20.20.20';
+  app.macaddr = "123456";
+  app.inet = "172.20.20.20";
 
   return app.init().then(() => {
     expect(true).toBe(true);

@@ -1,12 +1,12 @@
 import config from "config";
 import http from "http";
-import WebSocket from 'ws';
+import WebSocket from "ws";
 import {
   makeConfigureMessage,
   makeErrorMessage,
   makeMeterStatusMessage,
   makeSwitchStatusMessage,
-  makeWorkerRegisterMessage,
+  makeWorkerRegisterMessage
 } from "../shared/message-creators";
 import { AnySocketMessage } from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/util";
@@ -28,7 +28,7 @@ interface CustomSocket extends WebSocket {
 
 class HerbertSocket {
   private static instance: HerbertSocket;
-  private wss: WebSocket.Server
+  private wss: WebSocket.Server;
   private initialized = false;
 
   constructor() {
@@ -38,14 +38,14 @@ class HerbertSocket {
 
   public init(server: http.Server) {
     if (!this.initialized) {
-      this.wss =  new WebSocket.Server({ server });
+      this.wss = new WebSocket.Server({ server });
       this.wss.on("connection", this.onConnection);
       this.initialized = true;
     }
   }
 
   public broadcastAll(msg: AnySocketMessage) {
-    this.wss.clients.forEach((c) => {
+    this.wss.clients.forEach(c => {
       if (c.readyState === WebSocket.OPEN) {
         this.send(c, msg);
       }
@@ -53,7 +53,7 @@ class HerbertSocket {
   }
 
   public sendByDeviceID(deviceID: string, msg: AnySocketMessage) {
-    this.wss.clients.forEach((c) => {
+    this.wss.clients.forEach(c => {
       if ((c as CustomSocket).devices.has(deviceID.toLowerCase())) {
         c.send(JSON.stringify(msg));
       }
@@ -61,7 +61,7 @@ class HerbertSocket {
   }
 
   public sendToWorker(workerID: string, msg: AnySocketMessage) {
-    this.wss.clients.forEach((c) => {
+    this.wss.clients.forEach(c => {
       if ((c as CustomSocket).id === workerID.toLowerCase()) {
         c.send(JSON.stringify(msg));
       }
@@ -80,19 +80,19 @@ class HerbertSocket {
     const msg = makeConfigureMessage({
       worker: worker.worker,
       config: JSON.stringify(worker.config),
-      timestamp: new Date().toString(),
+      timestamp: new Date().toString()
     });
 
     this.sendToWorker(id, msg);
   }
 
   private onConnection = (ws: WebSocket) => {
-    console.log('websocket connection open');
+    console.log("websocket connection open");
     (ws as CustomSocket).id = "";
     (ws as CustomSocket).devices = new Set<string>();
     const onMessage = this.getOnMessageFunc(ws);
-    ws.on('message', onMessage);
-  }
+    ws.on("message", onMessage);
+  };
 
   private readonly getOnMessageFunc = (ws: WebSocket) => {
     return (msg: string) => {
@@ -119,13 +119,13 @@ class HerbertSocket {
           client.send(msg);
         }
       });
-    }
-  }
+    };
+  };
 
   private sendError(ws: WebSocket, message: string) {
     const messageObject = makeErrorMessage({
       message,
-      timestamp: new Date().toString(),
+      timestamp: new Date().toString()
     });
 
     this.send(ws, messageObject);
@@ -146,16 +146,16 @@ class HerbertSocket {
         const diff =
           Date.parse(msg.payload.timestamp) - meter.timestamp.getTime();
         if (
-            meter.temperature != msg.payload.temperature ||
-            meter.humidity != msg.payload.humidity ||
-            diff > limit
+          meter.temperature != msg.payload.temperature ||
+          meter.humidity != msg.payload.humidity ||
+          diff > limit
         ) {
           createReading(
             msg.payload.device,
             msg.payload.temperature,
             msg.payload.humidity,
             msg.payload.pressure,
-            new Date(msg.payload.timestamp),
+            new Date(msg.payload.timestamp)
           );
         }
       }
@@ -173,7 +173,7 @@ class HerbertSocket {
           createStatus(
             msg.payload.device,
             msg.payload.status,
-            new Date(msg.payload.timestamp),
+            new Date(msg.payload.timestamp)
           );
         }
       }
@@ -182,15 +182,12 @@ class HerbertSocket {
 
     if (messageIsFrom(makeWorkerRegisterMessage, msg)) {
       (ws as CustomSocket).id = msg.payload.worker.toLowerCase();
-      await registerWorker(
-        msg.payload.worker,
-        msg.payload.inet,
-      );
+      await registerWorker(msg.payload.worker, msg.payload.inet);
       this.sendWorkerConfig(msg.payload.worker);
-      return
+      return;
     }
 
-    console.warn('unhandled message type', msg.type);
+    console.warn("unhandled message type", msg.type);
   }
 }
 

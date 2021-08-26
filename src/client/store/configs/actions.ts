@@ -9,7 +9,7 @@ export const actions: ActionTree<ConfigState, RootState> = {
       commit("ADD", Object.assign(new Config(), res.data));
     });
   },
-  edit({ commit }, payload: Config & {currentName: string}) {
+  edit({ commit }, payload: Config & { currentName: string }) {
     HTTP.put(`/configs/${payload.currentName}`, payload).then(response => {
       commit("EDIT", Object.assign(new Config(), response.data));
     });

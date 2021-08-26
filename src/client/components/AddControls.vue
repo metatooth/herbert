@@ -1,11 +1,6 @@
 <template>
   <div class="field is-grouped is-grouped-center">
-    <herbert-button
-      color="info"
-      icon="plus"
-      :show="!adding"
-      @on-click="on"
-    />
+    <herbert-button color="info" icon="plus" :show="!adding" @on-click="on" />
     <herbert-button
       color="success"
       icon="check"
