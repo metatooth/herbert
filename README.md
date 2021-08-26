@@ -8,7 +8,7 @@ Using Ubuntu 20.04 or Raspberry Pi OS Lite 5.10 2021-05-07
 
 ```
 $ sudo apt remove npm nodejs
-$ curl -sL https://deb.nodesource.com/setup_16.x | sudo bash -
+$ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 $ sudo apt-get install -y nodejs
 $ sudo apt-get install -y git bluetooth bluez libbluetooth-dev libudev-dev
 $ git clone https://github.com/metatooth/herbert.git
