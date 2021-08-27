@@ -1,4 +1,3 @@
-import WebSocket from "ws";
 import config from "config";
 import express from "express";
 import cors from "cors";
@@ -16,7 +15,7 @@ import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
 import { zonedTimeToUtc } from "date-fns-tz";
-import { herbertSocket } from "./socket";
+import { herbertSocket } from "./herbert-socket";
 import { makeCommandMessage } from "../shared/message-creators";
 
 const app = express();
@@ -59,6 +58,7 @@ herbertSocket.init(server);
 
 async function run() {
   const zones = await readActiveZones();
+  console.log("active zones", zones);
   zones.forEach(async zone => {
     const now = new Date();
     const hour = now.getUTCHours();
@@ -70,13 +70,11 @@ async function run() {
       let humidity = 0;
       let count = 0;
       await Promise.all(
-        zone.devices.map(async device => {
-          if (device.devicetype === "meter") {
-            temperature =
-              (count * temperature + device.temperature) / (count + 1);
-            humidity = (count * humidity + 100 * device.humidity) / (count + 1);
-            count++;
-          }
+        zone.meters.map(meter => {
+          temperature =
+            (count * temperature + 1 * meter.temperature) / (count + 1);
+          humidity = (count * humidity + 100 * meter.humidity) / (count + 1);
+          count++;
         })
       );
 
