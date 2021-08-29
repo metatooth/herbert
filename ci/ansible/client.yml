@@ -1,46 +1,57 @@
 - hosts: clients
-  become: yes
 
   vars:
-    - buildDir: "/etc/opt"
-    - appDir: "{{ buildDir }}/herbert"
-    - nodejs_version: "14.x"
-    - nodejs_package_json_path: "{{appDir}}"
-    - service_description: "Herbert client dashboard service"
+    - nodejs_version: '14.x'
+    - service_description: 'Herbert client dashboard service'
     - service_user: root
     - service_file: index.js
 
   tasks:
-    - name: Git Clone Repo
-      become: no
-      when: herbert_version != "local"
-      git:
-        repo: https://github.com/metatooth/herbert.git
-        dest: "{{appDir}}"
-        version: "{{herbert_version}}"
-        force: yes
+    - name: Create {{ appDir }}
+      file:
+        path: '{{ appDir }}'
+        state: directory
 
-    - name: Sync local herbert repo
-      become: no
-      when: herbert_version == "local"
+    - name: Create {{ appDir }}/dist
+      file:
+        path: '{{ appDir }}/dist'
+        state: directory
+
+    - name: Sync herbert dist
       synchronize:
-        src: ../../../herbert
-        dest: "{{buildDir}}"
+        src: '{{ distDir }}/client'
+        dest: '{{ appDir }}/dist'
+        recursive: yes
+        delete: yes
 
-    - name: Install nodejs {{nodejs_version}} and node_modules
-      when: herbert_version != "local"
+    - name: Sync index.js
+      synchronize:
+        src: '{{ srcDir }}/index.js'
+        dest: '{{ appDir }}'
+
+    - name: Sync herbert package.json
+      synchronize:
+        src: '{{ srcDir }}/package.json'
+        dest: '{{ appDir }}'
+
+    - name: Sync herbert package-lock.json
+      synchronize:
+        src: '{{ srcDir }}/package-lock.json'
+        dest: '{{ appDir }}'
+
+    - name: Install nodejs {{nodejs_version}}
       include_role:
         name: geerlingguy.nodejs
 
-    - name: Build client
-      become: no
-      when: herbert_version != "local"
-      command: "chdir={{appDir}} npm run build:client"
+    - name: Install production node_modules
+      command: npm install
+      args:
+        chdir: '{{ appDir }}'
       environment:
-        VUE_APP_WS_URL: "ws://{{api_host}}:{{api_port}}"
-        VUE_APP_API_URL: "http://{{api_host}}:{{api_port}}"
+        NODE_ENV: production
 
     - name: Install client service
+      become: yes
       template:
         src: ./templates/systemd-service.j2
         dest: /etc/systemd/system/herbert-client.service
@@ -49,6 +60,7 @@
         mode: '0644'
 
     - name: Enable and start herbert-client service
+      become: yes
       systemd:
         name: herbert-client
         state: restarted

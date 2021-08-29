@@ -1,18 +1,14 @@
 - hosts: workers
-  become: yes
 
   vars:
-    - buildDir: "/etc/opt"
-    - appDir: "{{buildDir}}/herbert"
-    - nodejs_version: "14.x"
-    - nodejs_package_json_path: "{{appDir}}"
-    - service_description: "Herbert in-room worker service"
+    - nodejs_version: '14.x'
+    - service_description: 'Herbert in-room worker service'
     - service_user: root
     - service_file: dist/worker/main.js
-    - node_env: "{{config_name}}"
 
   tasks:
     - name: Install System Dependencies
+      become: yes
       apt: name={{ item }} update_cache=yes state=latest
       with_items:
         - bluetooth
@@ -24,33 +20,60 @@
         - g++
         - make
 
-    - name: Git Clone Repo
-      become: no
-      when: herbert_version != "local"
-      git:
-        repo: https://github.com/metatooth/herbert.git
-        dest: "{{appDir}}"
-        version: "{{herbert_version}}"
-        force: yes
+    - name: Create {{ appDir }}
+      file:
+        path: '{{ appDir }}'
+        state: directory
 
-    - name: Sync local herbert repo
-      become: no
-      when: herbert_version == "local"
+    - name: Create {{ appDir }}/dist
+      file:
+        path: '{{ appDir }}/dist'
+        state: directory
+
+    - name: Sync herbert dist
       synchronize:
-        src: ../../../herbert
-        dest: "{{buildDir}}"
+        src: '{{ distDir }}/worker'
+        dest: '{{ appDir }}/dist'
+        recursive: yes
+        delete: yes
 
-    - name: Install nodejs {{nodejs_version}} and node_modules
-      when: herbert_version != "local"
+    - name: Sync herbert shared
+      synchronize:
+        src: '{{ distDir }}/shared'
+        dest: '{{ appDir }}/dist'
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert config
+      synchronize:
+        src: '{{ srcDir }}/config'
+        dest: '{{ appDir }}'
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert package.json
+      synchronize:
+        src: '{{ srcDir }}/package.json'
+        dest: '{{ appDir }}'
+
+    - name: Sync herbert package-lock.json
+      synchronize:
+        src: '{{ srcDir }}/package-lock.json'
+        dest: '{{ appDir }}'
+
+    - name: Install nodejs {{nodejs_version}}
       include_role:
         name: geerlingguy.nodejs
 
-    - name: Build worker
-      become: no
-      when: herbert_version != "local"
-      command: "chdir={{appDir}} npm run build:worker"
+    - name: Install production node_modules
+      command: npm install
+      args:
+        chdir: '{{ appDir }}'
+      environment:
+        NODE_ENV: production
 
     - name: Install worker service
+      become: yes
       template:
         src: ./templates/systemd-service.j2
         dest: /etc/systemd/system/herbert-worker.service
@@ -59,6 +82,7 @@
         mode: '0644'
 
     - name: Enable and start herbert-worker service
+      become: yes
       systemd:
         name: herbert-worker
         state: restarted

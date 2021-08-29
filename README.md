@@ -85,16 +85,31 @@ create an inventory file. A sample inventory file has been provided in
 `ci/ansible/inventory`.
 
 - Set the SSH user, password, ans herbert_version in the [all:vars] section
-    - If you want to deploy a local version of herbert, set
-      `herbert_version=local`
-- Add IPs / hosts for databases
+- Add hosts for databases
     - Set vars listed under [databases:vars]
-- Add IPs / hosts for servers
-    - Set the vars listed under [servers:vars]
-- Add IPs / hosts for clients
-    - Set the vars listed under [clients:vars]
-- Add IPs / hosts for workers
-    - Set config_path and config_name per worker IP
+
+## Deployment Version
+
+Deployment is performed using the `ci/Makefile` and `make` command. To choose
+the version of hebert to deploy, you must set the `HERBERT_BRANCH` var. See
+examples below.
+
+```bash
+# deploy tagged version 0.18.0
+cd ci && make deploy-all HERBERT_BRANCH=0.18.0
+
+# deploy main branch to only workers
+cd ci && make deploy-workers HERBERT_BRANCH=main
+
+# deploy local changes in current working directory to only servers
+cd ci && make deploy-servers HERBERT_BRANCH=local
+
+# deploy develop branch to only clients
+cd ci && make deploy-clients HERBERT_BRANCH=develop
+
+# deploy to only databases (No need to set HERBERT_BRANCH here)
+cd ci && make deploy-databases
+```
 
 ## Database Deployment
 
@@ -102,10 +117,10 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image database using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
-    - Add database IP under `[databases]` section
+    - Add database hosts under `[databases]` section
     - Set vars under `[databases:vars]` section
 - Run ansible databases deployment
-    - `cd ci/ansible && ansible-playbook -i inventory database.yml`
+    - `cd ci && make deploy-databases`
 
 ## Server Deployment
 
@@ -113,23 +128,19 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image server using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
-    - Add server IP under `[servers]` section
-    - Set vars under `[servers:vars]` section
+    - Add server hosts under `[servers]` section
 - Run ansible servers deployment
-    - `cd ci/ansible && ansible-playbook -i inventory server.yml`
+    - `cd ci && make deploy-servers HERBERT_BRANCH=<branch_or_tag>`
 
 ## Worker Deployment
 
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image worker using `scripts/reimage.sh` script
-- Create configuration json file for worker
 - Update `ci/ansible/inventory`
-    - Add worker IP under `[workers]` section
-    - Set `config_path` and `config_name` for this worker
-    - Set vars under `[workers:vars]` section
+    - Add worker hosts under `[workers]` section
 - Run ansible workers deployment
-    - `cd ci/ansible && ansible-playbook -i inventory worker.yml`
+    - `cd ci && make deploy-workers HERBERT_BRANCH=<branch_or_tag>`
 
 Deploying to a single worker via ansible can be accomplished via the following:
 
@@ -138,19 +149,15 @@ cd ci/ansible
 ansible-playbook --limit <target_worker_host_ip> worker.yml
 ```
 
-TODO: In the future we can probably use a jinja2 template for configs similar
-to what we are doing for service definition files now
-
 ## Client Deployment
 
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image client using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
-    - Add client IP under `[clients]` section
-    - Set vars under `[clients:vars]` section
+    - Add client hosts under `[clients]` section
 - Run ansible clients deployment
-    - `cd ci/ansible && ansible-playbook -i inventory client.yml`
+    - `cd ci && make deploy-clients HERBERT_BRANCH=<branch_or_tag>`
 
 ## Deployment Logs
 Logs for production deployments are all managed by journald. Each service's
@@ -178,6 +185,13 @@ Bring up all containers
 make docker
 make up
 # Then navigate to http://localhost:8080 in your browser
+```
+
+Scale up workers
+
+```bash
+# Create 3 worker containers
+make scale-workers NUM_WORKERS=3
 ```
 
 Tear down all containers
