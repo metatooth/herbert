@@ -2,7 +2,7 @@
   <div id="overview">
     <section class="section">
       <div class="tile is-ancestor">
-        <div class="tile" v-if="zonesCount === 0">
+        <div class="tile" v-if="activeCount === 0">
           <p class="title has-text-centered">No zones!</p>
         </div>
         <div class="tile is-4 is-vertical">
@@ -42,17 +42,31 @@ import { Notification } from "@/store/notifications/types";
 import ZoneTile from "@/components/ZoneTile.vue";
 
 const Overview = Vue.extend({
+  props: {
+    filter: String
+  },
+
   components: {
     NotificationTile,
     ZoneTile
   },
 
   computed: {
+    activeSet() {
+      return this.zones.filter(el => {
+        return el.nickname.match(this.filter);
+      });
+    },
+
+    activeCount() {
+      return this.activeSet.length;
+    },
+
     left() {
       const zones = [];
-      for (let i = 0; i < this.zonesCount; i = i + 3) {
-        if (this.zones[i]) {
-          zones.push(this.zones[i]);
+      for (let i = 0; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          zones.push(this.activeSet[i]);
         }
       }
       return zones;
@@ -60,9 +74,9 @@ const Overview = Vue.extend({
 
     middle() {
       const zones = [];
-      for (let i = 1; i < this.zonesCount; i = i + 3) {
-        if (this.zones[i]) {
-          zones.push(this.zones[i]);
+      for (let i = 1; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          zones.push(this.activeSet[i]);
         }
       }
       return zones;
@@ -70,21 +84,16 @@ const Overview = Vue.extend({
 
     right() {
       const zones = [];
-      for (let i = 2; i < this.zonesCount; i = i + 3) {
-        if (this.zones[i]) {
-          zones.push(this.zones[i]);
+      for (let i = 2; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          zones.push(this.activeSet[i]);
         }
       }
       return zones;
     },
 
-    ...mapGetters("meters", ["meters", "metersCount"]),
-    ...mapGetters("devices", ["devices", "devicesCount"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
-    ...mapGetters("profiles", ["profilesCount"]),
-    ...mapGetters("workers", ["workersCount"]),
-    ...mapGetters("zones", ["zones", "zonesCount"]),
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("zones", ["zones"])
   },
 
   mounted() {

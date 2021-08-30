@@ -1,7 +1,7 @@
 <template>
   <section class="sectioon">
     <div class="level">
-      <span class="title">{{ devicesCount }} {{ devicesName }}</span>
+      <span class="title">{{ activeCount }} {{ devicesName }}</span>
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
@@ -44,11 +44,17 @@ const Devices = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("devices", ["devices", "devicesCount"]),
+    ...mapGetters("devices", ["devices"]),
 
     activeSet() {
       return this.devices.filter(el => {
-        return true;
+        if (el.nickname) {
+          if (el.nickname.match(this.filter)) {
+            return true;
+          }
+        }
+
+        return el.device.match(this.filter);
       });
     },
 
@@ -67,8 +73,8 @@ const Devices = Vue.extend({
     left() {
       const devices = [];
       for (let i = 0; i < this.activeCount; i = i + 3) {
-        if (this.devices[i]) {
-          devices.push(this.devices[i]);
+        if (this.activeSet[i]) {
+          devices.push(this.activeSet[i]);
         }
       }
       return devices;
@@ -77,8 +83,8 @@ const Devices = Vue.extend({
     middle() {
       const devices = [];
       for (let i = 1; i < this.activeCount; i = i + 3) {
-        if (this.devices[i]) {
-          devices.push(this.devices[i]);
+        if (this.activeSet[i]) {
+          devices.push(this.activeSet[i]);
         }
       }
       return devices;
@@ -87,8 +93,8 @@ const Devices = Vue.extend({
     right() {
       const devices = [];
       for (let i = 2; i < this.activeCount; i = i + 3) {
-        if (this.devices[i]) {
-          devices.push(this.devices[i]);
+        if (this.activeSet[i]) {
+          devices.push(this.activeSet[i]);
         }
       }
       return devices;

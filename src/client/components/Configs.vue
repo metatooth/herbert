@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <div class="level">
-      <span class="title">{{ configsCount }} {{ configsName }}</span>
+      <span class="title">{{ activeCount }} {{ configsName }}</span>
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
@@ -52,6 +52,10 @@ import ConfigTile from "@/components/ConfigTile.vue";
 import { mapActions, mapGetters } from "vuex";
 
 const Configs = Vue.extend({
+  props: {
+    filter: String
+  },
+
   components: {
     AddControls,
     ConfigTile
@@ -66,10 +70,20 @@ const Configs = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("configs", ["configs", "configsCount"]),
+    ...mapGetters("configs", ["configs"]),
+
+    activeSet() {
+      return this.configs.filter(el => {
+        return el.nickname.match(this.filter);
+      });
+    },
+
+    activeCount() {
+      return this.activeSet.length;
+    },
 
     configsName(): string {
-      if (this.configsCount === 1) {
+      if (this.activeCount === 1) {
         return "Config";
       } else {
         return "Configs";
@@ -78,9 +92,9 @@ const Configs = Vue.extend({
 
     left() {
       const configs = [];
-      for (let i = 0; i < this.configsCount; i = i + 3) {
-        if (this.configs[i]) {
-          configs.push(this.configs[i]);
+      for (let i = 0; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          configs.push(this.activeSet[i]);
         }
       }
       return configs;
@@ -88,9 +102,9 @@ const Configs = Vue.extend({
 
     middle() {
       const configs = [];
-      for (let i = 1; i < this.configsCount; i = i + 3) {
-        if (this.configs[i]) {
-          configs.push(this.configs[i]);
+      for (let i = 1; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          configs.push(this.activeSet[i]);
         }
       }
       return configs;
@@ -98,9 +112,9 @@ const Configs = Vue.extend({
 
     right() {
       const configs = [];
-      for (let i = 2; i < this.configsCount; i = i + 3) {
-        if (this.configs[i]) {
-          configs.push(this.configs[i]);
+      for (let i = 2; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          configs.push(this.activeSet[i]);
         }
       }
       return configs;

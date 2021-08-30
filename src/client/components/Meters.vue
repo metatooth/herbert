@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <div class="level">
-      <span class="title">{{ metersCount }} {{ metersName }}</span>
+      <span class="title">{{ activeCount }} {{ metersName }}</span>
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
@@ -24,6 +24,7 @@ import { mapGetters } from "vuex";
 
 const Meters = Vue.extend({
   props: {
+    filter: String,
     units: String
   },
 
@@ -32,10 +33,26 @@ const Meters = Vue.extend({
   },
 
   computed: {
-    ...mapGetters("meters", ["meters", "metersCount"]),
+    ...mapGetters("meters", ["meters"]),
+
+    activeSet() {
+      return this.meters.filter(el => {
+        if (el.nickname) {
+          if (el.nickname.match(this.filter)) {
+            return true;
+          }
+        }
+
+        return el.device.match(this.filter);
+      });
+    },
+
+    activeCount() {
+      return this.activeSet.length;
+    },
 
     metersName() {
-      if (this.metersCount === 1) {
+      if (this.activeCount === 1) {
         return "Meter";
       } else {
         return "Meters";
@@ -44,9 +61,9 @@ const Meters = Vue.extend({
 
     left() {
       const meters = [];
-      for (let i = 0; i < this.metersCount; i = i + 3) {
-        if (this.meters[i]) {
-          meters.push(this.meters[i]);
+      for (let i = 0; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          meters.push(this.activeSet[i]);
         }
       }
       return meters;
@@ -54,9 +71,9 @@ const Meters = Vue.extend({
 
     middle() {
       const meters = [];
-      for (let i = 1; i < this.metersCount; i = i + 3) {
-        if (this.meters[i]) {
-          meters.push(this.meters[i]);
+      for (let i = 1; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          meters.push(this.activeSet[i]);
         }
       }
       return meters;
@@ -64,9 +81,9 @@ const Meters = Vue.extend({
 
     right() {
       const meters = [];
-      for (let i = 2; i < this.metersCount; i = i + 3) {
-        if (this.meters[i]) {
-          meters.push(this.meters[i]);
+      for (let i = 2; i < this.activeCount; i = i + 3) {
+        if (this.active[i]) {
+          meters.push(this.activeSet[i]);
         }
       }
       return meters;

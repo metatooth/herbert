@@ -19,19 +19,6 @@ export class Zone {
   deletedat?: Date;
   active: boolean;
 
-  constructor() {
-    this.id = 0;
-    this.nickname = "";
-    this.maxirrigators = 3;
-    this.devices = [];
-    this.meters = [];
-    this.children = [];
-    this.createdat = new Date();
-    this.updatedat = new Date();
-    this.deleted = false;
-    this.active = true;
-  }
-
   isDay(timestamp: Date): boolean {
     let day = true;
 
@@ -83,7 +70,7 @@ export class Zone {
     let result = 0;
     if (this.meters.length !== 0) {
       this.meters.forEach(meter => {
-        result = result + meter.temperature;
+        result = result + parseFloat(meter.temperature);
       });
       result = result / this.meters.length;
     }
@@ -94,7 +81,7 @@ export class Zone {
     let result = 0;
     if (this.meters.length !== 0) {
       this.meters.forEach(meter => {
-        result = result + meter.humidity;
+        result = result + parseFloat(meter.humidity);
       });
       result = result / this.meters.length;
     }

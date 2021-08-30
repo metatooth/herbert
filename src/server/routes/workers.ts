@@ -37,7 +37,7 @@ router.put("/:id", async (req, res) => {
   );
 
   await herbertSocket.sendWorkerConfig(id);
-  res.status(200).json(rows[0]);
+  res.status(200).json(await readWorker(rows[0].worker));
 });
 
 export default router;

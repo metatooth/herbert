@@ -123,13 +123,17 @@
       </div>
     </nav>
     <section class="section">
-      <overview v-if="is('overview')" @child-picked="pick" />
+      <overview v-if="is('overview')" :filter="filter" @child-picked="pick" />
       <devices v-if="is('devices')" :filter="filter" />
-      <meters v-if="is('meters')" :units="settings.units" />
-      <profiles v-if="is('profiles')" :units="settings.units" />
-      <workers v-if="is('workers')" />
-      <configs v-if="is('configs')" />
-      <zones v-if="is('zones')" :units="settings.units" />
+      <meters v-if="is('meters')" :filter="filter" :units="settings.units" />
+      <profiles
+        v-if="is('profiles')"
+        :filter="filter"
+        :units="settings.units"
+      />
+      <workers v-if="is('workers')" :filter="filter" />
+      <configs v-if="is('configs')" :filter="filter" />
+      <zones v-if="is('zones')" :filter="filter" :units="settings.units" />
       <settings-page
         v-if="is('settings')"
         :settings="settings"
@@ -221,6 +225,7 @@ const Dashboard = Vue.extend({
 
     pick(section: string) {
       this.picked = section;
+      this.filter = "";
       if (this.picked !== "overview") {
         this.$refs.navbarBurger.classList.toggle("is-active");
         this.$refs.navMenuIndex.classList.toggle("is-active");

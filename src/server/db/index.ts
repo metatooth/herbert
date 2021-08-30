@@ -71,6 +71,7 @@ export async function readZone(id: number) {
 
   if (devices.rowCount > 0) {
     devices.rows.forEach(row => {
+      console.log("ZONE HAS", row.device);
       promises.push(readDevice(row.device));
     });
   }

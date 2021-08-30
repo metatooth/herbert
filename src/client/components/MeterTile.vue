@@ -23,7 +23,10 @@
         <meter-actual :meter="meter" />
       </div>
       <div class="content">
-        <timestamp :timestamp="meter.updatedat" :readable="readable" />
+        <timestamp
+          :timestamp="new Date(meter.updatedat)"
+          :readable="readable"
+        />
       </div>
       <div class="content">
         <router-link

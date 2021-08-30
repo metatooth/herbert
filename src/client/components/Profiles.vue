@@ -1,6 +1,6 @@
 <template>
   <section class="section">
-    <span class="title">{{ profilesCount }} {{ profilesName }}</span>
+    <span class="title">{{ activeCount }} {{ profilesName }}</span>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
         <profile-tile
@@ -67,6 +67,10 @@ import {
 } from "../../shared/utils";
 
 const Profiles = Vue.extend({
+  props: {
+    filter: String
+  },
+
   data() {
     return {
       profile: "",
@@ -87,11 +91,29 @@ const Profiles = Vue.extend({
   },
 
   computed: {
+    activeSet() {
+      return this.profiles.filter(el => {
+        return el.profile.match(this.filter);
+      });
+    },
+
+    activeCount() {
+      return this.activeSet.length;
+    },
+
+    profilesName(): string {
+      if (this.activeCount === 1) {
+        return "Profile";
+      } else {
+        return "Profiles";
+      }
+    },
+
     left() {
       const profiles = [];
-      for (let i = 0; i < this.profilesCount; i = i + 3) {
-        if (this.profiles[i]) {
-          profiles.push(this.profiles[i]);
+      for (let i = 0; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          profiles.push(this.activeSet[i]);
         }
       }
       return profiles;
@@ -99,9 +121,9 @@ const Profiles = Vue.extend({
 
     middle() {
       const profiles = [];
-      for (let i = 1; i < this.profilesCount; i = i + 3) {
-        if (this.profiles[i]) {
-          profiles.push(this.profiles[i]);
+      for (let i = 1; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          profiles.push(this.activeSet[i]);
         }
       }
       return profiles;
@@ -109,20 +131,12 @@ const Profiles = Vue.extend({
 
     right() {
       const profiles = [];
-      for (let i = 2; i < this.profilesCount; i = i + 3) {
-        if (this.profiles[i]) {
-          profiles.push(this.profiles[i]);
+      for (let i = 2; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          profiles.push(this.activeSet[i]);
         }
       }
       return profiles;
-    },
-
-    profilesName(): string {
-      if (this.profilesCount === 1) {
-        return "Profile";
-      } else {
-        return "Profiles";
-      }
     },
 
     tempMin(): number {
@@ -147,7 +161,7 @@ const Profiles = Vue.extend({
       return max;
     },
 
-    ...mapGetters("profiles", ["profilesCount", "profiles"]),
+    ...mapGetters("profiles", ["profiles"]),
 
     ...mapGetters("settings", ["settings"])
   },

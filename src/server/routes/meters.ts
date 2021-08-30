@@ -16,7 +16,7 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { rows } = await query<Meter>(
-    "UPDATE devices SET nickname = $1, updatedat = CURRENT_TIMESTAMP WHERE meter = $2 RETURNING meter",
+    "UPDATE devices SET nickname = $1, updatedat = CURRENT_TIMESTAMP WHERE device = $2 RETURNING device",
     [req.body.nickname, id]
   );
   const meter = await readMeter(rows[0].device);

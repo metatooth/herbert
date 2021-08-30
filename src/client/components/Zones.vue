@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <div class="level">
-      <span class="title">{{ zonesCount }} {{ zonesName }}</span>
+      <span class="title">{{ activeCount }} {{ zonesName }}</span>
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
@@ -60,6 +60,7 @@ import { mapGetters, mapActions } from "vuex";
 
 const Zones = Vue.extend({
   props: {
+    filter: String,
     units: String
   },
 
@@ -77,8 +78,18 @@ const Zones = Vue.extend({
   },
 
   computed: {
+    activeSet() {
+      return this.zones.filter(el => {
+        return el.nickname.match(this.filter);
+      });
+    },
+
+    activeCount() {
+      return this.activeSet.length;
+    },
+
     zonesName(): string {
-      if (this.zonesCount === 1) {
+      if (this.activeCount === 1) {
         return "Zone";
       } else {
         return "Zones";
@@ -87,9 +98,9 @@ const Zones = Vue.extend({
 
     left() {
       const zones = [];
-      for (let i = 0; i < this.zonesCount; i = i + 3) {
-        if (this.zones[i]) {
-          zones.push(this.zones[i]);
+      for (let i = 0; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          zones.push(this.activeSet[i]);
         }
       }
       return zones;
@@ -97,9 +108,9 @@ const Zones = Vue.extend({
 
     middle() {
       const zones = [];
-      for (let i = 1; i < this.zonesCount; i = i + 3) {
-        if (this.zones[i]) {
-          zones.push(this.zones[i]);
+      for (let i = 1; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          zones.push(this.activeSet[i]);
         }
       }
       return zones;
@@ -107,9 +118,9 @@ const Zones = Vue.extend({
 
     right() {
       const zones = [];
-      for (let i = 2; i < this.zonesCount; i = i + 3) {
-        if (this.zones[i]) {
-          zones.push(this.zones[i]);
+      for (let i = 2; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          zones.push(this.activeSet[i]);
         }
       }
       return zones;
@@ -117,7 +128,7 @@ const Zones = Vue.extend({
 
     ...mapGetters("profiles", ["profiles"]),
 
-    ...mapGetters("zones", ["zones", "zonesCount"])
+    ...mapGetters("zones", ["zones"])
   },
 
   methods: {

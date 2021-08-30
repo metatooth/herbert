@@ -17,7 +17,7 @@
         />
       </div>
 
-      <div class="card-content">
+      <div class="card-content" v-if="zone.children.length > 0">
         <edit-number
           :num="maxirrigators"
           label="Max Irrigators"
