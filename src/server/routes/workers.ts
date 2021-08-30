@@ -1,8 +1,7 @@
 import Router from "express-promise-router";
-import { Config, Worker } from "../../shared/types";
-
+import { Worker } from "../../shared/types";
 import { query, readConfig, readWorker } from "../db";
-import { herbertSocket } from "../socket";
+import { herbertSocket } from "../herbert-socket";
 
 const router = Router();
 
@@ -38,7 +37,7 @@ router.put("/:id", async (req, res) => {
   );
 
   await herbertSocket.sendWorkerConfig(id);
-  res.status(200).json(rows[0]);
+  res.status(200).json(await readWorker(rows[0].worker));
 });
 
 export default router;

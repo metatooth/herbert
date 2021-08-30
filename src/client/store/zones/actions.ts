@@ -103,12 +103,12 @@ export const actions: ActionTree<ZonesState, RootState> = {
         const children: number[] = [];
 
         clone.devices.forEach((d: object) => {
-          const device = new Device(JSON.stringify(d));
+          const device = Object.assign(new Device(), d);
           devices.push(device);
         });
 
         clone.meters.forEach((m: object) => {
-          const meter = new Meter(JSON.stringify(m));
+          const meter = Object.assign(new Meter(), m);
           meters.push(meter);
         });
 

@@ -26,6 +26,15 @@
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
       <div class="content">
+        <div class="tags is-grouped is-grouped-multiline">
+          <device-tag
+            v-for="device in zone.devices"
+            :key="device.device"
+            :device="device"
+          />
+        </div>
+      </div>
+      <div class="content">
         <timestamp :timestamp="lastupdate" :readable="readable" />
       </div>
     </div>
@@ -38,6 +47,7 @@ import { mapGetters, mapActions } from "vuex";
 import { Zone } from "@/store/zones/types";
 import ZoneActual from "@/components/ZoneActual.vue";
 import Timestamp from "@/components/Timestamp.vue";
+import DeviceTag from "@/components/DeviceTag.vue";
 
 const ZoneTile = Vue.extend({
   props: {
@@ -52,6 +62,7 @@ const ZoneTile = Vue.extend({
   },
 
   components: {
+    DeviceTag,
     Timestamp,
     ZoneActual
   },
@@ -64,7 +75,7 @@ const ZoneTile = Vue.extend({
     lastupdate() {
       let last = null;
       this.zone.meters.forEach(meter => {
-        const updatedat = new Date(Date.parse(meter.updatedat));
+        const updatedat = new Date(meter.updatedat);
         if (last === null || updatedat > last) {
           last = updatedat;
         }

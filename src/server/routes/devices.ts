@@ -1,9 +1,8 @@
 import Router from "express-promise-router";
-import WebSocket from "ws";
 import { makeCommandMessage } from "../../shared/message-creators";
 import { Device } from "../../shared/types";
 import { query, readDevice, readDevices } from "../db";
-import { herbertSocket } from "../socket";
+import { herbertSocket } from "../herbert-socket";
 
 const router = Router();
 

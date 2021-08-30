@@ -411,6 +411,7 @@ export class App {
     logger.info("Check switches...");
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
+      console.log(plug.device, mac);
       if (this.formatMacAddress(plug.device) === mac) {
         if (data.action === "on") {
           logger.info(plug.device, "on");

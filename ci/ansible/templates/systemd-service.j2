@@ -12,6 +12,7 @@ User={{ service_user }}
 Environment=DATABASE_URL={{ dburl | default("") }}
 Environment=NODE_ENV={{ node_env | default("") }}
 Environment=WS_URL={{ ws_url | default("") }}
+Environment=PORT={{ client_port | default("") }}
 
 [Install]
 WantedBy=multi-user.target

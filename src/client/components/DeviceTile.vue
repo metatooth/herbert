@@ -35,7 +35,10 @@
         <span class="tag is-medium">{{ device.device }}</span>
       </p>
       <div class="content">
-        <timestamp :timestamp="device.updatedat" :readable="readable" />
+        <timestamp
+          :timestamp="new Date(device.updatedat)"
+          :readable="readable"
+        />
       </div>
       <div class="content">
         <router-link
@@ -113,7 +116,7 @@ const DeviceTile = Vue.extend({
       return style;
     },
 
-    deviceIcon(): string {
+    deviceIcon() {
       if (this.device.status !== "on" && this.device.status !== "off") {
         return "times";
       }

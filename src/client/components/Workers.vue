@@ -1,7 +1,7 @@
 <template>
   <section class="section">
     <div class="level">
-      <span class="title">{{ workersCount }} {{ workersName }}</span>
+      <span class="title">{{ activeCount }} {{ workersName }}</span>
     </div>
     <div class="tile is-ancestor">
       <div class="tile is-4 is-vertical">
@@ -35,15 +35,35 @@ import WorkerTile from "@/components/WorkerTile.vue";
 import { mapGetters } from "vuex";
 
 const Workers = Vue.extend({
+  props: {
+    filter: String
+  },
+
   components: {
     WorkerTile
   },
 
   computed: {
-    ...mapGetters("workers", ["workers", "workersCount"]),
+    ...mapGetters("workers", ["workers"]),
+
+    activeSet() {
+      return this.workers.filter(el => {
+        if (el.nickname) {
+          if (el.nickname.match(this.filter)) {
+            return true;
+          }
+        }
+
+        return el.worker.match(this.filter);
+      });
+    },
+
+    activeCount() {
+      return this.activeSet.length;
+    },
 
     workersName(): string {
-      if (this.workersCount === 1) {
+      if (this.activeCount === 1) {
         return "Herbert";
       } else {
         return "Herberts";
@@ -52,9 +72,9 @@ const Workers = Vue.extend({
 
     left() {
       const workers = [];
-      for (let i = 0; i < this.workersCount; i = i + 3) {
-        if (this.workers[i]) {
-          workers.push(this.workers[i]);
+      for (let i = 0; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          workers.push(this.activeSet[i]);
         }
       }
       return workers;
@@ -62,9 +82,9 @@ const Workers = Vue.extend({
 
     middle() {
       const workers = [];
-      for (let i = 1; i < this.workersCount; i = i + 3) {
-        if (this.workers[i]) {
-          workers.push(this.workers[i]);
+      for (let i = 1; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          workers.push(this.activeSet[i]);
         }
       }
       return workers;
@@ -72,9 +92,9 @@ const Workers = Vue.extend({
 
     right() {
       const workers = [];
-      for (let i = 2; i < this.workersCount; i = i + 3) {
-        if (this.workers[i]) {
-          workers.push(this.workers[i]);
+      for (let i = 2; i < this.activeCount; i = i + 3) {
+        if (this.activeSet[i]) {
+          workers.push(this.activeSet[i]);
         }
       }
       return workers;

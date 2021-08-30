@@ -96,8 +96,6 @@ class HerbertSocket {
 
   private readonly getOnMessageFunc = (ws: WebSocket) => {
     return (msg: string) => {
-      console.log("ON MESSAGE", msg);
-
       let data: any;
       try {
         data = JSON.parse(msg);

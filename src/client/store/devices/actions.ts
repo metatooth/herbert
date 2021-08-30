@@ -7,14 +7,14 @@ export const actions: ActionTree<DevicesState, RootState> = {
   edit({ commit }, payload: Device) {
     const json = JSON.stringify(payload);
     HTTP.put(`/devices/${payload.device}`, json).then(response => {
-      commit("EDIT", Object.assign(new Device(response.data)));
+      commit("EDIT", Object.assign(new Device(), response.data));
     });
   },
   fetchData({ commit }) {
     HTTP.get("/devices").then(response => {
       const payload: Device[] = [];
       response.data.forEach((json: object) => {
-        payload.push(new Device(JSON.stringify(json)));
+        payload.push(Object.assign(new Device(), json));
       });
       commit("SET", payload);
     });

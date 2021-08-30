@@ -1,6 +1,5 @@
 import { App } from "./app";
 import * as WebSocket from "ws";
-import { Meter } from "./meter";
 
 let server: WebSocket.Server;
 let app: App;

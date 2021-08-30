@@ -41,11 +41,13 @@
         dest: "{{buildDir}}"
 
     - name: Install nodejs {{nodejs_version}} and node_modules
+      when: herbert_version != "local"
       include_role:
         name: geerlingguy.nodejs
 
     - name: Build worker
       become: no
+      when: herbert_version != "local"
       command: "chdir={{appDir}} npm run build:worker"
 
     - name: Install worker service

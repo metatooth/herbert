@@ -8,7 +8,7 @@ export const mutations: MutationTree<WorkersState> = {
     });
     if (found) {
       const index = state.workers.indexOf(found);
-      state.workers.splice(index, 1, found);
+      state.workers.splice(index, 1, payload);
     }
   },
   SET(state, payload: Worker[]) {
