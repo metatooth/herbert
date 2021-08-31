@@ -1,0 +1,5 @@
+.git/
+ci/
+Procfile
+docker-compose*
+.nvmrc

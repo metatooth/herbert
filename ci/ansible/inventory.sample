@@ -3,7 +3,10 @@ ansible_connection=ssh
 ansible_user=<add_ssh_user>
 ansible_ssh_pass=<add_ssh_password>
 ansible_python_interpreter=/usr/bin/python3
-herbert_version=<version_of_herbert_to_deploy>
+buildDir="/home/{{ ansible_user }}"
+appDir="{{ buildDir }}/herbert"
+srcDir=/tmp/herbert/deployment
+distDir="{{ srcDir }}/dist"
 
 [databases]
 <add_db_hosts>
@@ -18,17 +21,21 @@ db_allowed_cidr=<add_allowed_cidr>
 <add_server_hosts>
 
 [servers:vars]
-dburl=postgresql://<dbuser>:<dbpass>@<db_ip>:5432/<dbname>
+dbuser="{{ hostvars[groups['databases'][0]].dbuser }}"
+dbpass="{{ hostvars[groups['databases'][0]].dbpass }}"
+dbname="{{ hostvars[groups['databases'][0]].dbname }}"
+dbhost="{{ groups['databases'][0] }}"
+dburl="postgresql://{{ dbuser }}:{{ dbpass }}@{{ dbhost }}:5432/{{ dbname }}"
+api_port=5000
+ws_port=5000
 
 [clients]
 <add_client_hosts>
-
-[clients:vars]
-api_host=<server_api_host>
-api_port=<server_api_port>
 
 [workers]
 <add_worker_hosts>
 
 [workers:vars]
-ws_url=ws://<server_host>:<server_port>
+server_host="{{ groups['servers'][0] }}"
+ws_port="{{ hostvars[groups['servers'][0]].ws_port }}"
+ws_url="ws://{{ server_host }}:{{ ws_port }}"
