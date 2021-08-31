@@ -164,7 +164,7 @@ get_user_input() {
     read -p "$(log 'Enter DNS: ')" DNS
   fi
   if [ -z "${PI_HOSTNAME}" ]; then
-    read -p "$(log 'Enter Hostname [raspberrypi]: ')" HOSTNAME
+    read -p "$(log 'Enter Hostname [raspberrypi]: ')" PI_HOSTNAME
     PI_HOSTNAME="${PI_HOSTNAME:-raspberrypi}"
   fi
   if [ -z "${NEW_USER}" ]; then

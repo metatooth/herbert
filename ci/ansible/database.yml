@@ -1,5 +1,4 @@
 - hosts: databases
-  become: yes
 
   vars:
     postgresql_auth_method: scram-sha-256
@@ -25,12 +24,17 @@
       - {type: host, database: "{{dbname}}", user: "{{dbuser}}", address: "{{db_allowed_cidr}}", auth_method: "{{ postgresql_auth_method }}"}
 
   tasks:
+    - name: Update package list
+      become: yes
+      command: "apt update"
+
     - name: Install System Dependencies
       include_role:
         name: geerlingguy.postgresql
+        apply:
+          become: yes
 
     - name: Sync init scripts
-      become: no
       synchronize:
         src: ../../scripts/db
         dest: "/home/{{ansible_user}}"
@@ -42,7 +46,6 @@
       register: sql_glob
 
     - name: Initialize Database
-      become: no
       command: "psql -U {{dbuser}} -h localhost -d {{dbname}} -f {{item}} -w"
       environment:
         PGPASSWORD: "{{dbpass}}"
