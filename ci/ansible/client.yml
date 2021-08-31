@@ -42,6 +42,8 @@
     - name: Install nodejs {{nodejs_version}}
       include_role:
         name: geerlingguy.nodejs
+        apply:
+          become: yes
 
     - name: Install production node_modules
       command: npm install
