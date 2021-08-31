@@ -1,6 +1,5 @@
 {
   "polling": 5,
   "interval": 30,
-  "reporting-period": 180,
-  "ws-url": "ws://localhost:5000"
+  "reporting-period": 180
 }

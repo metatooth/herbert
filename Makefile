@@ -6,6 +6,10 @@ docker:
 up:
 	docker-compose up -d
 
+.PHONY: scale-worker
+scale-worker:
+	docker-compose up --scale=$(NUM_WORKERS)
+
 .PHONY: down
 down:
 	docker-compose down
