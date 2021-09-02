@@ -138,7 +138,7 @@ async function run() {
         ],
         ["heater", directives.temperature === "heat"],
         ["cooler", directives.temperature === "cool"],
-        ["dehumidifer", directives.humidity === "dehumidify"],
+        ["dehumidifier", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],
         ["fan", 1 === 1]
       ]);
