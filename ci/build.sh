@@ -2,18 +2,19 @@
 
 SERVICE=$1
 BRANCH=$2
+INVENTORY=$3
 
-if [ -z "${SERVICE}" ] || [ -z "${BRANCH}" ]; then
-  echo "must set both SERVICE & BRANCH env vars"
+if [ -z "${SERVICE}" ] || [ -z "${BRANCH}" ] || [ -z "${INVENTORY}" ]; then
+  echo "must set both SERVICE & BRANCH & INVENTORY env vars"
   exit 1
 fi
 
 HERE=$( cd $( dirname "${BASH_SOURCE[0]}" ) >/dev/null 2>&1 && pwd )
 TOPDIR=$( dirname ${HERE} )
 
-SERVER_HOST=$(cat ansible/inventory | grep -C 1 '\[servers\]' | awk 'NR==3')
-API_PORT=$(cat ansible/inventory | grep api_port= | awk -F= 'NR==1 { print $2 }')
-WS_PORT=$(cat ansible/inventory | grep ws_port= | awk -F= 'NR==1 { print $2 }')
+SERVER_HOST=$(cat ${INVENTORY} | grep -C 1 '\[servers\]' | awk 'NR==3')
+API_PORT=$(cat ${INVENTORY} | grep api_port= | awk -F= 'NR==1 { print $2 }')
+WS_PORT=$(cat ${INVENTORY} | grep ws_port= | awk -F= 'NR==1 { print $2 }')
 VUE_APP_API_URL=http://${SERVER_HOST}:${API_PORT}
 VUE_APP_WS_URL=ws://${SERVER_HOST}:${WS_PORT}
 

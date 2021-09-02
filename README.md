@@ -91,12 +91,13 @@ create an inventory file. A sample inventory file has been provided in
 ## Deployment Version
 
 Deployment is performed using the `ci/Makefile` and `make` command. To choose
-the version of hebert to deploy, you must set the `HERBERT_BRANCH` var. See
-examples below.
+the version of Herbert to deploy, you must set the `HERBERT_BRANCH` var. To
+use an Ansible inventory outside the source tree, you must set the
+`ANSIBLE_INVENTORY` var. See examples below.
 
 ```bash
 # deploy tagged version 0.18.0
-cd ci && make deploy-all HERBERT_BRANCH=0.18.0
+cd ci && make deploy-all HERBERT_BRANCH=0.18.0 ANSIBLE_INVENTORY=~/inventory
 
 # deploy main branch to only workers
 cd ci && make deploy-workers HERBERT_BRANCH=main
