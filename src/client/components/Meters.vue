@@ -82,7 +82,7 @@ const Meters = Vue.extend({
     right() {
       const meters = [];
       for (let i = 2; i < this.activeCount; i = i + 3) {
-        if (this.active[i]) {
+        if (this.activeSet[i]) {
           meters.push(this.activeSet[i]);
         }
       }
