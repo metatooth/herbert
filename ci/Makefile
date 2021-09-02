@@ -1,3 +1,6 @@
+HERBERT_BRANCH ?= local
+ANSIBLE_INVENTORY ?= ansible/inventory
+
 .PHONY: all
 all: deploy-all
 
