@@ -12,7 +12,7 @@ ifeq ($(HERBERT_BRANCH),)
 endif
 
 .PHONY: deploy-all
-deploy-all: deploy-databases deploy-servers deploy-workers deploy-clients
+deploy-all: deploy-databases deploy-servers deploy-workers deploy-clients deploy-kiosks
 
 .PHONY: build
 build: check_branch
@@ -40,3 +40,8 @@ deploy-clients:
 deploy-workers:
 	$(MAKE) build SERVICE=worker
 	$(MAKE) deploy SERVICE=worker
+
+.PHONY: deploy-kiosks
+deploy-kiosks:
+	$(MAKE) build SERVICE=kiosk
+	$(MAKE) deploy SERVICE=kiosk
