@@ -118,6 +118,14 @@ export async function readZone(id: number) {
   });
 }
 
+export async function parentZone(id: string): Promise<Zone> {
+  const { rows } = await query<Zone>(
+    "SELECT e.a as id FROM zones z INNER JOIN edges e ON z.id = e.b WHERE e.b = $1",
+    [id]
+  );
+  return await readZone(rows[0].id);
+}
+
 export async function readZones() {
   const zones = [];
 

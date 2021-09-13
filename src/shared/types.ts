@@ -79,6 +79,8 @@ export interface Zone {
   maxirrigators: number;
   profile: Profile;
   children: Zone[];
+  meters: Meter[];
+  devices: Device[];
   timestamp: Date;
 }
 
