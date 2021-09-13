@@ -3,7 +3,7 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import { readActiveZones, readZone } from "./db";
+import { parentZone, readActiveZones, readZone } from "./db";
 
 import path from "path";
 import favicon from "serve-favicon";
@@ -58,8 +58,9 @@ herbertSocket.init(server);
 
 async function run() {
   const zones = await readActiveZones();
-  console.log("active zones", zones);
+
   zones.forEach(async zone => {
+    console.log("active zone", zone.id, zone.nickname);
     const now = new Date();
     const hour = now.getUTCHours();
     const min = now.getUTCMinutes();
@@ -96,8 +97,8 @@ async function run() {
       const lamp = new LampTimer(utc.getHours(), duration);
 
       const blower = new BlowerTimer(
-        zone.profile.bloweractive,
-        zone.profile.blowercycle
+        zone.profile.bloweractive / 1000,
+        zone.profile.blowercycle / 1000
       );
 
       let target;
@@ -127,18 +128,37 @@ async function run() {
 
       console.log(directives);
 
-      console.log("blower is on?", min, sec, blower.isOn(min * 60 + sec));
-      console.log("blower is cooling?", directives.temperature === "cool");
+      let isblower = blower.isOn(min * 60 + sec);
+
+      console.log("blower is on?", min, sec, isblower);
+      if (!isblower) {
+        const parent = await parentZone(zone.id);
+
+        let mean = 0;
+        if (parent.meters.length !== 0) {
+          parent.meters.forEach(meter => {
+            mean = mean + meter.temperature;
+          });
+          mean = mean / parent.meters.length;
+        }
+
+        console.log("parent and child", mean, temperature);
+
+        if (mean < temperature && directives.temperature === "cool") {
+          isblower = true;
+          console.log("blower is cooling");
+        } else if (mean > temperature && directives.temperature === "heat") {
+          isblower = true;
+          console.log("blower is heating");
+        }
+      }
 
       const systems = new Map([
         ["lamp", lamp.isOn(hour)],
-        [
-          "blower",
-          blower.isOn(min * 60 + sec) || directives.temperature === "cool"
-        ],
+        ["blower", isblower],
         ["heater", directives.temperature === "heat"],
         ["cooler", directives.temperature === "cool"],
-        ["dehumidifer", directives.humidity === "dehumidify"],
+        ["dehumidifier", directives.humidity === "dehumidify"],
         ["humidifier", directives.humidity === "humidify"],
         ["fan", 1 === 1]
       ]);
