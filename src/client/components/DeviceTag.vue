@@ -1,5 +1,5 @@
 <template>
-  <span class="tag has-background-black">
+  <span class="tag is-medium has-background-black">
     <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
   </span>
 </template>

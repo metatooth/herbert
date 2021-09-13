@@ -20,9 +20,11 @@ export const actions: ActionTree<DevicesState, RootState> = {
     });
   },
   off(context, payload: string) {
+    context.commit("OFF", payload);
     HTTP.put(`/devices/${payload}/off`);
   },
   on(context, payload: string) {
+    context.commit("ON", payload);
     HTTP.put(`/devices/${payload}/on`);
   },
   remove({ commit }, payload: Device) {

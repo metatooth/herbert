@@ -1,30 +1,28 @@
 <template>
-  <div class="card-content">
-    <div class="field is-grouped is-grouped-multiline">
-      <target
-        icon="thermometer-half"
-        :value="temperature"
-        :precision="1"
-        :units="unitsWithDegree"
-        :color="temperatureColor"
-      />
+  <div class="field is-grouped is-grouped-multiline">
+    <target
+      icon="thermometer-half"
+      :value="temperature"
+      :precision="1"
+      :units="unitsWithDegree"
+      :color="temperatureColor"
+    />
 
-      <target
-        icon="tint"
-        :value="humidity"
-        :precision="0"
-        units="%"
-        :color="humidityColor"
-      />
+    <target
+      icon="tint"
+      :value="humidity"
+      :precision="0"
+      units="%"
+      :color="humidityColor"
+    />
 
-      <target
-        icon="cloud"
-        :value="pressure"
-        :precision="1"
-        units="hPa"
-        :color="pressureColor"
-      />
-    </div>
+    <target
+      icon="cloud"
+      :value="pressure"
+      :precision="1"
+      units="hPa"
+      :color="pressureColor"
+    />
   </div>
 </template>
 

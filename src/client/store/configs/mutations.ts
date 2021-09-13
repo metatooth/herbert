@@ -11,7 +11,7 @@ export const mutations: MutationTree<ConfigState> = {
     });
     if (found) {
       const index = state.configs.indexOf(found);
-      state.configs.splice(index, 1, found);
+      state.configs.splice(index, 1, payload);
     }
   },
   SET(state, payload: Config[]) {
