@@ -1,0 +1,36 @@
+#
+# ansible-reboot.yml
+#
+# Initiates  a  reboot  of  all the hosts and  waits  for  them  to  finish
+# rebooting.
+#
+# This  program is free software: you can redistribute it and/or modify  it
+# under  the  terms of the GNU General Public License as published  by  the
+# Free  Software  Foundation, either version 3 of the License, or (at  your
+# option) any later version.
+#
+# This  program  is  distributed in the hope that it will  be  useful,  but
+# WITHOUT   ANY   WARRANTY;   without  even   the   implied   warranty   of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+# Public License for more details.
+#
+# You  should have received a copy of the GNU General Public License  along
+# with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# 24 Jul 18   0.1   - Initial version - MEJT
+#
+---
+- hosts: all
+  tasks:
+    - name: Reboot # Reboot debian based hosts (including raspbian, ubuntu etc).
+      shell: nohup bash -c "/bin/sleep 5 && /sbin/shutdown -r now" &
+      when: ansible_os_family == "Debian"
+      become: true
+ 
+    - name: Reboot # Reboot all redhat hosts (including centos).
+      shell: nohup bash -c "/usr/bin/sleep 5 && /usr/sbin/shutdown -r now" &
+      when: ansible_os_family == "RedHat"
+      become: true
+ 
+    - name: Wait # Wait for hosts to reboot.
+      wait_for_connection: timeout=300 delay=30
