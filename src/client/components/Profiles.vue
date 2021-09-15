@@ -190,8 +190,12 @@ const Profiles = Vue.extend({
 
       const profile = new Profile();
       profile.profile = this.profile;
+
+      profile.timezone = this.settings.timezone;
+
       profile.lampstart = `${hourString}:${start[1]}`;
       profile.lampduration = { hours: this.duration };
+
       if (this.settings.units === "F") {
         profile.lampontemperature = fahrenheit2celsius(this.lampontemperature);
         profile.lampofftemperature = fahrenheit2celsius(
