@@ -63,7 +63,11 @@ export class SM8relay extends Switch {
         if (stderr) {
           console.log(`stderr: ${stderr}`);
         }
-        this.state = stdout.replace(/[\n]$/, "");
+        if (stdout.replace(/[\n]$/, "") === "1") {
+          this.state = "on";
+        } else {
+          this.state = "off";
+        }
       }
     );
     return this;
