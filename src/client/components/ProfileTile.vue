@@ -218,7 +218,7 @@
         </div>
 
         <div class="tags has-addons">
-          <span class="tag is-small has-text-success is-dark">
+          <span class="tag is-small has-text-success has-background-black-bis">
             <font-awesome-icon icon="wind" />
           </span>
           <span class="tag is-small has-text-dark is-success"
@@ -227,7 +227,7 @@
         </div>
 
         <div class="tags has-addons">
-          <span class="tag is-small has-text-success is-dark">
+          <span class="tag is-small has-text-success has-background-black-bis">
             <font-awesome-icon icon="cloud-rain" />
           </span>
           <span class="tag is-small has-text-dark is-success"
