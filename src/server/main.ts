@@ -60,7 +60,6 @@ async function run() {
   const zones = await readActiveZones();
 
   zones.forEach(async zone => {
-    console.log("active zone", zone.id, zone.nickname);
     const now = new Date();
     const hour = now.getUTCHours();
     const min = now.getUTCMinutes();
@@ -104,6 +103,7 @@ async function run() {
       let target;
       let delta;
 
+      console.log("active zone", zone.id, zone.nickname);
       console.log("check hour", hour);
 
       if (lamp.isOn(hour)) {
