@@ -44,7 +44,7 @@ const MeterWidget = Vue.extend({
   computed: {
     temperature(): number {
       if (this.units === "C") {
-        return this.meter.temperature;
+        return this.meter.temperature / 1;
       } else if (this.units === "F") {
         return celsius2fahrenheit(this.meter.temperature);
       } else {
