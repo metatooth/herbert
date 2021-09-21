@@ -44,6 +44,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
+import { Device } from "@/store/devices/types";
 import { Zone } from "@/store/zones/types";
 import ZoneActual from "@/components/ZoneActual.vue";
 import Timestamp from "@/components/Timestamp.vue";
@@ -99,10 +100,10 @@ const ZoneTile = Vue.extend({
       }
     },
 
-    sorted() {
+    sorted(): Device[] {
       const devices = [];
       this.zone.devices.forEach(d => {
-        devices.push(d);
+        devices.push(Object.assign(new Device(), d));
       });
       devices.sort((a, b) => {
         return a.devicetype > b.devicetype;
