@@ -16,9 +16,15 @@ const DeviceTag = Vue.extend({
     device: Device
   },
 
+  data() {
+    return {
+      status: this.device.status
+    };
+  },
+
   computed: {
     deviceIcon() {
-      if (this.device.status !== "on" && this.device.status !== "off") {
+      if (this.status !== "on" && this.status !== "off") {
         return "times";
       }
 
@@ -44,7 +50,7 @@ const DeviceTag = Vue.extend({
     },
 
     deviceClass() {
-      if (this.device.status === "on" || this.device.status === "1") {
+      if (this.status === "on" || this.status === "1") {
         return "has-text-success icon";
       } else {
         return "has-text-warning icon";
@@ -54,10 +60,12 @@ const DeviceTag = Vue.extend({
 
   methods: {
     toggle() {
-      if (this.device.status === "on") {
+      if (this.status === "on") {
         this.off(this.device.device);
+        this.status = "off";
       } else {
         this.on(this.device.device);
+        this.status = "on";
       }
     },
 
