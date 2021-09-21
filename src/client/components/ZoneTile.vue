@@ -21,13 +21,11 @@
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
       <div class="content">
-        <div class="tags is-grouped is-grouped-multiline">
-          <device-tag
-            v-for="device in zone.devices"
-            :key="device.device"
-            :device="device"
-          />
-        </div>
+        <device-tag
+          v-for="device in sorted"
+          :key="device.device"
+          :device="device"
+        />
       </div>
       <div class="content">
         <button class="button is-small" :class="statusClass" @click="toggle">
@@ -99,6 +97,13 @@ const ZoneTile = Vue.extend({
       } else {
         return "toggle-off";
       }
+    },
+
+    sorted() {
+      const s = this.zone.devices;
+      return s.sort((a, b) => {
+        return a.devicetype > b.devicetype;
+      });
     },
 
     ...mapGetters("settings", ["settings"])
