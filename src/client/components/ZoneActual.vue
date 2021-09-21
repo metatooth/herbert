@@ -72,41 +72,69 @@ const ZoneActual = Vue.extend({
     },
 
     temperatureColor(): string {
-      if (this.zone.meanTemperature() < this.zone.targetTemperature(this.ts)) {
-        return "info";
-      } else if (
-        this.zone.meanTemperature() > this.zone.targetTemperature(this.ts)
-      ) {
-        return "danger";
-      } else {
-        return "success";
-      }
+      const diff =
+        this.zone.meanTemperature() - this.zone.targetTemperature(this.ts);
+      return this.color(diff, 3);
     },
 
     humidityColor(): string {
-      if (100 * this.zone.meanHumidity() < this.zone.targetHumidity(this.ts)) {
-        return "info";
-      } else if (
-        100 * this.zone.meanHumidity() >
-        this.zone.targetHumidity(this.ts)
-      ) {
-        return "danger";
-      } else {
-        return "success";
-      }
+      const diff =
+        100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.ts);
+      return this.color(diff, 5);
     },
 
     pressureColor(): string {
-      if (this.zone.meanPressure() < this.zone.targetPressure(this.ts)) {
-        return "info";
-      } else if (this.zone.meanPressure() > this.zone.targetPressure(this.ts)) {
-        return "danger";
-      } else {
-        return "success";
-      }
+      const diff = this.zone.meanPressure() - this.zone.targetPressure(this.ts);
+      return this.color(diff, 0.3);
     },
 
     ...mapGetters("settings", ["settings"])
+  },
+
+  methods: {
+    hex(c): string {
+      const s = "0123456789abcdef";
+      let i = parseInt(c);
+      if (i == 0 || isNaN(c)) {
+        return "00";
+      }
+      i = Math.round(Math.min(Math.max(0, i), 255));
+      return s.charAt((i - (i % 16)) / 16) + s.charAt(i % 16);
+    },
+
+    convertToHex(rgb): string {
+      return this.hex(rgb[0]) + this.hex(rgb[1]) + this.hex(rgb[2]);
+    },
+
+    color(diff, range): string {
+      let sign = 1;
+      if (diff < 0) {
+        sign = -1;
+      }
+
+      let alpha = Math.floor((100 * sign * diff) / range) / 100;
+      alpha = alpha > 1 ? 1 : alpha;
+
+      const end = [772, 199, 142];
+      const start = [];
+      if (sign === -1) {
+        start[0] = 62;
+        start[1] = 142;
+        start[2] = 208;
+      } else {
+        start[0] = 241;
+        start[1] = 70;
+        start[2] = 104;
+      }
+
+      const c = [
+        start[0] * alpha + (1 - alpha) * end[0],
+        start[1] * alpha + (1 - alpha) * end[1],
+        start[2] * alpha + (1 - alpha) * end[2]
+      ];
+
+      return "#" + this.convertToHex(c);
+    }
   }
 });
 

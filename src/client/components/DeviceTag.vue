@@ -1,7 +1,7 @@
 <template>
-  <button class="button" :class="statusClass" @click="toggle">
+  <button class="button" :class="deviceClass" @click="toggle">
     <span class="icon">
-      <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
+      <font-awesome-icon :icon="deviceIcon" />
     </span>
   </button>
 </template>

@@ -100,10 +100,14 @@ const ZoneTile = Vue.extend({
     },
 
     sorted() {
-      const s = this.zone.devices;
-      return s.sort((a, b) => {
+      const devices = [];
+      this.zone.devices.forEach(d => {
+        devices.push(d);
+      });
+      devices.sort((a, b) => {
         return a.devicetype > b.devicetype;
       });
+      return devices;
     },
 
     ...mapGetters("settings", ["settings"])
