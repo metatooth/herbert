@@ -348,7 +348,7 @@ export class App {
         return;
       }
 
-      logger.warn("unhandled socket message", data);
+      logger.debug("unhandled socket message", data);
     } catch (e) {
       logger.error("socket message error:", e);
     }
