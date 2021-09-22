@@ -35,7 +35,10 @@
         <span class="is-family-code">{{ worker.inet }}</span>
       </div>
       <div class="content">
-        <timestamp :timestamp="new Date(worker.updatedat)" :readable="readable" />
+        <timestamp
+          :timestamp="new Date(worker.updatedat)"
+          :readable="readable"
+        />
       </div>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
     </div>

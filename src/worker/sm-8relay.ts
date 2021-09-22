@@ -15,7 +15,7 @@ export class SM8relay extends Switch {
     console.log("SM 8-relay ON?", this.state);
     if (this.state === "off" || this.state === "0") {
       exec(
-        `8relay ${this.board} write ${this.channel} on`,
+        `8relind ${this.board} write ${this.channel} on`,
         (error, stdout, stderr) => {
           if (error) {
             console.log(`error: ${error.message}`);
@@ -36,7 +36,7 @@ export class SM8relay extends Switch {
     console.log("SM 8-relay OFF?", this.state);
     if (this.state === "on" || this.state === "1") {
       exec(
-        `8relay ${this.board} write ${this.channel} off`,
+        `8relind ${this.board} write ${this.channel} off`,
         (error, stdout, stderr) => {
           if (error) {
             console.log(`error: ${error.message}`);
@@ -55,7 +55,7 @@ export class SM8relay extends Switch {
 
   public status() {
     exec(
-      `8relay ${this.board} read ${this.channel}`,
+      `8relind ${this.board} read ${this.channel}`,
       (error, stdout, stderr) => {
         if (error) {
           console.log(`error: ${error.message}`);
