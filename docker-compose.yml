@@ -12,13 +12,27 @@ services:
     ports:
       - '5432:5432'
 
-  server:
+  socket_server:
+    image: herbert_socket:latest
+    build:
+      context: .
+      target: socket-server
+    environment:
+      API_URL: http://api:5000
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    ports:
+      - '2929:2929'
+
+  api:
     image: herbert_server:latest
     build:
       context: .
       target: server
     environment:
       DATABASE_URL: postgresql://postgres:bar@db:5432/herbert?sslmode=disable
+      WSS_URL: ws://socket_server:2929
     volumes:
       - ./src:/app/src
       - ./config:/app/config
@@ -37,7 +51,8 @@ services:
       - ./src:/app/src
       - ./config:/app/config
     depends_on:
-      - server
+      - api
+      - socket_server
     ports:
       - '8080:8080'
 
@@ -48,12 +63,13 @@ services:
       target: worker
     environment:
       NODE_ENV: docker
-      WS_URL: ws://server:5000
+      WSS_URL: ws://socket_server:2929
     volumes:
       - ./src:/app/src
       - ./config:/app/config
     depends_on:
-      - server
+      - api
+      - socket_server
 
 volumes:
   pgdata:

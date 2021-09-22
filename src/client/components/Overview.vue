@@ -40,6 +40,11 @@ import { convertToLocalTime } from "date-fns-timezone";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import ZoneTile from "@/components/ZoneTile.vue";
+import { messageIsFrom } from "../../shared/type-guards";
+import {
+  makeErrorMessage,
+  makeSwitchStatusMessage
+} from "../../shared/message-creators";
 
 const Overview = Vue.extend({
   props: {
@@ -105,27 +110,30 @@ const Overview = Vue.extend({
     );
 
     ws.addEventListener("message", (ev: MessageEvent) => {
-      const data = JSON.parse(ev.data);
-      if (data.type === "STATUS" && data.payload.status === "disconnected") {
+      const data = JSON.parse(ev.data.toString());
+      if (messageIsFrom(makeSwitchStatusMessage, data)) {
         const n: Notification = {
           id: data.payload.device,
           action: "",
           code: "",
-          plug: data.payload.nickname || data.payload.device,
+          plug: data.payload.device,
           message: data.payload.status,
           timestamp: new Date(Date.parse(data.payload.timestamp))
         };
         this.add(n);
-      } else if (data.type === "ERROR") {
+        return;
+      }
+      if (messageIsFrom(makeErrorMessage, data)) {
         const n: Notification = {
           id: data.payload.device,
-          plug: data.payload.nickname || data.payload.device,
+          plug: data.payload.device,
           action: data.payload.action,
           code: data.payload.code,
-          message: data.payload.message || data.payload.status,
+          message: data.payload.message,
           timestamp: new Date(Date.parse(data.payload.timestamp))
         };
         this.add(n);
+        return;
       }
     });
   },

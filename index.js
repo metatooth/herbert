@@ -1,15 +1,9 @@
-const role = process.env.ROLE || "client";
+const express = require('express');
+const app = express();
+const port = process.env.CLIENT_PORT || '8080';
 
-if (role === "client") {
-  const express = require("express");
-  const app = express();
-  const port = process.env.PORT || "8080";
+app.use(express.static('dist/client'));
 
-  app.use(express.static("dist/client"));
-
-  app.listen(port, () => {
-    console.log(`Herbert ${role} listing at ${port}`);
-  });
-} else {
-  require("./dist/server/main");
-}
+app.listen(port, () => {
+  console.log(`Herbert client listing at ${port}`);
+});

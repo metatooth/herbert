@@ -31,6 +31,11 @@ deploy-servers:
 	$(MAKE) build SERVICE=server
 	$(MAKE) deploy SERVICE=server
 
+.PHONY: deploy-socket-servers
+deploy-socket-servers:
+	$(MAKE) build SERVICE=socket-server
+	$(MAKE) deploy SERVICE=socket-server
+
 .PHONY: deploy-clients
 deploy-clients:
 	$(MAKE) build SERVICE=client

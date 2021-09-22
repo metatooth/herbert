@@ -1,7 +1,14 @@
 import Router from "express-promise-router";
+import { makeSendWorkerConfigMessage } from "../../shared/message-creators";
 import { Worker } from "../../shared/types";
-import { query, readConfig, readWorker } from "../db";
-import { herbertSocket } from "../herbert-socket";
+import {
+  query,
+  readConfig,
+  readWorker,
+  registerWorker,
+  updateWorker
+} from "../db";
+import { sendSocketMessage } from "../util";
 
 const router = Router();
 
@@ -13,6 +20,13 @@ router.get("/", async (req, res) => {
   res.status(200).json(rows);
 });
 
+router.post("/", async (req, res) => {
+  const { body } = req;
+  const { device, inet } = body;
+  await registerWorker(device, inet);
+  res.status(204).send();
+});
+
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   res.status(200).json(await readWorker(id));
@@ -20,7 +34,12 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
+  await updateWorker(id);
+  res.status(204).send();
+});
 
+router.put("/:id/config", async (req, res) => {
+  const { id } = req.params;
   const config = await readConfig(req.body.configname);
   const jsonStr = JSON.stringify(config.config);
 
@@ -36,7 +55,7 @@ router.put("/:id", async (req, res) => {
     [req.body.nickname, req.body.configname, jsonStr, id]
   );
 
-  await herbertSocket.sendWorkerConfig(id);
+  await sendSocketMessage(makeSendWorkerConfigMessage(id));
   res.status(200).json(await readWorker(rows[0].worker));
 });
 
