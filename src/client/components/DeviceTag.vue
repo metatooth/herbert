@@ -1,11 +1,14 @@
 <template>
-  <span class="tag has-background-black">
-    <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
-  </span>
+  <button class="button" :class="statusClass" @click="toggle">
+    <span class="icon">
+      <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
+    </span>
+  </button>
 </template>
 
 <script>
 import Vue from "vue";
+import { mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 
 const DeviceTag = Vue.extend({
@@ -47,6 +50,18 @@ const DeviceTag = Vue.extend({
         return "has-text-warning icon";
       }
     }
+  },
+
+  methods: {
+    toggle() {
+      if (this.device.status === "on") {
+        this.off(this.device.device);
+      } else {
+        this.on(this.device.device);
+      }
+    },
+
+    ...mapActions("devices", ["on", "off"])
   }
 });
 

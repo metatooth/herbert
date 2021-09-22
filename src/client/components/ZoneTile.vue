@@ -13,11 +13,6 @@
             {{ zone.nickname }}
           </router-link>
         </span>
-        <button class="button is-small" :class="statusClass" @click="toggle">
-          <span class="icon">
-            <font-awesome-icon :icon="statusIcon" />
-          </span>
-        </button>
       </p>
       <div class="content">
         <span>{{ zone.profile.profile }}</span>
@@ -33,6 +28,13 @@
             :device="device"
           />
         </div>
+      </div>
+      <div class="content">
+        <button class="button is-small" :class="statusClass" @click="toggle">
+          <span class="icon">
+            <font-awesome-icon :icon="statusIcon" />
+          </span>
+        </button>
       </div>
       <div class="content">
         <timestamp :timestamp="lastupdate" :readable="readable" />

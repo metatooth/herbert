@@ -63,17 +63,25 @@
       </div>
 
       <div class="card-content">
-        <select-zone :exclude="zone" @select-zone="addZone" />
+        <select-zone
+          label="Zones"
+          :zones="availableZones"
+          @select-zone="addZone"
+        />
       </div>
 
       <div class="card-content">
-        <select-meter @select-meter="add" />
+        <select-meter
+          label="Meters"
+          :meters="availableMeters"
+          @select-meter="add"
+        />
       </div>
 
       <div class="card-content">
         <select-device
           label="Switches"
-          :devices="devices"
+          :devices="availableSwitches"
           @select-device="add"
         />
       </div>
@@ -135,8 +143,34 @@ const ZoneDetail = Vue.extend({
   },
 
   computed: {
-    linkto(): string {
+    linkto() {
       return `zone-details-${this.zone.id}`;
+    },
+
+    availableMeters() {
+      const taken = this.zone.meters.map(m => {
+        return m.device;
+      });
+
+      return this.meters.filter(el => {
+        return !taken.includes(el.device);
+      });
+    },
+
+    availableSwitches() {
+      const taken = this.zone.devices.map(d => {
+        return d.device;
+      });
+
+      return this.devices.filter(el => {
+        return !taken.includes(el.device) && el.devicetype !== null;
+      });
+    },
+
+    availableZones() {
+      return this.zones.filter(el => {
+        return el.id !== this.zone.id;
+      });
     },
 
     ...mapGetters("devices", ["devices"]),

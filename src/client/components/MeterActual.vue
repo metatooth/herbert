@@ -54,7 +54,7 @@ const MeterActual = Vue.extend({
         return celsius2kelvin(this.meter.temperature);
       }
 
-      return this.meter.temperature;
+      return this.meter.temperature / 1;
     },
 
     humidity(): number {

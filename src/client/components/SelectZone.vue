@@ -9,7 +9,7 @@
           <div class="select">
             <select v-model="selected">
               <option
-                v-for="zone in available"
+                v-for="zone in zones"
                 v-bind:key="zone.id"
                 v-bind:value="zone.id"
               >
@@ -30,31 +30,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapGetters } from "vuex";
-import { Zone } from "@/store/zones/types";
 
 const SelectZone = Vue.extend({
   props: {
-    exclude: Zone
+    zones: Array
   },
+
   data() {
     return {
       selected: ""
     };
-  },
-
-  computed: {
-    available() {
-      const available = [];
-      this.zones.forEach(zone => {
-        if (this.exclude.id !== zone.id) {
-          available.push(zone);
-        }
-      });
-      return available;
-    },
-
-    ...mapGetters("zones", ["zones"])
   },
 
   methods: {

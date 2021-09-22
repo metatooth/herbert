@@ -1,7 +1,7 @@
 <template>
   <div class="field is-horizontal">
     <div class="field-label">
-      <label class="label">Meters</label>
+      <label class="label">{{ label }}</label>
     </div>
     <div class="field-body">
       <div class="field has-addons">
@@ -30,17 +30,17 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapGetters } from "vuex";
 
 const SelectMeter = Vue.extend({
+  props: {
+    label: String,
+    meters: Array
+  },
+
   data() {
     return {
       selected: ""
     };
-  },
-
-  computed: {
-    ...mapGetters("meters", ["meters"])
   },
 
   methods: {
