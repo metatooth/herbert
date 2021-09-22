@@ -11,7 +11,7 @@ import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
 import { AnySocketMessage, CommandPayload } from "../shared/types";
-import { isSocketMessage, messageIsFrom } from "../shared/util";
+import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import {
   makeCommandMessage,
   makeConfigureMessage,
@@ -56,7 +56,7 @@ interface ConfigDevice {
 export class App {
   private static instance: App;
   private config: any = {};
-  private wsUrl = process.env.WS_URL || "";
+  private wsUrl = process.env.WSS_URL || "";
   private closed = false;
   initialized = false;
   socket?: WebSocket = undefined;
@@ -74,10 +74,10 @@ export class App {
     return App.instance;
   }
 
-  public init(): Promise<void> {
-    console.info("=====================================");
-    console.info("== Herbert Worker = Starting up... ==");
-    console.info("=====================================");
+  public async init(): Promise<void> {
+    logger.info("=====================================");
+    logger.info("== Herbert Worker = Starting up... ==");
+    logger.info("=====================================");
 
     const ifaces = networkInterfaces();
     console.info("network interfaces", ifaces);
@@ -99,9 +99,9 @@ export class App {
       this.inet = net[0]["address"];
     }
 
-    console.info("device network info", this.macaddr, this.inet);
+    logger.info("device network info", this.macaddr, this.inet);
 
-    this.createSocket();
+    await this.createSocket();
 
     return new Promise(resolve => {
       const i = setInterval(() => {
@@ -291,14 +291,17 @@ export class App {
   }
 
   private async createSocket(): Promise<void> {
-    if (this.socket) {
-      this.stop();
-    }
+    return new Promise(resolve => {
+      if (this.socket) {
+        this.stop();
+      }
 
-    this.socket = new WebSocket(this.wsUrl);
-    this.socket.on("error", this.onSocketError);
-    this.socket.on("close", this.onSocketClose);
-    this.socket.on("message", this.handleSocketMessage);
+      this.socket = new WebSocket(this.wsUrl);
+      this.socket.on("open", resolve);
+      this.socket.on("error", this.onSocketError);
+      this.socket.on("close", this.onSocketClose);
+      this.socket.on("message", this.handleSocketMessage);
+    });
   }
 
   private readonly onSocketError = (err: Error) => {
@@ -345,7 +348,12 @@ export class App {
         return;
       }
 
-      console.debug("unhandled socket message", data);
+      if (messageIsFrom(makeErrorMessage, data)) {
+        logger.error("!! ERROR !!", data.payload);
+        return;
+      }
+
+      logger.debug("unhandled socket message", data);
     } catch (e) {
       console.error("socket message error:", e);
     }

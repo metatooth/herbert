@@ -34,6 +34,17 @@ RUN npm run build:server
 
 CMD ["npm", "run", "serve:server"]
 
+FROM base as socket-server
+
+COPY config ./config
+COPY src/socket-server ./src/socket-server
+COPY src/shared src/shared
+COPY tsconfig.json tsconfig.base.json ./
+
+RUN npm run build:socket-server
+
+CMD ["npm", "run", "serve:socket-server"]
+
 FROM base as worker
 
 RUN apt update \
