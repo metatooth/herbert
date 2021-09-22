@@ -79,8 +79,11 @@ const Zones = Vue.extend({
 
   computed: {
     activeSet() {
-      return this.zones.filter(el => {
+      const active = this.zones.filter(el => {
         return el.nickname.match(this.filter);
+      });
+      return active.sort((a, b) => {
+        return a.nickname > b.nickname;
       });
     },
 

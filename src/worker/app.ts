@@ -178,9 +178,10 @@ export class App {
     this.meters.forEach(meter => {
       if (meter.manufacturer === "mockmeter") {
         const now = new Date().getTime();
-        meter.clime.temperature = 23.9 + Math.sin((2 * 3.14 * now) / 3600000);
+        meter.clime.temperature =
+          23.9 + 5 * Math.sin((2 * 3.14 * now) / 3600000);
         meter.clime.humidity =
-          0.55 + 0.02 * Math.cos((2 * 3.14 * now) / 3600000);
+          0.55 + 0.05 * Math.cos((2 * 3.14 * now) / 3600000);
       }
       this.meterStatus(meter);
     });
@@ -348,7 +349,7 @@ export class App {
         return;
       }
 
-      logger.warn("unhandled socket message", data);
+      logger.debug("unhandled socket message", data);
     } catch (e) {
       logger.error("socket message error:", e);
     }

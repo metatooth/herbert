@@ -47,7 +47,7 @@ const Devices = Vue.extend({
     ...mapGetters("devices", ["devices"]),
 
     activeSet() {
-      return this.devices.filter(el => {
+      const active = this.devices.filter(el => {
         if (el.nickname) {
           if (el.nickname.match(this.filter)) {
             return true;
@@ -55,6 +55,12 @@ const Devices = Vue.extend({
         }
 
         return el.device.match(this.filter);
+      });
+      return active.sort((a, b) => {
+        const A = a.nickname ? a.nickname : a.device;
+        const B = b.nickname ? b.nickname : b.device;
+
+        return A > B;
       });
     },
 

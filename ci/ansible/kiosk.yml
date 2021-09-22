@@ -8,15 +8,10 @@
   tasks:
     - name: Install System Dependencies
       become: yes
-      apt: name={{ item }} update_cache=yes state=latest
-      with_items:
-        - xserver-xorg
-        - xinit
-        - x11-xserver-utils
-        - chromium-browser
-        - matchbox-window-manager
-        - xautomation
-        - unclutter
+      apt:
+        update_cache: yes
+        state: latest
+        name: [ 'xserver-xorg', 'xinit', 'x11-xserver-utils', 'chromium-browser', 'matchbox-window-manager', 'xautomation', 'unclutter' ]
 
     - name: Create {{ appDir }}
       file:

@@ -92,8 +92,11 @@ const Profiles = Vue.extend({
 
   computed: {
     activeSet() {
-      return this.profiles.filter(el => {
+      const active = this.profiles.filter(el => {
         return el.profile.match(this.filter);
+      });
+      return active.sort((a, b) => {
+        return a.nickname > b.nickname;
       });
     },
 

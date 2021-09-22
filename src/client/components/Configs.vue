@@ -73,8 +73,11 @@ const Configs = Vue.extend({
     ...mapGetters("configs", ["configs"]),
 
     activeSet() {
-      return this.configs.filter(el => {
+      const active = this.configs.filter(el => {
         return el.nickname.match(this.filter);
+      });
+      return active.sort((a, b) => {
+        return a.nickname > b.nickname;
       });
     },
 

@@ -123,7 +123,11 @@ export async function parentZone(id: string): Promise<Zone> {
     "SELECT e.a as id FROM zones z INNER JOIN edges e ON z.id = e.b WHERE e.b = $1",
     [id]
   );
-  return await readZone(rows[0].id);
+  if (rows.length > 0) {
+    return await readZone(rows[0].id);
+  } else {
+    return null;
+  }
 }
 
 export async function readZones() {
@@ -293,7 +297,7 @@ export async function updateWorker(id: string) {
   return query("SELECT * FROM workers WHERE worker = $1", [id]).then(res => {
     if (res.rowCount !== 0) {
       return query(
-        "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = $1",
+        "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE worker = $1",
         [id]
       );
     }

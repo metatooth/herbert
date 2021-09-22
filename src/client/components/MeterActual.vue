@@ -5,21 +5,21 @@
       :value="temperature"
       :precision="1"
       :units="unitsWithDegree"
-      color="success"
+      color="#48c78e"
     />
     <target
       icon="tint"
       :value="humidity"
       :precision="0"
       units="%"
-      color="success"
+      color="#48c78e"
     />
     <target
       icon="cloud"
       :value="pressure"
       :precision="1"
       units="hPa"
-      color="success"
+      color="#48c78e"
     />
   </div>
 </template>

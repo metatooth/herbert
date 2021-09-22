@@ -52,7 +52,7 @@ const ZoneTarget = Vue.extend({
 
   computed: {
     color(): string {
-      return this.zone.isDay(this.ts) ? "warning" : "info";
+      return this.zone.isDay(this.ts) ? "#ffe08a" : "#3e8ed0";
     },
 
     temperature(): number {
