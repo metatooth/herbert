@@ -71,7 +71,6 @@ class HerbertSocket {
   }
 
   public async sendWorkerConfig(id: string) {
-    console.log("*** UPDATE WORKER ***");
     const worker = await readWorker(id);
 
     if (!worker) {
