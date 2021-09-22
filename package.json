@@ -1,6 +1,6 @@
 {
   "name": "herbert",
-  "version": "0.21.0",
+  "version": "0.23.0",
   "description": "Control your grow environment.",
   "main": "index.js",
   "engines": {
