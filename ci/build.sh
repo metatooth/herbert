@@ -5,7 +5,7 @@ BRANCH=$2
 INVENTORY=$3
 
 if [ -z "${SERVICE}" ] || [ -z "${BRANCH}" ] || [ -z "${INVENTORY}" ]; then
-  echo "must set both SERVICE & BRANCH & INVENTORY env vars"
+  echo "usage: ./build.sh SERVICE BRANCH INVENTORY"
   exit 1
 fi
 
