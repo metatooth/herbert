@@ -7,6 +7,21 @@
     - service_file: dist/worker/main.js
 
   tasks:
+    - name: Enable I2C
+      become: yes
+      shell: "raspi-config nonint do_i2c 0"
+
+    - name: Clone 8relind-rpi
+      git:
+        repo: 'https://github.com/SequentMicrosystems/8relind-rpi.git'
+        dest: /home/{{ ansible_user }}/8relind-rpi
+
+    - name: Build and install 8relind-rpi
+      become: yes
+      make:
+        chdir: /home/{{ ansible_user }}/8relind-rpi
+        target: install
+
     - name: Install System Dependencies
       become: yes
       apt:
