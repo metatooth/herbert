@@ -6,7 +6,8 @@ import {
   makeErrorMessage,
   makeMeterStatusMessage,
   makeSwitchStatusMessage,
-  makeWorkerRegisterMessage
+  makeWorkerRegisterMessage,
+  makeWorkerStatusMessage
 } from "../shared/message-creators";
 import { AnySocketMessage } from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/util";
@@ -18,7 +19,8 @@ import {
   readWorker,
   registerDevice,
   registerMeter,
-  registerWorker
+  registerWorker,
+  updateWorker
 } from "./db";
 
 interface CustomSocket extends WebSocket {
@@ -54,7 +56,7 @@ class HerbertSocket {
 
   public sendByDeviceID(deviceID: string, msg: AnySocketMessage) {
     this.wss.clients.forEach(c => {
-      if ((c as CustomSocket).devices.has(deviceID.toLowerCase())) {
+      if ((c as CustomSocket).devices.has(deviceID)) {
         c.send(JSON.stringify(msg));
       }
     });
@@ -69,7 +71,6 @@ class HerbertSocket {
   }
 
   public async sendWorkerConfig(id: string) {
-    console.log("*** UPDATE WORKER ***");
     const worker = await readWorker(id);
 
     if (!worker) {
@@ -182,6 +183,12 @@ class HerbertSocket {
       (ws as CustomSocket).id = msg.payload.worker.toLowerCase();
       await registerWorker(msg.payload.worker, msg.payload.inet);
       this.sendWorkerConfig(msg.payload.worker);
+      return;
+    }
+
+    if (messageIsFrom(makeWorkerStatusMessage, msg)) {
+      (ws as CustomSocket).id = msg.payload.worker.toLowerCase();
+      await updateWorker(msg.payload.worker);
       return;
     }
 

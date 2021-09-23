@@ -1,10 +1,12 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <span :class="iconClass">
+      <span :class="iconClass" :style="text">
         <font-awesome-icon :icon="icon" />
       </span>
-      <span :class="displayClass"> {{ formatted }} {{ units }} </span>
+      <span :class="displayClass" :style="background">
+        {{ formatted }} {{ units }}
+      </span>
     </div>
   </div>
 </template>
@@ -18,17 +20,25 @@ const Target = Vue.extend({
     value: Number,
     precision: Number,
     units: String,
-    color: { type: String, default: "grey" },
+    color: { type: String, default: "#ffffff" },
     size: { type: String, default: "medium" }
   },
 
   computed: {
+    background(): string {
+      return `background-color: ${this.color};`;
+    },
+
+    text(): string {
+      return `color: ${this.color};`;
+    },
+
     displayClass(): string {
-      return `tag has-text-black-bis has-background-${this.color} is-${this.size}`;
+      return `tag has-text-black-bis is-${this.size}`;
     },
 
     iconClass(): string {
-      return `tag has-text-${this.color} has-background-black-bis is-${this.size}`;
+      return `tag has-background-black-bis is-${this.size}`;
     },
 
     formatted(): string {

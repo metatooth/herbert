@@ -21,13 +21,11 @@
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
       <div class="content">
-        <div class="tags is-grouped is-grouped-multiline">
-          <device-tag
-            v-for="device in zone.devices"
-            :key="device.device"
-            :device="device"
-          />
-        </div>
+        <device-tag
+          v-for="device in sorted"
+          :key="device.device"
+          :device="device"
+        />
       </div>
       <div class="content">
         <button class="button is-small" :class="statusClass" @click="toggle">
@@ -46,6 +44,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
+import { Device } from "@/store/devices/types";
 import { Zone } from "@/store/zones/types";
 import ZoneActual from "@/components/ZoneActual.vue";
 import Timestamp from "@/components/Timestamp.vue";
@@ -99,6 +98,17 @@ const ZoneTile = Vue.extend({
       } else {
         return "toggle-off";
       }
+    },
+
+    sorted(): Device[] {
+      const devices = [];
+      this.zone.devices.forEach(d => {
+        devices.push(Object.assign(new Device(), d));
+      });
+      devices.sort((a, b) => {
+        return a.devicetype > b.devicetype;
+      });
+      return devices;
     },
 
     ...mapGetters("settings", ["settings"])

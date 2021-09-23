@@ -47,7 +47,7 @@ const Workers = Vue.extend({
     ...mapGetters("workers", ["workers"]),
 
     activeSet() {
-      return this.workers.filter(el => {
+      const active = this.workers.filter(el => {
         if (el.nickname) {
           if (el.nickname.match(this.filter)) {
             return true;
@@ -55,6 +55,12 @@ const Workers = Vue.extend({
         }
 
         return el.worker.match(this.filter);
+      });
+      return active.sort((a, b) => {
+        const A = a.nickname ? a.nickname : a.macaddr;
+        const B = b.nickname ? b.nickname : b.macaddr;
+
+        return A > B;
       });
     },
 

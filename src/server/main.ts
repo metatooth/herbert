@@ -131,9 +131,8 @@ async function run() {
       let isblower = blower.isOn(min * 60 + sec);
 
       console.log("blower is on?", min, sec, isblower);
-      if (!isblower) {
-        const parent = await parentZone(zone.id);
-
+      const parent = await parentZone(zone.id);
+      if (!isblower && parent) {
         let mean = 0;
         if (parent.meters.length !== 0) {
           parent.meters.forEach(meter => {

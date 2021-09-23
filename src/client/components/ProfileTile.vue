@@ -170,7 +170,7 @@
             :precision="1"
             :units="unitsWithDegree"
             size="small"
-            color="warning"
+            color="#ffe08a"
           />
           <target
             icon="tint"
@@ -178,7 +178,7 @@
             :precision="0"
             units="%"
             size="small"
-            color="warning"
+            color="#ffe08a"
           />
           <target
             icon="cloud"
@@ -186,7 +186,7 @@
             :precision="1"
             units="hPa"
             size="small"
-            color="warning"
+            color="#ffe08a"
           />
         </div>
 
@@ -197,7 +197,7 @@
             :precision="1"
             :units="unitsWithDegree"
             size="small"
-            color="info"
+            color="#3e8ed0"
           />
           <target
             icon="tint"
@@ -205,7 +205,7 @@
             :precision="0"
             units="%"
             size="small"
-            color="info"
+            color="#3e8ed0"
           />
           <target
             icon="cloud"
@@ -213,7 +213,7 @@
             :precision="1"
             units="hPa"
             size="small"
-            color="info"
+            color="#3e8ed0"
           />
         </div>
 

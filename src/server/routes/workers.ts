@@ -40,4 +40,13 @@ router.put("/:id", async (req, res) => {
   res.status(200).json(await readWorker(rows[0].worker));
 });
 
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  await query(
+    "UPDATE workers SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE worker = $1",
+    [id]
+  );
+  res.status(204).json({});
+});
+
 export default router;

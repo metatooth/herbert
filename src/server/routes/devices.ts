@@ -34,7 +34,7 @@ router.put("/:id/:action", async (req, res) => {
     timestamp: new Date().toString()
   });
   herbertSocket.sendByDeviceID(device.device, cmd);
-  res.status(200);
+  res.status(204).json({});
 });
 
 router.delete("/:id", async (req, res) => {

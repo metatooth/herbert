@@ -36,7 +36,7 @@ const Meters = Vue.extend({
     ...mapGetters("meters", ["meters"]),
 
     activeSet() {
-      return this.meters.filter(el => {
+      const active = this.meters.filter(el => {
         if (el.nickname) {
           if (el.nickname.match(this.filter)) {
             return true;
@@ -44,6 +44,13 @@ const Meters = Vue.extend({
         }
 
         return el.device.match(this.filter);
+      });
+      return active.sort((a, b) => {
+        if (a.nickname && b.nickname) {
+          return a.nickname > b.nickname;
+        } else {
+          return a.device > b.device;
+        }
       });
     },
 

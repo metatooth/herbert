@@ -35,9 +35,17 @@
         <span class="is-family-code">{{ worker.inet }}</span>
       </div>
       <div class="content">
-        <timestamp :timestamp="timestamp" :readable="readable" />
+        <timestamp
+          :timestamp="new Date(worker.updatedat)"
+          :readable="readable"
+        />
       </div>
-      <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
+      <edit-controls
+        @on-edit="editable"
+        @on-save="save"
+        @on-cancel="cancel"
+        @on-destroy="destroy"
+      />
     </div>
   </div>
 </template>
@@ -59,7 +67,6 @@ const WorkerTile = Vue.extend({
     return {
       nickname: this.worker.nickname,
       configname: this.worker.configname,
-      timestamp: new Date(Date.parse(this.worker.updatedat)),
       config: JSON.stringify(this.worker.config),
       readable: true,
       editing: false
@@ -92,13 +99,19 @@ const WorkerTile = Vue.extend({
       this.editing = false;
     },
 
+    destroy() {
+      if (confirm("OK to remove?")) {
+        this.remove(this.worker);
+      }
+    },
+
     cancel() {
       this.nickname = this.worker.nickname;
       this.configname = this.worker.configname;
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit"])
+    ...mapActions("workers", ["edit", "remove"])
   }
 });
 

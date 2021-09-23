@@ -1,6 +1,6 @@
 # Herbert
 
-An environment control system with SwitchBot and WYZE devices.
+An environment control system with Raspiberry Pi, SwitchBot, and WYZE.
 
 ## Getting Started
 
