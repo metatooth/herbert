@@ -40,7 +40,12 @@
           :readable="readable"
         />
       </div>
-      <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
+      <edit-controls
+        @on-edit="editable"
+        @on-save="save"
+        @on-cancel="cancel"
+        @on-destroy="destroy"
+      />
     </div>
   </div>
 </template>
@@ -94,13 +99,19 @@ const WorkerTile = Vue.extend({
       this.editing = false;
     },
 
+    destroy() {
+      if (confirm("OK to remove?")) {
+        this.remove(this.worker);
+      }
+    },
+
     cancel() {
       this.nickname = this.worker.nickname;
       this.configname = this.worker.configname;
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit"])
+    ...mapActions("workers", ["edit", "remove"])
   }
 });
 
