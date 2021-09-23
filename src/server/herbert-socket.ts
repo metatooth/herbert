@@ -56,7 +56,7 @@ class HerbertSocket {
 
   public sendByDeviceID(deviceID: string, msg: AnySocketMessage) {
     this.wss.clients.forEach(c => {
-      if ((c as CustomSocket).devices.has(deviceID.toLowerCase())) {
+      if ((c as CustomSocket).devices.has(deviceID)) {
         c.send(JSON.stringify(msg));
       }
     });

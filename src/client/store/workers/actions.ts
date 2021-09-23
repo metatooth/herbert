@@ -18,5 +18,9 @@ export const actions: ActionTree<WorkersState, RootState> = {
       });
       commit("SET", payload);
     });
+  },
+  remove({ commit }, payload: Worker) {
+    HTTP.delete(`/workers/${payload.worker}`);
+    commit("REMOVE", payload);
   }
 };
