@@ -1,3 +1,6 @@
+HERBERT_BRANCH ?= local
+ANSIBLE_INVENTORY ?= ansible/inventory
+
 .PHONY: all
 all: deploy-all
 
@@ -11,16 +14,26 @@ ifeq ($(HERBERT_BRANCH),)
 	@exit 1
 endif
 
+.PHONY: check_inventory
+check_inventory:
+ifeq ($(ANSIBLE_INVENTORY),)
+	@echo ""
+	@echo "Must set ANSIBLE_INVENTORY. Use \"ansible/inventory\" to use invetory"
+  @echo	"from current repository."
+	@echo ""
+	@exit 1
+endif
+
 .PHONY: deploy-all
 deploy-all: deploy-databases deploy-servers deploy-workers deploy-clients deploy-kiosks
 
 .PHONY: build
-build: check_branch
-	./build.sh $(SERVICE) $(HERBERT_BRANCH)
+build: check_branch check_inventory
+	./build.sh $(SERVICE) $(HERBERT_BRANCH) ${ANSIBLE_INVENTORY}
 
 .PHONY: deploy
 deploy:
-	ansible-playbook -i ansible/inventory ansible/$(SERVICE).yml
+	ansible-playbook -i ${ANSIBLE_INVENTORY} ansible/$(SERVICE).yml
 
 .PHONY: deploy-databases
 deploy-databases:
