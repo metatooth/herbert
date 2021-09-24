@@ -53,3 +53,11 @@ client_port=8080
 wss_host="{{ groups['socket_servers'][0] }}"
 wss_port="{{ hostvars[groups['socket_servers'][0]].wss_port }}"
 wss_url="ws://{{ wss_host }}:{{ wss_port }}"
+
+[kiosks]
+<add_kiosk_hosts>
+
+[kiosks:vars]
+client_host="{{ groups['clients'][0] }}"
+client_port="{{ hostvars[groups['clients'][0]].client_port }}"
+client_url="http://{{ client_host }}:{{ client_port }}"
