@@ -28,7 +28,7 @@
         <span>
           <button class="button is-small" @click="toggle">
             <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
-            <span>{{ device.status }}</span>
+            <span>{{ status }}</span>
           </button>
         </span>
         &nbsp;
@@ -81,9 +81,9 @@ const DeviceTile = Vue.extend({
     return {
       nickname: this.device.nickname,
       devicetype: this.device.devicetype,
+      status: this.device.status,
       readable: true,
       editing: false,
-      updating: false
     };
   },
 
@@ -99,25 +99,21 @@ const DeviceTile = Vue.extend({
         return n.id === this.device.device;
       });
 
-      let style = "icon";
+      let style;
 
-      if (found || this.device.status === "disconnected") {
-        style = `has-text-danger ${style}`;
-      } else if (this.device.status === "on" || this.device.status === "1") {
-        style = `has-text-success ${style}`;
-      } else if (this.device.status === "off" || this.device.status === "0") {
-        style = `has-text-warning ${style}`;
-      }
-
-      if (this.updating) {
-        style = `is-loading ${style}`;
+      if (found || this.status === "disconnected") {
+        style = "icon has-text-danger";
+      } else if (this.status === "on") {
+        style = "icon has-text-success";
+      } else if (this.status === "off") {
+        style = "icon has-text-warning";
       }
 
       return style;
     },
 
     deviceIcon() {
-      if (this.device.status !== "on" && this.device.status !== "off") {
+      if (this.status !== "on" && this.status !== "off") {
         return "times";
       }
 
@@ -143,7 +139,7 @@ const DeviceTile = Vue.extend({
     },
 
     statusClass() {
-      if (this.device.status === "on" || this.device.status === "1") {
+      if (this.status === "on") {
         return "has-text-success";
       } else {
         return "has-text-info";
@@ -151,7 +147,7 @@ const DeviceTile = Vue.extend({
     },
 
     statusIcon() {
-      if (this.device.status === "on" || this.device.status === "1") {
+      if (this.status === "on") {
         return "toggle-on";
       } else {
         return "toggle-off";
@@ -164,9 +160,11 @@ const DeviceTile = Vue.extend({
   methods: {
     toggle() {
       this.updating = true;
-      if (this.device.status === "off" || this.device.status === "0") {
+      if (this.status === "off") {
+        this.status = "on";
         this.on(this.device.device);
-      } else if (this.device.status === "on" || this.device.status === "1") {
+      } else if (this.status === "on") {
+        this.status = "off";
         this.off(this.device.device);
       }
     },
