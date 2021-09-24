@@ -15,8 +15,11 @@ import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
 import { zonedTimeToUtc } from "date-fns-tz";
-import { herbertSocket } from "./herbert-socket";
-import { makeCommandMessage } from "../shared/message-creators";
+import {
+  makeBroadcastAllMessage,
+  makeCommandMessage
+} from "../shared/message-creators";
+import { sendSocketMessage } from "./util";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");
@@ -34,7 +37,7 @@ console.log("cors added");
 mountRoutes(app);
 console.log("routes added");
 
-const port = process.env.PORT || 5000;
+const port = process.env.API_PORT || 5000;
 
 app.get("/", (req, res) => {
   res.send("OK");
@@ -54,7 +57,6 @@ process.env.TZ = "ETC/Utc";
 const server = http.createServer(app);
 server.listen(port);
 console.log("http server listening on %d", port);
-herbertSocket.init(server);
 
 async function run() {
   const zones = await readActiveZones();
@@ -171,7 +173,7 @@ async function run() {
               action: action,
               timestamp: new Date().toString()
             });
-            herbertSocket.broadcastAll(msg);
+            sendSocketMessage(makeBroadcastAllMessage(msg));
           }
         });
       });
@@ -199,7 +201,7 @@ async function run() {
               action: action,
               timestamp: new Date().toString()
             });
-            herbertSocket.broadcastAll(msg);
+            sendSocketMessage(makeBroadcastAllMessage(msg));
           }
         });
       });

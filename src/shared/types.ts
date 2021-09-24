@@ -92,7 +92,10 @@ export enum SocketMessageType {
   Register = "REGISTER",
   Command = "COMMAND",
   Configure = "CONFIGURE",
-  Error = "ERROR"
+  Error = "ERROR",
+  SendWorkerConfig = "SEND_WORKER_CONFIG",
+  BroadcastAll = "BROADCAST_ALL",
+  SendByDeviceID = "SEND_BY_DEVICE_ID"
 }
 
 // Represents a simple message consisting only of a type
@@ -107,7 +110,7 @@ export interface SocketMessage<T extends SocketMessageType, P>
 }
 
 // Represents any socket message
-export type AnySocketMessage = SocketMessage<SocketMessageType, any>;
+export type AnySocketMessage = SocketMessage<SocketMessageType, unknown>;
 
 // Represents a function that creates a socket message object
 export type MessageCreator<T extends SocketMessageType, P> = (
@@ -119,7 +122,7 @@ export type MessageCreator<T extends SocketMessageType, P> = (
 export interface EnhancedMessageCreator<T extends SocketMessageType, P>
   extends MessageCreator<T, P> {
   type: T;
-  isOfType(msg: SocketMessage<T, any>): msg is SocketMessage<T, P>;
+  isOfType(msg: SocketMessage<T, unknown>): msg is SocketMessage<T, P>;
 }
 
 // Represents the payload for a register message from a worker
@@ -173,4 +176,9 @@ export interface MeterStatusPayload {
   humidity: number;
   pressure: number;
   timestamp: string;
+}
+
+export interface SendByDeviceIDPayload {
+  device: string;
+  msg: AnySocketMessage;
 }

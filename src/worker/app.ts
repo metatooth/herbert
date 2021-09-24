@@ -11,7 +11,7 @@ import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
 import { AnySocketMessage, CommandPayload } from "../shared/types";
-import { isSocketMessage, messageIsFrom } from "../shared/util";
+import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import {
   makeCommandMessage,
   makeConfigureMessage,
@@ -56,7 +56,7 @@ interface ConfigDevice {
 export class App {
   private static instance: App;
   private config: any = {};
-  private wsUrl = process.env.WS_URL || "";
+  private wsUrl = process.env.WSS_URL || "";
   private closed = false;
   initialized = false;
   socket?: WebSocket = undefined;
@@ -74,7 +74,7 @@ export class App {
     return App.instance;
   }
 
-  public init(): Promise<void> {
+  public async init(): Promise<void> {
     console.info("=====================================");
     console.info("== Herbert Worker = Starting up... ==");
     console.info("=====================================");
@@ -101,7 +101,7 @@ export class App {
 
     console.info("device network info", this.macaddr, this.inet);
 
-    this.createSocket();
+    await this.createSocket();
 
     return new Promise(resolve => {
       const i = setInterval(() => {
@@ -143,18 +143,7 @@ export class App {
       console.debug("Check on WYZE plugs...");
       const wyzes = await this.wyze.getDeviceList();
       wyzes.forEach(async (wyze: WyzeDevice) => {
-        const mac = this.formatMacAddress(wyze.mac);
-        if (wyze.conn_state === 0) {
-          const msg = makeErrorMessage({
-            id: mac,
-            device: mac,
-            message: "disconnected",
-            timestamp: new Date().toString()
-          });
-          this.send(msg);
-        }
-
-        const plug = new WyzeSwitch(mac);
+        const plug = new WyzeSwitch(this.formatMacAddress(wyze.mac));
 
         if (wyze.conn_state === 0) {
           plug.state = "disconnected";
@@ -291,14 +280,17 @@ export class App {
   }
 
   private async createSocket(): Promise<void> {
-    if (this.socket) {
-      this.stop();
-    }
+    return new Promise(resolve => {
+      if (this.socket) {
+        this.stop();
+      }
 
-    this.socket = new WebSocket(this.wsUrl);
-    this.socket.on("error", this.onSocketError);
-    this.socket.on("close", this.onSocketClose);
-    this.socket.on("message", this.handleSocketMessage);
+      this.socket = new WebSocket(this.wsUrl);
+      this.socket.on("open", resolve);
+      this.socket.on("error", this.onSocketError);
+      this.socket.on("close", this.onSocketClose);
+      this.socket.on("message", this.handleSocketMessage);
+    });
   }
 
   private readonly onSocketError = (err: Error) => {
@@ -342,6 +334,11 @@ export class App {
         await this.updateWYZE(data.payload);
         this.updateSwitches(data.payload);
         console.info("Done.");
+        return;
+      }
+
+      if (messageIsFrom(makeErrorMessage, data)) {
+        console.error("!! ERROR !!", data.payload);
         return;
       }
 

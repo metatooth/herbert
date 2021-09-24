@@ -1,0 +1,88 @@
+- hosts: socket_servers
+
+  vars:
+    - nodejs_version: '14.x'
+    - service_description: 'Main socket-server for the herbert system'
+    - service_user: root
+    - service_file: dist/socket-server/main.js
+
+  tasks:
+    - name: Install System Dependencies
+      become: yes
+      apt: name={{ item }} update_cache=yes state=latest
+      with_items:
+        - git
+        - gcc
+        - g++
+        - make
+
+    - name: Create {{ appDir }}
+      file:
+        path: '{{ appDir }}'
+        state: directory
+
+    - name: Create {{ appDir }}/dist
+      file:
+        path: '{{ appDir }}/dist'
+        state: directory
+
+    - name: Sync herbert dist
+      synchronize:
+        src: '{{ distDir }}/socket-server'
+        dest: '{{ appDir }}/dist'
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert shared
+      synchronize:
+        src: '{{ distDir }}/shared'
+        dest: '{{ appDir }}/dist'
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert config
+      synchronize:
+        src: '{{ srcDir }}/config'
+        dest: '{{ appDir }}'
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert package.json
+      synchronize:
+        src: '{{ srcDir }}/package.json'
+        dest: '{{ appDir }}'
+
+    - name: Sync herbert package-lock.json
+      synchronize:
+        src: '{{ srcDir }}/package-lock.json'
+        dest: '{{ appDir }}'
+
+    - name: Install nodejs {{nodejs_version}}
+      include_role:
+        name: geerlingguy.nodejs
+        apply:
+          become: yes
+
+    - name: Install production node_modules
+      command: npm install
+      args:
+        chdir: '{{ appDir }}'
+      environment:
+        NODE_ENV: production
+
+    - name: Install socket-server service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/herbert-socket-server.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start herbert-socket-server service
+      become: yes
+      systemd:
+        name: herbert-server
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
