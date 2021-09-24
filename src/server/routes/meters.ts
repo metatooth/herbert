@@ -1,6 +1,6 @@
 import Router from "express-promise-router";
 import { Meter } from "../../shared/types";
-import { query, readMeter, readMeters } from "../db";
+import { query, readMeter, readMeters, registerMeter } from "../db";
 
 const router = Router();
 
@@ -11,6 +11,13 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   res.status(200).json(await readMeter(id));
+});
+
+router.post("/", async (req, res) => {
+  const { body } = req;
+  const { macaddr, manufacturer } = body;
+  await registerMeter(macaddr, manufacturer);
+  res.status(204).send();
 });
 
 router.put("/:id", async (req, res) => {

@@ -1,33 +1,20 @@
-- hosts: workers
+- hosts: socket_servers
 
   vars:
     - nodejs_version: '14.x'
-    - service_description: 'Herbert in-room worker service'
+    - service_description: 'Main socket-server for the herbert system'
     - service_user: root
-    - service_file: dist/worker/main.js
+    - service_file: dist/socket-server/main.js
 
   tasks:
-    - name: Enable I2C
-      become: yes
-      shell: "raspi-config nonint do_i2c 0"
-
-    - name: Clone 8relind-rpi
-      git:
-        repo: 'https://github.com/SequentMicrosystems/8relind-rpi.git'
-        dest: /home/{{ ansible_user }}/8relind-rpi
-
-    - name: Build and install 8relind-rpi
-      become: yes
-      make:
-        chdir: /home/{{ ansible_user }}/8relind-rpi
-        target: install
-
     - name: Install System Dependencies
       become: yes
-      apt:
-        update_cache: yes
-        state: latest
-        name: ['bluetooth', 'bluez', 'libbluetooth-dev', 'libudev-dev', 'git', 'gcc', 'g++', 'make']
+      apt: name={{ item }} update_cache=yes state=latest
+      with_items:
+        - git
+        - gcc
+        - g++
+        - make
 
     - name: Create {{ appDir }}
       file:
@@ -41,7 +28,7 @@
 
     - name: Sync herbert dist
       synchronize:
-        src: '{{ distDir }}/worker'
+        src: '{{ distDir }}/socket-server'
         dest: '{{ appDir }}/dist'
         recursive: yes
         delete: yes
@@ -83,19 +70,19 @@
       environment:
         NODE_ENV: production
 
-    - name: Install worker service
+    - name: Install socket-server service
       become: yes
       template:
         src: ./templates/systemd-service.j2
-        dest: /etc/systemd/system/herbert-worker.service
+        dest: /etc/systemd/system/herbert-socket-server.service
         owner: root
         group: root
         mode: '0644'
 
-    - name: Enable and start herbert-worker service
+    - name: Enable and start herbert-socket-server service
       become: yes
       systemd:
-        name: herbert-worker
+        name: herbert-server
         state: restarted
         daemon_reload: yes
         enabled: yes

@@ -1,6 +1,6 @@
 import Router from "express-promise-router";
 
-import { query } from "../db";
+import { createStatus, query } from "../db";
 
 const router = Router();
 
@@ -58,6 +58,13 @@ router.get("/", async (req, res) => {
     );
     res.status(200).json(rows);
   }
+});
+
+router.post("/", async (req, res) => {
+  const { body } = req;
+  const { device, status, ts } = body;
+  await createStatus(device, status, new Date(ts));
+  res.status(204).send();
 });
 
 export default router;

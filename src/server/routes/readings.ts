@@ -1,6 +1,6 @@
 import Router from "express-promise-router";
 
-import { query } from "../db";
+import { createReading, query } from "../db";
 
 const router = Router();
 
@@ -58,6 +58,14 @@ router.get("/", async (req, res) => {
     );
     res.status(200).json(rows);
   }
+});
+
+router.post("/", async (req, res) => {
+  const { body } = req;
+  const { meter, temperature, humidity, pressure, ts } = body;
+  const dateObj = new Date(ts);
+  await createReading(meter, temperature, humidity, pressure, dateObj);
+  res.status(204).send();
 });
 
 export default router;
