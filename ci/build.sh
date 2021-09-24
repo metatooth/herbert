@@ -2,19 +2,20 @@
 
 SERVICE=$1
 BRANCH=$2
+INVENTORY=$3
 
-if [ -z "${SERVICE}" ] || [ -z "${BRANCH}" ]; then
-  echo "must set both SERVICE & BRANCH env vars"
+if [ -z "${SERVICE}" ] || [ -z "${BRANCH}" ] || [ -z "${INVENTORY}" ]; then
+  echo "usage: ./build.sh SERVICE BRANCH INVENTORY"
   exit 1
 fi
 
 HERE=$( cd $( dirname "${BASH_SOURCE[0]}" ) >/dev/null 2>&1 && pwd )
 TOPDIR=$( dirname ${HERE} )
 
-API_HOST=$(cat ansible/inventory | grep -C 1 '\[servers\]' | awk 'NR==3')
-API_PORT=$(cat ansible/inventory | grep api_port= | awk -F= 'NR==1 { print $2 }')
-WSS_HOST=$(cat ansible/inventory | grep -C 1 '\[socket_servers\]' | awk 'NR==3')
-WSS_PORT=$(cat ansible/inventory | grep wss_port= | awk -F= 'NR==2 { print $2 }')
+API_HOST=$(cat ${INVENTORY} | grep -C 1 '\[servers\]' | awk 'NR==3')
+API_PORT=$(cat ${INVENTORY} | grep api_port= | awk -F= 'NR==1 { print $2 }')
+WSS_HOST=$(cat ${INVENTORY} | grep -C 1 '\[socket_servers\]' | awk 'NR==3')
+WSS_PORT=$(cat ${INVENTORY} | grep wss_port= | awk -F= 'NR==2 { print $2 }')
 VUE_APP_API_URL=http://${API_HOST}:${API_PORT}
 VUE_APP_WS_URL=ws://${WSS_HOST}:${WSS_PORT}
 
