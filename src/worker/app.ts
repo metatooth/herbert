@@ -75,9 +75,9 @@ export class App {
   }
 
   public async init(): Promise<void> {
-    logger.info("=====================================");
-    logger.info("== Herbert Worker = Starting up... ==");
-    logger.info("=====================================");
+    console.info("=====================================");
+    console.info("== Herbert Worker = Starting up... ==");
+    console.info("=====================================");
 
     const ifaces = networkInterfaces();
     console.info("network interfaces", ifaces);
@@ -99,7 +99,7 @@ export class App {
       this.inet = net[0]["address"];
     }
 
-    logger.info("device network info", this.macaddr, this.inet);
+    console.info("device network info", this.macaddr, this.inet);
 
     await this.createSocket();
 
@@ -143,18 +143,7 @@ export class App {
       console.debug("Check on WYZE plugs...");
       const wyzes = await this.wyze.getDeviceList();
       wyzes.forEach(async (wyze: WyzeDevice) => {
-        const mac = this.formatMacAddress(wyze.mac);
-        if (wyze.conn_state === 0) {
-          const msg = makeErrorMessage({
-            id: mac,
-            device: mac,
-            message: "disconnected",
-            timestamp: new Date().toString()
-          });
-          this.send(msg);
-        }
-
-        const plug = new WyzeSwitch(mac);
+        const plug = new WyzeSwitch(this.formatMacAddress(wyze.mac));
 
         if (wyze.conn_state === 0) {
           plug.state = "disconnected";
@@ -349,11 +338,11 @@ export class App {
       }
 
       if (messageIsFrom(makeErrorMessage, data)) {
-        logger.error("!! ERROR !!", data.payload);
+        console.error("!! ERROR !!", data.payload);
         return;
       }
 
-      logger.debug("unhandled socket message", data);
+      console.debug("unhandled socket message", data);
     } catch (e) {
       console.error("socket message error:", e);
     }
