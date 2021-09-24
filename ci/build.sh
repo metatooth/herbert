@@ -59,3 +59,8 @@ if [ "${SERVICE}" = "client" ]; then
 else
   cp -R config $DEPLOYMENT_DIR
 fi
+
+if [ "${SERVICE}" = "kiosk" ]; then
+  mkdir $DEPLOYMENT_DIR/scripts
+  cp scripts/kiosk.sh $DEPLOYMENT_DIR/scripts/kiosk.sh
+fi
