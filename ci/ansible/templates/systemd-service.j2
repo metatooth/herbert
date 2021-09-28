@@ -11,11 +11,12 @@ Restart=always
 User={{ service_user }}
 Environment=DATABASE_URL={{ dburl | default("") }}
 Environment=NODE_ENV={{ node_env | default("") }}
-Environment=WSS_URL={{ wss_url | default("") }}
 Environment=API_URL={{ api_url | default("") }}
-Environment=CLIENT_PORT={{ client_port | default("") }}
-Environment=API_PORT={{ api_port | default("") }}
-Environment=WSS_PORT={{ wss_port | default("") }}
+Environment=API_PORT={{ api_port | default("2929") }}
+Environment=WSS_URL={{ wss_url | default("") }}
+Environment=WSS_PORT={{ wss_port | default("5000") }}
+Environment=CLIENT_URL={{ client_url | default("") }}
+Environment=CLIENT_PORT={{ client_port | default("8080") }}
 
 [Install]
 WantedBy=multi-user.target
