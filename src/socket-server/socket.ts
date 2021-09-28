@@ -127,7 +127,6 @@ export class HerbertSocket {
       }
 
       this.processMessage(ws, data);
-      this.broadcastAllExcept(data, ws);
     };
   };
 
