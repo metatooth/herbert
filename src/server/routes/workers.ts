@@ -34,6 +34,12 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
+  await updateWorker(id);
+  res.status(204).send();
+});
+
+router.put("/:id/config", async (req, res) => {
+  const { id } = req.params;
   const config = await readConfig(req.body.configname);
   const jsonStr = JSON.stringify(config.config);
 
