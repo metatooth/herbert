@@ -6,7 +6,7 @@ import { RootState } from "../types";
 export const actions: ActionTree<WorkersState, RootState> = {
   edit({ commit }, payload: Worker) {
     const json = JSON.stringify(payload);
-    HTTP.put(`/workers/${payload.worker}/config`, json).then(response => {
+    HTTP.put(`/workers/${payload.worker}`, json).then(response => {
       commit("EDIT", Object.assign(new Worker(), response.data));
     });
   },
