@@ -27,9 +27,7 @@
             {{ config.nickname }}
           </option>
         </select>
-        <div class="is-family-code">
-          {{ configname }} : {{ config }}
-        </div>
+        <div class="is-family-code">{{ configname }} : {{ config }}</div>
       </div>
       <div class="content">
         <span class="is-family-code">{{ worker.inet }}</span>
@@ -80,14 +78,14 @@ const WorkerTile = Vue.extend({
 
   watch: {
     configname() {
-      this.configs.forEach((config) => {
-        if (this.configname === config.nickname) { 
+      this.configs.forEach(config => {
+        if (this.configname === config.nickname) {
           this.config = config.config;
         }
-      });      
+      });
     }
   },
-  
+
   computed: {
     lastupdate() {
       return new Date(Date.parse(this.worker.updatedat));

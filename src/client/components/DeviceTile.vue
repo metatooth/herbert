@@ -83,7 +83,7 @@ const DeviceTile = Vue.extend({
       devicetype: this.device.devicetype,
       status: this.device.status,
       readable: true,
-      editing: false,
+      editing: false
     };
   },
 
