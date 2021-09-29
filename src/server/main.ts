@@ -16,7 +16,7 @@ import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
 import { zonedTimeToUtc } from "date-fns-tz";
 import {
-  makeBroadcastAllMessage,
+  makeSendByDeviceIDMessage,
   makeCommandMessage
 } from "../shared/message-creators";
 import { sendSocketMessage } from "./util";
@@ -168,12 +168,13 @@ async function run() {
         zone.devices.map(device => {
           if (device.devicetype === key) {
             const action = value ? "on" : "off";
-            const msg = makeCommandMessage({
+            const cmd = makeCommandMessage({
               device: device.device,
               action: action,
               timestamp: new Date().toString()
             });
-            sendSocketMessage(makeBroadcastAllMessage(msg));
+            const payload = { device: device.device, msg: cmd };
+            sendSocketMessage(makeSendByDeviceIDMessage(payload));
           }
         });
       });
@@ -196,12 +197,13 @@ async function run() {
             const action = irrigator.isOn(ms % 86400000, ++counter)
               ? "on"
               : "off";
-            const msg = makeCommandMessage({
+            const cmd = makeCommandMessage({
               device: device.device,
               action: action,
               timestamp: new Date().toString()
             });
-            sendSocketMessage(makeBroadcastAllMessage(msg));
+            const payload = { device: device.device, msg: cmd };
+            sendSocketMessage(makeSendByDeviceIDMessage(payload));
           }
         });
       });
