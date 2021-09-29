@@ -119,6 +119,7 @@ export class App {
   }
 
   public readonly run = async (): Promise<void> => {
+    console.info("Starting run...");
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
@@ -129,18 +130,15 @@ export class App {
     const interval: number = 1000 * parseInt(this.config.interval || 30);
 
     if (!isMockWorker()) {
-      console.debug("Start SwitchBot scan %dms ...", polling);
       const switchbot = new Switchbot();
       switchbot.onadvertisement = this.switchBotHandler;
       switchbot.startScan();
       switchbot.wait(polling);
       switchbot.stopScan();
       this.switchbot = switchbot;
-      console.debug("Done switchbot scan.");
     }
 
     if (this.wyze) {
-      console.debug("Check on WYZE plugs...");
       const wyzes = await this.wyze.getDeviceList();
       wyzes.forEach(async (wyze: WyzeDevice) => {
         const plug = new WyzeSwitch(this.formatMacAddress(wyze.mac));
@@ -157,9 +155,6 @@ export class App {
       });
     }
 
-    console.debug("Done.");
-
-    console.debug("Other meters...");
     this.meters.forEach(meter => {
       if (meter.manufacturer === "mockmeter") {
         const now = new Date().getTime();
@@ -170,13 +165,10 @@ export class App {
       }
       this.meterStatus(meter);
     });
-    console.debug("Done.");
 
-    console.debug("Herbert switches...");
     this.switches.forEach(plug => {
       this.switchStatus(plug.status());
     });
-    console.debug("Done.");
 
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
@@ -184,6 +176,7 @@ export class App {
     }
 
     this.runTimeout = setTimeout(this.run, interval);
+    console.info("Done.");
   };
 
   public stop() {
@@ -355,13 +348,11 @@ export class App {
     }
 
     try {
-      console.debug("Sending data", data);
       this.socket.send(JSON.stringify(data));
 
       for (let i = 0; i < this.heldMessages.length; ++i) {
         if (this.socket) {
           const msg = this.heldMessages.shift();
-          console.debug("Sending held message", msg);
           this.socket.send(JSON.stringify(msg));
         }
       }
@@ -383,7 +374,7 @@ export class App {
         }
         if (result.code !== "1") {
           console.error(
-            `ERROR ${result.code} ${device.nickname} ${data.action} - ${result}`
+            `ERROR ${result.code} ${device.nickname} ${data.action} - ${result.code} - ${result.message}`
           );
           const reply = makeErrorMessage({
             message: result.msg,
