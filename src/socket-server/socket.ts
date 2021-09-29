@@ -116,7 +116,7 @@ export class HerbertSocket {
       try {
         data = JSON.parse(msg);
       } catch (e) {
-        console.error(e.message);
+        console.error("get on message func", e.message);
         this.sendError(ws, e.message);
         return;
       }
@@ -202,7 +202,7 @@ export class HerbertSocket {
 
       this.sendWorkerConfig(payload.worker);
     } catch (e) {
-      console.error(e.message);
+      console.error("handle worker register", e.message);
     }
   }
 
@@ -214,7 +214,7 @@ export class HerbertSocket {
       (ws as CustomSocket).id = payload.worker.toLowerCase();
       await HTTP.put(`/workers/${payload.worker}`);
     } catch (e) {
-      console.error(e.message);
+      console.error("handle worker status", e.message);
     }
   }
 
@@ -254,7 +254,7 @@ export class HerbertSocket {
         });
       }
     } catch (e) {
-      console.error(e.message);
+      console.error("handle switch status", e.message);
     }
   }
 
@@ -301,7 +301,7 @@ export class HerbertSocket {
         });
       }
     } catch (e) {
-      console.error(e.message);
+      console.error("handle meter status", e.message);
     }
   }
 }
