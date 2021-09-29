@@ -1,0 +1,29 @@
+- hosts: kiosks
+
+  tasks:
+    - name: Install System Dependencies
+      become: yes
+      apt:
+        update_cache: yes
+        state: latest
+        name: [ 'xserver-xorg', 'xinit', 'x11-xserver-utils', 'chromium-browser', 'matchbox-window-manager', 'xautomation', 'unclutter' ]
+
+    - name: Create {{ appDir }}
+      file:
+        path: '{{ appDir }}'
+        state: directory
+
+    - name: Sync Herbert scripts
+      synchronize:
+        src: '{{ srcDir }}/scripts'
+        dest: '{{ appDir }}'
+        recursive: yes
+        delete: yes
+
+
+    - name: Add xinit to .bashrc
+      blockinfile:
+        path: /home/{{ ansible_user }}/.bashrc
+        backup: yes
+        block: |
+          xinit /home/herbert/kiosk.sh {{ client_url }} -- vt$(fgconsole)

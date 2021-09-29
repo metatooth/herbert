@@ -1,7 +1,3 @@
-import { configure, getLogger, Logger } from "log4js";
-configure("./config/log4js.json");
-const logger: Logger = getLogger("app");
-
 import {
   vaporPressureAir,
   vaporPressureDeficit,
@@ -46,14 +42,14 @@ export class Environment {
     const air = vaporPressureAir(temperature, humidity);
     const deficit = vaporPressureDeficit(temperature, delta, humidity);
 
-    logger.info(`TARGET TEMP ${this.temp.toFixed(1)} C`);
-    logger.info(`ACTUAL TEMP ${temperature.toFixed(1)} C`);
-    logger.info(`TARGET RH ${this.humidity.toFixed(2)}`);
-    logger.info(`ACTUAL RH ${humidity.toFixed(2)}`);
-    logger.debug(`CALC VPsat ${sat.toFixed(0)} pascals`);
-    logger.debug(`CALC VPair ${air.toFixed(0)} pascals`);
-    logger.info(`TARGET VPd ${this.vpd.toFixed(0)} pascals`);
-    logger.info(`ACTUAL VPd ${deficit.toFixed(0)} pascals`);
+    console.info(`TARGET TEMP ${this.temp.toFixed(1)} C`);
+    console.info(`ACTUAL TEMP ${temperature.toFixed(1)} C`);
+    console.info(`TARGET RH ${this.humidity.toFixed(2)}`);
+    console.info(`ACTUAL RH ${humidity.toFixed(2)}`);
+    console.debug(`CALC VPsat ${sat.toFixed(0)} pascals`);
+    console.debug(`CALC VPair ${air.toFixed(0)} pascals`);
+    console.info(`TARGET VPd ${this.vpd.toFixed(0)} pascals`);
+    console.info(`ACTUAL VPd ${deficit.toFixed(0)} pascals`);
 
     const systems = new Map([
       ["heat", false],

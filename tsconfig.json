@@ -4,6 +4,7 @@
   "references": [
     { "path": "src/shared" },
     { "path": "src/worker" },
-    { "path": "src/server" }
+    { "path": "src/server" },
+    { "path": "src/socket-server" }
   ]
 }

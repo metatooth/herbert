@@ -1,8 +1,11 @@
 import Router from "express-promise-router";
-import { makeCommandMessage } from "../../shared/message-creators";
+import {
+  makeCommandMessage,
+  makeSendByDeviceIDMessage
+} from "../../shared/message-creators";
 import { Device } from "../../shared/types";
-import { query, readDevice, readDevices } from "../db";
-import { herbertSocket } from "../herbert-socket";
+import { query, readDevice, readDevices, registerDevice } from "../db";
+import { sendSocketMessage } from "../util";
 
 const router = Router();
 
@@ -13,6 +16,13 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   res.status(200).json(await readDevice(id));
+});
+
+router.post("/", async (req, res) => {
+  const { body } = req;
+  const { device, manufacturer } = body;
+  await registerDevice(device, manufacturer);
+  res.status(204).send();
 });
 
 router.put("/:id", async (req, res) => {
@@ -33,7 +43,8 @@ router.put("/:id/:action", async (req, res) => {
     action: action,
     timestamp: new Date().toString()
   });
-  herbertSocket.sendByDeviceID(device.device, cmd);
+  const payload = { device: device.device, msg: cmd };
+  await sendSocketMessage(makeSendByDeviceIDMessage(payload));
   res.status(204).json({});
 });
 

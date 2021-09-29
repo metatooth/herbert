@@ -12,13 +12,15 @@ fi
 HERE=$( cd $( dirname "${BASH_SOURCE[0]}" ) >/dev/null 2>&1 && pwd )
 TOPDIR=$( dirname ${HERE} )
 
-SERVER_HOST=$(cat ${INVENTORY} | grep -C 1 '\[servers\]' | awk 'NR==3')
+API_HOST=$(cat ${INVENTORY} | grep -C 1 '\[servers\]' | awk 'NR==3')
 API_PORT=$(cat ${INVENTORY} | grep api_port= | awk -F= 'NR==1 { print $2 }')
-WS_PORT=$(cat ${INVENTORY} | grep ws_port= | awk -F= 'NR==1 { print $2 }')
-VUE_APP_API_URL=http://${SERVER_HOST}:${API_PORT}
-VUE_APP_WS_URL=ws://${SERVER_HOST}:${WS_PORT}
+WSS_HOST=$(cat ${INVENTORY} | grep -C 1 '\[socket_servers\]' | awk 'NR==3')
+WSS_PORT=$(cat ${INVENTORY} | grep wss_port= | awk -F= 'NR==2 { print $2 }')
+VUE_APP_API_URL=http://${API_HOST}:${API_PORT}
+VUE_APP_WS_URL=ws://${WSS_HOST}:${WSS_PORT}
 
 TMP_DIR=/tmp/herbert
+rm -rf $TMP_DIR
 mkdir -p $TMP_DIR
 
 BUILD_DIR=${TMP_DIR}/${BRANCH}
@@ -56,4 +58,9 @@ if [ "${SERVICE}" = "client" ]; then
   cp index.js $DEPLOYMENT_DIR
 else
   cp -R config $DEPLOYMENT_DIR
+fi
+
+if [ "${SERVICE}" = "kiosk" ]; then
+  mkdir $DEPLOYMENT_DIR/scripts
+  cp scripts/kiosk.sh $DEPLOYMENT_DIR/scripts/kiosk.sh
 fi

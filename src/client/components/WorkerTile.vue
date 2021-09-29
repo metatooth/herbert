@@ -12,7 +12,7 @@
             @keyup.enter="save"
           />
         </span>
-        <span v-else>{{ worker.nickname || worker.worker }}</span>
+        <span v-else>{{ nickname }}</span>
       </p>
       <p class="subtitle">
         <span class="icon has-text-success">
@@ -27,9 +27,7 @@
             {{ config.nickname }}
           </option>
         </select>
-        <div class="is-family-code">
-          {{ worker.configname }} : {{ worker.config }}
-        </div>
+        <div class="is-family-code">{{ configname }} : {{ config }}</div>
       </div>
       <div class="content">
         <span class="is-family-code">{{ worker.inet }}</span>
@@ -56,7 +54,7 @@ import Vue from "vue";
 import EditControls from "@/components/EditControls.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import { Worker } from "@/store/workers/types";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 const WorkerTile = Vue.extend({
   props: {
@@ -65,7 +63,7 @@ const WorkerTile = Vue.extend({
 
   data() {
     return {
-      nickname: this.worker.nickname,
+      nickname: this.worker.nickname || this.worker.worker,
       configname: this.worker.configname,
       config: JSON.stringify(this.worker.config),
       readable: true,
@@ -78,11 +76,21 @@ const WorkerTile = Vue.extend({
     Timestamp
   },
 
+  watch: {
+    configname() {
+      this.configs.forEach(config => {
+        if (this.configname === config.nickname) {
+          this.config = config.config;
+        }
+      });
+    }
+  },
+
   computed: {
     lastupdate() {
       return new Date(Date.parse(this.worker.updatedat));
     },
-    ...mapState("configs", ["configs"])
+    ...mapGetters("configs", ["configs"])
   },
 
   methods: {

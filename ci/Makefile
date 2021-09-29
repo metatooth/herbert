@@ -25,7 +25,12 @@ ifeq ($(ANSIBLE_INVENTORY),)
 endif
 
 .PHONY: deploy-all
-deploy-all: deploy-databases deploy-servers deploy-workers deploy-clients deploy-kiosks
+deploy-all: deploy-databases \
+deploy-servers \
+deploy-socket-servers \
+deploy-workers \
+deploy-clients \
+deploy-kiosks
 
 .PHONY: build
 build: check_branch check_inventory
@@ -43,6 +48,11 @@ deploy-databases:
 deploy-servers:
 	$(MAKE) build SERVICE=server
 	$(MAKE) deploy SERVICE=server
+
+.PHONY: deploy-socket-servers
+deploy-socket-servers:
+	$(MAKE) build SERVICE=socket-server
+	$(MAKE) deploy SERVICE=socket-server
 
 .PHONY: deploy-clients
 deploy-clients:
