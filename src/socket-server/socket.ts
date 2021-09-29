@@ -175,7 +175,7 @@ export class HerbertSocket {
     }
 
     if (messageIsFrom(makeBroadcastAllMessage, msg)) {
-      this.broadcastAll(msg);
+      this.broadcastAll(msg.payload);
       return;
     }
 
