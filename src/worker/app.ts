@@ -222,8 +222,6 @@ export class App {
     meter.clime.humidity = ad.serviceData.humidity / 100.0;
     meter.clime.timestamp = new Date();
 
-    console.debug(meter.device, meter.clime);
-
     this.meterStatus(meter);
 
     return Promise.resolve(true);
