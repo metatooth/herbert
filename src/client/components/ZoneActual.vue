@@ -102,16 +102,16 @@ const ZoneActual = Vue.extend({
       let alpha = Math.floor((100 * sign * diff) / range) / 100;
       alpha = alpha > 1 ? 1 : alpha;
 
-      const end = [772, 199, 142];
+      const end = [35, 209, 96];
       const start = [];
       if (sign === -1) {
-        start[0] = 62;
-        start[1] = 142;
-        start[2] = 208;
+        start[0] = 32;
+        start[1] = 156;
+        start[2] = 238;
       } else {
-        start[0] = 241;
-        start[1] = 70;
-        start[2] = 104;
+        start[0] = 255;
+        start[1] = 56;
+        start[2] = 96;
       }
 
       const c = [
