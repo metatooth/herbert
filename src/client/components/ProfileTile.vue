@@ -167,7 +167,6 @@
           <target
             icon="thermometer-half"
             :value="dayTemperature"
-            :precision="1"
             :units="unitsWithDegree"
             size="small"
             color="#ffe08a"
@@ -175,7 +174,6 @@
           <target
             icon="tint"
             :value="dayHumidity"
-            :precision="0"
             units="%"
             size="small"
             color="#ffe08a"

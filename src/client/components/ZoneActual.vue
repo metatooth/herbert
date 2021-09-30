@@ -3,26 +3,13 @@
     <target
       icon="thermometer-half"
       :value="temperature"
-      :precision="1"
       :units="unitsWithDegree"
       :color="temperatureColor"
     />
 
-    <target
-      icon="tint"
-      :value="humidity"
-      :precision="0"
-      units="%"
-      :color="humidityColor"
-    />
+    <target icon="tint" :value="humidity" units="%" :color="humidityColor" />
 
-    <target
-      icon="cloud"
-      :value="pressure"
-      :precision="1"
-      units="hPa"
-      :color="pressureColor"
-    />
+    <target icon="cloud" :value="pressure" units="hPa" :color="pressureColor" />
   </div>
 </template>
 
@@ -64,7 +51,7 @@ const ZoneActual = Vue.extend({
     },
 
     pressure(): number {
-      return this.zone.meanPressure();
+      return this.zone.meanPressure() * 10;
     },
 
     unitsWithDegree(): string {
