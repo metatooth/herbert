@@ -181,7 +181,6 @@
           <target
             icon="cloud"
             :value="dayPressure"
-            :precision="1"
             units="hPa"
             size="small"
             color="#ffe08a"
@@ -192,7 +191,6 @@
           <target
             icon="thermometer-half"
             :value="nightTemperature"
-            :precision="1"
             :units="unitsWithDegree"
             size="small"
             color="#3e8ed0"
@@ -200,7 +198,6 @@
           <target
             icon="tint"
             :value="nightHumidity"
-            :precision="0"
             units="%"
             size="small"
             color="#3e8ed0"
@@ -208,7 +205,6 @@
           <target
             icon="cloud"
             :value="nightPressure"
-            :precision="1"
             units="hPa"
             size="small"
             color="#3e8ed0"
@@ -403,7 +399,7 @@ const ProfileTile = Vue.extend({
           this.profile.lampontemperature,
           0.6,
           this.profile.lamponhumidity / 100
-        ) / 1000
+        ) / 100
       );
     },
 
@@ -413,7 +409,7 @@ const ProfileTile = Vue.extend({
           this.profile.lampofftemperature,
           -0.6,
           this.profile.lampoffhumidity / 100
-        ) / 1000
+        ) / 100
       );
     }
   },
