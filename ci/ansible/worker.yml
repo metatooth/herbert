@@ -99,3 +99,9 @@
         state: restarted
         daemon_reload: yes
         enabled: yes
+
+    - name: Create .bash_aliases
+      copy:
+        dest: /home/{{ ansible_user }}/.bash_aliases
+        content: |
+          alias tail-worker='sudo journalctl -u herbert-worker -f'
