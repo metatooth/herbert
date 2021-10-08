@@ -53,9 +53,15 @@ interface ConfigDevice {
   channel?: string;
 }
 
+interface ConfigWorker {
+  interval: number;
+  polling: number;
+  devices: ConfigDevice[];
+}
+
 export class App {
   private static instance: App;
-  private config: any = {};
+  private config: ConfigWorker;
   private wsUrl = process.env.WSS_URL || "";
   private closed = false;
   initialized = false;
@@ -79,20 +85,7 @@ export class App {
     console.info("== Herbert Worker = Starting up... ==");
     console.info("=====================================");
 
-    const ifaces = networkInterfaces();
-    console.info("network interfaces", ifaces);
-
-    let net = ifaces["wlo1"];
-
-    if (!net) {
-      net = ifaces["wlan0"];
-    }
-
-    if (!net) {
-      net = ifaces["eth0"];
-    }
-
-    console.info("net", net);
+    const net = networkInterfaces()["wlan0"];
 
     if (net && net.length) {
       this.macaddr = net[0]["mac"];
@@ -126,8 +119,10 @@ export class App {
 
     this.workerStatus();
 
-    const polling: number = 1000 * parseInt(this.config.polling || 5);
-    const interval: number = 1000 * parseInt(this.config.interval || 30);
+    console.debug("run with config", this.config);
+
+    const polling: number = 1000 * (this.config.polling || 5);
+    const interval: number = 1000 * (this.config.interval || 30);
 
     if (!isMockWorker()) {
       const switchbot = new Switchbot();
@@ -389,7 +384,7 @@ export class App {
   }
 
   private updateSwitches(data: CommandPayload) {
-    console.info("Check switches...");
+    console.info("Update switches...");
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
       if (this.formatMacAddress(plug.device) === mac) {
@@ -411,7 +406,6 @@ export class App {
       manufacturer: meter.manufacturer,
       temperature: meter.clime.temperature,
       humidity: meter.clime.humidity,
-      pressure: meter.clime.vpd(),
       timestamp: new Date().toString()
     });
     this.send(msg);
