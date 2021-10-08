@@ -5,15 +5,31 @@
         <edit-text :text="nickname" @edit-text="saveNickname" />
       </div>
 
-      <zone-actual :zone="zone" :units="units" />
-
       <zone-target :zone="zone" :units="units" />
+
+      <zone-actual :zone="zone" :units="units" />
 
       <div class="card-content">
         <select-profile
           label="Growing"
           :zone="zone"
           @select-profile="saveProfile"
+        />
+        <edit-number
+          :num="dayLeafDiff"
+          label="Leaf Diff (Day)"
+          icon="cannabis"
+          color="#ffe08a"
+          size="medium"
+          @edit-number="saveLampOnLeafDiff"
+        />
+        <edit-number
+          :num="nightLeafDiff"
+          label="Leaf Diff (Night)"
+          icon="cannabis"
+          color="#209cee"
+          size="medium"
+          @edit-number="saveLampOffLeafDiff"
         />
       </div>
 
@@ -123,6 +139,8 @@ const ZoneDetail = Vue.extend({
       nickname: this.zone.nickname,
       profileid: this.zone.profileid,
       maxirrigators: this.zone.maxirrigators,
+      lamponleafdiff: this.zone.lamponleafdiff,
+      lampoffleafdiff: this.zone.lampoffleafdiff,
       timestamp: new Date()
     };
   },
@@ -173,10 +191,27 @@ const ZoneDetail = Vue.extend({
       });
     },
 
+    dayLeafDiff() {
+      if (this.settings.units === "F") {
+        return (this.lamponleafdiff * 9) / 5;
+      } else {
+        return this.lamponleafdiff;
+      }
+    },
+
+    nightLeafDiff() {
+      if (this.settings.units === "F") {
+        return (this.lampoffleafdiff * 9) / 5;
+      } else {
+        return this.lampoffleafdiff;
+      }
+    },
+
     ...mapGetters("devices", ["devices"]),
     ...mapGetters("meters", ["meters"]),
     ...mapGetters("profiles", ["profiles"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("settings", ["settings"])
   },
 
   mounted() {
@@ -231,6 +266,34 @@ const ZoneDetail = Vue.extend({
       const zone = {
         ...this.zone,
         profileid: profile
+      };
+
+      this.edit(zone);
+    },
+
+    saveLampOnLeafDiff(diff: number) {
+      let val = diff;
+      if (this.settings.units === "F") {
+        val = (diff * 5) / 9;
+      }
+
+      const zone = {
+        ...this.zone,
+        lamponleafdiff: val
+      };
+
+      this.edit(zone);
+    },
+
+    saveLampOffLeafDiff(diff: number) {
+      let val = diff;
+      if (this.settings.units === "F") {
+        val = (diff * 5) / 9;
+      }
+
+      const zone = {
+        ...this.zone,
+        lampoffleafdiff: val
       };
 
       this.edit(zone);

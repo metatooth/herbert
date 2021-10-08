@@ -50,7 +50,7 @@ export async function readZone(id: number) {
   const promises = [];
 
   const res = await query<Zone & Profile>(
-    "SELECT z.id, z.nickname, p.id as profileid, z.maxirrigators, z.updatedat, z.active FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
+    "SELECT z.id, z.nickname, p.id as profileid, z.maxirrigators, z.lamponleafdiff, z.lampoffleafdiff, z.updatedat, z.active FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
     [id]
   );
 

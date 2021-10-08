@@ -19,6 +19,7 @@ import { Zone } from "@/store/zones/types";
 import Target from "@/components/Target.vue";
 import { mapGetters } from "vuex";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
+import { vaporPressureDeficit } from "../../shared/utils";
 
 const ZoneActual = Vue.extend({
   props: {
@@ -50,8 +51,35 @@ const ZoneActual = Vue.extend({
       return this.zone.meanHumidity() * 100;
     },
 
+    leafdiff(): number {
+      let diff;
+      if (this.zone.isDay(this.ts)) {
+        diff = this.zone.lamponleafdiff;
+      } else {
+        diff = this.zone.lampoffleafdiff;
+      }
+
+      if (this.settings.units === "F") {
+        return (diff * 9) / 5;
+      }
+      return diff;
+    },
+
     pressure(): number {
-      return this.zone.meanPressure() * 10;
+      let diff;
+      if (this.zone.isDay(this.ts)) {
+        diff = this.zone.lamponleafdiff;
+      } else {
+        diff = this.zone.lampoffleafdiff;
+      }
+
+      return (
+        vaporPressureDeficit(
+          this.zone.meanTemperature(),
+          diff,
+          this.zone.meanHumidity()
+        ) / 100
+      );
     },
 
     unitsWithDegree(): string {
