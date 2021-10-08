@@ -15,7 +15,16 @@
         </span>
       </p>
       <div class="content">
-        <span>{{ zone.profile.profile }}</span>
+        <div cqlass="control">
+          <div class="tags has-addons">
+            <span class="tag has-background-black-bis is-medium" :style="text">
+              <font-awesome-icon icon="lightbulb" />
+            </span>
+            <span class="tag has-text-black-bis is-medium" :style="background">
+              {{ zone.profile.profile }}
+            </span>
+          </div>
+        </div>
       </div>
       <div class="content">
         <zone-actual :zone="zone" :units="settings.units" />
@@ -28,7 +37,7 @@
         />
       </div>
       <div class="content">
-        <button class="button is-small" :class="statusClass" @click="toggle">
+        <button class="button" :class="statusClass" @click="toggle">
           <span class="icon">
             <font-awesome-icon :icon="statusIcon" />
           </span>
@@ -69,6 +78,14 @@ const ZoneTile = Vue.extend({
   },
 
   computed: {
+    background() {
+      if (this.zone.isDay(new Date())) {
+        return "background-color: #ffe08a";
+      } else {
+        return "background-color: #209cee";
+      }
+    },
+
     linkto(): string {
       return `#zone-details-${this.zone.id}`;
     },
@@ -109,6 +126,14 @@ const ZoneTile = Vue.extend({
         return a.devicetype > b.devicetype;
       });
       return devices;
+    },
+
+    text() {
+      if (this.zone.isDay(new Date())) {
+        return "color: #ffe08a";
+      } else {
+        return "color: #209cee";
+      }
     },
 
     ...mapGetters("settings", ["settings"])
