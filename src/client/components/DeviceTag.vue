@@ -24,10 +24,6 @@ const DeviceTag = Vue.extend({
 
   computed: {
     deviceIcon() {
-      if (this.status !== "on" && this.status !== "off") {
-        return "times";
-      }
-
       if (this.device.devicetype === "heater") {
         return "fire-alt";
       } else if (this.device.devicetype === "humidifier") {
@@ -50,10 +46,12 @@ const DeviceTag = Vue.extend({
     },
 
     deviceClass() {
-      if (this.status === "on" || this.status === "1") {
-        return "has-text-success icon";
+      if (this.status === "disconnected") {
+        return "has-text-danger";
+      } else if (this.status === "on" || this.status === "1") {
+        return "has-text-success";
       } else {
-        return "has-text-warning icon";
+        return "has-text-warning";
       }
     }
   },
