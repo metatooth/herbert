@@ -44,8 +44,8 @@ router.put("/:id/:action", async (req, res) => {
     timestamp: new Date().toString()
   });
   const payload = { device: device.device, msg: cmd };
-  await sendSocketMessage(makeSendByDeviceIDMessage(payload));
-  res.status(204).json({});
+  sendSocketMessage(makeSendByDeviceIDMessage(payload));
+  res.status(204).send();
 });
 
 router.delete("/:id", async (req, res) => {

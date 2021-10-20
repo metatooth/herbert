@@ -1,4 +1,4 @@
-import WebSocket from "ws";
+import { io, Socket } from "socket.io-client";
 import fs from "fs";
 import { networkInterfaces } from "os";
 
@@ -10,7 +10,11 @@ import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
-import { AnySocketMessage, CommandPayload } from "../shared/types";
+import {
+  AnySocketMessage,
+  CommandPayload,
+  SocketMessageMap
+} from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import {
   makeCommandMessage,
@@ -59,7 +63,7 @@ export class App {
   private wsUrl = process.env.WSS_URL || "";
   private closed = false;
   initialized = false;
-  socket?: WebSocket = undefined;
+  socket?: Socket<SocketMessageMap> = undefined;
   meters: Array<Meter> = [];
   switches: Array<Switch> = [];
   macaddr = "";
@@ -191,7 +195,6 @@ export class App {
     }
 
     if (this.socket) {
-      this.socket.removeAllListeners();
       this.socket.close();
       this.socket = undefined;
     }
@@ -269,21 +272,27 @@ export class App {
 
     this.meters = meters;
     this.switches = switches;
+    const all = [...this.meters, ...this.switches].map(d => d.device);
+    this.socket.emit("join", {
+      room: "workers",
+      workerID: this.macaddr,
+      devices: all
+    });
     this.initialized = true;
   }
 
-  private async createSocket(): Promise<void> {
-    return new Promise(resolve => {
-      if (this.socket) {
-        this.stop();
-      }
+  private async createSocket() {
+    if (this.socket) {
+      this.stop();
+    }
 
-      this.socket = new WebSocket(this.wsUrl);
-      this.socket.on("open", resolve);
-      this.socket.on("error", this.onSocketError);
-      this.socket.on("close", this.onSocketClose);
-      this.socket.on("message", this.handleSocketMessage);
+    this.socket = io(this.wsUrl);
+    this.socket.on("connect", () => {
+      this.socket.emit("join", { room: "workers", workerID: this.macaddr });
     });
+    this.socket.on("connect_error", this.onSocketError);
+    this.socket.on("disconnect", this.onSocketClose);
+    this.socket.on("message", this.handleSocketMessage);
   }
 
   private readonly onSocketError = (err: Error) => {
@@ -304,10 +313,8 @@ export class App {
     await this.run();
   };
 
-  private readonly handleSocketMessage = async (msg: AnySocketMessage) => {
+  private readonly handleSocketMessage = async (data: AnySocketMessage) => {
     try {
-      const data = JSON.parse(msg.toString());
-
       if (!isSocketMessage(data)) {
         console.warn("unknown message format:", data);
         return;
@@ -316,7 +323,7 @@ export class App {
       if (messageIsFrom(makeConfigureMessage, data)) {
         if (data.payload.worker === this.macaddr) {
           console.info("!! CONFIGURE !!", data.payload.config);
-          this.config = JSON.parse(data.payload.config);
+          this.config = data.payload.config;
           this.initDevices();
         }
         return;
@@ -342,18 +349,20 @@ export class App {
   };
 
   private async send(data: AnySocketMessage) {
-    if (this.socket === undefined || this.socket.readyState !== 1) {
+    if (this.socket === undefined) {
       this.heldMessages.push(data);
       return;
     }
 
     try {
-      this.socket.send(JSON.stringify(data));
+      console.debug("Sending data", data);
+      this.socket.emit("message", data);
 
       for (let i = 0; i < this.heldMessages.length; ++i) {
         if (this.socket) {
           const msg = this.heldMessages.shift();
-          this.socket.send(JSON.stringify(msg));
+          console.debug("Sending held message", msg);
+          this.socket.emit("message", msg);
         }
       }
     } catch (e) {

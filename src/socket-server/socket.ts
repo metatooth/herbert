@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "config";
-import WebSocket from "ws";
+import IO from "socket.io";
 import {
   makeBroadcastAllMessage,
   makeConfigureMessage,
@@ -18,76 +18,73 @@ import {
   Meter,
   MeterStatusPayload,
   RegisterWorkerPayload,
+  SocketMessageMap,
   SwitchStatusPaylaod,
   Worker,
   WorkerStatusPayload
 } from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 
-interface CustomSocket extends WebSocket {
-  id: string;
-  devices: Set<string>;
-}
-
 const apiUrl = process.env.API_URL || "";
 const HTTP = axios.create({ baseURL: apiUrl });
 
 export class HerbertSocket {
   private static instance: HerbertSocket;
-  private wss: WebSocket.Server;
+  private wss: IO.Server<SocketMessageMap>;
   private limit = (config.get("reporting-period") as number) * 1000;
 
-  constructor(wss: WebSocket.Server) {
+  constructor(wss: IO.Server<SocketMessageMap>) {
     HerbertSocket.instance = HerbertSocket.instance || this;
     if (HerbertSocket.instance.wss) {
       HerbertSocket.instance.wss.close();
     }
     HerbertSocket.instance.wss = wss;
+    HerbertSocket.instance.wss.on("connection", this.onConnection);
     return HerbertSocket.instance;
   }
 
-  public listen() {
-    this.wss.on("connection", this.onConnection);
+  public listen(port?: string) {
+    try {
+      if (!port) {
+        throw "Must define port for socket server";
+      }
+      const portNumber = parseInt(port);
+      if (isNaN(portNumber)) {
+        throw `Invalid port: ${port}`;
+      }
+      this.wss.listen(portNumber);
+    } catch (e) {
+      console.error(e.message);
+      throw e;
+    }
   }
 
   public broadcastAll(msg: AnySocketMessage) {
-    this.wss.clients.forEach(c => {
-      if (c.readyState === WebSocket.OPEN) {
-        this.send(c, msg);
-      }
-    });
+    this.wss.emit("message", msg);
   }
 
-  public broadcastAllExcept(msg: AnySocketMessage, ...exceptions: WebSocket[]) {
-    this.wss.clients.forEach(client => {
-      for (const ws of exceptions) {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          this.send(client, msg);
-        }
-      }
-    });
+  public broadcastToOthers(
+    ws: IO.Socket<SocketMessageMap>,
+    msg: AnySocketMessage
+  ) {
+    ws.broadcast.emit("message", msg);
   }
 
-  public sendByDeviceID(deviceID: string, msg: AnySocketMessage) {
-    this.wss.clients.forEach(c => {
-      if ((c as CustomSocket).devices.has(deviceID.toLowerCase())) {
-        c.send(JSON.stringify(msg));
-      }
-    });
+  public broadcastToClients(msg: AnySocketMessage) {
+    this.wss.to("clients").emit("message", msg);
   }
 
-  public sendToWorker(workerID: string, msg: AnySocketMessage) {
-    this.wss.clients.forEach(c => {
-      if ((c as CustomSocket).id === workerID.toLowerCase()) {
-        c.send(JSON.stringify(msg));
-      }
-    });
+  public sendToWorkerByDeviceID(deviceID: string, msg: AnySocketMessage) {
+    this.wss.to(`devices:${deviceID}`).emit("message", msg);
+  }
+
+  public sendToWorkerID(workerID: string, msg: AnySocketMessage) {
+    this.wss.to(`workers:${workerID}`).emit("message", msg);
   }
 
   public async sendWorkerConfig(id: string) {
     const resp = await HTTP.get<Worker>(`/workers/${id}`);
     const worker = resp.data;
-
     if (!worker) {
       console.warn("no worker found for id:", id);
       return;
@@ -95,42 +92,43 @@ export class HerbertSocket {
 
     const msg = makeConfigureMessage({
       worker: worker.worker,
-      config: JSON.stringify(worker.config),
+      config: worker.config,
       timestamp: new Date().toString()
     });
 
-    this.sendToWorker(id, msg);
+    this.sendToWorkerID(id, msg);
   }
 
-  private readonly onConnection = (ws: WebSocket) => {
+  private readonly onConnection = (ws: IO.Socket<SocketMessageMap>) => {
     console.log("websocket connection open");
-    (ws as CustomSocket).id = "";
-    (ws as CustomSocket).devices = new Set<string>();
+    ws.on("join", data => {
+      ws.join(data.room);
+      if (data.workerID) {
+        ws.join(`workers:${data.workerID}`);
+      }
+      if (data.devices && data.devices.length) {
+        for (const deviceID of data.devices) {
+          ws.join(`devices:${deviceID}`);
+        }
+      }
+    });
     const onMessage = this.getOnMessageFunc(ws);
     ws.on("message", onMessage);
   };
 
-  private readonly getOnMessageFunc = (ws: WebSocket) => {
-    return (msg: string) => {
-      let data: object;
-      try {
-        data = JSON.parse(msg);
-      } catch (e) {
-        console.error("get on message func", e.message);
-        this.sendError(ws, e.message);
-        return;
-      }
-
+  private readonly getOnMessageFunc = (ws: IO.Socket<SocketMessageMap>) => {
+    return (data: AnySocketMessage) => {
       if (!isSocketMessage(data)) {
         this.sendError(ws, "Message must specify type & payload.");
         return;
       }
 
-      this.processMessage(ws, data);
+      this.processMessage(data);
+      this.broadcastToOthers(ws, data);
     };
   };
 
-  private sendError(ws: WebSocket, message: string) {
+  private sendError(ws: IO.Socket<SocketMessageMap>, message: string) {
     const messageObject = makeErrorMessage({
       message,
       timestamp: new Date().toString()
@@ -139,28 +137,28 @@ export class HerbertSocket {
     this.send(ws, messageObject);
   }
 
-  private send(ws: WebSocket, message: AnySocketMessage) {
-    ws.send(JSON.stringify(message));
+  private send(ws: IO.Socket<SocketMessageMap>, message: AnySocketMessage) {
+    ws.emit("message", message);
   }
 
-  private async processMessage(ws: WebSocket, msg: AnySocketMessage) {
+  private async processMessage(msg: AnySocketMessage) {
     if (messageIsFrom(makeMeterStatusMessage, msg)) {
-      await this.handleMeterStatusMsg(ws, msg.payload);
+      await this.handleMeterStatusMsg(msg.payload);
       return;
     }
 
     if (messageIsFrom(makeSwitchStatusMessage, msg)) {
-      await this.handleSwitchStatusMsg(ws, msg.payload);
+      await this.handleSwitchStatusMsg(msg.payload);
       return;
     }
 
     if (messageIsFrom(makeWorkerRegisterMessage, msg)) {
-      this.handleWorkerRegisterMsg(ws, msg.payload);
+      this.handleWorkerRegisterMsg(msg.payload);
       return;
     }
 
     if (messageIsFrom(makeWorkerStatusMessage, msg)) {
-      this.handleWorkerStatusMsg(ws, msg.payload);
+      this.handleWorkerStatusMsg(msg.payload);
       return;
     }
 
@@ -170,7 +168,7 @@ export class HerbertSocket {
     }
 
     if (messageIsFrom(makeSendByDeviceIDMessage, msg)) {
-      this.sendByDeviceID(msg.payload.device, msg.payload.msg);
+      this.sendToWorkerByDeviceID(msg.payload.device, msg.payload.msg);
       return;
     }
 
@@ -182,13 +180,8 @@ export class HerbertSocket {
     console.warn("unhandled message type", msg.type);
   }
 
-  private async handleWorkerRegisterMsg(
-    ws: WebSocket,
-    payload: RegisterWorkerPayload
-  ) {
+  private async handleWorkerRegisterMsg(payload: RegisterWorkerPayload) {
     try {
-      (ws as CustomSocket).id = payload.worker.toLowerCase();
-
       const body = {
         device: payload.worker,
         inet: payload.inet
@@ -206,25 +199,16 @@ export class HerbertSocket {
     }
   }
 
-  private async handleWorkerStatusMsg(
-    ws: WebSocket,
-    payload: WorkerStatusPayload
-  ) {
+  private async handleWorkerStatusMsg(payload: WorkerStatusPayload) {
     try {
-      (ws as CustomSocket).id = payload.worker.toLowerCase();
       await HTTP.put(`/workers/${payload.worker}`);
     } catch (e) {
       console.error("handle worker status", e.message);
     }
   }
 
-  private async handleSwitchStatusMsg(
-    ws: WebSocket,
-    payload: SwitchStatusPaylaod
-  ) {
+  private async handleSwitchStatusMsg(payload: SwitchStatusPaylaod) {
     try {
-      (ws as CustomSocket).devices.add(payload.device.toLowerCase());
-
       const body = {
         device: payload.device,
         manufacturer: payload.manufacturer
@@ -258,13 +242,8 @@ export class HerbertSocket {
     }
   }
 
-  private async handleMeterStatusMsg(
-    ws: WebSocket,
-    payload: MeterStatusPayload
-  ) {
+  private async handleMeterStatusMsg(payload: MeterStatusPayload) {
     try {
-      (ws as CustomSocket).devices.add(payload.device.toLowerCase());
-
       const body = {
         macaddr: payload.device,
         manufacturer: payload.manufacturer
