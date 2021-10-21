@@ -41,10 +41,12 @@ import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import ZoneTile from "@/components/ZoneTile.vue";
 import { messageIsFrom } from "../../shared/type-guards";
+import { io, Socket } from "socket.io-client";
 import {
   makeErrorMessage,
   makeSwitchStatusMessage
 } from "../../shared/message-creators";
+import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
 
 const Overview = Vue.extend({
   props: {
@@ -105,32 +107,31 @@ const Overview = Vue.extend({
   },
 
   mounted() {
-    const ws = new WebSocket(
+    const ws: Socket<SocketMessageMap> = io(
       process.env.VUE_APP_WS_URL || "ws://localhost:5000"
     );
-
-    ws.addEventListener("message", (ev: MessageEvent) => {
-      const data = JSON.parse(ev.data.toString());
-      if (messageIsFrom(makeSwitchStatusMessage, data)) {
+    ws.emit("join", { room: "clients" });
+    ws.on("message", (msg: AnySocketMessage) => {
+      if (messageIsFrom(makeSwitchStatusMessage, msg)) {
         const n: Notification = {
-          id: data.payload.device,
+          id: msg.payload.device,
           action: "",
           code: "",
-          plug: data.payload.device,
-          message: data.payload.status,
-          timestamp: new Date(Date.parse(data.payload.timestamp))
+          plug: msg.payload.device,
+          message: msg.payload.status,
+          timestamp: new Date(Date.parse(msg.payload.timestamp))
         };
         this.add(n);
         return;
       }
-      if (messageIsFrom(makeErrorMessage, data)) {
+      if (messageIsFrom(makeErrorMessage, msg)) {
         const n: Notification = {
-          id: data.payload.device,
-          plug: data.payload.device,
-          action: data.payload.action,
-          code: data.payload.code,
-          message: data.payload.message,
-          timestamp: new Date(Date.parse(data.payload.timestamp))
+          id: msg.payload.device,
+          plug: msg.payload.device,
+          action: msg.payload.action,
+          code: msg.payload.code,
+          message: msg.payload.message,
+          timestamp: new Date(Date.parse(msg.payload.timestamp))
         };
         this.add(n);
         return;

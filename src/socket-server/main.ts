@@ -1,12 +1,8 @@
-import http from "http";
-import WebSocket from "ws";
+import { Server } from "socket.io";
+import { SocketMessageMap } from "../shared/types";
 import { HerbertSocket } from "./socket";
 
-const port = process.env.WSS_PORT || 2929;
-const httpServer = http.createServer();
-httpServer.listen(port, () => {
-  console.log(`socket server listening on port ${port}`);
-  const wss = new WebSocket.Server({ server: httpServer });
-  const herbertSocket = new HerbertSocket(wss);
-  herbertSocket.listen();
-});
+const port = process.env.WSS_PORT || "2929";
+const ioServer = new Server<SocketMessageMap>({ cors: { origin: "*" } });
+const herbertSocket = new HerbertSocket(ioServer);
+herbertSocket.listen(port);
