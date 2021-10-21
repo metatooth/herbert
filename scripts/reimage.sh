@@ -53,9 +53,8 @@ add_wifi_settings() {
 country=US
 network={
   ssid="${WIFI_SSID}"
-  scan_ssid=1
-  psk="${WIFI_PWD}"
-  key_mgmt=WPA-PSK
+  wep_key0="${WIFI_PWD}"
+  key_mgmt=NONE
 }
 EOF
   sudo sed -i -E \
@@ -96,7 +95,7 @@ add_user() {
     sudo chroot ${FILESYSTEM_MOUNT} userdel -r pi
     sudo rm -v ${FILESYSTEM_MOUNT}/etc/sudoers.d/010_pi-nopasswd
     log "Adding User: ${NEW_USER}"
-    sudo chroot ${FILESYSTEM_MOUNT} useradd -ms /bin/bash ${NEW_USER}
+    sudo chroot ${FILESYSTEM_MOUNT} useradd -m -s /bin/bash ${NEW_USER}
     sudo chroot ${FILESYSTEM_MOUNT} bash -c \
       "echo -e \"${NEW_USER_PWD}\n${NEW_USER_PWD}\" | passwd ${NEW_USER}"
     echo "${NEW_USER} ALL=(ALL) NOPASSWD: ALL" | sudo tee \

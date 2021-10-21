@@ -72,6 +72,13 @@
     </div>
 
     <div class="field">
+      <label class="label">Server Interval (seconds)</label>
+      <div class="control">
+        <input class="input" type="number" v-model="interval" />
+      </div>
+    </div>
+
+    <div class="field">
       <label class="label">API Base URL</label>
       <div class="control">
         <a target="_blank" :href="url">{{ url }}</a>
@@ -116,6 +123,7 @@ const SettingsPage = Vue.extend({
       units: this.settings.units,
       refresh: this.settings.refresh / 1000,
       timeout: this.settings.timeout / 1000,
+      interval: this.settings.interval / 1000,
       name: "",
       filedata: ""
     };
@@ -136,7 +144,8 @@ const SettingsPage = Vue.extend({
         this.settings.timezone !== this.timezone ||
         this.settings.units !== this.units ||
         this.settings.refresh !== 1000 * this.refresh ||
-        this.settings.timeout !== 1000 * this.timeout
+        this.settings.timeout !== 1000 * this.timeout ||
+        this.settings.interval !== 1000 * this.interval
       ) {
         return true;
       }
@@ -161,6 +170,7 @@ const SettingsPage = Vue.extend({
       this.units = this.settings.units;
       this.refresh = this.settings.refresh / 1000;
       this.timeout = this.settings.timeout / 1000;
+      this.interval = this.settings.interval / 1000;
     },
 
     pick() {
@@ -199,6 +209,7 @@ const SettingsPage = Vue.extend({
         units: this.units,
         refresh: 1000 * this.refresh,
         timeout: 1000 * this.timeout,
+        interval: 1000 * this.interval,
         createdat: this.settings.createdat,
         updatedat: new Date(),
         deleted: false

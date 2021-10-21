@@ -85,7 +85,14 @@ export class App {
     console.info("== Herbert Worker = Starting up... ==");
     console.info("=====================================");
 
-    const net = networkInterfaces()["wlan0"];
+    const interfaces = networkInterfaces();
+
+    let net;
+    if (interfaces["wlan0"]) {
+      net = interfaces["wlan0"];
+    } else {
+      net = interfaces["eth0"];
+    }
 
     if (net && net.length) {
       this.macaddr = net[0]["mac"];

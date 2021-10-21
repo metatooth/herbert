@@ -12,19 +12,6 @@ services:
     ports:
       - '5432:5432'
 
-  socket_server:
-    image: herbert_socket:latest
-    build:
-      context: .
-      target: socket-server
-    environment:
-      API_URL: http://api:5000
-    volumes:
-      - ./src:/app/src
-      - ./config:/app/config
-    ports:
-      - '2929:2929'
-
   api:
     image: herbert_server:latest
     build:
@@ -40,6 +27,21 @@ services:
       - '5000:5000'
     depends_on:
       - db
+
+  socket_server:
+    image: herbert_socket:latest
+    build:
+      context: .
+      target: socket-server
+    environment:
+      API_URL: http://api:5000
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    ports:
+      - '2929:2929'
+    depends_on:
+      - api
 
   client:
     image: herbert_client:latest

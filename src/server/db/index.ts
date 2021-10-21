@@ -1,5 +1,6 @@
 import { Pool, QueryResult } from "pg";
 import {
+  Account,
   Device,
   Meter,
   Profile,
@@ -20,6 +21,14 @@ export async function query<T>(text, params): Promise<QueryResult<T>> {
   //const duration = Date.now() - start;
   //console.log("executed query", { text, duration, rows: res.rowCount });
   return res;
+}
+
+export async function readAccount(id: number): Promise<Account> {
+  const { rows } = await query<Account>(
+    "SELECT units, timezone, locale, refresh, timeout, interval, logo, updatedat FROM accounts WHERE id = $1",
+    [id]
+  );
+  return rows[0];
 }
 
 export async function readProfile(id: string): Promise<Profile> {

@@ -1,3 +1,13 @@
+export interface Account {
+  units: string;
+  refresh: number;
+  timeout: number;
+  interval: number;
+  locale: string;
+  timezone: string;
+  logo: Uint8Array;
+}
+
 export interface Config {
   nickname: string;
   config: string;
@@ -27,7 +37,6 @@ export interface Meter {
   timestamp: Date;
   temperature: number;
   humidity: number;
-  pressure: number;
 }
 
 export interface Notification {
@@ -174,7 +183,6 @@ export interface MeterStatusPayload {
   manufacturer: string;
   temperature: number;
   humidity: number;
-  pressure: number;
   timestamp: string;
 }
 
