@@ -7,6 +7,7 @@ export class IRSend extends Switch {
   constructor(device: string, remote: string) {
     super(device, "herbert");
     this.remote = remote;
+    this.state = "off";
   }
 
   public on() {

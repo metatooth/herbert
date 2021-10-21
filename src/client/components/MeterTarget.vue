@@ -7,26 +7,13 @@
       <target
         icon="thermometer-half"
         :value="temperature"
-        :precision="1"
         :units="unitsWithDegree"
         :color="color"
       />
 
-      <target
-        icon="tint"
-        :value="humidity"
-        :precision="0"
-        units="%"
-        :color="color"
-      />
+      <target icon="tint" :value="humidity" units="%" :color="color" />
 
-      <target
-        icon="cloud"
-        :value="pressure"
-        :precision="1"
-        units="hPa"
-        :color="color"
-      />
+      <target icon="cloud" :value="pressure" units="hPa" :color="color" />
     </div>
   </div>
 </template>
@@ -66,7 +53,7 @@ const MeterTarget = Vue.extend({
     },
 
     pressure(): number {
-      return this.zone.targetPressure(this.ts);
+      return this.zone.targetPressure(this.ts) * 10;
     },
 
     unitsWithDegree(): string {

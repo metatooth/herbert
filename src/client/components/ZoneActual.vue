@@ -3,26 +3,13 @@
     <target
       icon="thermometer-half"
       :value="temperature"
-      :precision="1"
       :units="unitsWithDegree"
       :color="temperatureColor"
     />
 
-    <target
-      icon="tint"
-      :value="humidity"
-      :precision="0"
-      units="%"
-      :color="humidityColor"
-    />
+    <target icon="tint" :value="humidity" units="%" :color="humidityColor" />
 
-    <target
-      icon="cloud"
-      :value="pressure"
-      :precision="1"
-      units="hPa"
-      :color="pressureColor"
-    />
+    <target icon="cloud" :value="pressure" units="hPa" :color="pressureColor" />
   </div>
 </template>
 
@@ -32,6 +19,7 @@ import { Zone } from "@/store/zones/types";
 import Target from "@/components/Target.vue";
 import { mapGetters } from "vuex";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
+import { vaporPressureDeficit } from "../../shared/utils";
 
 const ZoneActual = Vue.extend({
   props: {
@@ -63,8 +51,35 @@ const ZoneActual = Vue.extend({
       return this.zone.meanHumidity() * 100;
     },
 
+    leafdiff(): number {
+      let diff;
+      if (this.zone.isDay(this.ts)) {
+        diff = this.zone.lamponleafdiff;
+      } else {
+        diff = this.zone.lampoffleafdiff;
+      }
+
+      if (this.settings.units === "F") {
+        return (diff * 9) / 5;
+      }
+      return diff;
+    },
+
     pressure(): number {
-      return this.zone.meanPressure();
+      let diff;
+      if (this.zone.isDay(this.ts)) {
+        diff = this.zone.lamponleafdiff;
+      } else {
+        diff = this.zone.lampoffleafdiff;
+      }
+
+      return (
+        vaporPressureDeficit(
+          this.zone.meanTemperature(),
+          diff,
+          this.zone.meanHumidity()
+        ) / 100
+      );
     },
 
     unitsWithDegree(): string {
@@ -115,16 +130,16 @@ const ZoneActual = Vue.extend({
       let alpha = Math.floor((100 * sign * diff) / range) / 100;
       alpha = alpha > 1 ? 1 : alpha;
 
-      const end = [772, 199, 142];
+      const end = [35, 209, 96];
       const start = [];
       if (sign === -1) {
-        start[0] = 62;
-        start[1] = 142;
-        start[2] = 208;
+        start[0] = 32;
+        start[1] = 156;
+        start[2] = 238;
       } else {
-        start[0] = 241;
-        start[1] = 70;
-        start[2] = 104;
+        start[0] = 255;
+        start[1] = 56;
+        start[2] = 96;
       }
 
       const c = [

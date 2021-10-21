@@ -173,6 +173,7 @@ async function run() {
               action: action,
               timestamp: new Date().toString()
             });
+            console.info("cmd is", device.nickname || device.device, action);
             const payload = { device: device.device, msg: cmd };
             sendSocketMessage(makeSendByDeviceIDMessage(payload));
           }

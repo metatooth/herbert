@@ -23,6 +23,7 @@ import {
   WorkerStatusPayload
 } from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
+import { vaporPressureDeficit } from "../shared/utils";
 
 interface CustomSocket extends WebSocket {
   id: string;
@@ -144,6 +145,7 @@ export class HerbertSocket {
   }
 
   private async processMessage(ws: WebSocket, msg: AnySocketMessage) {
+    console.info("incoming", JSON.stringify(msg));
     if (messageIsFrom(makeMeterStatusMessage, msg)) {
       await this.handleMeterStatusMsg(ws, msg.payload);
       return;
@@ -290,7 +292,11 @@ export class HerbertSocket {
           meter: payload.device,
           temperature: payload.temperature,
           humidity: payload.humidity,
-          pressure: payload.pressure,
+          pressure: vaporPressureDeficit(
+            payload.temperature,
+            0,
+            payload.humidity
+          ),
           ts: payload.timestamp
         };
 

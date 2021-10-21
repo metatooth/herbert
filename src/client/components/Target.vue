@@ -18,7 +18,7 @@ const Target = Vue.extend({
   props: {
     icon: String,
     value: Number,
-    precision: Number,
+    precision: { type: Number, default: 0 },
     units: String,
     color: { type: String, default: "#ffffff" },
     size: { type: String, default: "medium" }

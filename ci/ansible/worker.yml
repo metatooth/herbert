@@ -11,6 +11,13 @@
       become: yes
       shell: "raspi-config nonint do_i2c 0"
 
+    - name: Install System Dependencies
+      become: yes
+      apt:
+        update_cache: yes
+        state: latest
+        name: ['bluetooth', 'bluez', 'libbluetooth-dev', 'libudev-dev', 'git', 'gcc', 'g++', 'make']
+
     - name: Clone 8relind-rpi
       git:
         repo: 'https://github.com/SequentMicrosystems/8relind-rpi.git'
@@ -21,13 +28,6 @@
       make:
         chdir: /home/{{ ansible_user }}/8relind-rpi
         target: install
-
-    - name: Install System Dependencies
-      become: yes
-      apt:
-        update_cache: yes
-        state: latest
-        name: ['bluetooth', 'bluez', 'libbluetooth-dev', 'libudev-dev', 'git', 'gcc', 'g++', 'make']
 
     - name: Create {{ appDir }}
       file:
@@ -99,3 +99,9 @@
         state: restarted
         daemon_reload: yes
         enabled: yes
+
+    - name: Create .bash_aliases
+      copy:
+        dest: /home/{{ ansible_user }}/.bash_aliases
+        content: |
+          alias tail-worker='sudo journalctl -u herbert-worker -f'

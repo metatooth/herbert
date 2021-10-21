@@ -3,10 +3,12 @@
     <div class="field-body">
       <div class="field">
         <div class="tags has-addons">
-          <span class="tag">
+          <span class="tag has-background-black" :style="text">
             <font-awesome-icon :icon="icon" />
           </span>
-          <span class="tag">{{ this.label }}</span>
+          <span class="tag has-text-black" :style="background">{{
+            this.label
+          }}</span>
         </div>
       </div>
       <div class="field" v-if="!editing">
@@ -43,7 +45,8 @@ const EditNumber = Vue.extend({
     num: Number,
     size: String,
     label: String,
-    icon: String
+    icon: String,
+    color: { type: String, default: "#ffffff" }
   },
 
   components: {
@@ -60,6 +63,14 @@ const EditNumber = Vue.extend({
   computed: {
     buttonClass() {
       return `${name} is-${this.size}`;
+    },
+
+    background() {
+      return `background-color: ${this.color}`;
+    },
+
+    text() {
+      return `color: ${this.color}`;
     },
 
     valueClass() {

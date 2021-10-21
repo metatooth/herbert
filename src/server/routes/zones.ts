@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const { rows } = await query<Zone>(
-    "INSERT INTO zones (nickname, profileid) VALUES ($1, $2) RETURNING id",
+    "INSERT INTO zones (nickname, profileid, maxirrigators, lamponleafdiff, lampoffleafdiff) VALUES ($1, $2, 3, 0, 0) RETURNING id",
     [req.body.nickname, req.body.profileid]
   );
   const zone = await readZone(rows[0].id);
@@ -27,12 +27,14 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { rows } = await query<Zone>(
-    "UPDATE zones SET nickname = $1, profileid = $2, active = $3, maxirrigators = $4, updatedat = CURRENT_TIMESTAMP WHERE id = $5 RETURNING id",
+    "UPDATE zones SET nickname = $1, profileid = $2, active = $3, maxirrigators = $4, lamponleafdiff = $5, lampoffleafdiff= $6, updatedat = CURRENT_TIMESTAMP WHERE id = $7 RETURNING id",
     [
       req.body.nickname,
       req.body.profileid,
       req.body.active,
       req.body.maxirrigators,
+      req.body.lamponleafdiff,
+      req.body.lampoffleafdiff,
       id
     ]
   );
