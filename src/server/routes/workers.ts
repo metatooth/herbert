@@ -55,7 +55,7 @@ router.put("/:id/config", async (req, res) => {
     [req.body.nickname, req.body.configname, jsonStr, id]
   );
 
-  await sendSocketMessage(makeSendWorkerConfigMessage(id));
+  sendSocketMessage(makeSendWorkerConfigMessage(id));
   res.status(200).json(await readWorker(rows[0].worker));
 });
 

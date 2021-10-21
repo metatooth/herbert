@@ -190,3 +190,14 @@ export interface SendByDeviceIDPayload {
   device: string;
   msg: AnySocketMessage;
 }
+
+export interface JoinRoomPayload {
+  room: "clients" | "workers";
+  workerID?: string;
+  devices?: string[];
+}
+
+export interface SocketMessageMap {
+  message: (m: AnySocketMessage) => void;
+  join: (p: JoinRoomPayload) => void;
+}
