@@ -323,7 +323,7 @@ export class App {
       if (messageIsFrom(makeConfigureMessage, data)) {
         if (data.payload.worker === this.macaddr) {
           console.info("!! CONFIGURE !!", data.payload.config);
-          this.config = data.payload.config;
+          this.config = JSON.parse(data.payload.config);
           this.initDevices();
         }
         return;
