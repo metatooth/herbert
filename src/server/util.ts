@@ -1,29 +1,23 @@
-import Websocket from "ws";
-import { AnySocketMessage } from "../shared/types";
+import { io, Socket } from "socket.io-client";
+import { AnySocketMessage, SocketMessageMap } from "../shared/types";
 
-let socketConnection: Websocket;
+let socket: Socket<SocketMessageMap>;
 
 const getSocketURL = () => {
   return process.env.WSS_URL || "";
 };
 
-const getSocketClient = (): Promise<Websocket> => {
-  return new Promise(resolve => {
-    if (socketConnection) {
-      resolve(socketConnection);
-      return;
-    }
-    socketConnection = new Websocket(getSocketURL());
-    socketConnection.on("open", () => {
-      resolve(socketConnection);
-    });
-  });
+const getSocketClient = () => {
+  if (!socket) {
+    socket = io(getSocketURL());
+  }
+  return socket;
 };
 
-export const sendSocketMessage = async (msg: AnySocketMessage) => {
+export const sendSocketMessage = (msg: AnySocketMessage) => {
   try {
-    const ws = await getSocketClient();
-    await new Promise(resolve => ws.send(JSON.stringify(msg), resolve));
+    const ws = getSocketClient();
+    ws.emit("message", msg);
   } catch (e) {
     console.error(e.message);
     throw e;

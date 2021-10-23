@@ -193,21 +193,21 @@
             :value="nightTemperature"
             :units="unitsWithDegree"
             size="small"
-            color="#3e8ed0"
+            color="#7a7a7a"
           />
           <target
             icon="tint"
             :value="nightHumidity"
             units="%"
             size="small"
-            color="#3e8ed0"
+            color="#7a7a7a"
           />
           <target
             icon="cloud"
             :value="nightPressure"
             units="hPa"
             size="small"
-            color="#3e8ed0"
+            color="#7a7a7a"
           />
         </div>
 

@@ -82,7 +82,7 @@ const ZoneTile = Vue.extend({
       if (this.zone.isDay(new Date())) {
         return "background-color: #ffe08a";
       } else {
-        return "background-color: #209cee";
+        return "background-color: #7a7a7a";
       }
     },
 
@@ -132,7 +132,7 @@ const ZoneTile = Vue.extend({
       if (this.zone.isDay(new Date())) {
         return "color: #ffe08a";
       } else {
-        return "color: #209cee";
+        return "color: #7a7a7a";
       }
     },
 

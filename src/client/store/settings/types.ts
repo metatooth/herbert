@@ -7,6 +7,7 @@ export class Settings {
   logo?: Uint8Array;
   refresh: number;
   timeout: number;
+  interval: number;
   createdat: Date;
   updatedat: Date;
   deleted: boolean;
@@ -17,6 +18,7 @@ export class Settings {
     this.units = "F";
     this.refresh = 30000;
     this.timeout = 300000;
+    this.interval = 30000;
     this.locale = "us_EN";
     this.timezone = "America/New_York";
     this.createdat = new Date();

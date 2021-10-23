@@ -1,9 +1,8 @@
-import config from "config";
 import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import { parentZone, readActiveZones, readZone } from "./db";
+import { parentZone, readAccount, readActiveZones, readZone } from "./db";
 
 import path from "path";
 import favicon from "serve-favicon";
@@ -59,6 +58,9 @@ server.listen(port);
 console.log("http server listening on %d", port);
 
 async function run() {
+  console.debug("RUN", new Date());
+
+  const account = await readAccount(1);
   const zones = await readActiveZones();
 
   zones.forEach(async zone => {
@@ -210,8 +212,10 @@ async function run() {
       });
     }
   });
+
+  setTimeout(run, account.interval);
 }
 
 (async () => {
-  setInterval(run, (config.get("interval") as number) * 1000);
+  run();
 })();

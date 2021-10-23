@@ -1,4 +1,4 @@
-import WebSocket from "ws";
+import { io, Socket } from "socket.io-client";
 import fs from "fs";
 import { networkInterfaces } from "os";
 
@@ -10,7 +10,11 @@ import { Herbert } from "./herbert";
 import { SM8relay } from "./sm-8relay";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
-import { AnySocketMessage, CommandPayload } from "../shared/types";
+import {
+  AnySocketMessage,
+  CommandPayload,
+  SocketMessageMap
+} from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import {
   makeCommandMessage,
@@ -65,7 +69,7 @@ export class App {
   private wsUrl = process.env.WSS_URL || "";
   private closed = false;
   initialized = false;
-  socket?: WebSocket = undefined;
+  socket?: Socket<SocketMessageMap> = undefined;
   meters: Array<Meter> = [];
   switches: Array<Switch> = [];
   macaddr = "";
@@ -85,7 +89,14 @@ export class App {
     console.info("== Herbert Worker = Starting up... ==");
     console.info("=====================================");
 
-    const net = networkInterfaces()["wlan0"];
+    const interfaces = networkInterfaces();
+
+    let net;
+    if (interfaces["wlan0"]) {
+      net = interfaces["wlan0"];
+    } else {
+      net = interfaces["eth0"];
+    }
 
     if (net && net.length) {
       this.macaddr = net[0]["mac"];
@@ -170,6 +181,7 @@ export class App {
       this.runTimeout = undefined;
     }
 
+    console.info("Set timeout", interval);
     this.runTimeout = setTimeout(this.run, interval);
     console.info("Done.");
   };
@@ -186,7 +198,6 @@ export class App {
     }
 
     if (this.socket) {
-      this.socket.removeAllListeners();
       this.socket.close();
       this.socket = undefined;
     }
@@ -262,21 +273,27 @@ export class App {
 
     this.meters = meters;
     this.switches = switches;
+    const all = [...this.meters, ...this.switches].map(d => d.device);
+    this.socket.emit("join", {
+      room: "workers",
+      workerID: this.macaddr,
+      devices: all
+    });
     this.initialized = true;
   }
 
-  private async createSocket(): Promise<void> {
-    return new Promise(resolve => {
-      if (this.socket) {
-        this.stop();
-      }
+  private async createSocket() {
+    if (this.socket) {
+      this.stop();
+    }
 
-      this.socket = new WebSocket(this.wsUrl);
-      this.socket.on("open", resolve);
-      this.socket.on("error", this.onSocketError);
-      this.socket.on("close", this.onSocketClose);
-      this.socket.on("message", this.handleSocketMessage);
+    this.socket = io(this.wsUrl);
+    this.socket.on("connect", () => {
+      this.socket.emit("join", { room: "workers", workerID: this.macaddr });
     });
+    this.socket.on("connect_error", this.onSocketError);
+    this.socket.on("disconnect", this.onSocketClose);
+    this.socket.on("message", this.handleSocketMessage);
   }
 
   private readonly onSocketError = (err: Error) => {
@@ -297,10 +314,8 @@ export class App {
     await this.run();
   };
 
-  private readonly handleSocketMessage = async (msg: AnySocketMessage) => {
+  private readonly handleSocketMessage = async (data: AnySocketMessage) => {
     try {
-      const data = JSON.parse(msg.toString());
-
       if (!isSocketMessage(data)) {
         console.warn("unknown message format:", data);
         return;
@@ -308,8 +323,7 @@ export class App {
 
       if (messageIsFrom(makeConfigureMessage, data)) {
         if (data.payload.worker === this.macaddr) {
-          console.info("!! CONFIGURE !!", data.payload.config);
-          this.config = JSON.parse(data.payload.config);
+          this.config = JSON.parse(JSON.stringify(data.payload.config));
           this.initDevices();
         }
         return;
@@ -335,18 +349,18 @@ export class App {
   };
 
   private async send(data: AnySocketMessage) {
-    if (this.socket === undefined || this.socket.readyState !== 1) {
+    if (this.socket === undefined) {
       this.heldMessages.push(data);
       return;
     }
 
     try {
-      this.socket.send(JSON.stringify(data));
+      this.socket.emit("message", data);
 
       for (let i = 0; i < this.heldMessages.length; ++i) {
         if (this.socket) {
           const msg = this.heldMessages.shift();
-          this.socket.send(JSON.stringify(msg));
+          this.socket.emit("message", msg);
         }
       }
     } catch (e) {
@@ -384,15 +398,12 @@ export class App {
   }
 
   private updateSwitches(data: CommandPayload) {
-    console.info("Update switches...");
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
       if (this.formatMacAddress(plug.device) === mac) {
         if (data.action === "on") {
-          console.info(plug.device, "on");
           plug.on();
         } else {
-          console.info(plug.device, "off");
           plug.off();
         }
       }
@@ -401,7 +412,7 @@ export class App {
 
   private async meterStatus(meter: Meter) {
     const msg = makeMeterStatusMessage({
-      device: meter.device,
+      device: this.formatMacAddress(meter.device),
       type: "meter",
       manufacturer: meter.manufacturer,
       temperature: meter.clime.temperature,
@@ -413,7 +424,7 @@ export class App {
 
   private async switchStatus(switcher: Switch) {
     const msg = makeSwitchStatusMessage({
-      device: switcher.device,
+      device: this.formatMacAddress(switcher.device),
       manufacturer: switcher.manufacturer,
       status: switcher.state,
       timestamp: new Date().toString()
@@ -442,7 +453,7 @@ export class App {
     }
 
     // Remove all but alphanumeric characters
-    let mac = id.replace(/\W/gi, "");
+    let mac = id.replace(/\W/gi, "").toLowerCase();
 
     // Append a colon after every two characters
     mac = mac.replace(/(.{2})/g, "$1:");
