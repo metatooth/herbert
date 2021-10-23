@@ -89,4 +89,4 @@
       copy:
         dest: /home/{{ ansible_user }}/.bash_aliases
         content: |
-          alias tail-socket='sudo journalctl -u herbert-socket -f'
+          alias tail-socket-server='sudo journalctl -u herbert-socket-server -f'
