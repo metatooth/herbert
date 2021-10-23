@@ -181,6 +181,7 @@ export class App {
       this.runTimeout = undefined;
     }
 
+    console.info("Set timeout", interval);
     this.runTimeout = setTimeout(this.run, interval);
     console.info("Done.");
   };
@@ -354,13 +355,11 @@ export class App {
     }
 
     try {
-      console.debug("Sending data", data);
       this.socket.emit("message", data);
 
       for (let i = 0; i < this.heldMessages.length; ++i) {
         if (this.socket) {
           const msg = this.heldMessages.shift();
-          console.debug("Sending held message", msg);
           this.socket.emit("message", msg);
         }
       }
@@ -399,15 +398,12 @@ export class App {
   }
 
   private updateSwitches(data: CommandPayload) {
-    console.info("Update switches...");
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
       if (this.formatMacAddress(plug.device) === mac) {
         if (data.action === "on") {
-          console.info(plug.device, "on");
           plug.on();
         } else {
-          console.info(plug.device, "off");
           plug.off();
         }
       }
@@ -416,7 +412,7 @@ export class App {
 
   private async meterStatus(meter: Meter) {
     const msg = makeMeterStatusMessage({
-      device: meter.device,
+      device: this.formatMacAddress(meter.device),
       type: "meter",
       manufacturer: meter.manufacturer,
       temperature: meter.clime.temperature,
@@ -428,7 +424,7 @@ export class App {
 
   private async switchStatus(switcher: Switch) {
     const msg = makeSwitchStatusMessage({
-      device: switcher.device,
+      device: this.formatMacAddress(switcher.device),
       manufacturer: switcher.manufacturer,
       status: switcher.state,
       timestamp: new Date().toString()
@@ -457,7 +453,7 @@ export class App {
     }
 
     // Remove all but alphanumeric characters
-    let mac = id.replace(/\W/gi, "");
+    let mac = id.replace(/\W/gi, "").toLowerCase();
 
     // Append a colon after every two characters
     mac = mac.replace(/(.{2})/g, "$1:");
