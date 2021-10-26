@@ -64,3 +64,9 @@ if [ "${SERVICE}" = "kiosk" ]; then
   mkdir $DEPLOYMENT_DIR/scripts
   cp scripts/kiosk.sh $DEPLOYMENT_DIR/scripts/kiosk.sh
 fi
+
+if [ "${SERVICE}" = "worker" ]; then
+  mkdir $DEPLOYMENT_DIR/scripts
+  cp scripts/AKB73016012.licrd.conf $DEPLOYMENT_DIR/scripts/AKB73016012.licrd.conf
+  cp scripts/810900812A.licrd.conf $DEPLOYMENT_DIR/scripts/810900812A.licrd.conf
+fi
