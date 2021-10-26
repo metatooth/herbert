@@ -8,8 +8,6 @@
     />
 
     <target icon="tint" :value="humidity" units="%" :color="humidityColor" />
-
-    <target icon="cloud" :value="pressure" units="hPa" :color="pressureColor" />
   </div>
 </template>
 
@@ -19,7 +17,6 @@ import { Zone } from "@/store/zones/types";
 import Target from "@/components/Target.vue";
 import { mapGetters } from "vuex";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
-import { vaporPressureDeficit } from "../../shared/utils";
 
 const ZoneActual = Vue.extend({
   props: {
@@ -65,23 +62,6 @@ const ZoneActual = Vue.extend({
       return diff;
     },
 
-    pressure(): number {
-      let diff;
-      if (this.zone.isDay(this.ts)) {
-        diff = this.zone.lamponleafdiff;
-      } else {
-        diff = this.zone.lampoffleafdiff;
-      }
-
-      return (
-        vaporPressureDeficit(
-          this.zone.meanTemperature(),
-          diff,
-          this.zone.meanHumidity()
-        ) / 100
-      );
-    },
-
     unitsWithDegree(): string {
       return "°" + this.settings.units;
     },
@@ -96,11 +76,6 @@ const ZoneActual = Vue.extend({
       const diff =
         100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.ts);
       return this.color(diff, 5);
-    },
-
-    pressureColor(): string {
-      const diff = this.zone.meanPressure() - this.zone.targetPressure(this.ts);
-      return this.color(diff, 0.3);
     },
 
     ...mapGetters("settings", ["settings"])

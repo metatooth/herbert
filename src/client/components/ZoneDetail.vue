@@ -5,9 +5,9 @@
         <edit-text :text="nickname" @edit-text="saveNickname" />
       </div>
 
-      <zone-target :zone="zone" :units="units" />
+      <zone-target :zone="zone" :units="settings.units" />
 
-      <zone-actual :zone="zone" :units="units" />
+      <zone-actual :zone="zone" :units="settings.units" />
 
       <div class="card-content">
         <select-profile
@@ -61,7 +61,7 @@
             v-for="meter in zone.meters"
             :key="meter.device"
             :meter="meter"
-            :units="units"
+            :units="settings.units"
             @remove-device="remove"
           />
         </div>
@@ -130,8 +130,7 @@ import ChildWidget from "@/components/ChildWidget.vue";
 
 const ZoneDetail = Vue.extend({
   props: {
-    zone: Zone,
-    units: String
+    zone: Zone
   },
 
   data() {

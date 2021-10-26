@@ -8,7 +8,6 @@
         v-for="zone in zones"
         v-bind:key="zone.id"
         v-bind:zone="zone"
-        v-bind:units="settings.units"
       />
     </section>
   </div>

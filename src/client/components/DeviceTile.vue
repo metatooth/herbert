@@ -13,51 +13,47 @@
                 @keyup.esc="cancel"
               />
             </div>
-            <div class="control">
-              <select-device-type
-                :devicetype="device.devicetype"
-                @select-devicetype="selected"
-              />
-            </div>
+          </div>
+          <div class="control">
+            <select-device-type
+              :devicetype="device.devicetype"
+              @select-devicetype="selected"
+            />
           </div>
         </span>
 
-        <span v-else>{{ device.nickname || device.device }}</span>
+        <span v-else>{{ name }}</span>
       </div>
       <p class="subtitle">
-        <span>
-          <button class="button is-small" @click="toggle">
-            <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
-            <span>{{ status }}</span>
-          </button>
-        </span>
-        &nbsp;
-        <span class="tag is-medium">{{ device.device }}</span>
-      </p>
-      <div class="content">
-        <timestamp
-          :timestamp="new Date(device.updatedat)"
-          :readable="readable"
-        />
-      </div>
-      <div class="content">
+        <button class="button is-small" @click="toggle">
+          <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
+          <span>{{ status }}</span>
+        </button>
         <router-link
           :to="{
             name: 'statuses',
             params: { name: device.nickname, device: device.device }
           }"
         >
-          history
+          &gt;&gt;&gt;
         </router-link>
-      </div>
+      </p>
       <div class="content">
-        <edit-controls
-          class="edit-controls"
-          @on-edit="editable"
-          @on-save="save"
-          @on-destroy="destroy"
-          @on-cancel="cancel"
+        <timestamp
+          :timestamp="new Date(device.updatedat)"
+          :readable="readable"
         />
+        <span class="tag is-medium">
+          {{ device.device }}
+          &nbsp;
+          <edit-controls
+            class="edit-controls"
+            @on-edit="editable"
+            @on-save="save"
+            @on-destroy="destroy"
+            @on-cancel="cancel"
+          />
+        </span>
       </div>
     </div>
   </div>
@@ -136,6 +132,11 @@ const DeviceTile = Vue.extend({
       }
 
       return "circle";
+    },
+
+    name() {
+      if (this.device.nickname) return this.device.nickname;
+      return this.device.device.slice(12);
     },
 
     statusClass() {
