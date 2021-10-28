@@ -2,19 +2,23 @@
   <div class="tile is-parent">
     <div class="tile is-child box">
       <p class="title">
-        <span class="icon" :class="meterClass">
-          <font-awesome-icon icon="tachometer-alt" />
-        </span>
         <span v-if="editing">
-          <input
-            class="input"
-            type="text"
-            placeHolder="Name this meter"
-            v-model="nickname"
-            @keyup.esc="cancel"
-          />
+          <div class="field">
+            <div class="control">
+              <input
+                class="input"
+                type="text"
+                placeHolder="Name this meter"
+                v-model="nickname"
+                @keyup.esc="cancel"
+              />
+            </div>
+          </div>
         </span>
         <span v-else>{{ meter.name }}</span>
+      </p>
+      <p class="subtitle">
+        {{ meter.device }}
       </p>
       <div class="content">
         <meter-actual :meter="meter" />
@@ -27,18 +31,16 @@
             params: { name: meter.nickname, device: meter.device }
           }"
         >
-          history
+          &gt;&gt;&gt;
         </router-link>
-        <span class="tag is-medium">
-          {{ meter.device }}
-          &nbsp;
-          <edit-controls
-            @on-edit="editable"
-            @on-save="save"
-            @on-destroy="destroy"
-            @on-cancel="cancel"
-          />
-        </span>
+      </div>
+      <div class="content">
+        <edit-controls
+          @on-edit="editable"
+          @on-save="save"
+          @on-destroy="destroy"
+          @on-cancel="cancel"
+        />
       </div>
     </div>
   </div>

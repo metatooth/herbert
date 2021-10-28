@@ -1,23 +1,5 @@
 <template>
   <tr>
-    <td class="has-text-centered">
-      <div class="field is-grouped">
-        <div class="control">
-          <button class="button is-small" :class="deviceClass" @click="toggle">
-            <span class="icon">
-              <font-awesome-icon :icon="deviceIcon" />
-            </span>
-          </button>
-        </div>
-
-        <div class="control">
-          <select-device-type
-            :devicetype="device.devicetype"
-            @select-devicetype="saveDeviceType"
-          />
-        </div>
-      </div>
-    </td>
     <td>
       <a @click="editable" v-if="!editing">
         {{ device.name }}
@@ -40,6 +22,24 @@
           <button class="button is-small is-danger" @click="cancel">
             <font-awesome-icon icon="times" />
           </button>
+        </div>
+      </div>
+    </td>
+    <td class="has-text-centered">
+      <div class="field is-grouped">
+        <div class="control">
+          <button class="button is-small" :class="deviceClass" @click="toggle">
+            <span class="icon">
+              <font-awesome-icon :icon="deviceIcon" />
+            </span>
+          </button>
+        </div>
+
+        <div class="control">
+          <select-device-type
+            :devicetype="device.devicetype"
+            @select-devicetype="saveDeviceType"
+          />
         </div>
       </div>
     </td>

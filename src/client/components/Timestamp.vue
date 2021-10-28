@@ -1,15 +1,15 @@
 <template>
-  <div>
+  <span>
     <span v-if="timeago"
       ><em>{{ lapsed }} ago</em></span
     >
-    <div v-else class="is-family-code">
+    <span v-else class="is-family-code">
       <span v-if="dayold">{{ monthday }} - </span>
       <span
         >{{ hhmm }}<span class="is-size-7">{{ ss }}</span></span
       >
-    </div>
-  </div>
+    </span>
+  </span>
 </template>
 
 <script lang="ts">

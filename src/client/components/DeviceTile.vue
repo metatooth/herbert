@@ -22,13 +22,22 @@
           </div>
         </span>
 
-        <span v-else>{{ name }}</span>
+        <span v-else>{{ device.name }}</span>
       </div>
       <p class="subtitle">
-        <button class="button is-small" @click="toggle">
+        {{ device.device }}
+      </p>
+      <div class="content">
+        <button class="button" @click="toggle">
           <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
           <span>{{ status }}</span>
         </button>
+      </div>
+      <div class="content">
+        <timestamp
+          :timestamp="new Date(Date.parse(device.updatedat))"
+          :readable="true"
+        />
         <router-link
           :to="{
             name: 'statuses',
@@ -37,23 +46,15 @@
         >
           &gt;&gt;&gt;
         </router-link>
-      </p>
+      </div>
       <div class="content">
-        <timestamp
-          :timestamp="new Date(device.updatedat)"
-          :readable="readable"
+        <edit-controls
+          class="edit-controls"
+          @on-edit="editable"
+          @on-save="save"
+          @on-destroy="destroy"
+          @on-cancel="cancel"
         />
-        <span class="tag is-medium">
-          {{ device.device }}
-          &nbsp;
-          <edit-controls
-            class="edit-controls"
-            @on-edit="editable"
-            @on-save="save"
-            @on-destroy="destroy"
-            @on-cancel="cancel"
-          />
-        </span>
       </div>
     </div>
   </div>
@@ -132,11 +133,6 @@ const DeviceTile = Vue.extend({
       }
 
       return "circle";
-    },
-
-    name() {
-      if (this.device.nickname) return this.device.nickname;
-      return this.device.device.slice(12);
     },
 
     statusClass() {
