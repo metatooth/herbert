@@ -2,6 +2,9 @@
   <div class="tile is-parent">
     <div class="tile is-child box">
       <p class="title">
+        <span class="icon" :class="meterClass">
+          <font-awesome-icon icon="tachometer-alt" />
+        </span>
         <span v-if="editing">
           <input
             class="input"
@@ -11,24 +14,13 @@
             @keyup.esc="cancel"
           />
         </span>
-        <span v-else>{{ meter.nickname || meter.device }}</span>
-      </p>
-      <p class="subtitle">
-        <span class="icon" :class="meterClass">
-          <font-awesome-icon icon="tachometer-alt" />
-        </span>
-        <span class="tag is-medium">{{ meter.device }}</span>
+        <span v-else>{{ meter.name }}</span>
       </p>
       <div class="content">
         <meter-actual :meter="meter" />
       </div>
       <div class="content">
-        <timestamp
-          :timestamp="new Date(meter.updatedat)"
-          :readable="readable"
-        />
-      </div>
-      <div class="content">
+        <timestamp :timestamp="new Date(meter.updatedat)" :readable="true" />
         <router-link
           :to="{
             name: 'readings',
@@ -37,13 +29,17 @@
         >
           history
         </router-link>
+        <span class="tag is-medium">
+          {{ meter.device }}
+          &nbsp;
+          <edit-controls
+            @on-edit="editable"
+            @on-save="save"
+            @on-destroy="destroy"
+            @on-cancel="cancel"
+          />
+        </span>
       </div>
-      <edit-controls
-        @on-edit="editable"
-        @on-save="save"
-        @on-destroy="destroy"
-        @on-cancel="cancel"
-      />
     </div>
   </div>
 </template>
@@ -65,7 +61,6 @@ const MeterTile = Vue.extend({
   data() {
     return {
       nickname: this.meter.nickname,
-      readable: true,
       editing: false
     };
   },

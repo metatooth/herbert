@@ -11,6 +11,10 @@ export class Meter {
   humidity: number;
   pressure: number;
   timestamp: Date;
+
+  get name() {
+    return this.nickname || this.device.slice(9);
+  }
 }
 
 export class MetersState {
