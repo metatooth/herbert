@@ -2,7 +2,7 @@
   <tr>
     <td>
       <router-link
-        v-if="!editing"
+        class="has-text-weight-bold"
         :to="{
           name: 'zone',
           hash: linkto,
@@ -11,65 +11,44 @@
       >
         {{ zone.nickname }}
       </router-link>
-      <div class="control" v-else>
-        <input
-          class="input"
-          type="text"
-          v-model="nickname"
-          placeHolder="zone name"
-        />
-      </div>
     </td>
     <td>
-      <div v-if="!editing">
-        <div v-if="zone.profile">
-          {{ zone.profile.profile }}
-        </div>
-        <div v-else>
-          no profile set
-        </div>
-      </div>
-      <div class="control" v-else>
-        <div class="select">
-          <select v-model="profileid">
-            <option
-              v-for="profile in profiles"
-              v-bind:key="profile.id"
-              v-bind:value="profile.id"
-            >
-              {{ profile.profile }}
-            </option>
-          </select>
+      <div class="control">
+        <div class="tags has-addons">
+          <span class="tag has-background-black-bis is-medium" :style="text">
+            <font-awesome-icon icon="lightbulb" />
+          </span>
+          <span class="tag has-text-black-bis is-medium" :style="background">
+            {{ zone.profile.profile }}
+          </span>
         </div>
       </div>
     </td>
     <td>
-      {{ zone.active ? "on" : "off" }}
+      <zone-actual :zone="zone" :units="settings.units" />
     </td>
     <td>
-      <meter-actual :zone="zone" :units="settings.units" />
-    </td>
-    <td>
-      <timestamp :timestamp="new Date(Date.parse(zone.updatedat))" />
-    </td>
-    <td>
-      <edit-controls
-        @on-edit="editable"
-        @on-save="save"
-        @on-destroy="destroy"
-        @on-cancel="cancel"
+      <timestamp
+        :timestamp="new Date(Date.parse(zone.updatedat))"
+        :readable="true"
       />
+    </td>
+    <td>
+      <button class="button" :class="statusClass" @click="toggle">
+        <span class="icon">
+          <font-awesome-icon :icon="statusIcon" />
+        </span>
+      </button>
     </td>
   </tr>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import Timestamp from "@/components/Timestamp.vue";
-import EditControls from "@/components/EditControls.vue";
 import { mapGetters, mapActions } from "vuex";
 import { Zone } from "@/store/zones/types";
-import MeterActual from "@/components/MeterActual.vue";
+import ZoneActual from "@/components/ZoneActual.vue";
+import Timestamp from "@/components/Timestamp.vue";
 
 const ZoneRow = Vue.extend({
   props: {
@@ -86,14 +65,45 @@ const ZoneRow = Vue.extend({
   },
 
   components: {
-    EditControls,
-    MeterActual,
-    Timestamp
+    Timestamp,
+    ZoneActual
   },
 
   computed: {
+    background() {
+      if (this.zone.isDay(new Date())) {
+        return "background-color: #ffe08a";
+      } else {
+        return "background-color: #7a7a7a";
+      }
+    },
+
     linkto(): string {
       return `#zone-details-${this.zone.id}`;
+    },
+
+    text() {
+      if (this.zone.isDay(new Date())) {
+        return "color: #ffe08a";
+      } else {
+        return "color: #7a7a7a";
+      }
+    },
+
+    statusClass() {
+      if (this.zone.active) {
+        return "has-text-success";
+      } else {
+        return "has-text-info";
+      }
+    },
+
+    statusIcon() {
+      if (this.zone.active) {
+        return "toggle-on";
+      } else {
+        return "toggle-off";
+      }
     },
 
     ...mapGetters("profiles", ["profiles"]),
@@ -125,6 +135,15 @@ const ZoneRow = Vue.extend({
       this.nickname = this.zone.nickname;
       this.profileid = this.zone.profileid;
       this.editing = false;
+    },
+
+    toggle() {
+      const zone = {
+        ...this.zone,
+        active: !this.zone.active
+      };
+
+      this.edit(zone);
     },
 
     ...mapActions("zones", ["edit", "remove"])

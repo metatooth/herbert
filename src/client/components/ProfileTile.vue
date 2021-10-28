@@ -219,7 +219,7 @@
         </div>
       </div>
       <div class="content">
-        <timestamp :timestamp="updatedat" :readable="readable" />
+        <timestamp :timestamp="updatedat" :readable="true" />
       </div>
       <div class="content">
         <edit-controls
@@ -296,8 +296,7 @@ const ProfileTile = Vue.extend({
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
-      editing: false,
-      readable: false
+      editing: false
     };
   },
 

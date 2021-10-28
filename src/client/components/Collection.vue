@@ -2,6 +2,14 @@
   <section class="section" ref="collection">
     <div class="level">
       <span class="title">{{ activeCount }} {{ name }}</span>
+      <herbert-button
+        v-if="!single"
+        style="margin: 20px"
+        :show="true"
+        :icon="icon"
+        color="black"
+        @on-click="toggle"
+      />
     </div>
     <div class="tile is-ancestor" v-if="single">
       <div class="tile is-4 is-vertical" v-if="isMeter">
@@ -33,7 +41,7 @@
         />
       </div>
     </div>
-    <div v-else>
+    <div v-if="!single && !table">
       <div class="tile is-ancestor" v-if="isMeter">
         <div class="tile is-4 is-vertical">
           <meter-tile v-for="meter in left" :key="meter.meter" :meter="meter" />
@@ -181,6 +189,58 @@
         </div>
       </div>
     </div>
+    <table class="table" v-if="!single && table">
+      <thead>
+        <th v-for="(heading, index) in headings" :key="`heading-${index}`">
+          {{ heading }}
+        </th>
+      </thead>
+      <tbody v-if="isMeter">
+        <meter-row
+          v-for="(item, index) in activeSet"
+          :key="`item-${index}`"
+          :meter="item"
+          :units="settings.units"
+        />
+      </tbody>
+      <tbody v-if="isDevice">
+        <device-row
+          v-for="(item, index) in activeSet"
+          :key="`item-${index}`"
+          :device="item"
+        />
+      </tbody>
+      <tbody v-if="isProfile">
+        <profile-row
+          v-for="(item, index) in activeSet"
+          :key="`item-${index}`"
+          :profile="item"
+          :units="settings.units"
+        />
+      </tbody>
+      <tbody v-if="isZone">
+        <zone-row
+          v-for="(item, index) in activeSet"
+          :key="`item-${index}`"
+          :zone="item"
+          :units="settings.units"
+        />
+      </tbody>
+      <tbody v-if="isWorker">
+        <worker-row
+          v-for="(item, index) in activeSet"
+          :key="`item-${index}`"
+          :worker="item"
+        />
+      </tbody>
+      <tbody v-if="isConfig">
+        <config-row
+          v-for="(item, index) in activeSet"
+          :key="`item-${index}`"
+          :config="item"
+        />
+      </tbody>
+    </table>
     <div class="tile is-ancestor" v-if="allowed">
       <div class="tile is-parent">
         <div class="tile is-child box">
@@ -209,18 +269,26 @@
 
 <script lang="ts">
 import Vue from "vue";
-import ConfigTile from "@/components/ConfigTile.vue";
-import DeviceTile from "@/components/DeviceTile.vue";
-import MeterTile from "@/components/MeterTile.vue";
-import ProfileTile from "@/components/ProfileTile.vue";
-import WorkerTile from "@/components/WorkerTile.vue";
-import ZoneTile from "@/components/ZoneTile.vue";
+import { mapGetters } from "vuex";
+
 import AddControls from "@/components/AddControls.vue";
+import ConfigRow from "@/components/ConfigRow.vue";
+import ConfigTile from "@/components/ConfigTile.vue";
+import DeviceRow from "@/components/DeviceRow.vue";
+import DeviceTile from "@/components/DeviceTile.vue";
+import HerbertButton from "@/components/Button.vue";
+import MeterRow from "@/components/MeterRow.vue";
+import MeterTile from "@/components/MeterTile.vue";
+import ProfileRow from "@/components/ProfileRow.vue";
+import ProfileTile from "@/components/ProfileTile.vue";
+import WorkerRow from "@/components/WorkerRow.vue";
+import WorkerTile from "@/components/WorkerTile.vue";
+import ZoneRow from "@/components/ZoneRow.vue";
+import ZoneTile from "@/components/ZoneTile.vue";
+
+import { Config } from "@/store/configs/types.ts";
 import { Profile } from "@/store/profiles/types.ts";
 import { Zone } from "@/store/zones/types.ts";
-import { Config } from "@/store/configs/types.ts";
-
-import { mapGetters } from "vuex";
 
 const Collection = Vue.extend({
   props: {
@@ -232,17 +300,25 @@ const Collection = Vue.extend({
     return {
       adding: false,
       nickname: "",
-      single: false
+      single: false,
+      table: false
     };
   },
 
   components: {
     AddControls,
+    ConfigRow,
     ConfigTile,
+    DeviceRow,
     DeviceTile,
+    HerbertButton,
+    MeterRow,
     MeterTile,
+    ProfileRow,
     ProfileTile,
+    WorkerRow,
     WorkerTile,
+    ZoneRow,
     ZoneTile
   },
 
@@ -342,6 +418,47 @@ const Collection = Vue.extend({
 
     allowed() {
       return this.isProfile || this.isZone || this.isConfig;
+    },
+
+    headings() {
+      if (this.isMeter) {
+        return [];
+      } else if (this.isDevice) {
+        return ["Status & Type", "Name", "Last Ping", "History", "MAC", ""];
+      } else if (this.isProfile) {
+        return [
+          "Name",
+          "Day Start",
+          "Duration",
+          "Day Temp & RH",
+          "Night Temp & RH",
+          "Blower",
+          "Irrigation",
+          ""
+        ];
+      } else if (this.isZone) {
+        return [
+          "Name",
+          "Profile & Lights",
+          "Current Temp & RH",
+          "Last Ping",
+          "Active?"
+        ];
+      } else if (this.isWorker) {
+        return ["MAC", "INET", "Name", "Configuration", "Last Ping", ""];
+      } else if (this.isConfig) {
+        return ["Name", "Configuration", "Updated", ""];
+      }
+
+      return [];
+    },
+
+    icon() {
+      if (this.table) {
+        return "grip-vertical";
+      } else {
+        return "list";
+      }
     },
 
     isMeter() {
@@ -469,6 +586,10 @@ const Collection = Vue.extend({
     cancel() {
       this.nickname = "";
       this.adding = false;
+    },
+
+    toggle() {
+      this.table = !this.table;
     }
   }
 });

@@ -20,8 +20,7 @@
     </td>
     <td>
       <a @click="editable" v-if="!editing">
-        <span v-if="device.nickname">{{ device.nickname }}</span>
-        <span v-else>click to name</span>
+        {{ device.name }}
       </a>
       <div class="field is-grouped" v-else>
         <div class="control">
@@ -45,7 +44,10 @@
       </div>
     </td>
     <td>
-      <timestamp v-bind:timestamp="device.timestamp" />
+      <timestamp
+        :timestamp="new Date(Date.parse(device.updatedat))"
+        :readable="true"
+      />
     </td>
     <td>
       <router-link

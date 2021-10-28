@@ -1,21 +1,9 @@
 <template>
   <div id="overview">
-    <section class="section">
-      <div class="tile is-ancestor">
-        <div class="tile" v-if="activeCount === 0">
-          <p class="title has-text-centered">No zones!</p>
-        </div>
-        <div class="tile is-4 is-vertical">
-          <zone-tile v-for="zone in left" :key="zone.id" :zone="zone" />
-        </div>
-        <div class="tile is-3 is-vertical">
-          <zone-tile v-for="zone in middle" :key="zone.id" :zone="zone" />
-        </div>
-        <div class="tile is-3 is-vertical">
-          <zone-tile v-for="zone in right" :key="zone.id" :zone="zone" />
-        </div>
-      </div>
-    </section>
+    <div class="tile" v-if="activeCount === 0">
+      <p class="title has-text-centered">No zones!</p>
+    </div>
+    <collection type="zone" :filter="filter" />
     <section class="section">
       <div class="tile is-ancestor">
         <div class="tile" v-if="notificationsCount === 0">
@@ -39,7 +27,6 @@ import NotificationTile from "@/components/NotificationTile.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
-import ZoneTile from "@/components/ZoneTile.vue";
 import { messageIsFrom } from "../../shared/type-guards";
 import { io, Socket } from "socket.io-client";
 import {
@@ -47,6 +34,7 @@ import {
   makeSwitchStatusMessage
 } from "../../shared/message-creators";
 import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
+import Collection from "@/components/Collection.vue";
 
 const Overview = Vue.extend({
   props: {
@@ -54,8 +42,8 @@ const Overview = Vue.extend({
   },
 
   components: {
-    NotificationTile,
-    ZoneTile
+    Collection,
+    NotificationTile
   },
 
   computed: {

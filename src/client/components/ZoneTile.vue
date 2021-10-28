@@ -15,7 +15,7 @@
         </span>
       </p>
       <div class="content">
-        <div cqlass="control">
+        <div class="control">
           <div class="tags has-addons">
             <span class="tag has-background-black-bis is-medium" :style="text">
               <font-awesome-icon icon="lightbulb" />

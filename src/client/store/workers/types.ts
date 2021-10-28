@@ -14,6 +14,10 @@ export class Worker {
     this.updatedat = new Date();
     this.deleted = false;
   }
+
+  get name() {
+    return this.nickname || this.worker.slice(12);
+  }
 }
 
 export interface WorkersState {
