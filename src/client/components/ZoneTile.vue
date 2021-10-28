@@ -30,18 +30,17 @@
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
       <div class="content">
-        <device-tag
-          v-for="device in sorted"
-          :key="device.device"
-          :device="device"
-        />
-      </div>
-      <div class="content">
         <button class="button" :class="statusClass" @click="toggle">
           <span class="icon">
             <font-awesome-icon :icon="statusIcon" />
           </span>
         </button>
+        &nbsp;
+        <device-tag
+          v-for="device in sorted"
+          :key="device.device"
+          :device="device"
+        />
       </div>
       <div class="content">
         <timestamp :timestamp="lastupdate" :readable="readable" />

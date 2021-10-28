@@ -258,6 +258,8 @@
                 type="text"
                 v-model="nickname"
                 placeHolder="Nickname"
+                @keyup.esc="cancel"
+                @keyup.enter="save"
               />
             </div>
           </div>

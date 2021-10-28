@@ -8,6 +8,7 @@
             type="text"
             v-model="nickname"
             @keyup.esc="cancel"
+            @keyup.enter="save"
           />
         </div>
         <div class="control">
