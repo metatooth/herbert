@@ -53,8 +53,7 @@ add_wifi_settings() {
 country=US
 network={
   ssid="${WIFI_SSID}"
-  wep_key0="${WIFI_PWD}"
-  key_mgmt=NONE
+  psk="${WIFI_PWD}"
 }
 EOF
   sudo sed -i -E \
@@ -83,7 +82,7 @@ add_static_ip() {
   log "Setting Static IP: ${STATIC_IP}"
   cat <<-EOF | sudo tee -a ${FILESYSTEM_MOUNT}/etc/dhcpcd.conf
 interface ${INTERFACE}
-static ip_address=${STATIC_IP}/24
+static ip_address=${STATIC_IP}/16
 static routers=${ROUTER}
 static domain_name_servers=${DNS}
 EOF

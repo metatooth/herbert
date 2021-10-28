@@ -27,11 +27,19 @@ router.post("/", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const { rows } = await query<Device>(
-    "UPDATE devices SET nickname = $1, devicetype = $2, updatedat = CURRENT_TIMESTAMP WHERE device = $3 RETURNING device",
-    [req.body.nickname, req.body.devicetype, id]
-  );
-  const device = await readDevice(rows[0].device);
+
+  if (req.body.devicetype) {
+    await query<Device>(
+      "UPDATE devices SET nickname = $1, devicetype = $2, updatedat = CURRENT_TIMESTAMP WHERE device = $3 RETURNING device",
+      [req.body.nickname, req.body.devicetype, id]
+    );
+  } else {
+    await query<Device>(
+      "UPDATE devices SET nickname = $1, devicetype = null, updatedat = CURRENT_TIMESTAMP WHERE device = $2 RETURNING device",
+      [req.body.nickname, id]
+    );
+  }
+  const device = await readDevice(id);
   res.status(201).json(device);
 });
 

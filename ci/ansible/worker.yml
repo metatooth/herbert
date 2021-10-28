@@ -16,7 +16,7 @@
       apt:
         update_cache: yes
         state: latest
-        name: ['bluetooth', 'bluez', 'libbluetooth-dev', 'libudev-dev', 'git', 'gcc', 'g++', 'make']
+        name: ['bluetooth', 'bluez', 'git', 'gcc', 'g++', 'libbluetooth-dev', 'libudev-dev', 'lirc', 'make']
 
     - name: Clone 8relind-rpi
       git:
@@ -29,6 +29,52 @@
         chdir: /home/{{ ansible_user }}/8relind-rpi
         target: install
 
+    - name: Insert/update the bootloader file
+      become: yes
+      blockinfile:
+        path: /boot/config.txt
+        block: |
+          dtoverlay=gpio-ir,gpio_pin=18
+          dtoverlay=gpio-ir-tx,gpio_pin=17
+
+    - name: Create LIRC module configuration
+      become: yes
+      copy:
+        dest: /etc/lirc/hardware.conf
+        content: |
+          LIRCD_ARGS="--uinput --listen"
+          LOAD_MODULES=true
+          DRIVER="default"
+          DEVICE="/dev/lirc0"
+          MODULES="lirc_rpi"
+
+    - name: Create LIRC module option
+      become: yes
+      copy:
+        dest: /etc/lirc/lirc_options.conf
+        content: |
+          [lircd]
+          nodaemon        = False
+          driver          = default
+          device          = /dev/lirc0
+          output          = /var/run/lirc/lircd
+          pidfile         = /var/run/lirc/lircd.pid
+          plugindir       = /usr/lib/arm-linux-gnueabihf/lirc/plugins
+          permission      = 666
+          allow-simulate  = No
+          repeat-max      = 600
+
+    - name: Create the LG controller file
+      become: yes
+      copy:
+        src: '{{ srcDir }}/scripts/AKB73016012.licrd.conf'
+        dest: /etc/lirc/lircd.conf.d/lg.lircd.conf
+
+    - name: Create the B+D controller file
+      become: yes
+      copy:
+        src: '{{ srcDir }}/scripts/810900812A.licrd.conf'
+        dest: /etc/lirc/lircd.conf.d/b+d.lircd.conf
     - name: Create {{ appDir }}
       file:
         path: '{{ appDir }}'

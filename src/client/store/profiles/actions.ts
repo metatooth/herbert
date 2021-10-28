@@ -12,7 +12,10 @@ export const actions: ActionTree<ProfilesState, RootState> = {
       profile.lamponhumidity = parseFloat(response.data.lamponhumidity);
       profile.lampofftemperature = parseFloat(response.data.lampofftemperature);
       profile.lampoffhumidity = parseFloat(response.data.lampoffhumidity);
-
+      profile.bloweractive = parseInt(response.data.bloweractive);
+      profile.blowercycle = parseInt(response.data.blowercycle);
+      profile.irrigationperday = parseInt(response.data.irrigationperday);
+      profile.irrigationduration = parseInt(response.data.irrigationduration);
       commit("ADD", profile);
     });
   },
@@ -24,6 +27,10 @@ export const actions: ActionTree<ProfilesState, RootState> = {
       profile.lamponhumidity = parseFloat(response.data.lamponhumidity);
       profile.lampofftemperature = parseFloat(response.data.lampofftemperature);
       profile.lampoffhumidity = parseFloat(response.data.lampoffhumidity);
+      profile.bloweractive = parseInt(response.data.bloweractive);
+      profile.blowercycle = parseInt(response.data.blowercycle);
+      profile.irrigationperday = parseInt(response.data.irrigationperday);
+      profile.irrigationduration = parseInt(response.data.irrigationduration);
       commit("EDIT", profile);
     });
   },
@@ -38,6 +45,10 @@ export const actions: ActionTree<ProfilesState, RootState> = {
         profile.lamponhumidity = parseFloat(clone.lamponhumidity);
         profile.lampofftemperature = parseFloat(clone.lampofftemperature);
         profile.lampoffhumidity = parseFloat(clone.lampoffhumidity);
+        profile.bloweractive = parseInt(clone.bloweractive);
+        profile.blowercycle = parseInt(clone.blowercycle);
+        profile.irrigationperday = parseInt(clone.irrigationperday);
+        profile.irrigationduration = parseInt(clone.irrigationduration);
 
         payload.push(profile);
       });

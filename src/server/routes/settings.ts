@@ -13,6 +13,7 @@ router.put("/", async (req, res) => {
 
   if (Object.keys(req.body.logo).length !== 0) {
     const arr = req.body.logo.split(",");
+    console.log("TITLE", req.body.title);
     console.log("IMAGE", arr[0]);
     console.log("DATA", arr[1]);
     await query(
@@ -43,7 +44,7 @@ router.put("/", async (req, res) => {
     );
   }
 
-  const { rows } = await query("SELECT * FROM accounts WHERE id = 1", []);
+  const { rows } = await query("SELECT * FROM accounts WHERE id = $1", [1]);
   res.status(200).json(rows[0]);
 });
 

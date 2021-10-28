@@ -178,13 +178,6 @@
             size="small"
             color="#ffe08a"
           />
-          <target
-            icon="cloud"
-            :value="dayPressure"
-            units="hPa"
-            size="small"
-            color="#ffe08a"
-          />
         </div>
 
         <div class="field is-grouped is-grouped-multiline">
@@ -199,13 +192,6 @@
             icon="tint"
             :value="nightHumidity"
             units="%"
-            size="small"
-            color="#7a7a7a"
-          />
-          <target
-            icon="cloud"
-            :value="nightPressure"
-            units="hPa"
             size="small"
             color="#7a7a7a"
           />
@@ -254,8 +240,7 @@ import {
   celsius2fahrenheit,
   celsius2kelvin,
   fahrenheit2celsius,
-  kelvin2celsius,
-  vaporPressureDeficit
+  kelvin2celsius
 } from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 import EditControls from "@/components/EditControls.vue";
@@ -391,26 +376,6 @@ const ProfileTile = Vue.extend({
       }
 
       return max;
-    },
-
-    dayPressure(): number {
-      return (
-        vaporPressureDeficit(
-          this.profile.lampontemperature,
-          0.6,
-          this.profile.lamponhumidity / 100
-        ) / 100
-      );
-    },
-
-    nightPressure(): number {
-      return (
-        vaporPressureDeficit(
-          this.profile.lampofftemperature,
-          -0.6,
-          this.profile.lampoffhumidity / 100
-        ) / 100
-      );
     }
   },
 

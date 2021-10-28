@@ -6,7 +6,7 @@
           class="navbar-item has-text-success is-size-3"
           @click="pick('overview')"
         >
-          <font-awesome-icon icon="cannabis" v-if="!logo" class="icon" />
+          <font-awesome-icon icon="seedling" v-if="!logo" class="icon" />
           <img v-else :src="logo" width="48" height="48" />
           {{ title }}
         </a>
@@ -57,7 +57,7 @@
             :class="is('profiles')"
           >
             <span class="icon has-text-success">
-              <font-awesome-icon icon="seedling" />
+              <font-awesome-icon icon="cannabis" />
             </span>
             <span>Profiles</span>
           </a>
@@ -123,17 +123,18 @@
       </div>
     </nav>
     <section class="section">
-      <overview v-if="is('overview')" :filter="filter" @child-picked="pick" />
-      <devices v-if="is('devices')" :filter="filter" />
-      <meters v-if="is('meters')" :filter="filter" :units="settings.units" />
-      <profiles
-        v-if="is('profiles')"
+      <overview
+        v-if="is('overview')"
+        type="zone"
         :filter="filter"
-        :units="settings.units"
+        @child-picked="pick"
       />
-      <workers v-if="is('workers')" :filter="filter" />
-      <configs v-if="is('configs')" :filter="filter" />
-      <zones v-if="is('zones')" :filter="filter" :units="settings.units" />
+      <collection v-if="is('devices')" type="device" :filter="filter" />
+      <collection v-if="is('meters')" type="meter" :filter="filter" />
+      <collection v-if="is('profiles')" type="profile" :filter="filter" />
+      <collection v-if="is('workers')" type="worker" :filter="filter" />
+      <collection v-if="is('configs')" type="config" :filter="filter" />
+      <collection v-if="is('zones')" type="zone" :filter="filter" />
       <settings-page
         v-if="is('settings')"
         :settings="settings"
@@ -160,12 +161,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Overview from "@/components/Overview.vue";
-import Devices from "@/components/Devices.vue";
-import Meters from "@/components/Meters.vue";
-import Profiles from "@/components/Profiles.vue";
-import Workers from "@/components/Workers.vue";
-import Configs from "@/components/Configs.vue";
-import Zones from "@/components/Zones.vue";
+import Collection from "@/components/Collection.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import { mapGetters, mapActions } from "vuex";
@@ -180,14 +176,9 @@ const Dashboard = Vue.extend({
   },
 
   components: {
-    Devices,
+    Collection,
     Overview,
-    Meters,
-    Profiles,
     Timestamp,
-    Workers,
-    Configs,
-    Zones,
     SettingsPage
   },
 

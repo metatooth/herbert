@@ -2,6 +2,7 @@
   <div class="control has-icons-left">
     <div class="select is-small">
       <select v-model="selected">
+        <option value="">undefined</option>
         <option
           v-for="type in devicetypes"
           v-bind:key="type"

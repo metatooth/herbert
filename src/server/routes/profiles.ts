@@ -17,7 +17,7 @@ router.post("/", async (req, res) => {
   console.log("POST /profiles");
   console.log(req.body);
   const { rows } = await query<Profile>(
-    "INSERT INTO profiles (profile, lampstart, lampduration, lampontemperature, lamponhumidity, lampofftemperature, lampoffhumidity) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+    "INSERT INTO profiles (profile, lampstart, lampduration, lampontemperature, lamponhumidity, lampofftemperature, lampoffhumidity, bloweractive, blowercycle, irrigationperday, irrigationduration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id",
     [
       req.body.profile,
       req.body.lampstart,
@@ -25,7 +25,11 @@ router.post("/", async (req, res) => {
       req.body.lampontemperature,
       req.body.lamponhumidity,
       req.body.lampofftemperature,
-      req.body.lampoffhumidity
+      req.body.lampoffhumidity,
+      req.body.bloweractive,
+      req.body.blowercycle,
+      req.body.irrigationperday,
+      req.body.irrigationduration
     ]
   );
   const profile = await readProfile(rows[0].id);

@@ -1,11 +1,20 @@
 <template>
-  <div class="control">
-    <div class="tags has-addons">
+  <div class="control has-background-dark">
+    <div class="tags has-addons" style="">
       <span class="tag is-medium has-background-dark" :class="meterClass">
-        <font-awesome-icon icon="tachometer-alt" />
+        <font-awesome-icon icon="thermometer-half" />
       </span>
       <span class="tag is-medium has-text-light has-background-dark">
         {{ temperature.toFixed(1) }} {{ unitsWithDegrees }}
+      </span>
+      <span class="tag is-medium has-text-light has-background-dark">
+        {{ name }}
+        <button class="delete" v-on:click="remove(meter.device)" />
+      </span>
+    </div>
+    <div class="tags has-addons">
+      <span class="tag is-medium has-background-dark" :class="meterClass">
+        <font-awesome-icon icon="tint" />
       </span>
       <span class="tag is-medium has-text-light has-background-dark">
         {{ humidity.toFixed(0) }} %
@@ -21,8 +30,7 @@
         </router-link>
       </span>
       <span class="tag is-medium has-text-light has-background-dark">
-        {{ linkName }}
-        <button class="delete" v-on:click="remove(meter.device)" />
+        &nbsp;
       </span>
     </div>
   </div>
@@ -56,8 +64,9 @@ const MeterWidget = Vue.extend({
       return 100 * this.meter.humidity;
     },
 
-    linkName(): string {
-      return this.meter.nickname || this.meter.device;
+    name(): string {
+      if (this.meter.nickname) return this.meter.nickname;
+      return this.meter.device.slice(12);
     },
 
     meterClass(): string {
