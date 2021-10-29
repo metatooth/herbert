@@ -7,9 +7,14 @@ export const mutations: MutationTree<ZonesState> = {
     state.zones.push(zone);
   },
   ADD_DEVICE(state, payload: { zone: Zone; device: Device }) {
-    state.zones.find((el: Zone) => {
-      if (el.id === payload.zone.id) {
-        el.devices.push(payload.device);
+    state.zones.find((zone: Zone) => {
+      if (zone.id === payload.zone.id) {
+        const found = zone.devices.find((d: Device) => {
+          return d.id === device;
+        });
+        if (!found) {
+          zone.devices.push(payload.device);
+        }
       }
     });
   },
@@ -24,7 +29,7 @@ export const mutations: MutationTree<ZonesState> = {
     state.zones.find((zone: Zone) => {
       if (zone.id === payload.zone.id) {
         const found = zone.children.find((z: Zone) => {
-          return z.id === child;
+          return z.id === payload.child;
         });
         if (!found) {
           zone.children.push(payload.child);
