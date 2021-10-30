@@ -14,6 +14,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
   },
 
   addDevice({ commit }, payload: { zone: Zone; device: string }) {
+    console.log("add device with payload", payload);
     const json = JSON.stringify({ device: payload.device });
     HTTP.post(`/zones/${payload.zone.id}/devices`, json).then(response => {
       const device = response.data.devices.find(
