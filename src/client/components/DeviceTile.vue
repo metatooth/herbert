@@ -2,7 +2,7 @@
   <div class="tile is-parent">
     <div class="tile is-child box">
       <div class="title">
-        <span v-if="editing">
+        <div v-if="editing">
           <div class="field is-grouped is-grouped-multiline">
             <div class="control">
               <input
@@ -13,22 +13,39 @@
                 @keyup.esc="cancel"
               />
             </div>
+            <div class="control">
+              <select-device-type
+                :devicetype="device.devicetype"
+                @select-devicetype="selectdevicetype"
+              />
+            </div>
+            <div class="control">
+              <select-zone-for-device
+                :zoneid="zoneid"
+                @select-zone="selectzone"
+              />
+            </div>
           </div>
-          <div class="control">
-            <select-device-type
-              :devicetype="device.devicetype"
-              @select-devicetype="selected"
-            />
-          </div>
-        </span>
-
-        <span v-else>{{ name }}</span>
+        </div>
+        <span v-else>{{ device.name }}</span>
       </div>
       <p class="subtitle">
-        <button class="button is-small" @click="toggle">
+        {{ device.device }}
+      </p>
+      <p class="subtitle">
+        {{ zonename }}
+      </p>
+      <div class="content">
+        <button class="button" @click="toggle">
           <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
           <span>{{ status }}</span>
         </button>
+      </div>
+      <div class="content">
+        <timestamp
+          :timestamp="new Date(Date.parse(device.updatedat))"
+          :readable="true"
+        />
         <router-link
           :to="{
             name: 'statuses',
@@ -37,23 +54,15 @@
         >
           &gt;&gt;&gt;
         </router-link>
-      </p>
+      </div>
       <div class="content">
-        <timestamp
-          :timestamp="new Date(device.updatedat)"
-          :readable="readable"
+        <edit-controls
+          class="edit-controls"
+          @on-edit="editable"
+          @on-save="save"
+          @on-destroy="destroy"
+          @on-cancel="cancel"
         />
-        <span class="tag is-medium">
-          {{ device.device }}
-          &nbsp;
-          <edit-controls
-            class="edit-controls"
-            @on-edit="editable"
-            @on-save="save"
-            @on-destroy="destroy"
-            @on-cancel="cancel"
-          />
-        </span>
       </div>
     </div>
   </div>
@@ -67,6 +76,7 @@ import { Notification } from "@/store/notifications/types";
 import Timestamp from "@/components/Timestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
+import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
 const DeviceTile = Vue.extend({
   props: {
@@ -86,6 +96,7 @@ const DeviceTile = Vue.extend({
   components: {
     EditControls,
     SelectDeviceType,
+    SelectZoneForDevice,
     Timestamp
   },
 
@@ -134,11 +145,6 @@ const DeviceTile = Vue.extend({
       return "circle";
     },
 
-    name() {
-      if (this.device.nickname) return this.device.nickname;
-      return this.device.device.slice(12);
-    },
-
     statusClass() {
       if (this.status === "on") {
         return "has-text-success";
@@ -154,8 +160,37 @@ const DeviceTile = Vue.extend({
         return "toggle-off";
       }
     },
+
+    zone() {
+      const found = this.zones.filter(zone => {
+        const devices = zone.devices.filter(device => {
+          return this.device.device === device.device;
+        });
+        return devices.length !== 0;
+      });
+
+      return found.length !== 0 ? found[0] : null;
+    },
+
+    zoneid() {
+      const zone = this.zone;
+      if (zone) {
+        return zone.id;
+      }
+      return 0;
+    },
+
+    zonename() {
+      const zone = this.zone;
+      if (zone) {
+        return zone.nickname;
+      }
+      return "";
+    },
+
     ...mapGetters("notifications", ["notifications"]),
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   methods: {
@@ -183,8 +218,27 @@ const DeviceTile = Vue.extend({
       this.editing = false;
     },
 
-    selected(type: string) {
+    selectdevicetype(type: string) {
       this.devicetype = type;
+    },
+
+    selectzone(zone: number) {
+      const target = this.zones.filter(z => {
+        return zone === z.id;
+      });
+
+      const payload = { zone: target[0], device: this.device.device };
+      this.zones.forEach(zone => {
+        zone.devices.forEach(device => {
+          if (device.device === this.device.device) {
+            this.removeDevice(payload);
+          }
+        });
+
+        if (payload.zone.id === zone.id) {
+          this.addDevice(payload);
+        }
+      });
     },
 
     destroy() {
@@ -199,7 +253,8 @@ const DeviceTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("devices", ["on", "off", "edit", "remove"])
+    ...mapActions("devices", ["on", "off", "edit", "remove"]),
+    ...mapActions("zones", ["addDevice", "removeDevice"])
   }
 });
 

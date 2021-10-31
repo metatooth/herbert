@@ -1,27 +1,8 @@
 <template>
   <tr>
-    <td class="has-text-centered">
-      <div class="field is-grouped">
-        <div class="control">
-          <button class="button is-small" :class="deviceClass" @click="toggle">
-            <span class="icon">
-              <font-awesome-icon :icon="deviceIcon" />
-            </span>
-          </button>
-        </div>
-
-        <div class="control">
-          <select-device-type
-            :devicetype="device.devicetype"
-            @select-devicetype="saveDeviceType"
-          />
-        </div>
-      </div>
-    </td>
     <td>
       <a @click="editable" v-if="!editing">
-        <span v-if="device.nickname">{{ device.nickname }}</span>
-        <span v-else>click to name</span>
+        {{ device.name }}
       </a>
       <div class="field is-grouped" v-else>
         <div class="control">
@@ -44,8 +25,29 @@
         </div>
       </div>
     </td>
+    <td class="has-text-centered">
+      <div class="field is-grouped">
+        <div class="control">
+          <button class="button is-small" :class="deviceClass" @click="toggle">
+            <span class="icon">
+              <font-awesome-icon :icon="deviceIcon" />
+            </span>
+          </button>
+        </div>
+
+        <div class="control">
+          <select-device-type
+            :devicetype="device.devicetype"
+            @select-devicetype="saveDeviceType"
+          />
+        </div>
+      </div>
+    </td>
     <td>
-      <timestamp v-bind:timestamp="device.timestamp" />
+      <timestamp
+        :timestamp="new Date(Date.parse(device.updatedat))"
+        :readable="true"
+      />
     </td>
     <td>
       <router-link

@@ -3,47 +3,45 @@
     <div class="tile is-child box">
       <p class="title">
         <span v-if="editing">
-          <input
-            class="input"
-            type="text"
-            placeHolder="Name this meter"
-            v-model="nickname"
-            @keyup.esc="cancel"
-          />
+          <div class="field">
+            <div class="control">
+              <input
+                class="input"
+                type="text"
+                placeHolder="Name this meter"
+                v-model="nickname"
+                @keyup.esc="cancel"
+              />
+            </div>
+          </div>
         </span>
-        <span v-else>{{ meter.nickname || meter.device }}</span>
+        <span v-else>{{ meter.name }}</span>
       </p>
       <p class="subtitle">
-        <span class="icon" :class="meterClass">
-          <font-awesome-icon icon="tachometer-alt" />
-        </span>
-        <span class="tag is-medium">{{ meter.device }}</span>
+        {{ meter.device }}
       </p>
       <div class="content">
         <meter-actual :meter="meter" />
       </div>
       <div class="content">
-        <timestamp
-          :timestamp="new Date(meter.updatedat)"
-          :readable="readable"
-        />
-      </div>
-      <div class="content">
+        <timestamp :timestamp="new Date(meter.updatedat)" :readable="true" />
         <router-link
           :to="{
             name: 'readings',
             params: { name: meter.nickname, device: meter.device }
           }"
         >
-          history
+          &gt;&gt;&gt;
         </router-link>
       </div>
-      <edit-controls
-        @on-edit="editable"
-        @on-save="save"
-        @on-destroy="destroy"
-        @on-cancel="cancel"
-      />
+      <div class="content">
+        <edit-controls
+          @on-edit="editable"
+          @on-save="save"
+          @on-destroy="destroy"
+          @on-cancel="cancel"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -65,7 +63,6 @@ const MeterTile = Vue.extend({
   data() {
     return {
       nickname: this.meter.nickname,
-      readable: true,
       editing: false
     };
   },

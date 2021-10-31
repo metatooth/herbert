@@ -1,30 +1,14 @@
 <template>
   <tr>
-    <td class="has-text-centered">
-      <div class="tags has-addons">
-        <span class="tag has-background-dark" :class="meterClass">
-          <font-awesome-icon icon="tachometer-alt" />
-        </span>
-        <span class="tag has-text-light has-background-dark">
-          {{ meterReadingTemperature.toFixed(1) }} {{ unitsWithDegrees }}
-        </span>
-        <span class="tag has-text-light has-background-dark">
-          {{ meterReadingHumidity.toFixed(0) }} %
-        </span>
-      </div>
-    </td>
     <td>
-      <a @click="editable" v-if="!editing">
-        <span v-if="meter.nickname">{{ meter.nickname }}</span>
-        <span v-else>click to name</span>
-      </a>
-      <div class="field is-grouped" v-else>
+      <div class="field is-grouped" v-if="editing">
         <div class="control">
           <input
             class="input is-small"
             type="text"
             v-model="nickname"
             @keyup.esc="cancel"
+            @keyup.enter="save"
           />
         </div>
         <div class="control">
@@ -38,11 +22,17 @@
           </button>
         </div>
       </div>
+      <a class="is-size-5" @click="editable" v-if="!editing">
+        {{ meter.name }}
+      </a>
+    </td>
+    <td>
+      <meter-actual :meter="meter" :units="units" />
     </td>
     <td>
       <timestamp :timestamp="new Date(Date.parse(meter.timestamp))" />
     </td>
-    <td>
+    <td class="is-size-5">
       <router-link
         :to="{
           name: 'readings',
@@ -52,15 +42,16 @@
         &gt;&gt;&gt;
       </router-link>
     </td>
-    <td>
+    <td class="is-size-5">
       {{ meter.device }}
     </td>
     <td>
-      <div class="control">
-        <button class="button is-small is-danger" @click="trash">
-          <font-awesome-icon icon="trash" />
-        </button>
-      </div>
+      <edit-controls
+        @on-edit="editable"
+        @on-save="save"
+        @on-destroy="destroy"
+        @on-cancel="cancel"
+      />
     </td>
   </tr>
 </template>
@@ -72,6 +63,8 @@ import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 import Timestamp from "@/components/Timestamp.vue";
+import MeterActual from "@/components/MeterActual.vue";
+import EditControls from "@/components/EditControls.vue";
 
 const MeterRow = Vue.extend({
   props: {
@@ -82,12 +75,15 @@ const MeterRow = Vue.extend({
   data() {
     return {
       nickname: this.meter.nickname,
+      updatedat: new Date(Date.parse(this.meter.updatedat)),
       updating: false,
       editing: false
     };
   },
 
   components: {
+    EditControls,
+    MeterActual,
     Timestamp
   },
 
@@ -139,19 +135,12 @@ const MeterRow = Vue.extend({
       this.editing = false;
     },
 
-    saveMeterType(metertype: string): void {
-      this.edit({
-        ...this.meter,
-        metertype: metertype
-      });
-    },
-
     cancel() {
       this.nickname = this.meter.nickname;
       this.editing = false;
     },
 
-    trash() {
+    destroy() {
       if (confirm("OK to remove?")) {
         this.remove(this.meter);
       }

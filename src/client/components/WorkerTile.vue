@@ -87,9 +87,6 @@ const WorkerTile = Vue.extend({
   },
 
   computed: {
-    lastupdate() {
-      return new Date(Date.parse(this.worker.updatedat));
-    },
     ...mapGetters("configs", ["configs"])
   },
 

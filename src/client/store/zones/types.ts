@@ -19,6 +19,10 @@ export class Zone {
   deletedat?: Date;
   active: boolean;
 
+  get name() {
+    return this.nickname;
+  }
+
   isDay(timestamp: Date): boolean {
     let day = true;
 

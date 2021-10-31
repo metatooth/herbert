@@ -7,7 +7,6 @@
       color="#48c78e"
     />
     <target icon="tint" :value="humidity" units="%" color="#48c78e" />
-    <target icon="cloud" :value="pressure" units="hPa" color="#48c78e" />
   </div>
 </template>
 
@@ -46,10 +45,6 @@ const MeterActual = Vue.extend({
 
     humidity(): number {
       return this.meter.humidity * 100;
-    },
-
-    pressure(): number {
-      return this.meter.pressure / 100;
     },
 
     unitsWithDegree(): string {

@@ -7,43 +7,50 @@
       {{ worker.inet }}
     </td>
     <td>
-      <a @click="editable" v-if="!editing">
-        <span v-if="worker.nickname">{{ worker.nickname }}</span>
-        <span v-else>click to name</span>
-      </a>
-      <div class="field is-grouped" v-else>
-        <div class="control">
-          <input
-            class="input"
-            type="text"
-            v-model="nickname"
-            @keyup.esc="cancel"
-          />
-        </div>
-        <div class="control">
-          <button class="button is-primary" @click="save">
-            <font-awesome-icon icon="check" />
-          </button>
-        </div>
-        <div class="control">
-          <button class="button is-danger" @click="cancel">
-            <font-awesome-icon icon="times" />
-          </button>
-        </div>
+      <span v-if="!editing">
+        {{ worker.name }}
+      </span>
+      <span v-else>
+        <input
+          class="input"
+          type="text"
+          v-model="nickname"
+          placeHolder="Name this worker"
+          @keyup.esc="cancel"
+          @keyup.enter="save"
+        />
+      </span>
+    </td>
+    <td>
+      <select v-if="editing" v-model="configname">
+        <option disabled value="">Select a config for this worker</option>
+        <option v-for="config in configs" :key="config.nickname">
+          {{ config.nickname }}
+        </option>
+      </select>
+      <div class="is-family-code">
+        {{ worker.configname }} => {{ worker.config }}
       </div>
     </td>
     <td>
-      <timestamp :timestamp="new Date(Date.parse(worker.updatedat))" />
+      <timestamp
+        :timestamp="new Date(Date.parse(worker.updatedat))"
+        :readable="true"
+      />
+    </td>
+    <td>
+      <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
     </td>
   </tr>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { mapActions, mapGetters } from "vuex";
 
+import EditControls from "@/components/EditControls.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import { Worker } from "@/store/workers/types";
-import { mapActions } from "vuex";
 
 const WorkerRow = Vue.extend({
   props: {
@@ -53,12 +60,28 @@ const WorkerRow = Vue.extend({
   data() {
     return {
       nickname: this.worker.nickname,
+      configname: this.worker.configname,
       editing: false
     };
   },
 
   components: {
+    EditControls,
     Timestamp
+  },
+
+  watch: {
+    configname() {
+      this.configs.forEach(config => {
+        if (this.configname === config.nickname) {
+          this.config = config.config;
+        }
+      });
+    }
+  },
+
+  computed: {
+    ...mapGetters("configs", ["configs"])
   },
 
   methods: {
@@ -69,17 +92,25 @@ const WorkerRow = Vue.extend({
     save() {
       this.edit({
         ...this.worker,
-        nickname: this.nickname
+        nickname: this.nickname,
+        configname: this.configname
       });
       this.editing = false;
     },
 
+    destroy() {
+      if (confirm("OK to remove?")) {
+        this.remove(this.worker);
+      }
+    },
+
     cancel() {
       this.nickname = this.worker.nickname;
+      this.configname = this.worker.configname;
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit"])
+    ...mapActions("workers", ["edit", "remove"])
   }
 });
 

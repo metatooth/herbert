@@ -8,6 +8,10 @@ export class Device {
   deleted: boolean;
   deletedat?: Date;
   status: string;
+
+  get name() {
+    return this.nickname || this.device.slice(12);
+  }
 }
 
 export class DevicesState {

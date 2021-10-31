@@ -15,7 +15,7 @@
         </span>
       </p>
       <div class="content">
-        <div cqlass="control">
+        <div class="control">
           <div class="tags has-addons">
             <span class="tag has-background-black-bis is-medium" :style="text">
               <font-awesome-icon icon="lightbulb" />
@@ -30,18 +30,17 @@
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
       <div class="content">
-        <device-tag
-          v-for="device in sorted"
-          :key="device.device"
-          :device="device"
-        />
-      </div>
-      <div class="content">
         <button class="button" :class="statusClass" @click="toggle">
           <span class="icon">
             <font-awesome-icon :icon="statusIcon" />
           </span>
         </button>
+        &nbsp;
+        <device-tag
+          v-for="device in sorted"
+          :key="device.device"
+          :device="device"
+        />
       </div>
       <div class="content">
         <timestamp :timestamp="lastupdate" :readable="readable" />

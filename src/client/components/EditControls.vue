@@ -1,5 +1,5 @@
 <template>
-  <div class="field is-grouped">
+  <span class="field is-grouped is-grouped-right">
     <herbert-button
       color="warning"
       icon="edit"
@@ -24,7 +24,7 @@
       :show="editing"
       @on-click="cancel"
     />
-  </div>
+  </span>
 </template>
 
 <script lang="ts">

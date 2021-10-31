@@ -21,7 +21,9 @@ import {
   faFileCode,
   faFireAlt,
   faGripHorizontal,
+  faGripVertical,
   faLightbulb,
+  faList,
   faMoon,
   faPencilAlt,
   faPlus,
@@ -59,7 +61,9 @@ library.add(faFan);
 library.add(faFileCode);
 library.add(faFireAlt);
 library.add(faGripHorizontal);
+library.add(faGripVertical);
 library.add(faLightbulb);
+library.add(faList);
 library.add(faMoon);
 library.add(faPencilAlt);
 library.add(faPlus);

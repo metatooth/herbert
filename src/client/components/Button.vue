@@ -1,10 +1,10 @@
 <template>
-  <div class="control" v-if="show">
+  <span class="control" v-if="show">
     <button :class="display" @click="$emit('on-click')">
       <font-awesome-icon :icon="icon" />
       <span v-if="label">{{ label }}</span>
     </button>
-  </div>
+  </span>
 </template>
 
 <script lang="ts">
