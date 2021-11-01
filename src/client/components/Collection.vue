@@ -29,13 +29,20 @@
         v-for="(zone, index) in activeSet"
         :key="`zone-${index}`"
         :zone="zone"
-        />
+      />
     </div>
     <div v-if="single && table && isMeter">
       <meter-narrow
         v-for="(meter, index) in activeSet"
         :key="`meter-${index}`"
         :meter="meter"
+      />
+    </div>
+    <div v-if="single && table && isDevice">
+      <device-narrow
+        v-for="(device, index) in activeSet"
+        :key="`device-${index}`"
+        :device="device"
       />
     </div>
 
@@ -304,6 +311,7 @@ import { mapGetters } from "vuex";
 import AddControls from "@/components/AddControls.vue";
 import ConfigRow from "@/components/ConfigRow.vue";
 import ConfigTile from "@/components/ConfigTile.vue";
+import DeviceNarrow from "@/components/DeviceNarrow.vue";
 import DeviceRow from "@/components/DeviceRow.vue";
 import DeviceTile from "@/components/DeviceTile.vue";
 import HerbertButton from "@/components/Button.vue";
@@ -341,10 +349,11 @@ const Collection = Vue.extend({
     AddControls,
     ConfigRow,
     ConfigTile,
+    DeviceNarrow,
     DeviceRow,
     DeviceTile,
-HerbertButton,
-MeterNarrow,
+    HerbertButton,
+    MeterNarrow,
     MeterRow,
     MeterTile,
     ProfileRow,

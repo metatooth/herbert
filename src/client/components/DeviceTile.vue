@@ -37,7 +37,7 @@
       </p>
       <div class="content">
         <button class="button" @click="toggle">
-          <font-awesome-icon :class="deviceClass" :icon="deviceIcon" />
+          <font-awesome-icon :class="deviceClass" :icon="device.icon" />
           <span>{{ status }}</span>
         </button>
       </div>
@@ -117,32 +117,6 @@ const DeviceTile = Vue.extend({
       }
 
       return style;
-    },
-
-    deviceIcon() {
-      if (this.status !== "on" && this.status !== "off") {
-        return "times";
-      }
-
-      if (this.device.devicetype === "heater") {
-        return "fire-alt";
-      } else if (this.device.devicetype === "humidifier") {
-        return "tint";
-      } else if (this.device.devicetype === "dehumidifier") {
-        return "tint-slash";
-      } else if (this.device.devicetype === "lamp") {
-        return "lightbulb";
-      } else if (this.device.devicetype === "blower") {
-        return "wind";
-      } else if (this.device.devicetype === "cooler") {
-        return "snowflake";
-      } else if (this.device.devicetype === "irrigator") {
-        return "cloud-rain";
-      } else if (this.device.devicetype === "fan") {
-        return "fan";
-      }
-
-      return "circle";
     },
 
     statusClass() {

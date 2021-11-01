@@ -3,16 +3,15 @@
     <div class="level-left">
       <div class="level-item">
         <p class="subtitle is-7">
-          <strong>{{ meter.name.slice(0, 12) }}</strong><br />
+          <strong>{{ meter.name.slice(0, 12) }}</strong
+          ><br />
           {{ meter.device.slice(9) }}
         </p>
       </div>
     </div>
     <div class="level-right">
       <div class="level-item">
-        <p class="title">
-          {{ temperature.toFixed(0) }}{{ unitsWithDegree }}
-        </p>
+        <p class="title">{{ temperature.toFixed(0) }}{{ unitsWithDegree }}</p>
       </div>
       <div class="level-item">
         <p class="title">{{ humidity.toFixed(0) }}%</p>
@@ -51,8 +50,7 @@ const MeterNarrow = Vue.extend({
     },
 
     ...mapGetters("settings", ["settings"])
-  },
-
+  }
 });
 
 export default MeterNarrow;
