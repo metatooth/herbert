@@ -1,22 +1,15 @@
 <template>
   <div id="overview">
-    <div class="tile" v-if="activeCount === 0">
-      <p class="title has-text-centered">No zones!</p>
-    </div>
+    <current-conditions />
     <collection type="zone" :filter="filter" />
-    <section class="section">
-      <div class="tile is-ancestor">
-        <div class="tile" v-if="notificationsCount === 0">
-          <p class="title has-text-centered">No notifications!</p>
-        </div>
-        <notification-tile
-          v-for="notification in notifications"
-          v-bind:key="notification.id"
-          v-bind="notification"
-          @delete-notification="deleteNotification(notification)"
-        />
-      </div>
-    </section>
+    <div class="tile is-ancestor">
+      <notification-tile
+        v-for="notification in notifications"
+        v-bind:key="notification.id"
+        v-bind="notification"
+        @delete-notification="deleteNotification(notification)"
+      />
+    </div>
   </div>
 </template>
 
@@ -35,6 +28,7 @@ import {
 } from "../../shared/message-creators";
 import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
 import Collection from "@/components/Collection.vue";
+import CurrentConditions from "@/components/CurrentConditions.vue";
 
 const Overview = Vue.extend({
   props: {
@@ -42,6 +36,7 @@ const Overview = Vue.extend({
   },
 
   components: {
+    CurrentConditions,
     Collection,
     NotificationTile
   },

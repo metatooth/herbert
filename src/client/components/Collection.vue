@@ -1,5 +1,5 @@
 <template>
-  <section class="section" ref="collection">
+  <div ref="collection">
     <nav class="level is-mobile">
       <div class="level-left">
         <div class="level-item">
@@ -26,236 +26,23 @@
 
     <narrow-table v-if="single && table" :items="activeSet" :type="type" />
 
-    <div class="tile is-ancestor" v-if="single && !table">
-      <div class="tile is-4 is-vertical" v-if="isMeter">
-        <meter-tile v-for="meter in activeSet" :key="meter.id" :meter="meter" />
-      </div>
-      <div class="tile is-4 is-vertical" v-if="isDevice">
-        <device-tile
-          v-for="device in activeSet"
-          :key="device.device"
-          :device="device"
-        />
-      </div>
-      <div class="tile is-4 is-vertical" v-if="isProfile">
-        <profile-tile
-          v-for="profile in activeSet"
-          :key="profile.id"
-          :profile="profile"
-          :units="settings.units"
-        />
-      </div>
-      <div class="tile is-4 is-vertical" v-if="isZone">
-        <zone-tile v-for="zone in activeSet" :key="zone.id" :zone="zone" />
-      </div>
-      <div class="tile is-4 is-vertical" v-if="isWorker">
-        <worker-tile
-          v-for="worker in activeSet"
-          :key="worker.id"
-          :worker="worker"
-        />
-      </div>
-    </div>
-    <div v-if="!single && !table">
-      <div class="tile is-ancestor" v-if="isMeter">
-        <div class="tile is-4 is-vertical">
-          <meter-tile v-for="meter in left" :key="meter.meter" :meter="meter" />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <meter-tile
-            v-for="meter in middle"
-            :key="meter.meter"
-            :meter="meter"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <meter-tile
-            v-for="meter in right"
-            :key="meter.meter"
-            :meter="meter"
-          />
-        </div>
-      </div>
-      <div class="tile is-ancestor" v-if="isDevice">
-        <div class="tile is-4 is-vertical">
-          <device-tile
-            v-for="device in left"
-            :key="device.device"
-            :device="device"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <device-tile
-            v-for="device in middle"
-            :key="device.device"
-            :device="device"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <device-tile
-            v-for="device in right"
-            :key="device.device"
-            :device="device"
-          />
-        </div>
-      </div>
-      <div class="tile is-ancestor" v-if="isProfile">
-        <div class="tile is-4 is-vertical">
-          <profile-tile
-            v-for="profile in left"
-            :key="profile.id"
-            :profile="profile"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <profile-tile
-            v-for="profile in middle"
-            :key="profile.id"
-            :profile="profile"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <profile-tile
-            v-for="profile in right"
-            :key="profile.id"
-            :profile="profile"
-            :units="settings.units"
-          />
-        </div>
-      </div>
-      <div class="tile is-ancestor" v-if="isZone">
-        <div class="tile is-4 is-vertical">
-          <zone-tile
-            v-for="zone in left"
-            :key="zone.id"
-            :zone="zone"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <zone-tile
-            v-for="zone in middle"
-            :key="zone.id"
-            :zone="zone"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <zone-tile
-            v-for="zone in right"
-            :key="zone.id"
-            :zone="zone"
-            :units="settings.units"
-          />
-        </div>
-      </div>
-      <div class="tile is-ancestor" v-if="isWorker">
-        <div class="tile is-4 is-vertical">
-          <worker-tile
-            v-for="worker in left"
-            :key="worker.id"
-            :worker="worker"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <worker-tile
-            v-for="worker in middle"
-            :key="worker.id"
-            :worker="worker"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <worker-tile
-            v-for="worker in right"
-            :key="worker.id"
-            :worker="worker"
-            :units="settings.units"
-          />
-        </div>
-      </div>
-      <div class="tile is-ancestor" v-if="isConfig">
-        <div class="tile is-4 is-vertical">
-          <config-tile
-            v-for="config in left"
-            :key="config.id"
-            :config="config"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <config-tile
-            v-for="config in middle"
-            :key="config.id"
-            :config="config"
-            :units="settings.units"
-          />
-        </div>
-        <div class="tile is-4 is-vertical">
-          <config-tile
-            v-for="config in right"
-            :key="config.id"
-            :config="config"
-            :units="settings.units"
-          />
-        </div>
-      </div>
-    </div>
-    <table class="table" v-if="!single && table">
-      <thead>
-        <th v-for="(heading, index) in headings" :key="`heading-${index}`">
-          {{ heading }}
-        </th>
-      </thead>
-      <tbody v-if="isMeter">
-        <meter-row
-          v-for="(item, index) in activeSet"
-          :key="`item-${index}`"
-          :meter="item"
-          :units="settings.units"
-        />
-      </tbody>
-      <tbody v-if="isDevice">
-        <device-row
-          v-for="(item, index) in activeSet"
-          :key="`item-${index}`"
-          :device="item"
-        />
-      </tbody>
-      <tbody v-if="isProfile">
-        <profile-row
-          v-for="(item, index) in activeSet"
-          :key="`item-${index}`"
-          :profile="item"
-          :units="settings.units"
-        />
-      </tbody>
-      <tbody v-if="isZone">
-        <zone-row
-          v-for="(item, index) in activeSet"
-          :key="`item-${index}`"
-          :zone="item"
-          :units="settings.units"
-        />
-      </tbody>
-      <tbody v-if="isWorker">
-        <worker-row
-          v-for="(item, index) in activeSet"
-          :key="`item-${index}`"
-          :worker="item"
-        />
-      </tbody>
-      <tbody v-if="isConfig">
-        <config-row
-          v-for="(item, index) in activeSet"
-          :key="`item-${index}`"
-          :config="item"
-        />
-      </tbody>
-    </table>
+    <single-column v-if="single && !table" :items="activeSet" :type="type" />
+
+    <three-columns
+      v-if="!single && !table"
+      :left="left"
+      :middle="middle"
+      :right="right"
+      :type="type"
+    />
+
+    <full-table
+      v-if="!single && table"
+      :headings="headings"
+      :items="activeSet"
+      :type="type"
+    />
+
     <div class="tile is-ancestor" v-if="allowed">
       <div class="tile is-parent">
         <div class="tile is-child box">
@@ -281,7 +68,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script lang="ts">
@@ -289,25 +76,13 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 
 import AddControls from "@/components/AddControls.vue";
-import ConfigRow from "@/components/ConfigRow.vue";
-import ConfigTile from "@/components/ConfigTile.vue";
 
-import DeviceRow from "@/components/DeviceRow.vue";
-import DeviceTile from "@/components/DeviceTile.vue";
 import HerbertButton from "@/components/Button.vue";
 
-import MeterRow from "@/components/MeterRow.vue";
-import MeterTile from "@/components/MeterTile.vue";
-
-import ProfileRow from "@/components/ProfileRow.vue";
-import ProfileTile from "@/components/ProfileTile.vue";
-import WorkerRow from "@/components/WorkerRow.vue";
-import WorkerTile from "@/components/WorkerTile.vue";
-
-import ZoneRow from "@/components/ZoneRow.vue";
-import ZoneTile from "@/components/ZoneTile.vue";
-
 import NarrowTable from "@/components/NarrowTable.vue";
+import SingleColumn from "@/components/SingleColumn.vue";
+import ThreeColumns from "@/components/ThreeColumns.vue";
+import FullTable from "@/components/FullTable.vue";
 
 import { Config } from "@/store/configs/types.ts";
 import { Profile } from "@/store/profiles/types.ts";
@@ -330,25 +105,11 @@ const Collection = Vue.extend({
 
   components: {
     AddControls,
-    ConfigRow,
-    ConfigTile,
-
-    DeviceRow,
-    DeviceTile,
+    FullTable,
     HerbertButton,
-
-    MeterRow,
-    MeterTile,
-
     NarrowTable,
-
-    ProfileRow,
-    ProfileTile,
-    WorkerRow,
-    WorkerTile,
-
-    ZoneRow,
-    ZoneTile
+    SingleColumn,
+    ThreeColumns
   },
 
   mounted() {

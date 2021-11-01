@@ -8,6 +8,9 @@ export class Settings {
   refresh: number;
   timeout: number;
   interval: number;
+  openweather: string;
+  cityname: string;
+  statecode: string;
   createdat: Date;
   updatedat: Date;
   deleted: boolean;
@@ -21,6 +24,9 @@ export class Settings {
     this.interval = 30000;
     this.locale = "us_EN";
     this.timezone = "America/New_York";
+    this.openweather = "";
+    this.cityname = "";
+    this.statecode = "";
     this.createdat = new Date();
     this.updatedat = new Date();
     this.deleted = false;
