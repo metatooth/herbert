@@ -16,7 +16,7 @@ export class Worker {
   }
 
   get name() {
-    return this.nickname || this.worker.slice(12);
+    return this.nickname || this.inet;
   }
 }
 

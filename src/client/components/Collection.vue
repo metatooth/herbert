@@ -24,27 +24,7 @@
       </div>
     </nav>
 
-    <div v-if="single && table && isZone">
-      <zone-narrow
-        v-for="(zone, index) in activeSet"
-        :key="`zone-${index}`"
-        :zone="zone"
-      />
-    </div>
-    <div v-if="single && table && isMeter">
-      <meter-narrow
-        v-for="(meter, index) in activeSet"
-        :key="`meter-${index}`"
-        :meter="meter"
-      />
-    </div>
-    <div v-if="single && table && isDevice">
-      <device-narrow
-        v-for="(device, index) in activeSet"
-        :key="`device-${index}`"
-        :device="device"
-      />
-    </div>
+    <narrow-table v-if="single && table" :items="activeSet" :type="type" />
 
     <div class="tile is-ancestor" v-if="single && !table">
       <div class="tile is-4 is-vertical" v-if="isMeter">
@@ -311,20 +291,23 @@ import { mapGetters } from "vuex";
 import AddControls from "@/components/AddControls.vue";
 import ConfigRow from "@/components/ConfigRow.vue";
 import ConfigTile from "@/components/ConfigTile.vue";
-import DeviceNarrow from "@/components/DeviceNarrow.vue";
+
 import DeviceRow from "@/components/DeviceRow.vue";
 import DeviceTile from "@/components/DeviceTile.vue";
 import HerbertButton from "@/components/Button.vue";
-import MeterNarrow from "@/components/MeterNarrow.vue";
+
 import MeterRow from "@/components/MeterRow.vue";
 import MeterTile from "@/components/MeterTile.vue";
+
 import ProfileRow from "@/components/ProfileRow.vue";
 import ProfileTile from "@/components/ProfileTile.vue";
 import WorkerRow from "@/components/WorkerRow.vue";
 import WorkerTile from "@/components/WorkerTile.vue";
-import ZoneNarrow from "@/components/ZoneNarrow.vue";
+
 import ZoneRow from "@/components/ZoneRow.vue";
 import ZoneTile from "@/components/ZoneTile.vue";
+
+import NarrowTable from "@/components/NarrowTable.vue";
 
 import { Config } from "@/store/configs/types.ts";
 import { Profile } from "@/store/profiles/types.ts";
@@ -349,18 +332,21 @@ const Collection = Vue.extend({
     AddControls,
     ConfigRow,
     ConfigTile,
-    DeviceNarrow,
+
     DeviceRow,
     DeviceTile,
     HerbertButton,
-    MeterNarrow,
+
     MeterRow,
     MeterTile,
+
+    NarrowTable,
+
     ProfileRow,
     ProfileTile,
     WorkerRow,
     WorkerTile,
-    ZoneNarrow,
+
     ZoneRow,
     ZoneTile
   },
