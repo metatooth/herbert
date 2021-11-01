@@ -7,19 +7,19 @@
             <strong>{{ activeCount }}</strong> {{ name }}
           </p>
         </div>
-        <div class="level-right">
-          <div class="level-item">
-            <p class="control">
-              <herbert-button
-                style="margin: 20px"
-                :show="true"
-                :icon="icon"
-                color="grey-darker"
-                size="small"
-                @on-click="toggle"
-              />
-            </p>
-          </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <p class="control">
+            <herbert-button
+              style="margin: 20px"
+              :show="true"
+              :icon="icon"
+              color="grey-darker"
+              size="small"
+              @on-click="toggle"
+            />
+          </p>
         </div>
       </div>
     </nav>
@@ -43,28 +43,24 @@
       :type="type"
     />
 
-    <div class="tile is-ancestor" v-if="allowed">
-      <div class="tile is-parent">
-        <div class="tile is-child box">
-          <p class="title">
-            <add-controls
-              @on-add="addable"
-              @on-save="save"
-              @on-cancel="cancel"
+    <div class="box" v-if="allowed">
+      <p class="title">
+        <add-controls
+          @on-add="addable"
+          @on-save="save"
+          @on-cancel="cancel"
+          />
+      </p>
+      <div class="content" v-if="adding">
+        <div class="control">
+          <input
+            class="input"
+            type="text"
+            v-model="nickname"
+            placeHolder="Nickname"
+            @keyup.esc="cancel"
+            @keyup.enter="save"
             />
-          </p>
-          <div class="content" v-if="adding">
-            <div class="control">
-              <input
-                class="input"
-                type="text"
-                v-model="nickname"
-                placeHolder="Nickname"
-                @keyup.esc="cancel"
-                @keyup.enter="save"
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -207,7 +203,7 @@ const Collection = Vue.extend({
     },
 
     allowed() {
-      return this.isProfile || this.isZone || this.isConfig;
+      return !this.table && (this.isProfile || this.isZone || this.isConfig);
     },
 
     headings() {

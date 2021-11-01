@@ -1,7 +1,7 @@
 <template>
-  <nav class="level is-mobile" v-if="ready">
+  <nav class="level is-mobile">
     <div class="level-left" />
-    <div class="level-right">
+    <div class="level-right" v-if="ready">
       <div class="level-item">
         <p class="subtitle">
           {{ main }}
@@ -14,6 +14,13 @@
       </div>
       <div class="level-item">
         <p class="subtitle">{{ humidity.toFixed(0) }}%</p>
+      </div>
+    </div>
+    <div class="level-right" v-else>
+      <div class="level-item">
+        <p class="subtitle">
+          Loading...
+        </p>
       </div>
     </div>
   </nav>
