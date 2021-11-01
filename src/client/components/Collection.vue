@@ -11,11 +11,10 @@
           <div class="level-item">
             <p class="control">
               <herbert-button
-                v-if="isZone || !single"
                 style="margin: 20px"
                 :show="true"
                 :icon="icon"
-                color="black"
+                color="grey-darker"
                 size="small"
                 @on-click="toggle"
               />
@@ -27,9 +26,16 @@
 
     <div v-if="single && table && isZone">
       <zone-narrow
-        v-for="zone in activeSet"
-        :key="`zone-${zone.id}`"
+        v-for="(zone, index) in activeSet"
+        :key="`zone-${index}`"
         :zone="zone"
+        />
+    </div>
+    <div v-if="single && table && isMeter">
+      <meter-narrow
+        v-for="(meter, index) in activeSet"
+        :key="`meter-${index}`"
+        :meter="meter"
       />
     </div>
 
@@ -301,6 +307,7 @@ import ConfigTile from "@/components/ConfigTile.vue";
 import DeviceRow from "@/components/DeviceRow.vue";
 import DeviceTile from "@/components/DeviceTile.vue";
 import HerbertButton from "@/components/Button.vue";
+import MeterNarrow from "@/components/MeterNarrow.vue";
 import MeterRow from "@/components/MeterRow.vue";
 import MeterTile from "@/components/MeterTile.vue";
 import ProfileRow from "@/components/ProfileRow.vue";
@@ -336,7 +343,8 @@ const Collection = Vue.extend({
     ConfigTile,
     DeviceRow,
     DeviceTile,
-    HerbertButton,
+HerbertButton,
+MeterNarrow,
     MeterRow,
     MeterTile,
     ProfileRow,
