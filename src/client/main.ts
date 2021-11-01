@@ -9,6 +9,8 @@ import App from "@/App.vue";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faCannabis,
+  faCaretDown,
+  faCaretUp,
   faCheck,
   faCheckCircle,
   faChevronCircleLeft,
@@ -49,6 +51,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 library.add(faCannabis);
+library.add(faCaretDown);
+library.add(faCaretUp);
 library.add(faCheck);
 library.add(faCheckCircle);
 library.add(faChevronCircleLeft);

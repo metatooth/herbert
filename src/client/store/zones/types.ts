@@ -1,8 +1,8 @@
 import { Device } from "@/store/devices/types";
 import { Meter } from "@/store/meters/types";
 import { Profile } from "@/store/profiles/types";
-import { LampTimer } from "../../../shared/lamp-timer";
 import { vaporPressureDeficit } from "../../../shared/utils";
+import { LampTimer } from "../../../shared/lamp-timer";
 
 export class Zone {
   id: number;
@@ -23,7 +23,7 @@ export class Zone {
     return this.nickname;
   }
 
-  isDay(timestamp: Date): boolean {
+  isDay(timestamp: Date) {
     let day = true;
 
     if (this.profile) {
@@ -33,41 +33,29 @@ export class Zone {
       const lamp = new LampTimer(parseInt(start[0]), duration);
 
       const hour = timestamp.getHours();
+
       day = lamp.isOn(hour);
     }
 
     return day;
   }
 
-  targetTemperature(ts: Date): number {
-    let target = 20;
+  targetTemperature(ts: Date) {
     if (this.profile) {
-      target = this.isDay(ts)
+      return this.isDay(ts)
         ? this.profile.lampontemperature
         : this.profile.lampofftemperature;
     }
-
-    return target;
+    return 20;
   }
 
-  targetHumidity(ts: Date): number {
-    let target = 35;
+  targetHumidity(ts: Date) {
     if (this.profile) {
-      target = this.isDay(ts)
+      return this.isDay(ts)
         ? this.profile.lamponhumidity
         : this.profile.lampoffhumidity;
     }
-
-    return target;
-  }
-
-  targetPressure(ts: Date): number {
-    const delta = this.isDay(ts) ? -0.6 : 0.6;
-    const temp = this.targetTemperature(ts);
-
-    return (
-      vaporPressureDeficit(temp, delta, this.targetHumidity(ts) / 100) / 1000
-    );
+    return 35;
   }
 
   meanTemperature(): number {

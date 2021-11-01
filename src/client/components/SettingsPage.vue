@@ -79,6 +79,27 @@
     </div>
 
     <div class="field">
+      <label class="label">OpenWeather API Key</label>
+      <div class="control">
+        <input class="input" type="text" v-model="openweather" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">City Name</label>
+      <div class="control">
+        <input class="input" type="text" v-model="cityname" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">State Code</label>
+      <div class="control">
+        <input class="input" type="text" v-model="statecode" />
+      </div>
+    </div>
+
+    <div class="field">
       <label class="label">API Base URL</label>
       <div class="control">
         <a target="_blank" :href="url">{{ url }}</a>
@@ -124,6 +145,9 @@ const SettingsPage = Vue.extend({
       refresh: this.settings.refresh / 1000,
       timeout: this.settings.timeout / 1000,
       interval: this.settings.interval / 1000,
+      openweather: this.settings.openweather,
+      cityname: this.settings.cityname,
+      statecode: this.settings.statecode,
       name: "",
       filedata: ""
     };
@@ -145,7 +169,10 @@ const SettingsPage = Vue.extend({
         this.settings.units !== this.units ||
         this.settings.refresh !== 1000 * this.refresh ||
         this.settings.timeout !== 1000 * this.timeout ||
-        this.settings.interval !== 1000 * this.interval
+        this.settings.interval !== 1000 * this.interval ||
+        this.settings.openweather !== this.openweather ||
+        this.settings.cityname !== this.cityname ||
+        this.settings.statecode !== this.statecode
       ) {
         return true;
       }
@@ -171,6 +198,9 @@ const SettingsPage = Vue.extend({
       this.refresh = this.settings.refresh / 1000;
       this.timeout = this.settings.timeout / 1000;
       this.interval = this.settings.interval / 1000;
+      this.openweather = this.settings.openweather;
+      this.cityname = this.settings.cityname;
+      this.statecode = this.settings.statecode;
     },
 
     pick() {
@@ -210,6 +240,9 @@ const SettingsPage = Vue.extend({
         refresh: 1000 * this.refresh,
         timeout: 1000 * this.timeout,
         interval: 1000 * this.interval,
+        openweather: this.openweather,
+        cityname: this.cityname,
+        statecode: this.statecode,
         createdat: this.settings.createdat,
         updatedat: new Date(),
         deleted: false
