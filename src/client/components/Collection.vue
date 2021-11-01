@@ -498,7 +498,7 @@ const Collection = Vue.extend({
       } else if (this.isZone) {
         name = "Zone";
       } else if (this.isWorker) {
-        name = "Worker";
+        name = "Herbert";
       } else if (this.isConfig) {
         name = "Config";
       }

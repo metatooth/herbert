@@ -28,10 +28,7 @@
       <zone-actual :zone="zone" :units="settings.units" />
     </td>
     <td>
-      <timestamp
-        :timestamp="new Date(Date.parse(zone.updatedat))"
-        :readable="true"
-      />
+      <timestamp :timestamp="lastupdate" :readable="true" />
     </td>
     <td>
       <button class="button" :class="statusClass" @click="toggle">
@@ -78,16 +75,19 @@ const ZoneRow = Vue.extend({
       }
     },
 
-    linkto(): string {
-      return `#zone-details-${this.zone.id}`;
+    lastupdate() {
+      let last = null;
+      this.zone.meters.forEach(meter => {
+        const updatedat = new Date(meter.updatedat);
+        if (last === null || updatedat > last) {
+          last = updatedat;
+        }
+      });
+      return last;
     },
 
-    text() {
-      if (this.zone.isDay(new Date())) {
-        return "color: #ffe08a";
-      } else {
-        return "color: #7a7a7a";
-      }
+    linkto(): string {
+      return `#zone-details-${this.zone.id}`;
     },
 
     statusClass() {
@@ -103,6 +103,14 @@ const ZoneRow = Vue.extend({
         return "toggle-on";
       } else {
         return "toggle-off";
+      }
+    },
+
+    text() {
+      if (this.zone.isDay(new Date())) {
+        return "color: #ffe08a";
+      } else {
+        return "color: #7a7a7a";
       }
     },
 
