@@ -1,17 +1,39 @@
 <template>
   <section class="section" ref="collection">
-    <div class="level">
-      <span class="title">{{ activeCount }} {{ name }}</span>
-      <herbert-button
-        v-if="!single"
-        style="margin: 20px"
-        :show="true"
-        :icon="icon"
-        color="black"
-        @on-click="toggle"
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          <p class="subtitle is-5">
+            <strong>{{ activeCount }}</strong> {{ name }}
+          </p>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <p class="control">
+              <herbert-button
+                v-if="isZone || !single"
+                style="margin: 20px"
+                :show="true"
+                :icon="icon"
+                color="black"
+                size="small"
+                @on-click="toggle"
+              />
+            </p>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div v-if="single && table && isZone">
+      <zone-narrow
+        v-for="zone in activeSet"
+        :key="`zone-${zone.id}`"
+        :zone="zone"
       />
     </div>
-    <div class="tile is-ancestor" v-if="single">
+
+    <div class="tile is-ancestor" v-if="single && !table">
       <div class="tile is-4 is-vertical" v-if="isMeter">
         <meter-tile v-for="meter in activeSet" :key="meter.id" :meter="meter" />
       </div>
@@ -285,6 +307,7 @@ import ProfileRow from "@/components/ProfileRow.vue";
 import ProfileTile from "@/components/ProfileTile.vue";
 import WorkerRow from "@/components/WorkerRow.vue";
 import WorkerTile from "@/components/WorkerTile.vue";
+import ZoneNarrow from "@/components/ZoneNarrow.vue";
 import ZoneRow from "@/components/ZoneRow.vue";
 import ZoneTile from "@/components/ZoneTile.vue";
 
@@ -303,7 +326,7 @@ const Collection = Vue.extend({
       adding: false,
       nickname: "",
       single: false,
-      table: false
+      table: true
     };
   },
 
@@ -320,6 +343,7 @@ const Collection = Vue.extend({
     ProfileTile,
     WorkerRow,
     WorkerTile,
+    ZoneNarrow,
     ZoneRow,
     ZoneTile
   },

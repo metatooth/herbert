@@ -1,10 +1,8 @@
 <template>
-  <span class="control" v-if="show">
-    <button :class="display" @click="$emit('on-click')">
-      <font-awesome-icon :icon="icon" />
-      <span v-if="label">{{ label }}</span>
-    </button>
-  </span>
+  <button :class="buttonClass" @click="$emit('on-click')" v-if="show">
+    <font-awesome-icon :icon="icon" />
+    <span v-if="label">{{ label }}</span>
+  </button>
 </template>
 
 <script lang="ts">
@@ -21,7 +19,7 @@ const Button = Vue.extend({
   },
 
   computed: {
-    display() {
+    buttonClass() {
       return `button is-${this.size} is-${this.color}`;
     }
   }

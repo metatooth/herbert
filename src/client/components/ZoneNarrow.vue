@@ -1,44 +1,41 @@
 <template>
-  <div class="field is-grouped is-grouped-multiline">
-    <target
-      icon="thermometer-half"
-      :value="temperature"
-      :units="unitsWithDegree"
-      :color="temperatureColor"
-      :size="size"
-    />
-
-    <target
-      icon="tint"
-      :value="humidity"
-      units="%"
-      :color="humidityColor"
-      :size="size"
-    />
-  </div>
+  <nav class="level is-mobile">
+    <div class="level-left">
+      <div class="level-item">
+        <p class="subtitle is-7">
+          <strong>{{ zone.nickname.slice(0, 12) }}</strong
+          ><br />
+          {{ zone.profile.profile.slice(0, 12) }}
+        </p>
+      </div>
+    </div>
+    <div class="level-right" v-if="zone.meters.length !== 0">
+      <div class="level-item">
+        <p class="title" :style="temperatureStyle">
+          {{ temperature.toFixed(0) }}{{ unitsWithDegree }}
+        </p>
+      </div>
+      <div class="level-item">
+        <p class="title" :style="humidityStyle">{{ humidity.toFixed(0) }}%</p>
+      </div>
+    </div>
+  </nav>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Zone } from "@/store/zones/types";
-import Target from "@/components/Target.vue";
 import { mapGetters } from "vuex";
+import { Zone } from "@/store/zones/types";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
-
-const ZoneActual = Vue.extend({
+const ZoneNarrow = Vue.extend({
   props: {
-    zone: Zone,
-    size: { type: String, default: "medium" }
+    zone: Zone
   },
 
   data() {
     return {
       ts: new Date()
     };
-  },
-
-  components: {
-    Target
   },
 
   computed: {
@@ -56,20 +53,6 @@ const ZoneActual = Vue.extend({
       return this.zone.meanHumidity() * 100;
     },
 
-    leafdiff(): number {
-      let diff;
-      if (this.zone.isDay(this.ts)) {
-        diff = this.zone.lamponleafdiff;
-      } else {
-        diff = this.zone.lampoffleafdiff;
-      }
-
-      if (this.settings.units === "F") {
-        return (diff * 9) / 5;
-      }
-      return diff;
-    },
-
     unitsWithDegree(): string {
       return "°" + this.settings.units;
     },
@@ -84,6 +67,29 @@ const ZoneActual = Vue.extend({
       const diff =
         100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.ts);
       return this.color(diff, 5);
+    },
+
+    temperatureStyle(): string {
+      return `color: ${this.temperatureColor}`;
+    },
+
+    humidityStyle(): string {
+      return `color: ${this.humidityColor}`;
+    },
+
+    lastupdate() {
+      let last = null;
+      this.zone.meters.forEach(meter => {
+        const updatedat = new Date(meter.updatedat);
+        if (last === null || updatedat > last) {
+          last = updatedat;
+        }
+      });
+      return last;
+    },
+
+    linkto(): string {
+      return `#zone-details-${this.zone.id}`;
     },
 
     ...mapGetters("settings", ["settings"])
@@ -136,5 +142,5 @@ const ZoneActual = Vue.extend({
   }
 });
 
-export default ZoneActual;
+export default ZoneNarrow;
 </script>
