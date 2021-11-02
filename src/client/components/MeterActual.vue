@@ -3,7 +3,7 @@
     <target
       icon="thermometer-half"
       :value="temperature"
-      :units="unitsWithDegree"
+      units="°"
       color="#48c78e"
     />
     <target icon="tint" :value="humidity" units="%" color="#48c78e" />
@@ -45,10 +45,6 @@ const MeterActual = Vue.extend({
 
     humidity(): number {
       return this.meter.humidity * 100;
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.settings.units;
     },
 
     ...mapGetters("settings", ["settings"])

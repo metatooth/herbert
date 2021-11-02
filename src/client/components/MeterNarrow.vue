@@ -11,7 +11,7 @@
     </div>
     <div class="level-right">
       <div class="level-item">
-        <p class="title">{{ temperature.toFixed(0) }}{{ unitsWithDegree }}</p>
+        <p class="title">{{ temperature.toFixed(0) }}°</p>
       </div>
       <div class="level-item">
         <p class="title">{{ humidity.toFixed(0) }}%</p>
@@ -43,10 +43,6 @@ const MeterNarrow = Vue.extend({
 
     humidity(): number {
       return this.meter.humidity * 100;
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.settings.units;
     },
 
     ...mapGetters("settings", ["settings"])

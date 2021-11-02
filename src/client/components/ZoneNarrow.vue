@@ -17,7 +17,7 @@
     <div class="level-right" v-if="zone.meters.length !== 0">
       <div class="level-item">
         <p class="title" :style="temperatureStyle">
-          {{ temperature.toFixed(0) }}{{ unitsWithDegree }}
+          {{ temperature.toFixed(0) }}&#176;
         </p>
       </div>
       <div class="level-item">
@@ -56,10 +56,6 @@ const ZoneNarrow = Vue.extend({
 
     humidity(): number {
       return this.zone.meanHumidity() * 100;
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.settings.units;
     },
 
     temperatureColor(): string {

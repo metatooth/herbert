@@ -14,7 +14,7 @@
             {{ duration }}hrs
           </div>
           <div class="tag has-background-black-bis" :style="style">
-            {{ temperature.toFixed(0) }}{{ unitsWithDegree }}
+            {{ temperature.toFixed(0) }}°
           </div>
           <div class="tag has-background-black-bis" :style="style">
             {{ humidity }}%
@@ -84,10 +84,6 @@ const ProfileNarrow = Vue.extend({
         return celsius2kelvin(temp);
       }
       return temp;
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.settings.units;
     },
 
     ...mapGetters("settings", ["settings"])

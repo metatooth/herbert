@@ -20,7 +20,10 @@
             <span class="tag has-background-black-bis is-medium" :style="text">
               <font-awesome-icon icon="lightbulb" />
             </span>
-            <span class="tag has-text-black-bis is-medium" :style="background">
+            <span
+              class="tag has-text-black-bis has-text-weight-bold is-medium"
+              :style="background"
+            >
               {{ zone.profile.profile }}
             </span>
           </div>
