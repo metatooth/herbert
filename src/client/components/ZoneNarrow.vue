@@ -119,6 +119,11 @@ const ZoneNarrow = Vue.extend({
   methods: {
     clicked() {
       console.log("clickety click", this.zone.nickname);
+      this.$router.push({
+        name: "zone",
+        hash: this.linkto,
+        params: { id: this.zone.id }
+      });
     },
 
     hex(c): string {

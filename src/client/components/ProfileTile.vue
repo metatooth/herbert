@@ -218,8 +218,8 @@
           >
         </div>
       </div>
-      <div class="content">
-        <timestamp :timestamp="updatedat" :readable="true" />
+      <div class="content is-italic">
+        Updated <readable :timestamp="updatedat" />
       </div>
       <div class="content">
         <edit-controls
@@ -245,7 +245,7 @@ import {
 import { Profile } from "@/store/profiles/types";
 import EditControls from "@/components/EditControls.vue";
 import Target from "@/components/Target.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 
 const ProfileTile = Vue.extend({
   props: {
@@ -256,7 +256,7 @@ const ProfileTile = Vue.extend({
   components: {
     EditControls,
     Target,
-    Timestamp
+    Readable
   },
 
   data() {

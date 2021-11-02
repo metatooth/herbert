@@ -42,8 +42,8 @@
           :device="device"
         />
       </div>
-      <div class="content">
-        <timestamp :timestamp="lastupdate" :readable="readable" />
+      <div class="content is-italic">
+        Updated <readable :timestamp="lastupdate" />
       </div>
     </div>
   </div>
@@ -55,7 +55,7 @@ import { mapGetters, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Zone } from "@/store/zones/types";
 import ZoneActual from "@/components/ZoneActual.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import DeviceTag from "@/components/DeviceTag.vue";
 
 const ZoneTile = Vue.extend({
@@ -72,7 +72,7 @@ const ZoneTile = Vue.extend({
 
   components: {
     DeviceTag,
-    Timestamp,
+    Readable,
     ZoneActual
   },
 

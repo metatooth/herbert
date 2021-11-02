@@ -91,7 +91,6 @@ const CurrentConditions = Vue.extend({
         Openweathermap.get("/data/2.5/weather", {
           params: { q: q, units: units, appid: this.settings.openweather }
         }).then(res => {
-          console.log("GET", res);
           this.timestamp = new Date();
           this.temperature = res.data.main.temp;
           this.humidity = res.data.main.humidity;

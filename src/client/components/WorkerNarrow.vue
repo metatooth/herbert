@@ -14,7 +14,8 @@
     </div>
     <div class="level-right">
       <div class="level-item">
-        <readable class="is-italic"
+        <readable
+          class="is-italic"
           :timestamp="new Date(Date.parse(worker.updatedat))"
         />
       </div>
