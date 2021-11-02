@@ -29,14 +29,11 @@
         </option>
       </select>
       <div class="is-family-code">
-        {{ worker.configname }} => {{ worker.config }}
+        {{ worker.configname }}
       </div>
     </td>
-    <td>
-      <timestamp
-        :timestamp="new Date(Date.parse(worker.updatedat))"
-        :readable="true"
-      />
+    <td class="is-italic">
+      <readable :timestamp="new Date(Date.parse(worker.updatedat))" />
     </td>
     <td>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
@@ -49,7 +46,7 @@ import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
 import EditControls from "@/components/EditControls.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import { Worker } from "@/store/workers/types";
 
 const WorkerRow = Vue.extend({
@@ -67,7 +64,7 @@ const WorkerRow = Vue.extend({
 
   components: {
     EditControls,
-    Timestamp
+    Readable
   },
 
   watch: {

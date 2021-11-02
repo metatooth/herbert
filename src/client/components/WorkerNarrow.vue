@@ -14,9 +14,9 @@
     </div>
     <div class="level-right">
       <div class="level-item">
-        <timestamp
+        <readable
+          class="is-italic"
           :timestamp="new Date(Date.parse(worker.updatedat))"
-          :readable="true"
         />
       </div>
     </div>
@@ -26,7 +26,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Worker } from "@/store/profiles/types";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 
 const WorkerNarrow = Vue.extend({
   props: {
@@ -34,7 +34,7 @@ const WorkerNarrow = Vue.extend({
   },
 
   components: {
-    Timestamp
+    Readable
   }
 });
 

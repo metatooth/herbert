@@ -1,70 +1,54 @@
 <template>
-  <span>
-    <span v-if="timeago"
-      ><em>{{ lapsed }} ago</em></span
-    >
-    <span v-else class="is-family-code">
-      <span v-if="dayold">{{ monthday }} - </span>
-      <span
-        >{{ hhmm }}<span class="is-size-7">{{ ss }}</span></span
-      >
-    </span>
-  </span>
+  <nav class="level">
+    <div class="level-item">
+      <span class="icon">
+        <font-awesome-icon icon="clock" />
+      </span>
+      <div>
+        <strong
+          >{{ hhmm }}<span class="is-size-7">{{ ss }}</span> {{ part }} on
+          {{ mmmddyyyy }}</strong
+        >
+      </div>
+    </div>
+    <div class="level-item">
+      <em>Updated <readable :timestamp="local"/></em>
+    </div>
+  </nav>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
+import Readable from "@/components/Readable.vue";
 
 const Timestamp = Vue.extend({
   props: {
     timestamp: { default: new Date(), type: Date },
-    timezone: { default: "America/New_York", type: String },
-    readable: { default: false, type: Boolean }
+    timezone: { default: "America/New_York", type: String }
   },
 
-  data() {
-    return {
-      timeago: this.readable
-    };
+  components: {
+    Readable
   },
 
   computed: {
-    dayold(): boolean {
-      const diff = new Date() - this.timestamp;
-      if (diff > 86400000) {
-        return true;
-      }
-      return false;
-    },
-
-    lapsed(): string {
-      const diff = new Date() - this.timestamp;
-      if (diff < 30000) {
-        return "seconds";
-      } else if (diff < 60000) {
-        return `${(diff / 1000).toFixed(0)} secs`;
-      } else if (diff < 3600000) {
-        const mins = diff / 60000;
-        if (mins < 2) {
-          return "1 minute";
-        } else {
-          return `${mins.toFixed(0)} mins`;
-        }
-      } else if (diff < 86400000) {
-        const hrs = diff / 3600000;
-        if (hrs < 2) {
-          return "1 hour";
-        } else {
-          return `${hrs.toFixed(0)} hrs`;
-        }
-      } else {
-        return "a long time";
-      }
-    },
-
     local(): Date {
       return convertToLocalTime(this.timestamp, { timeZone: this.timezone });
+    },
+
+    mmm() {
+      return this.timestamp.toLocaleString("default", { month: "long" });
+    },
+
+    mmmddyyyy() {
+      return (
+        this.mmm +
+        " " +
+        this.zeroes(this.local.getDay()) +
+        ", " +
+        this.local.getFullYear()
+      );
     },
 
     monthday(): string {
@@ -73,12 +57,18 @@ const Timestamp = Vue.extend({
       return mon + " " + this.local.getDay();
     },
 
+    part() {
+      return this.local.getHours() < 12 ? "AM" : "PM";
+    },
+
+    hh() {
+      return this.local.getHours() < 13
+        ? this.local.getHours()
+        : this.local.getHours() - 12;
+    },
+
     hhmm(): string {
-      return (
-        this.zeroes(this.local.getHours()) +
-        ":" +
-        this.zeroes(this.local.getMinutes())
-      );
+      return this.hh + ":" + this.zeroes(this.local.getMinutes());
     },
 
     ss(): string {

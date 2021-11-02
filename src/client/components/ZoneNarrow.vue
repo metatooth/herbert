@@ -1,12 +1,17 @@
 <template>
-  <nav class="level is-mobile">
+  <nav class="level is-mobile" @click="clicked">
     <div class="level-left">
       <div class="level-item">
-        <p class="subtitle is-7">
-          <strong>{{ zone.nickname.slice(0, 12) }}</strong
-          ><br />
-          {{ zone.profile.profile.slice(0, 12) }}
-        </p>
+        <div class="tags has-addons">
+          <div class="tag has-background-black-bis">
+            <strong>
+              <span :style="dayStyle">{{ zone.nickname }}</span>
+            </strong>
+          </div>
+          <div class="tag has-text-black-bis" :style="dayBackgroundStyle">
+            <strong>{{ zone.profile.profile.slice(0, 12) }}</strong>
+          </div>
+        </div>
       </div>
     </div>
     <div class="level-right" v-if="zone.meters.length !== 0">
@@ -69,12 +74,28 @@ const ZoneNarrow = Vue.extend({
       return this.color(diff, 5);
     },
 
+    dayStyle(): string {
+      if (this.zone.isDay(this.ts)) {
+        return "color: #ffe08a;";
+      } else {
+        return "color: #7a7a7a;";
+      }
+    },
+
+    dayBackgroundStyle(): string {
+      if (this.zone.isDay(this.ts)) {
+        return "background-color: #ffe08a;";
+      } else {
+        return "background-color: #7a7a7a;";
+      }
+    },
+
     temperatureStyle(): string {
-      return `color: ${this.temperatureColor}`;
+      return `color: ${this.temperatureColor};`;
     },
 
     humidityStyle(): string {
-      return `color: ${this.humidityColor}`;
+      return `color: ${this.humidityColor};`;
     },
 
     lastupdate() {
@@ -96,6 +117,15 @@ const ZoneNarrow = Vue.extend({
   },
 
   methods: {
+    clicked() {
+      console.log("clickety click", this.zone.nickname);
+      this.$router.push({
+        name: "zone",
+        hash: this.linkto,
+        params: { id: this.zone.id }
+      });
+    },
+
     hex(c): string {
       const s = "0123456789abcdef";
       let i = parseInt(c);

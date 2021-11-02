@@ -104,7 +104,7 @@
 
       <footer class="card-footer">
         <div class="card-footer-item">
-          <timestamp :timestamp="this.timestamp" />
+          <readable class="is-italic" :timestamp="this.lastupdate" />
         </div>
       </footer>
     </div>
@@ -118,7 +118,7 @@ import SelectDevice from "@/components/SelectDevice.vue";
 import SelectMeter from "@/components/SelectMeter.vue";
 import SelectZone from "@/components/SelectZone.vue";
 import SelectProfile from "@/components/SelectProfile.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import Vue from "vue";
 import { Zone } from "@/store/zones/types";
 import MeterWidget from "@/components/MeterWidget.vue";
@@ -139,8 +139,7 @@ const ZoneDetail = Vue.extend({
       profileid: this.zone.profileid,
       maxirrigators: this.zone.maxirrigators,
       lamponleafdiff: this.zone.lamponleafdiff,
-      lampoffleafdiff: this.zone.lampoffleafdiff,
-      timestamp: new Date()
+      lampoffleafdiff: this.zone.lampoffleafdiff
     };
   },
 
@@ -156,7 +155,7 @@ const ZoneDetail = Vue.extend({
     SelectMeter,
     SelectProfile,
     SelectZone,
-    Timestamp
+    Readable
   },
 
   computed: {
@@ -196,6 +195,14 @@ const ZoneDetail = Vue.extend({
       } else {
         return this.lamponleafdiff;
       }
+    },
+
+    lastupdate() {
+      let lastupdate;
+      this.zone.devices.forEach(d => {
+        if (d.updatedat < lastupdate) lastupdate = d.updatedat;
+      });
+      return lastupdate;
     },
 
     nightLeafDiff() {

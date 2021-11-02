@@ -1,19 +1,26 @@
 <template>
-  <nav class="level is-mobile" v-if="ready">
+  <nav class="level is-mobile">
     <div class="level-left" />
-    <div class="level-right">
+    <div class="level-right" v-if="ready">
       <div class="level-item">
-        <p class="subtitle">
+        <p class="title">
           {{ main }}
         </p>
       </div>
       <div class="level-item">
-        <p class="subtitle">
+        <p class="title">
           {{ temperature.toFixed(0) }}&#176;{{ this.settings.units }}
         </p>
       </div>
       <div class="level-item">
-        <p class="subtitle">{{ humidity.toFixed(0) }}%</p>
+        <p class="title">{{ humidity.toFixed(0) }}%</p>
+      </div>
+    </div>
+    <div class="level-right" v-else>
+      <div class="level-item">
+        <p class="subtitle">
+          Loading...
+        </p>
       </div>
     </div>
   </nav>
@@ -84,7 +91,6 @@ const CurrentConditions = Vue.extend({
         Openweathermap.get("/data/2.5/weather", {
           params: { q: q, units: units, appid: this.settings.openweather }
         }).then(res => {
-          console.log("GET", res);
           this.timestamp = new Date();
           this.temperature = res.data.main.temp;
           this.humidity = res.data.main.humidity;

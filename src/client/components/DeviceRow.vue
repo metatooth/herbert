@@ -44,10 +44,7 @@
       </div>
     </td>
     <td>
-      <timestamp
-        :timestamp="new Date(Date.parse(device.updatedat))"
-        :readable="true"
-      />
+      <readable :timestamp="new Date(Date.parse(device.updatedat))" />
     </td>
     <td>
       <router-link
@@ -78,7 +75,7 @@ import { mapState, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -96,7 +93,7 @@ const DeviceRow = Vue.extend({
 
   components: {
     SelectDeviceType,
-    Timestamp
+    Readable
   },
 
   watch: {

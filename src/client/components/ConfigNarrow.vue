@@ -12,9 +12,9 @@
     </div>
     <div class="level-right">
       <div class="level-item">
-        <timestamp
+        <readable
+          class="is-italic"
           :timestamp="new Date(Date.parse(config.updatedat))"
-          :readable="true"
         />
       </div>
     </div>
@@ -24,7 +24,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { Config } from "@/store/configs/types";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 
 const ConfigNarrow = Vue.extend({
   props: {
@@ -32,7 +32,7 @@ const ConfigNarrow = Vue.extend({
   },
 
   components: {
-    Timestamp
+    Readable
   }
 });
 

@@ -42,9 +42,9 @@
         </button>
       </div>
       <div class="content">
-        <timestamp
+        <readable
+          class="is-italic"
           :timestamp="new Date(Date.parse(device.updatedat))"
-          :readable="true"
         />
         <router-link
           :to="{
@@ -73,7 +73,7 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
@@ -97,7 +97,7 @@ const DeviceTile = Vue.extend({
     EditControls,
     SelectDeviceType,
     SelectZoneForDevice,
-    Timestamp
+    Readable
   },
 
   computed: {

@@ -27,16 +27,13 @@
             {{ config.nickname }}
           </option>
         </select>
-        <div class="is-family-code">{{ configname }} : {{ config }}</div>
+        <div class="is-family-code">{{ configname }}</div>
       </div>
       <div class="content">
         <span class="is-family-code">{{ worker.inet }}</span>
       </div>
-      <div class="content">
-        <timestamp
-          :timestamp="new Date(worker.updatedat)"
-          :readable="readable"
-        />
+      <div class="content is-italic">
+        Updated <readable :timestamp="new Date(worker.updatedat)" />
       </div>
       <edit-controls
         @on-edit="editable"
@@ -52,7 +49,7 @@
 import Vue from "vue";
 
 import EditControls from "@/components/EditControls.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import { Worker } from "@/store/workers/types";
 import { mapActions, mapGetters } from "vuex";
 
@@ -73,7 +70,7 @@ const WorkerTile = Vue.extend({
 
   components: {
     EditControls,
-    Timestamp
+    Readable
   },
 
   watch: {

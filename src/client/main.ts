@@ -15,6 +15,7 @@ import {
   faCheckCircle,
   faChevronCircleLeft,
   faCircle,
+  faClock,
   faCloud,
   faCloudRain,
   faCog,
@@ -57,6 +58,7 @@ library.add(faCheck);
 library.add(faCheckCircle);
 library.add(faChevronCircleLeft);
 library.add(faCircle);
+library.add(faClock);
 library.add(faCloud);
 library.add(faCloudRain);
 library.add(faCog);

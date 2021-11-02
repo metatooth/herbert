@@ -24,7 +24,7 @@
         <meter-actual :meter="meter" />
       </div>
       <div class="content">
-        <timestamp :timestamp="new Date(meter.updatedat)" :readable="true" />
+        <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
         <router-link
           :to="{
             name: 'readings',
@@ -52,7 +52,7 @@ import { mapActions, mapGetters } from "vuex";
 import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
 import MeterActual from "@/components/MeterActual.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import EditControls from "@/components/EditControls.vue";
 
 const MeterTile = Vue.extend({
@@ -70,7 +70,7 @@ const MeterTile = Vue.extend({
   components: {
     EditControls,
     MeterActual,
-    Timestamp
+    Readable
   },
 
   computed: {
