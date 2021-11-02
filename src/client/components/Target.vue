@@ -5,7 +5,7 @@
         <font-awesome-icon :icon="icon" />
       </span>
       <span :class="displayClass" :style="background">
-        {{ formatted }} {{ units }}
+        {{ formatted }}{{ units }}
       </span>
     </div>
   </div>
@@ -34,7 +34,7 @@ const Target = Vue.extend({
     },
 
     displayClass(): string {
-      return `tag has-text-black-bis is-${this.size}`;
+      return `tag has-text-black-bis has-text-weight-bold is-${this.size}`;
     },
 
     iconClass(): string {

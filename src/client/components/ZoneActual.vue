@@ -3,7 +3,7 @@
     <target
       icon="thermometer-half"
       :value="temperature"
-      :units="unitsWithDegree"
+      units="°"
       :color="temperatureColor"
       :size="size"
     />
@@ -68,10 +68,6 @@ const ZoneActual = Vue.extend({
         return (diff * 9) / 5;
       }
       return diff;
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.settings.units;
     },
 
     temperatureColor(): string {

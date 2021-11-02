@@ -4,12 +4,12 @@
       <span class="icon">
         <font-awesome-icon icon="clock" />
       </span>
-      <div>
-        <strong
-          >{{ hhmm }}<span class="is-size-7">{{ ss }}</span> {{ part }} on
-          {{ mmmddyyyy }}</strong
-        >
-      </div>
+      <strong>
+        {{ hhmm }}<span class="is-size-7">{{ ss }}</span> {{ part }}
+      </strong>
+    </div>
+    <div class="level-item">
+      <strong> on {{ mmmddyyyy }} </strong>
     </div>
     <div class="level-item">
       <em>Updated <readable :timestamp="local"/></em>

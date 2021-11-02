@@ -14,21 +14,21 @@ export class Device {
   }
 
   get icon() {
-    if (this.device.devicetype === "heater") {
+    if (this.devicetype === "heater") {
       return "fire-alt";
-    } else if (this.device.devicetype === "humidifier") {
+    } else if (this.devicetype === "humidifier") {
       return "tint";
-    } else if (this.device.devicetype === "dehumidifier") {
+    } else if (this.devicetype === "dehumidifier") {
       return "tint-slash";
-    } else if (this.device.devicetype === "lamp") {
+    } else if (this.devicetype === "lamp") {
       return "lightbulb";
-    } else if (this.device.devicetype === "blower") {
+    } else if (this.devicetype === "blower") {
       return "wind";
-    } else if (this.device.devicetype === "cooler") {
+    } else if (this.devicetype === "cooler") {
       return "snowflake";
-    } else if (this.device.devicetype === "irrigator") {
+    } else if (this.devicetype === "irrigator") {
       return "cloud-rain";
-    } else if (this.device.devicetype === "fan") {
+    } else if (this.devicetype === "fan") {
       return "fan";
     }
 

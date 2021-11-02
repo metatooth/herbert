@@ -8,9 +8,7 @@
         </p>
       </div>
       <div class="level-item">
-        <p class="title">
-          {{ temperature.toFixed(0) }}&#176;{{ this.settings.units }}
-        </p>
+        <p class="title">{{ temperature.toFixed(0) }}&#176;</p>
       </div>
       <div class="level-item">
         <p class="title">{{ humidity.toFixed(0) }}%</p>
