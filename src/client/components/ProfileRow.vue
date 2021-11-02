@@ -65,7 +65,7 @@
           icon="thermometer-half"
           :value="dayTemperature"
           :precision="1"
-          :units="unitsWithDegree"
+          units="°"
           size="small"
           color="#ffe08a"
         />
@@ -114,7 +114,7 @@
           icon="thermometer-half"
           :value="nightTemperature"
           :precision="1"
-          :units="unitsWithDegree"
+          units="°"
           size="small"
           color="#7a7a7a"
         />
@@ -288,10 +288,6 @@ const ProfileRow = Vue.extend({
   computed: {
     durationWithUnits(): string {
       return this.profile.lampduration["hours"] + "hrs";
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.units;
     },
 
     lamponMinute(): string {

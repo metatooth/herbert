@@ -30,7 +30,7 @@
         <div class="control">
           <button class="button is-small" :class="deviceClass" @click="toggle">
             <span class="icon">
-              <font-awesome-icon :icon="deviceIcon" />
+              <font-awesome-icon :icon="device.icon" />
             </span>
           </button>
         </div>
@@ -123,15 +123,6 @@ const DeviceRow = Vue.extend({
       }
 
       return style;
-    },
-
-    deviceIcon(): string | null {
-      if (this.device.status === "on") {
-        return "circle";
-      } else if (this.device.status === "off") {
-        return "circle";
-      }
-      return "times";
     },
 
     ...mapState("notifications", ["notifications"])
