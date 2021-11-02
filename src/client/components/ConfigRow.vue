@@ -21,11 +21,8 @@
         {{ config.config }}
       </span>
     </td>
-    <td>
-      <timestamp
-        :timestamp="new Date(Date.parse(config.updatedat))"
-        :readable="true"
-      />
+    <td class="is-italic">
+      <readable :timestamp="new Date(Date.parse(config.updatedat))" />
     </td>
     <td>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
@@ -37,7 +34,7 @@
 import Vue from "vue";
 
 import EditControls from "@/components/EditControls.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import { Config } from "@/store/configs/types";
 import { mapActions } from "vuex";
 
@@ -49,7 +46,6 @@ const ConfigTile = Vue.extend({
   data() {
     return {
       nickname: this.config.nickname,
-      timestamp: new Date(Date.parse(this.config.updatedat)),
       configStr: this.config.toString(),
       readable: true,
       editing: false
@@ -58,7 +54,7 @@ const ConfigTile = Vue.extend({
 
   components: {
     EditControls,
-    Timestamp
+    Readable
   },
 
   computed: {

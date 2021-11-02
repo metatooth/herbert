@@ -122,35 +122,28 @@
         </p>
       </div>
     </nav>
-    <overview
-      v-if="is('overview')"
-      type="zone"
-      :filter="filter"
-      @child-picked="pick"
-    />
-    <collection v-if="is('devices')" type="device" :filter="filter" />
-    <collection v-if="is('meters')" type="meter" :filter="filter" />
-    <collection v-if="is('profiles')" type="profile" :filter="filter" />
-    <collection v-if="is('workers')" type="worker" :filter="filter" />
-    <collection v-if="is('configs')" type="config" :filter="filter" />
-    <collection v-if="is('zones')" type="zone" :filter="filter" />
-    <settings-page
-      v-if="is('settings')"
-      :settings="settings"
-      @save-settings="saveSettings"
-    />
 
-    <nav class="level">
-      <div class="level-left" />
-      <div class="level-right">
-        <p class="level-item">
-          <em>
-            <span class="lastupdate">Last update &#8212;</span>
-            <timestamp :timestamp="ts" :timezone="this.settings.timezone" />
-          </em>
-        </p>
-      </div>
-    </nav>
+    <div class="section">
+      <overview
+        v-if="is('overview')"
+        type="zone"
+        :filter="filter"
+        @child-picked="pick"
+      />
+      <collection v-if="is('devices')" type="device" :filter="filter" />
+      <collection v-if="is('meters')" type="meter" :filter="filter" />
+      <collection v-if="is('profiles')" type="profile" :filter="filter" />
+      <collection v-if="is('workers')" type="worker" :filter="filter" />
+      <collection v-if="is('configs')" type="config" :filter="filter" />
+      <collection v-if="is('zones')" type="zone" :filter="filter" />
+      <settings-page
+        v-if="is('settings')"
+        :settings="settings"
+        @save-settings="saveSettings"
+      />
+    </div>
+
+    <timestamp :timestamp="ts" />
   </div>
 </template>
 

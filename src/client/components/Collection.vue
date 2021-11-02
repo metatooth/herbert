@@ -45,11 +45,7 @@
 
     <div class="box" v-if="allowed">
       <p class="title">
-        <add-controls
-          @on-add="addable"
-          @on-save="save"
-          @on-cancel="cancel"
-          />
+        <add-controls @on-add="addable" @on-save="save" @on-cancel="cancel" />
       </p>
       <div class="content" v-if="adding">
         <div class="control">
@@ -60,7 +56,7 @@
             placeHolder="Nickname"
             @keyup.esc="cancel"
             @keyup.enter="save"
-            />
+          />
         </div>
       </div>
     </div>

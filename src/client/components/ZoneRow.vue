@@ -27,8 +27,8 @@
     <td>
       <zone-actual :zone="zone" :units="settings.units" />
     </td>
-    <td>
-      <timestamp :timestamp="lastupdate" :readable="true" />
+    <td class="is-italic">
+      <readable :timestamp="lastupdate" />
     </td>
     <td>
       <button class="button" :class="statusClass" @click="toggle">
@@ -45,7 +45,7 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import { Zone } from "@/store/zones/types";
 import ZoneActual from "@/components/ZoneActual.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 
 const ZoneRow = Vue.extend({
   props: {
@@ -62,7 +62,7 @@ const ZoneRow = Vue.extend({
   },
 
   components: {
-    Timestamp,
+    Readable,
     ZoneActual
   },
 

@@ -3,17 +3,17 @@
     <div class="level-left" />
     <div class="level-right" v-if="ready">
       <div class="level-item">
-        <p class="subtitle">
+        <p class="title">
           {{ main }}
         </p>
       </div>
       <div class="level-item">
-        <p class="subtitle">
+        <p class="title">
           {{ temperature.toFixed(0) }}&#176;{{ this.settings.units }}
         </p>
       </div>
       <div class="level-item">
-        <p class="subtitle">{{ humidity.toFixed(0) }}%</p>
+        <p class="title">{{ humidity.toFixed(0) }}%</p>
       </div>
     </div>
     <div class="level-right" v-else>

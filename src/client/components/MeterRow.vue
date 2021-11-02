@@ -29,8 +29,8 @@
     <td>
       <meter-actual :meter="meter" :units="units" />
     </td>
-    <td>
-      <timestamp :timestamp="new Date(Date.parse(meter.timestamp))" />
+    <td class="is-italic">
+      <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
     </td>
     <td class="is-size-5">
       <router-link
@@ -62,7 +62,7 @@ import { mapState, mapActions } from "vuex";
 import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
-import Timestamp from "@/components/Timestamp.vue";
+import Readable from "@/components/Readable.vue";
 import MeterActual from "@/components/MeterActual.vue";
 import EditControls from "@/components/EditControls.vue";
 
@@ -84,7 +84,7 @@ const MeterRow = Vue.extend({
   components: {
     EditControls,
     MeterActual,
-    Timestamp
+    Readable
   },
 
   watch: {
