@@ -5,7 +5,7 @@
         <div class="tags has-addons">
           <div class="tag has-background-black-bis">
             <strong>
-              <span :style="dayStyle">{{ zone.nickname }}</span>
+              <span :style="dayStyle">{{ name }}</span>
             </strong>
           </div>
           <div class="tag has-text-black-bis" :style="dayBackgroundStyle">
@@ -109,6 +109,18 @@ const ZoneNarrow = Vue.extend({
       return `#zone-details-${this.zone.id}`;
     },
 
+    name(): string {
+      const tokens = this.zone.nickname.split(" ");
+
+      if (tokens.length === 2) {
+        return `${tokens[0].slice(0, 5)}${this.zeroes(tokens[1])}`;
+      } else if (tokens.length === 1) {
+        return tokens[0];
+      }
+
+      return this.zone.nickname;
+    },
+
     ...mapGetters("settings", ["settings"])
   },
 
@@ -164,6 +176,13 @@ const ZoneNarrow = Vue.extend({
       ];
 
       return "#" + this.convertToHex(c);
+    },
+
+    zeroes(n: number): string {
+      if (n < 10) {
+        return `0${n}`;
+      }
+      return n.toString();
     }
   }
 });
