@@ -123,6 +123,8 @@
       </div>
     </nav>
 
+    <current-conditions />
+
     <div class="section">
       <overview
         v-if="is('overview')"
@@ -151,6 +153,7 @@
 import Vue from "vue";
 import Overview from "@/components/Overview.vue";
 import Collection from "@/components/Collection.vue";
+import CurrentConditions from "@/components/CurrentConditions.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
 import { mapGetters, mapActions } from "vuex";
@@ -166,6 +169,7 @@ const Dashboard = Vue.extend({
 
   components: {
     Collection,
+    CurrentConditions,
     Overview,
     SettingsPage,
     Timestamp

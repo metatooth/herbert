@@ -1,12 +1,12 @@
 import { Switch } from "./switch";
 import { exec } from "child_process";
 
-export class SM8relay extends Switch {
+export class SequentMicrosystems extends Switch {
   board: number;
   channel: number;
 
   constructor(device: string, board: number, channel: number) {
-    super(device, "herbert");
+    super(device, "SequentMicrosystems");
     this.board = board;
     this.channel = channel;
   }

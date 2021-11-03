@@ -1,6 +1,5 @@
 <template>
   <div id="overview">
-    <current-conditions />
     <collection type="zone" :filter="filter" />
     <div class="tile is-ancestor">
       <notification-tile
@@ -28,7 +27,6 @@ import {
 } from "../../shared/message-creators";
 import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
 import Collection from "@/components/Collection.vue";
-import CurrentConditions from "@/components/CurrentConditions.vue";
 
 const Overview = Vue.extend({
   props: {
@@ -36,7 +34,6 @@ const Overview = Vue.extend({
   },
 
   components: {
-    CurrentConditions,
     Collection,
     NotificationTile
   },

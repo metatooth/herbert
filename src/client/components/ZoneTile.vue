@@ -1,32 +1,14 @@
 <template>
   <div class="tile is-parent">
     <div class="tile is-child box">
-      <p class="title">
-        <span>
-          <router-link
-            :to="{
-              name: 'zone',
-              hash: linkto,
-              params: { id: zone.id }
-            }"
-          >
-            {{ zone.nickname }}
-          </router-link>
-        </span>
-      </p>
-      <div class="content">
-        <div class="control">
-          <div class="tags has-addons">
-            <span class="tag has-background-black-bis is-medium" :style="text">
-              <font-awesome-icon icon="lightbulb" />
-            </span>
-            <span
-              class="tag has-text-black-bis has-text-weight-bold is-medium"
-              :style="background"
-            >
-              {{ zone.profile.profile }}
-            </span>
-          </div>
+      <div class="title" @click="clicked">
+        <div class="tags has-addons">
+          <span class="tag has-background-black-bis is-medium" :style="text">
+            <strong>{{ zone.nickname }}</strong>
+          </span>
+          <span class="tag has-text-black-bis is-medium" :style="background">
+            {{ zone.profile.profile }}
+          </span>
         </div>
       </div>
       <div class="content">
@@ -142,6 +124,14 @@ const ZoneTile = Vue.extend({
   },
 
   methods: {
+    clicked() {
+      this.$router.push({
+        name: "zone",
+        hash: this.linkto,
+        params: { id: this.zone.id }
+      });
+    },
+
     toggle() {
       const zone = {
         ...this.zone,

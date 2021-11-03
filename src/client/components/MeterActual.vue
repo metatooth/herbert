@@ -1,20 +1,16 @@
 <template>
-  <div class="field is-grouped is-grouped-multiline">
-    <target
-      icon="thermometer-half"
-      :value="temperature"
-      units="°"
-      color="#48c78e"
-    />
-    <target icon="tint" :value="humidity" units="%" color="#48c78e" />
-  </div>
+  <span>
+    <span class="title"> {{ temperature.toFixed(0) }}&#176; </span>
+    <span class="title"> {{ humidity.toFixed(0) }}% </span>
+  </span>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
+
 import { Meter } from "@/store/meters/types";
-import Target from "@/components/Target.vue";
+
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const MeterActual = Vue.extend({
@@ -26,10 +22,6 @@ const MeterActual = Vue.extend({
     return {
       ts: new Date()
     };
-  },
-
-  components: {
-    Target
   },
 
   computed: {

@@ -1,6 +1,6 @@
 <template>
   <div class="control has-icons-left">
-    <div class="select is-small">
+    <div class="select">
       <select v-model="selected">
         <option value="">undefined</option>
         <option

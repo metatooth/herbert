@@ -7,7 +7,8 @@ import { MockMeter } from "./mock-meter";
 import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
-import { SM8relay } from "./sm-8relay";
+import { MultiHerbert } from "./multi-herbert";
+import { SequentMicrosystems } from "./sequent-microsystems";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
 import {
@@ -53,6 +54,7 @@ interface ConfigDevice {
   password?: string;
   board?: string;
   remote?: string;
+  mode?: string;
   pin?: string;
   channel?: string;
 }
@@ -252,14 +254,20 @@ export class App {
 
         this.wyze = new Wyze(options);
       } else if (dev.manufacturer === "herbert") {
-        if (dev.pin) {
+        if (dev.devices) {
+          switches.push(new MultiHerbert(mac, dev.devices));
+        } else if (dev.pin) {
           switches.push(new Herbert(mac, parseInt(dev.pin)));
         } else if (dev.board && dev.channel) {
           switches.push(
-            new SM8relay(mac, parseInt(dev.board), parseInt(dev.channel))
+            new SequentMicrosystems(
+              mac,
+              parseInt(dev.board),
+              parseInt(dev.channel)
+            )
           );
-        } else if (dev.remote) {
-          switches.push(new IRSend(mac, dev.remote));
+        } else if (dev.remote && dev.mode) {
+          switches.push(new IRSend(mac, dev.remote, dev.mode));
         }
       } else if (dev.manufacturer === "mockmeter") {
         const meter = new MockMeter(mac);

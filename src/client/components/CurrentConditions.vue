@@ -3,6 +3,11 @@
     <div class="level-left" />
     <div class="level-right" v-if="ready">
       <div class="level-item">
+        <p class="subtitle">
+          {{ settings.cityname }}, {{ settings.statecode }}
+        </p>
+      </div>
+      <div class="level-item">
         <p class="title">
           {{ main }}
         </p>

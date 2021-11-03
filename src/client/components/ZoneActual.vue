@@ -1,29 +1,19 @@
 <template>
-  <div class="field is-grouped is-grouped-multiline">
-    <target
-      icon="thermometer-half"
-      :value="temperature"
-      units="°"
-      :color="temperatureColor"
-      :size="size"
-    />
-
-    <target
-      icon="tint"
-      :value="humidity"
-      units="%"
-      :color="humidityColor"
-      :size="size"
-    />
-  </div>
+  <span>
+    <span class="title" :style="temperatureStyle">
+      {{ temperature.toFixed(0) }}&#176;
+    </span>
+    <span class="title" :style="humidityStyle">
+      {{ humidity.toFixed(0) }}%
+    </span>
+  </span>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { Zone } from "@/store/zones/types";
-import Target from "@/components/Target.vue";
 import { mapGetters } from "vuex";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
+import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 
 const ZoneActual = Vue.extend({
   props: {
@@ -35,10 +25,6 @@ const ZoneActual = Vue.extend({
     return {
       ts: new Date()
     };
-  },
-
-  components: {
-    Target
   },
 
   computed: {
@@ -56,79 +42,27 @@ const ZoneActual = Vue.extend({
       return this.zone.meanHumidity() * 100;
     },
 
-    leafdiff(): number {
-      let diff;
-      if (this.zone.isDay(this.ts)) {
-        diff = this.zone.lamponleafdiff;
-      } else {
-        diff = this.zone.lampoffleafdiff;
-      }
-
-      if (this.settings.units === "F") {
-        return (diff * 9) / 5;
-      }
-      return diff;
-    },
-
     temperatureColor(): string {
       const diff =
         this.zone.meanTemperature() - this.zone.targetTemperature(this.ts);
-      return this.color(diff, 3);
+      return color(diff, 3);
     },
 
     humidityColor(): string {
       const diff =
         100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.ts);
-      return this.color(diff, 5);
+      return color(diff, 5);
+    },
+
+    temperatureStyle(): string {
+      return `color: ${this.temperatureColor};`;
+    },
+
+    humidityStyle(): string {
+      return `color: ${this.humidityColor};`;
     },
 
     ...mapGetters("settings", ["settings"])
-  },
-
-  methods: {
-    hex(c): string {
-      const s = "0123456789abcdef";
-      let i = parseInt(c);
-      if (i == 0 || isNaN(c)) {
-        return "00";
-      }
-      i = Math.round(Math.min(Math.max(0, i), 255));
-      return s.charAt((i - (i % 16)) / 16) + s.charAt(i % 16);
-    },
-
-    convertToHex(rgb): string {
-      return this.hex(rgb[0]) + this.hex(rgb[1]) + this.hex(rgb[2]);
-    },
-
-    color(diff, range): string {
-      let sign = 1;
-      if (diff < 0) {
-        sign = -1;
-      }
-
-      let alpha = Math.floor((100 * sign * diff) / range) / 100;
-      alpha = alpha > 1 ? 1 : alpha;
-
-      const end = [35, 209, 96];
-      const start = [];
-      if (sign === -1) {
-        start[0] = 32;
-        start[1] = 156;
-        start[2] = 238;
-      } else {
-        start[0] = 255;
-        start[1] = 56;
-        start[2] = 96;
-      }
-
-      const c = [
-        start[0] * alpha + (1 - alpha) * end[0],
-        start[1] * alpha + (1 - alpha) * end[1],
-        start[2] * alpha + (1 - alpha) * end[2]
-      ];
-
-      return "#" + this.convertToHex(c);
-    }
   }
 });
 

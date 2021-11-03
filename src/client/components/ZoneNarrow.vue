@@ -2,16 +2,7 @@
   <nav class="level is-mobile" @click="clicked">
     <div class="level-left">
       <div class="level-item">
-        <div class="tags has-addons">
-          <div class="tag has-background-black-bis">
-            <strong>
-              <span :style="dayStyle">{{ name }}</span>
-            </strong>
-          </div>
-          <div class="tag has-text-black-bis" :style="dayBackgroundStyle">
-            <strong>{{ zone.profile.profile.slice(0, 12) }}</strong>
-          </div>
-        </div>
+        <zone-tag :zone="zone" />
       </div>
     </div>
     <div class="level-right" v-if="zone.meters.length !== 0">
@@ -31,10 +22,16 @@
 import Vue from "vue";
 import { mapGetters } from "vuex";
 import { Zone } from "@/store/zones/types";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
+import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
+import ZoneTag from "@/components/ZoneTag.vue";
+
 const ZoneNarrow = Vue.extend({
   props: {
     zone: Zone
+  },
+
+  components: {
+    ZoneTag
   },
 
   data() {
@@ -61,29 +58,13 @@ const ZoneNarrow = Vue.extend({
     temperatureColor(): string {
       const diff =
         this.zone.meanTemperature() - this.zone.targetTemperature(this.ts);
-      return this.color(diff, 3);
+      return color(diff, 3);
     },
 
     humidityColor(): string {
       const diff =
         100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.ts);
-      return this.color(diff, 5);
-    },
-
-    dayStyle(): string {
-      if (this.zone.isDay(this.ts)) {
-        return "color: #ffe08a;";
-      } else {
-        return "color: #7a7a7a;";
-      }
-    },
-
-    dayBackgroundStyle(): string {
-      if (this.zone.isDay(this.ts)) {
-        return "background-color: #ffe08a;";
-      } else {
-        return "background-color: #7a7a7a;";
-      }
+      return color(diff, 5);
     },
 
     temperatureStyle(): string {
@@ -109,80 +90,16 @@ const ZoneNarrow = Vue.extend({
       return `#zone-details-${this.zone.id}`;
     },
 
-    name(): string {
-      const tokens = this.zone.nickname.split(" ");
-
-      if (tokens.length === 2) {
-        return `${tokens[0].slice(0, 5)}${this.zeroes(tokens[1])}`;
-      } else if (tokens.length === 1) {
-        return tokens[0];
-      }
-
-      return this.zone.nickname;
-    },
-
     ...mapGetters("settings", ["settings"])
   },
 
   methods: {
     clicked() {
-      console.log("clickety click", this.zone.nickname);
       this.$router.push({
         name: "zone",
         hash: this.linkto,
         params: { id: this.zone.id }
       });
-    },
-
-    hex(c): string {
-      const s = "0123456789abcdef";
-      let i = parseInt(c);
-      if (i == 0 || isNaN(c)) {
-        return "00";
-      }
-      i = Math.round(Math.min(Math.max(0, i), 255));
-      return s.charAt((i - (i % 16)) / 16) + s.charAt(i % 16);
-    },
-
-    convertToHex(rgb): string {
-      return this.hex(rgb[0]) + this.hex(rgb[1]) + this.hex(rgb[2]);
-    },
-
-    color(diff, range): string {
-      let sign = 1;
-      if (diff < 0) {
-        sign = -1;
-      }
-
-      let alpha = Math.floor((100 * sign * diff) / range) / 100;
-      alpha = alpha > 1 ? 1 : alpha;
-
-      const end = [35, 209, 96];
-      const start = [];
-      if (sign === -1) {
-        start[0] = 32;
-        start[1] = 156;
-        start[2] = 238;
-      } else {
-        start[0] = 255;
-        start[1] = 56;
-        start[2] = 96;
-      }
-
-      const c = [
-        start[0] * alpha + (1 - alpha) * end[0],
-        start[1] * alpha + (1 - alpha) * end[1],
-        start[2] * alpha + (1 - alpha) * end[2]
-      ];
-
-      return "#" + this.convertToHex(c);
-    },
-
-    zeroes(n: number): string {
-      if (n < 10) {
-        return `0${n}`;
-      }
-      return n.toString();
     }
   }
 });

@@ -1,31 +1,17 @@
 <template>
   <tr>
     <td>
-      <router-link
-        class="has-text-weight-bold"
-        :to="{
-          name: 'zone',
-          hash: linkto,
-          params: { id: zone.id, units: units }
-        }"
-      >
-        {{ zone.nickname }}
-      </router-link>
-    </td>
-    <td>
-      <div class="control">
-        <div class="tags has-addons">
-          <span class="tag has-background-black-bis is-medium" :style="text">
-            <font-awesome-icon icon="lightbulb" />
-          </span>
-          <span class="tag has-text-black-bis is-medium" :style="background">
-            {{ zone.profile.profile }}
-          </span>
-        </div>
-      </div>
+      <zone-tag :zone="zone" />
     </td>
     <td>
       <zone-actual :zone="zone" :units="settings.units" />
+    </td>
+    <td>
+      <device-tag
+        v-for="device in zone.devices"
+        :key="device.device"
+        :device="device"
+      />
     </td>
     <td class="is-italic">
       <readable :timestamp="lastupdate" />
@@ -43,9 +29,12 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
-import { Zone } from "@/store/zones/types";
-import ZoneActual from "@/components/ZoneActual.vue";
+
+import DeviceTag from "@/components/DeviceTag.vue";
 import Readable from "@/components/Readable.vue";
+import ZoneActual from "@/components/ZoneActual.vue";
+import ZoneTag from "@/components/ZoneTag.vue";
+import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
   props: {
@@ -62,8 +51,10 @@ const ZoneRow = Vue.extend({
   },
 
   components: {
+    DeviceTag,
     Readable,
-    ZoneActual
+    ZoneActual,
+    ZoneTag
   },
 
   computed: {
@@ -119,6 +110,14 @@ const ZoneRow = Vue.extend({
   },
 
   methods: {
+    clicked() {
+      this.$router.push({
+        name: "zone",
+        hash: this.linkto,
+        params: { id: this.zone.id }
+      });
+    },
+
     editable() {
       this.editing = true;
     },
