@@ -7,7 +7,6 @@ import { MockMeter } from "./mock-meter";
 import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
-import { MultiHerbert } from "./multi-herbert";
 import { SequentMicrosystems } from "./sequent-microsystems";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
@@ -135,7 +134,7 @@ export class App {
     console.debug("run with config", this.config);
 
     const polling: number = 1000 * (this.config.polling || 5);
-    const interval: number = 1000 * (this.config.interval || 30);
+    const interval: number = 1000 * (this.config.interval || 300);
 
     if (!isMockWorker()) {
       const switchbot = new Switchbot();
@@ -254,9 +253,7 @@ export class App {
 
         this.wyze = new Wyze(options);
       } else if (dev.manufacturer === "herbert") {
-        if (dev.devices) {
-          switches.push(new MultiHerbert(mac, dev.devices));
-        } else if (dev.pin) {
+        if (dev.pin) {
           switches.push(new Herbert(mac, parseInt(dev.pin)));
         } else if (dev.board && dev.channel) {
           switches.push(
@@ -379,13 +376,40 @@ export class App {
   private async updateWYZE(data: CommandPayload) {
     if (this.wyze) {
       const mac = this.formatWyzeMacAddress(data.device);
-      const device = await this.wyze.getDeviceByMac(mac);
+      const device = await this.wyze.getDeviceByMac(mac)
+            .then(res => {
+              console.log("Call successful...");
+              return res;
+            })
+            .catch(err => {
+              console.log("Server error");
+              return err;
+            });
+      console.log("action is", data.action, "for", device);
       if (device) {
         let result;
         if (data.action === "on") {
-          result = await this.wyze.turnOn(device);
+          result = await this.wyze.turnOn(device)
+                      .then(res => {
+              console.log("Call successful...");
+              return res;
+            })
+            .catch(err => {
+              console.log("Server error");
+              return err;
+            });
+
         } else {
-          result = await this.wyze.turnOff(device);
+          result = await this.wyze.turnOff(device)
+                      .then(res => {
+              console.log("Call successful...");
+              return res;
+            })
+            .catch(err => {
+              console.log("Server error");
+              return err;
+            });
+
         }
         if (result.code !== "1") {
           console.error(

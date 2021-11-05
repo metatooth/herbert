@@ -86,10 +86,6 @@ const ZoneNarrow = Vue.extend({
       return last;
     },
 
-    linkto(): string {
-      return `#zone-details-${this.zone.id}`;
-    },
-
     ...mapGetters("settings", ["settings"])
   },
 
@@ -97,7 +93,6 @@ const ZoneNarrow = Vue.extend({
     clicked() {
       this.$router.push({
         name: "zone",
-        hash: this.linkto,
         params: { id: this.zone.id }
       });
     }
