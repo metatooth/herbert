@@ -8,11 +8,7 @@
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
       <div class="content">
-        <button class="button" :class="statusClass" @click="toggle">
-          <span class="icon">
-            <font-awesome-icon :icon="statusIcon" />
-          </span>
-        </button>
+        <zone-status-button :zone="zone" />
         &nbsp;
         <device-tag
           v-for="device in sorted"
@@ -34,6 +30,7 @@ import { mapGetters, mapActions } from "vuex";
 import DeviceTag from "@/components/DeviceTag.vue";
 import Readable from "@/components/Readable.vue";
 import ZoneActual from "@/components/ZoneActual.vue";
+import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 import ZoneTag from "@/components/ZoneTag.vue";
 import { Device } from "@/store/devices/types";
 import { Zone } from "@/store/zones/types";
@@ -54,6 +51,7 @@ const ZoneTile = Vue.extend({
     DeviceTag,
     Readable,
     ZoneActual,
+    ZoneStatusButton,
     ZoneTag
   },
 
@@ -67,22 +65,6 @@ const ZoneTile = Vue.extend({
         }
       });
       return last;
-    },
-
-    statusClass() {
-      if (this.zone.active) {
-        return "has-text-success";
-      } else {
-        return "has-text-info";
-      }
-    },
-
-    statusIcon() {
-      if (this.zone.active) {
-        return "toggle-on";
-      } else {
-        return "toggle-off";
-      }
     },
 
     sorted(): Device[] {

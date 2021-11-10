@@ -1,7 +1,7 @@
 <template>
-  <tr class="notification is-danger">
-    <td><timestamp :timestamp="timestamp" /></td>
-    <td>{{ plug }}</td>
+  <tr>
+    <td><timestamp :timestamp="timestamp" :abbreviated="true" /></td>
+    <td>{{ name }}</td>
     <td>{{ message }}</td>
     <td class="has-text-centered">
       <button class="delete" @click="$emit('delete-notification')" />
@@ -11,6 +11,8 @@
 
 <script>
 import Vue from "vue";
+import { mapGetters } from "vuex";
+
 import Timestamp from "@/components/Timestamp.vue";
 
 const NotificationRow = Vue.extend({
@@ -22,6 +24,25 @@ const NotificationRow = Vue.extend({
   },
 
   components: { Timestamp },
+
+  computed: {
+    notificationClass() {
+      return "notification is-danger";
+    },
+
+    name() {
+      const found = this.devices.filter(d => {
+        return d.device === this.plug;
+      });
+      if (found.length !== 0) {
+        return found[0].name;
+      } else {
+        return this.plug;
+      }
+    },
+
+    ...mapGetters("devices", ["devices"])
+  },
 
   emits: ["delete-notification"]
 });

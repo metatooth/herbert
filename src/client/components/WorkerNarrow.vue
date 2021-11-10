@@ -11,6 +11,9 @@
           {{ worker.inet }}
         </p>
       </div>
+      <div class="level-item">
+        <span class="is-family-code">{{ worker.configname }}</span>
+      </div>
     </div>
     <div class="level-right">
       <div class="level-item">

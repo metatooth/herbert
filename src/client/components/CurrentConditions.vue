@@ -110,3 +110,11 @@ const CurrentConditions = Vue.extend({
 
 export default CurrentConditions;
 </script>
+
+<style scoped>
+.level {
+  border-top-color: #efefef;
+  border-top-width: 2px;
+  border-top-style: solid;
+}
+</style>
