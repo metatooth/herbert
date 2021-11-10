@@ -2,11 +2,14 @@
   <nav class="level is-mobile">
     <div class="level-left">
       <div class="level-item">
-        <p class="subtitle is-7">
-          <strong>{{ meter.name.slice(0, 12) }}</strong
-          ><br />
-          {{ meter.device.slice(9) }}
-        </p>
+        <div class="content">
+          <p class="title is-5">
+            {{ meter.name }}
+          </p>
+          <p class="subtitle is-7">
+            {{ meter.device }}
+          </p>
+        </div>
       </div>
     </div>
     <div class="level-right">
@@ -15,6 +18,13 @@
       </div>
       <div class="level-item">
         <p class="title">{{ humidity.toFixed(0) }}%</p>
+      </div>
+      <div class="level-item">
+        <button class="button has-text-info" @click="history">
+          <span class="icon">
+            <font-awesome-icon icon="history" />
+          </span>
+        </button>
       </div>
     </div>
   </nav>
@@ -46,8 +56,23 @@ const MeterNarrow = Vue.extend({
     },
 
     ...mapGetters("settings", ["settings"])
+  },
+
+  methods: {
+    history() {
+      this.$router.push({
+        name: "readings",
+        params: { name: this.meter.nickname, device: this.meter.device }
+      });
+    }
   }
 });
 
 export default MeterNarrow;
 </script>
+
+<style scoped>
+.clickable:hover {
+  cursor: pointer;
+}
+</style>

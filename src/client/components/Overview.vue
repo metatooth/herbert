@@ -1,22 +1,34 @@
 <template>
   <div id="overview">
-    <current-conditions />
     <collection type="zone" :filter="filter" />
-    <div class="tile is-ancestor">
-      <notification-tile
-        v-for="notification in notifications"
-        v-bind:key="notification.id"
-        v-bind="notification"
-        @delete-notification="deleteNotification(notification)"
-      />
-    </div>
+    <h1 class="subtitle is-5">Notifications</h1>
+    <table
+      class="table is-bordered is-striped"
+      v-if="notifications.length !== 0"
+    >
+      <thead>
+        <th>At</th>
+        <th>Name</th>
+        <th>What</th>
+        <th></th>
+      </thead>
+      <tbody>
+        <notification-row
+          v-for="notification in notifications"
+          :key="notification.id"
+          v-bind="notification"
+          @delete-notification="deleteNotification(notification)"
+        />
+      </tbody>
+    </table>
+    <p class="content" v-else>All good...</p>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
-import NotificationTile from "@/components/NotificationTile.vue";
+import NotificationRow from "@/components/NotificationRow.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
@@ -28,7 +40,6 @@ import {
 } from "../../shared/message-creators";
 import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
 import Collection from "@/components/Collection.vue";
-import CurrentConditions from "@/components/CurrentConditions.vue";
 
 const Overview = Vue.extend({
   props: {
@@ -36,9 +47,8 @@ const Overview = Vue.extend({
   },
 
   components: {
-    CurrentConditions,
     Collection,
-    NotificationTile
+    NotificationRow
   },
 
   computed: {
@@ -85,6 +95,7 @@ const Overview = Vue.extend({
       return zones;
     },
 
+    ...mapGetters("devices", ["devices"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
     ...mapGetters("zones", ["zones"])
   },
@@ -96,17 +107,15 @@ const Overview = Vue.extend({
     ws.emit("join", { room: "clients" });
     ws.on("message", (msg: AnySocketMessage) => {
       if (messageIsFrom(makeSwitchStatusMessage, msg)) {
-        const n: Notification = {
-          id: msg.payload.device,
-          action: "",
-          code: "",
-          plug: msg.payload.device,
-          message: msg.payload.status,
-          timestamp: new Date(Date.parse(msg.payload.timestamp))
-        };
-        this.add(n);
+        const found = this.devices.filter(d => {
+          return d.device === msg.payload.device;
+        });
+        if (found.length !== 0) {
+          found[0].status = msg.payload.status;
+        }
         return;
       }
+
       if (messageIsFrom(makeErrorMessage, msg)) {
         const n: Notification = {
           id: msg.payload.device,
@@ -154,10 +163,6 @@ const Overview = Vue.extend({
 
     pretty(ts: Date): string {
       return this.zeroes(ts.getHours()) + ":" + this.zeroes(ts.getMinutes());
-    },
-
-    picked(name: string) {
-      this.$emit("child-picked", name);
     },
 
     zeroes(n: number): string {

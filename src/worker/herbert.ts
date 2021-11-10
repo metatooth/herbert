@@ -10,16 +10,14 @@ export class Herbert extends Switch {
     this.pin = pin;
 
     this.output = new Gpio(pin, "out");
-    console.log("init herbert on?", this.output.readSync());
+    this.status();
   }
 
   public on() {
-    console.log("herbert on?", this.output.readSync());
     this.output.writeSync(1);
   }
 
   public off() {
-    console.log("herbert off?", this.output.readSync());
     this.output.writeSync(0);
   }
 

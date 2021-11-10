@@ -7,7 +7,7 @@ import { MockMeter } from "./mock-meter";
 import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
-import { SM8relay } from "./sm-8relay";
+import { SequentMicrosystems } from "./sequent-microsystems";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
 import {
@@ -53,6 +53,7 @@ interface ConfigDevice {
   password?: string;
   board?: string;
   remote?: string;
+  mode?: string;
   pin?: string;
   channel?: string;
 }
@@ -72,6 +73,7 @@ export class App {
   socket?: Socket<SocketMessageMap> = undefined;
   meters: Array<Meter> = [];
   switches: Array<Switch> = [];
+  plugs: Array<WyzeDevice> = [];
   macaddr = "";
   inet = "";
   heldMessages: AnySocketMessage[] = [];
@@ -142,23 +144,6 @@ export class App {
       switchbot.wait(polling);
       switchbot.stopScan();
       this.switchbot = switchbot;
-    }
-
-    if (this.wyze) {
-      const wyzes = await this.wyze.getDeviceList();
-      wyzes.forEach(async (wyze: WyzeDevice) => {
-        const plug = new WyzeSwitch(this.formatMacAddress(wyze.mac));
-
-        if (wyze.conn_state === 0) {
-          plug.state = "disconnected";
-        } else if (wyze.device_params.switch_state === 1) {
-          plug.state = "on";
-        } else {
-          plug.state = "off";
-        }
-
-        this.switchStatus(plug);
-      });
     }
 
     this.meters.forEach(meter => {
@@ -236,6 +221,8 @@ export class App {
   private initDevices() {
     const meters = [];
     const switches = [];
+    const plugs = [];
+
     const devices =
       this.config && this.config.devices && Array.isArray(this.config.devices)
         ? (this.config.devices as ConfigDevice[])
@@ -251,15 +238,36 @@ export class App {
         };
 
         this.wyze = new Wyze(options);
+
+        const wyzes = this.wyze.getDeviceList();
+        wyzes.forEach(async (wyze: WyzeDevice) => {
+          this.plugs.push(wyze);
+
+          const plug = new WyzeSwitch(this.formatMacAddress(wyze.mac));
+
+          if (wyze.conn_state === 0) {
+            plug.state = "disconnected";
+          } else if (wyze.device_params.switch_state === 1) {
+            plug.state = "on";
+          } else {
+            plug.state = "off";
+          }
+
+          plugs.push(plug);
+        });
       } else if (dev.manufacturer === "herbert") {
         if (dev.pin) {
           switches.push(new Herbert(mac, parseInt(dev.pin)));
         } else if (dev.board && dev.channel) {
           switches.push(
-            new SM8relay(mac, parseInt(dev.board), parseInt(dev.channel))
+            new SequentMicrosystems(
+              mac,
+              parseInt(dev.board),
+              parseInt(dev.channel)
+            )
           );
-        } else if (dev.remote) {
-          switches.push(new IRSend(mac, dev.remote));
+        } else if (dev.remote && dev.mode) {
+          switches.push(new IRSend(mac, dev.remote, dev.mode));
         }
       } else if (dev.manufacturer === "mockmeter") {
         const meter = new MockMeter(mac);
@@ -273,7 +281,8 @@ export class App {
 
     this.meters = meters;
     this.switches = switches;
-    const all = [...this.meters, ...this.switches].map(d => d.device);
+
+    const all = [...this.meters, ...this.switches, ...plugs].map(d => d.device);
     this.socket.emit("join", {
       room: "workers",
       workerID: this.macaddr,
@@ -371,18 +380,31 @@ export class App {
   private async updateWYZE(data: CommandPayload) {
     if (this.wyze) {
       const mac = this.formatWyzeMacAddress(data.device);
-      const device = await this.wyze.getDeviceByMac(mac);
+      const plugs = this.plugs.filter(p => {
+        return p.mac === mac;
+      });
+
+      const device = plugs[0];
+      const plug = new WyzeSwitch(this.formatMacAddress(data.device));
+
       if (device) {
         let result;
-        if (data.action === "on") {
+        if (data.action === "on" && device.device_params.switch_state === 0) {
+          device.device_params["switch_state"] = 1;
+          plug.state = "on";
           result = await this.wyze.turnOn(device);
-        } else {
+        } else if (device.device_params.switch_state === 1) {
+          device.device_params["switch_state"] = 0;
+          plug.state = "off";
           result = await this.wyze.turnOff(device);
+        } else {
+          console.info("Action matches current state.");
         }
-        if (result.code !== "1") {
-          console.error(
-            `ERROR ${result.code} ${device.nickname} ${data.action} - ${result.code} - ${result.message}`
-          );
+
+        this.switchStatus(plug);
+
+        if (result && result.code !== "1") {
+          console.error(`ERROR ${mac} ${result.code} - ${result.message}`);
           const reply = makeErrorMessage({
             message: result.msg,
             worker: this.macaddr,

@@ -4,27 +4,17 @@
       <div class="field is-grouped" v-if="editing">
         <div class="control">
           <input
-            class="input is-small"
+            class="input"
             type="text"
             v-model="nickname"
             @keyup.esc="cancel"
             @keyup.enter="save"
           />
         </div>
-        <div class="control">
-          <button class="button is-small is-primary" @click="save">
-            <font-awesome-icon icon="check" />
-          </button>
-        </div>
-        <div class="control">
-          <button class="button is-small is-danger" @click="cancel">
-            <font-awesome-icon icon="times" />
-          </button>
-        </div>
       </div>
-      <a class="is-size-5" @click="editable" v-if="!editing">
+      <span class="is-size-5" v-else>
         {{ meter.name }}
-      </a>
+      </span>
     </td>
     <td>
       <meter-actual :meter="meter" :units="units" />
@@ -58,13 +48,12 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapActions } from "vuex";
-import { Meter } from "@/store/meters/types";
-import { Notification } from "@/store/notifications/types";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
-import Readable from "@/components/Readable.vue";
-import MeterActual from "@/components/MeterActual.vue";
+import { mapActions } from "vuex";
+
 import EditControls from "@/components/EditControls.vue";
+import MeterActual from "@/components/MeterActual.vue";
+import Readable from "@/components/Readable.vue";
+import { Meter } from "@/store/meters/types";
 
 const MeterRow = Vue.extend({
   props: {
@@ -91,35 +80,6 @@ const MeterRow = Vue.extend({
     meter() {
       this.updating = false;
     }
-  },
-
-  computed: {
-    meterClass(): string {
-      const found = this.notifications.find((n: Notification) => {
-        return n.id === this.meter.device;
-      });
-      if (found) {
-        return "has-text-danger";
-      }
-
-      return "has-text-success";
-    },
-    meterReadingHumidity(): number {
-      return 100 * this.meter.humidity;
-    },
-    meterReadingTemperature(): number {
-      if (this.units === "C") {
-        return this.meter.temperature;
-      } else if (this.units === "F") {
-        return celsius2fahrenheit(this.meter.temperature);
-      }
-      return celsius2kelvin(this.meter.temperature);
-    },
-    unitsWithDegrees(): string {
-      return "°" + this.units;
-    },
-
-    ...mapState("notifications", ["notifications"])
   },
 
   methods: {

@@ -7,7 +7,12 @@ import Vue from "vue";
 
 const Readable = Vue.extend({
   props: {
-    timestamp: { default: new Date(), type: Date }
+    timestamp: {
+      default: () => {
+        return new Date();
+      },
+      type: Date
+    }
   },
 
   computed: {

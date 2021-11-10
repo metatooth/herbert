@@ -8,10 +8,10 @@
         {{ hhmm }}<span class="is-size-7">{{ ss }}</span> {{ part }}
       </strong>
     </div>
-    <div class="level-item">
+    <div class="level-item" v-if="!abbreviated">
       <strong> on {{ mmmddyyyy }} </strong>
     </div>
-    <div class="level-item">
+    <div class="level-item" v-if="!abbreviated">
       <em>Updated <readable :timestamp="local"/></em>
     </div>
   </nav>
@@ -25,6 +25,7 @@ import Readable from "@/components/Readable.vue";
 const Timestamp = Vue.extend({
   props: {
     timestamp: { default: new Date(), type: Date },
+    abbreviated: { default: false, type: Boolean },
     timezone: { default: "America/New_York", type: String }
   },
 
@@ -45,16 +46,10 @@ const Timestamp = Vue.extend({
       return (
         this.mmm +
         " " +
-        this.zeroes(this.local.getDay()) +
+        this.zeroes(this.local.getDate()) +
         ", " +
         this.local.getFullYear()
       );
-    },
-
-    monthday(): string {
-      const mon = this.local.toLocaleString("default", { month: "short" });
-
-      return mon + " " + this.local.getDay();
     },
 
     part() {

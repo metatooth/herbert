@@ -297,6 +297,11 @@ export async function registerWorker(macaddr: string, inet: string) {
           "INSERT INTO workers (worker, inet, configname, config) VALUES ($1, $2, $3, $4)",
           [macaddr, inet, defaultConfig, jsonStr]
         );
+      } else {
+        return query(
+          "UPDATE workers SET inet = $1, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
+          [inet, macaddr]
+        );
       }
     }
   );

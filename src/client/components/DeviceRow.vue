@@ -1,46 +1,34 @@
 <template>
   <tr>
     <td>
-      <a @click="editable" v-if="!editing">
+      <span v-if="!editing">
         {{ device.name }}
-      </a>
-      <div class="field is-grouped" v-else>
-        <div class="control">
-          <input
-            class="input is-small"
-            type="text"
-            v-model="nickname"
-            @keyup.esc="cancel"
-          />
-        </div>
-        <div class="control">
-          <button class="button is-small is-primary" @click="save">
-            <font-awesome-icon icon="check" />
-          </button>
-        </div>
-        <div class="control">
-          <button class="button is-small is-danger" @click="cancel">
-            <font-awesome-icon icon="times" />
-          </button>
-        </div>
+      </span>
+      <div class="control" v-else>
+        <input
+          class="input"
+          type="text"
+          v-model="nickname"
+          @keyup.esc="cancel"
+        />
       </div>
     </td>
-    <td class="has-text-centered">
-      <div class="field is-grouped">
-        <div class="control">
-          <button class="button is-small" :class="deviceClass" @click="toggle">
-            <span class="icon">
-              <font-awesome-icon :icon="device.icon" />
-            </span>
-          </button>
-        </div>
-
-        <div class="control">
-          <select-device-type
-            :devicetype="device.devicetype"
-            @select-devicetype="saveDeviceType"
-          />
-        </div>
+    <td>
+      <span class="tags has-addons" @click="toggle" v-if="!editing">
+        <span :class="iconClass">
+          <span class="icon">
+            <font-awesome-icon :icon="device.icon" />
+          </span>
+        </span>
+        <span :class="labelClass">
+          {{ device.devicetype }}
+        </span>
+      </span>
+      <div class="control" v-else>
+        <select-device-type
+          :devicetype="device.devicetype"
+          @select-devicetype="saveDeviceType"
+        />
       </div>
     </td>
     <td>
@@ -60,11 +48,12 @@
       {{ device.device }}
     </td>
     <td>
-      <div class="control">
-        <button class="button is-small is-danger" @click="trash">
-          <font-awesome-icon icon="trash" />
-        </button>
-      </div>
+      <edit-controls
+        @on-edit="editable"
+        @on-save="save"
+        @on-destroy="destroy"
+        @on-cancel="cancel"
+      />
     </td>
   </tr>
 </template>
@@ -76,6 +65,7 @@ import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import Readable from "@/components/Readable.vue";
+import EditControls from "@/components/EditControls.vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -86,29 +76,23 @@ const DeviceRow = Vue.extend({
   data() {
     return {
       nickname: this.device.nickname,
-      updating: false,
       editing: false
     };
   },
 
   components: {
+    EditControls,
     SelectDeviceType,
     Readable
   },
 
-  watch: {
-    device() {
-      this.updating = false;
-    }
-  },
-
   computed: {
-    deviceClass(): string {
+    iconClass(): string {
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.device.device;
       });
 
-      let style = "has-background-dark";
+      let style = "tag is-medium has-background-black-bis";
 
       if (found || this.device.status === "disconnected") {
         style = `has-text-danger ${style}`;
@@ -118,8 +102,22 @@ const DeviceRow = Vue.extend({
         style = `has-text-warning ${style}`;
       }
 
-      if (this.updating) {
-        style = `is-loading ${style}`;
+      return style;
+    },
+
+    labelClass(): string {
+      const found = this.notifications.find((n: Notification) => {
+        return n.id === this.device.device;
+      });
+
+      let style = "tag is-medium has-text-black-bis";
+
+      if (found || this.device.status === "disconnected") {
+        style = `has-background-danger ${style}`;
+      } else if (this.device.status === "on" || this.device.status === "1") {
+        style = `has-background-success ${style}`;
+      } else if (this.device.status === "off" || this.device.status === "0") {
+        style = `has-background-warning ${style}`;
       }
 
       return style;
@@ -154,7 +152,6 @@ const DeviceRow = Vue.extend({
     },
 
     toggle() {
-      this.updating = true;
       if (this.device.status === "off") {
         this.on(this.device.device);
       } else if (this.device.status === "on") {
@@ -162,7 +159,7 @@ const DeviceRow = Vue.extend({
       }
     },
 
-    trash() {
+    destroy() {
       if (confirm("OK to remove?")) {
         this.remove(this.device);
       }

@@ -34,6 +34,16 @@ export class Device {
 
     return "circle";
   }
+
+  get textClass() {
+    if (this.status === "on") {
+      return "has-text-success";
+    } else if (this.status === "off") {
+      return "has-text-warning";
+    }
+
+    return "has-text-danger";
+  }
 }
 
 export class DevicesState {
