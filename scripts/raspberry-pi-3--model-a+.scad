@@ -1,4 +1,4 @@
-board = [65, 1.75, 56];
+board = [65, 56, 1.75];
 
 offset = 2.5;
 
@@ -7,33 +7,37 @@ radius = 1.125;
 minimum = 1;
 
 module blank() {
-    cube([65, board[1], 56]);
+    difference() {
+        cube(board);
+    
+        translate([20, board[1] / 2 + 15, board[2] - minimum])
+            linear_extrude(minimum)
+                text("© Metatooth LLC 2021", 2, "Ubuntu");
+    }
 }
 
 module board() {
-        difference() {
-            blank();
-            translate([0, board[1], 0])
-                rotate([90, 0 ,0])
-                    cutaways();
-        }
+    difference() {
+         blank();
+         cutaways();
+    }
 }
 
 module camera() {
     x = 4.21;
-    y = 5.5;
-    z = 22.87;
+    y = 22.87;
+    z = 5.5;
     
-    translate([45 - x / 2, board[1], board[2] - z - 0.6])
-        cube([x, y + board[1], z]);
+    translate([45 - x / 2, 11.5 - y / 2, board[2]])
+        cube([x, y, z]);
 }
 
 module cpu() {
     x = 14;
-    y = minimum;
-    z = 14;
+    y = 14;
+    z = minimum;
     
-    translate([26 - x / 2, board[1], 24 - z / 2])
+    translate([27.1 - x / 2, 31.2 - y / 2, board[2]])
             cube([x, y, z]);
 }
 
@@ -46,34 +50,22 @@ module cutaways() {
 
 module display() {
     x = 4.21;
-    y = 5.5;
-    z = 22.87;
+    y = 22.87;
+    z = 5.5;
     
-    translate([1.2, board[1], 28 - z / 2])
-        cube([x, y + board[1], z]);
+    translate([1.2, 28 - y / 2, board[2]])
+        cube([x, y, z]);
 }
 
 module fillet(quad, x, y) {
     rot = quad * 90 - 90;
-    
-    offx = x;
-    offy = y;
-    
-    if (quad == 2) {
-    } else if (quad == 3) {
-    } else if (quad == 4) {
-    }
-     
-    translate([offx, offy, board[1]])
+         
+    translate([x, y, 0])
         rotate([0, 0, rot])
-            rotate([-90, 0, 0])
                 difference() {
-
-                    cube([offset, board[1], offset]);
-
-                    translate([offset, board[1], offset])
-                        rotate([90, 0, 0])
-                            cylinder(board[1], offset, offset, $fa = 5, $fs = 0.1);
+                    cube([offset, offset, board[2]]);
+                    translate([offset, offset, 0])
+                        cylinder(board[2], offset, offset, $fa = 5, $fs = 0.1);
                 }
                 
 }
@@ -86,52 +78,68 @@ module fillets() {
 }
 
 module fourpole() {
-    x = 7.22;
-    y = 6;
-    z = 13.24;
+    x = 7.1;
+    y = 12.4;
+    z = 6;
+
     
-    r = y / 2;
+    r = z / 2;
     
-    translate([board[0] - 11.5, board[1] + y / 2, board[2] - z])
-        cylinder(14.44, r, r, $fa = 5, $fs = 0.1);
+    translate([board[0] - 11.5, y, board[2] + z / 2])
+    rotate([90, 0, 0])
+        cylinder(15.4, r, r, $fa = 5, $fs = 0.1);
     
-    translate([board[0] - x / 2 - 11.5, board[1], board[2] - z])
+    translate([board[0] - x / 2 - 11.5, 0, board[2]])
         cube([x, y, z]);
 }
 
 module gpio() {
     x = 51.76;
-    y = 8.5;
-    z = 4.81;
+    y = 4.81;
+    z = 8.5;
 
-    translate([offset + 29 - x / 2, board[1], offset - z / 2])
+    translate([offset + 29 - x / 2, board[1] - offset - y / 2, board[2]])
         cube([x, y, z]);    
 }
 
 module hdmi() {
     x = 14.44;
-    y = 6.5;
-    z = 12.04;
+    y = 12.04;
+    z = 6.5;
 
-    translate([32 - x / 2, board[1], board[2] - z + 1.2])
+    translate([32 - x / 2, -1.8, board[2]])
         cube([x, y, z]);
+}
+
+module led(offx, offy) {
+    x = 1.8;
+    y = 1.8;
+    z = minimum;
+    
+    translate([offx, offy, board[2]])
+        cube([x, y, z]);
+}
+
+module leds() {
+        led(0, 7.1);
+        led(0, 10.6);
 }
 
 module memory() {
     x = 10;
-    y = minimum;
-    z = 12;
+    y = 12;
+    z = minimum;
     
-    translate([11 - x / 2, board[1], 12.5 - z / 2])
+    translate([11.5 - x / 2, 41.5 - y / 2, board[2]])
             cube([x, y, z]);
 }
 
 module microusb() {
-    x = 8.43;
-    y = 3.61;
-    z = 6.02;
+    x = 8.4;
+    y = 6.0;
+    z = 3.6;
     
-    translate([10.6 - x / 2, board[1], board[2] - z + 1.2])
+    translate([10.5 - x / 2, -1.2, board[2]])
         cube([x, y, z]);
 }
 
@@ -142,25 +150,26 @@ module mipis() {
 
 module penrun() {
     x = 5;
-    y = minimum;
-    z = 2;
+    y = 2;
+    z = minimum;
     
-    translate([board[0] - x - 1, board[1], 10.91 - z /2])
+    translate([board[0] - x - 1.2, board[1] - 10.91 - y /2, board[2]])
         cube([x, y, z]);
 }
 
 module sdcard() {
     x = 15;
-    y = 1;
-    z = 11;
+    y = 12;
+    z = minimum;
+
     
-    translate([-2.41, -y,  27.5 - z / 2])
+    translate([-2.5, 22, -z])
         cube([x, y, z]);
 }
 
 module thruhole(x, y) {
   translate([x, y, 0])
-    cylinder(board[1], radius, radius, $fa = 5, $fs = 0.1);
+    cylinder(board[2], radius, radius, $fa = 5, $fs = 0.1);
 }
 
 module thruholes() {
@@ -171,12 +180,12 @@ thruhole(3.5, 52.5);
 }
 
 module usb() {
-    x = 14.44;
-    y = 7.1;
-    z = 13.24;
+    x = 14.2;
+    y = 14.2;
+    z = 7.1;
     
-    translate([board[0] - x + 2.41, board[1], board[2] - 31.45 - z / 2])
-        cube([x, y + board[1], z]);
+    translate([board[0] - x + 3.0, 31.45 - y / 2, board[2]])
+        cube([x, y, z]);
 }
 
 color("#00ff00") {
@@ -203,4 +212,5 @@ color("#ff5733") {
 color("#363636") {
     sdcard();
     fourpole();
+    leds();
 }
