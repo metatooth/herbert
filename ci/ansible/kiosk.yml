@@ -26,4 +26,4 @@
         path: /home/{{ ansible_user }}/.bashrc
         backup: yes
         block: |
-          xinit /home/herbert/kiosk.sh {{ client_url }} -- vt$(fgconsole)
+          xinit /home/herbert/herbert/scripts/kiosk.sh {{ client_url }} -- vt$(fgconsole)
