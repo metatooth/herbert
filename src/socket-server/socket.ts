@@ -124,6 +124,13 @@ export class HerbertSocket {
         return;
       }
 
+      if (data.payload) {
+        const payload = JSON.parse(JSON.stringify(data.payload));
+        if (payload.device) {
+          ws.join(`devices:${payload.device}`);
+        }
+      }
+
       this.processMessage(data);
       this.broadcastToOthers(ws, data);
     };
