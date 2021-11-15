@@ -72,7 +72,6 @@
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
-import { Notification } from "@/store/notifications/types";
 import Readable from "@/components/Readable.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
@@ -102,13 +101,9 @@ const DeviceTile = Vue.extend({
 
   computed: {
     deviceClass(): string {
-      const found = this.notifications.find((n: Notification) => {
-        return n.id === this.device.device;
-      });
-
       let style;
 
-      if (found || this.status === "disconnected") {
+      if (this.status === "disconnected") {
         style = "icon has-text-danger";
       } else if (this.status === "on") {
         style = "icon has-text-success";
@@ -162,7 +157,6 @@ const DeviceTile = Vue.extend({
       return "";
     },
 
-    ...mapGetters("notifications", ["notifications"]),
     ...mapGetters("settings", ["settings"]),
     ...mapGetters("zones", ["zones"])
   },

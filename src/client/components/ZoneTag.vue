@@ -36,10 +36,6 @@ const ZoneTag = Vue.extend({
       }
     },
 
-    linkto(): string {
-      return `#zone-details-${this.zone.id}`;
-    },
-
     text() {
       if (this.zone.isDay(this.now)) {
         return "color: #ffe08a";
@@ -65,7 +61,6 @@ const ZoneTag = Vue.extend({
     clicked() {
       this.$router.push({
         name: "zone",
-        hash: this.linkto,
         params: { id: this.zone.id }
       });
     }
@@ -74,3 +69,9 @@ const ZoneTag = Vue.extend({
 
 export default ZoneTag;
 </script>
+
+<style scoped>
+.tags:hover {
+  cursor: pointer;
+}
+</style>

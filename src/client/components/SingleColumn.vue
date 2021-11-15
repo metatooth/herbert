@@ -32,6 +32,14 @@
         :units="settings.units"
       />
     </div>
+    <div class="tile is-4 is-vertical" v-if="type === 'zone-detail'">
+      <zone-detail
+        v-for="(item, index) in items"
+        :key="`item-${index}`"
+        :zone="item"
+        :units="settings.units"
+      />
+    </div>
     <div class="tile is-4 is-vertical" v-if="type === 'worker'">
       <worker-tile
         v-for="(item, index) in items"
@@ -58,6 +66,7 @@ import { mapGetters } from "vuex";
 import DeviceTile from "@/components/DeviceTile.vue";
 import MeterTile from "@/components/MeterTile.vue";
 import ProfileTile from "@/components/ProfileTile.vue";
+import ZoneDetail from "@/components/ZoneDetail.vue";
 import ZoneTile from "@/components/ZoneTile.vue";
 import WorkerTile from "@/components/WorkerTile.vue";
 import ConfigTile from "@/components/ConfigTile.vue";
@@ -72,6 +81,7 @@ const SingleColumn = Vue.extend({
     DeviceTile,
     MeterTile,
     ProfileTile,
+    ZoneDetail,
     ZoneTile,
     WorkerTile,
     ConfigTile

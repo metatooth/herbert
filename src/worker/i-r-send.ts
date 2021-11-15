@@ -14,7 +14,6 @@ export class IRSend extends Switch {
 
   public on() {
     exec(`irsend SEND_ONCE ${this.remote} POWER_ON`);
-    exec(`irsend SEND_ONCE ${this.remote} ${this.mode}`);
     this.state = "on";
   }
 

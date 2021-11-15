@@ -132,6 +132,7 @@ export class HerbertSocket {
       }
 
       this.processMessage(data);
+      this.broadcastToOthers(ws, data);
     };
   };
 

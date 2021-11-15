@@ -1,5 +1,5 @@
 <template>
-  <nav class="level is-mobile">
+  <nav class="level">
     <div class="level-left" />
     <div class="level-right" v-if="ready">
       <div class="level-item">
@@ -110,3 +110,11 @@ const CurrentConditions = Vue.extend({
 
 export default CurrentConditions;
 </script>
+
+<style scoped>
+.level {
+  border-top-color: #efefef;
+  border-top-width: 2px;
+  border-top-style: solid;
+}
+</style>

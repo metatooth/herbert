@@ -11,7 +11,7 @@ const routes = [
   { path: "/dashboard", name: "dashboard", component: Dashboard },
   { path: "/readings/:device", name: "readings", component: Readings },
   { path: "/statuses/:device", name: "statuses", component: Statuses },
-  { path: "/zones", name: "zone", component: ZonePage }
+  { path: "/zones/:id", name: "zone", component: ZonePage }
 ];
 
 const router = new VueRouter({

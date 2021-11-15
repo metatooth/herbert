@@ -1,8 +1,25 @@
 <template>
-  <nav class="level is-mobile" @click="clicked">
+  <nav class="level is-mobile">
     <div class="level-left">
       <div class="level-item">
-        <zone-tag :zone="zone" />
+        <zone-status-button :zone="zone" />
+      </div>
+      <div class="level-item">
+        <div class="tag has-background-black-bis is-medium" :style="iconStyle">
+          <span class="icon">
+            <font-awesome-icon icon="lightbulb" />
+          </span>
+        </div>
+      </div>
+      <div class="level-item" @click="clicked">
+        <div class="content">
+          <p class="title is-5">
+            {{ zone.shortname }}
+          </p>
+          <p class="subtitle is-7">
+            {{ zone.profile.profile }}
+          </p>
+        </div>
       </div>
     </div>
     <div class="level-right" v-if="zone.meters.length !== 0">
@@ -21,58 +38,47 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
+
+import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 import { Zone } from "@/store/zones/types";
 import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
-import ZoneTag from "@/components/ZoneTag.vue";
 
 const ZoneNarrow = Vue.extend({
   props: {
     zone: Zone
   },
 
-  components: {
-    ZoneTag
-  },
-
   data() {
     return {
-      ts: new Date()
+      now: new Date()
     };
   },
 
-  computed: {
-    temperature(): number {
-      const mean = this.zone.meanTemperature();
-      if (this.settings.units === "F") {
-        return celsius2fahrenheit(mean);
-      } else if (this.settings.units === "K") {
-        return celsius2kelvin(mean);
-      }
-      return mean;
-    },
+  components: {
+    ZoneStatusButton
+  },
 
+  computed: {
     humidity(): number {
       return this.zone.meanHumidity() * 100;
     },
 
-    temperatureColor(): string {
-      const diff =
-        this.zone.meanTemperature() - this.zone.targetTemperature(this.ts);
-      return color(diff, 3);
-    },
-
     humidityColor(): string {
       const diff =
-        100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.ts);
+        100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.now);
       return color(diff, 5);
-    },
-
-    temperatureStyle(): string {
-      return `color: ${this.temperatureColor};`;
     },
 
     humidityStyle(): string {
       return `color: ${this.humidityColor};`;
+    },
+
+    iconStyle() {
+      if (this.zone.isDay(this.now)) {
+        return "color: #ffe08a;";
+      } else {
+        return "color: #7a7a7a;";
+      }
     },
 
     lastupdate() {
@@ -86,8 +92,24 @@ const ZoneNarrow = Vue.extend({
       return last;
     },
 
-    linkto(): string {
-      return `#zone-details-${this.zone.id}`;
+    temperature(): number {
+      const mean = this.zone.meanTemperature();
+      if (this.settings.units === "F") {
+        return celsius2fahrenheit(mean);
+      } else if (this.settings.units === "K") {
+        return celsius2kelvin(mean);
+      }
+      return mean;
+    },
+
+    temperatureColor(): string {
+      const diff =
+        this.zone.meanTemperature() - this.zone.targetTemperature(this.now);
+      return color(diff, 3);
+    },
+
+    temperatureStyle(): string {
+      return `color: ${this.temperatureColor};`;
     },
 
     ...mapGetters("settings", ["settings"])
@@ -97,7 +119,6 @@ const ZoneNarrow = Vue.extend({
     clicked() {
       this.$router.push({
         name: "zone",
-        hash: this.linkto,
         params: { id: this.zone.id }
       });
     }

@@ -1,7 +1,6 @@
 import { Device } from "@/store/devices/types";
 import { Meter } from "@/store/meters/types";
 import { Profile } from "@/store/profiles/types";
-import { vaporPressureDeficit } from "../../../shared/utils";
 import { LampTimer } from "../../../shared/lamp-timer";
 
 export class Zone {
@@ -18,10 +17,6 @@ export class Zone {
   deleted: boolean;
   deletedat?: Date;
   active: boolean;
-
-  get name() {
-    return this.nickname;
-  }
 
   isDay(timestamp: Date) {
     let day = true;
@@ -40,22 +35,8 @@ export class Zone {
     return day;
   }
 
-  targetTemperature(ts: Date) {
-    if (this.profile) {
-      return this.isDay(ts)
-        ? this.profile.lampontemperature
-        : this.profile.lampofftemperature;
-    }
-    return 20;
-  }
-
-  targetHumidity(ts: Date) {
-    if (this.profile) {
-      return this.isDay(ts)
-        ? this.profile.lamponhumidity
-        : this.profile.lampoffhumidity;
-    }
-    return 35;
+  get name(): string {
+    return this.nickname;
   }
 
   meanTemperature(): number {
@@ -80,11 +61,42 @@ export class Zone {
     return result;
   }
 
-  meanPressure(): number {
-    const delta = this.isDay(new Date()) ? -0.6 : 0.6;
-    const temp = this.meanTemperature();
+  get shortname(): string {
+    const tokens = this.nickname.split(" ");
 
-    return vaporPressureDeficit(temp, delta, this.meanHumidity()) / 1000;
+    let shortname = tokens[0].slice(0, 5);
+
+    if (tokens.length === 2) {
+      if (!isNaN(tokens[1])) {
+        let index = tokens[1];
+        if (index.length < 2) {
+          index = `0${index}`;
+        }
+        shortname = `${tokens[0].slice(0, 5)}${index}`;
+      } else {
+        shortname = `${tokens[0].slice(0, 5)}${tokens[1].slice(0, 4)}`;
+      }
+    }
+
+    return shortname;
+  }
+
+  targetTemperature(ts: Date) {
+    if (this.profile) {
+      return this.isDay(ts)
+        ? this.profile.lampontemperature
+        : this.profile.lampofftemperature;
+    }
+    return 20;
+  }
+
+  targetHumidity(ts: Date) {
+    if (this.profile) {
+      return this.isDay(ts)
+        ? this.profile.lamponhumidity
+        : this.profile.lampoffhumidity;
+    }
+    return 35;
   }
 }
 

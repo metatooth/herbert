@@ -1,28 +1,22 @@
 <template>
-  <div class="field is-grouped is-grouped-multiline">
-    <target
-      icon="thermometer-half"
-      :value="temperature"
-      :units="unitsWithDegree"
-      :color="color"
-    />
-
-    <target icon="tint" :value="humidity" units="%" :color="color" />
-
-    <target icon="cloud" :value="pressure" units="hPa" :color="color" />
-  </div>
+  <span>
+    <span class="title" :style="style">
+      {{ temperature.toFixed(0) }}&#176;
+    </span>
+    <span class="title" :style="style"> {{ humidity.toFixed(0) }}% </span>
+  </span>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { mapGetters } from "vuex";
+
 import { Zone } from "@/store/zones/types";
-import Target from "@/components/Target.vue";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const ZoneTarget = Vue.extend({
   props: {
-    zone: Zone,
-    units: String
+    zone: Zone
   },
 
   data() {
@@ -31,20 +25,20 @@ const ZoneTarget = Vue.extend({
     };
   },
 
-  components: {
-    Target
-  },
-
   computed: {
     color(): string {
-      return this.zone.isDay(this.ts) ? "#ffe08a" : "#3e8ed0";
+      return this.zone.isDay(this.ts) ? "#ffe08a" : "#7a7a7a";
+    },
+
+    style(): string {
+      return `color: ${this.color};`;
     },
 
     temperature(): number {
       const target = this.zone.targetTemperature(this.ts);
-      if (this.units === "F") {
+      if (this.settings.units === "F") {
         return celsius2fahrenheit(target);
-      } else if (this.units === "K") {
+      } else if (this.settings.units === "K") {
         return celsius2kelvin(target);
       }
       return target;
@@ -54,13 +48,7 @@ const ZoneTarget = Vue.extend({
       return this.zone.targetHumidity(this.ts);
     },
 
-    pressure(): number {
-      return this.zone.targetPressure(this.ts) * 10;
-    },
-
-    unitsWithDegree(): string {
-      return "°" + this.units;
-    }
+    ...mapGetters("settings", ["settings"])
   }
 });
 

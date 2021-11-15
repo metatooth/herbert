@@ -16,6 +16,13 @@
           <span>{{ status.slice(0, 3) }}</span>
         </button>
       </div>
+      <div class="level-item">
+        <button class="button has-text-info" @click="history">
+          <span class="icon">
+            <font-awesome-icon icon="history" />
+          </span>
+        </button>
+      </div>
     </div>
   </nav>
 </template>
@@ -54,6 +61,16 @@ const DeviceNarrow = Vue.extend({
   },
 
   methods: {
+    history() {
+      this.$router.push({
+        name: "statuses",
+        params: {
+          name: this.device.nickname,
+          device: this.device.device
+        }
+      });
+    },
+
     toggle() {
       if (this.status === "off") {
         this.status = "on";

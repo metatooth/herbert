@@ -25,6 +25,7 @@ import {
   faFireAlt,
   faGripHorizontal,
   faGripVertical,
+  faHistory,
   faLightbulb,
   faList,
   faMoon,
@@ -68,6 +69,7 @@ library.add(faFileCode);
 library.add(faFireAlt);
 library.add(faGripHorizontal);
 library.add(faGripVertical);
+library.add(faHistory);
 library.add(faLightbulb);
 library.add(faList);
 library.add(faMoon);
