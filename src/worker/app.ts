@@ -380,46 +380,48 @@ export class App {
         return p.mac === mac;
       });
 
-      const device = plugs[0];
-      const plug = new WyzeSwitch(this.formatMacAddress(data.device));
+      if (plugs.length !== 0) {
+        const device = plugs[0];
+        const plug = new WyzeSwitch(this.formatMacAddress(data.device));
 
-      console.log(
-        "action is",
-        data.action,
-        " ?? ",
-        device.device_params.switch_state
-      );
+        console.log(
+          "action is",
+          data.action,
+          " ?? ",
+          device.device_params.switch_state
+        );
 
-      if (device) {
-        let result;
-        if (data.action === "on" && device.device_params.switch_state === 0) {
-          console.log("WILL TURN ON");
-          device.device_params["switch_state"] = 1;
-          plug.state = "on";
-          result = await this.wyze.turnOn(device);
-        } else if (
-          data.action === "off" &&
-          device.device_params.switch_state === 1
-        ) {
-          console.log("WILL TURN OFF");
-          device.device_params["switch_state"] = 0;
-          plug.state = "off";
-          result = await this.wyze.turnOff(device);
-        } else {
-          console.log("NO ACTION - matches current state.");
-        }
+        if (device) {
+          let result;
+          if (data.action === "on" && device.device_params.switch_state === 0) {
+            console.log("WILL TURN ON");
+            device.device_params["switch_state"] = 1;
+            plug.state = "on";
+            result = await this.wyze.turnOn(device);
+          } else if (
+            data.action === "off" &&
+              device.device_params.switch_state === 1
+          ) {
+            console.log("WILL TURN OFF");
+            device.device_params["switch_state"] = 0;
+            plug.state = "off";
+            result = await this.wyze.turnOff(device);
+          } else {
+            console.log("NO ACTION - matches current state.");
+          }
 
-        if (result && result.code !== "1") {
-          console.error(`ERROR ${mac} ${result.code} - ${result.message}`);
-          const reply = makeErrorMessage({
-            message: result.msg,
-            worker: this.macaddr,
-            device: data.device,
-            action: data.action,
-            code: result.code,
-            timestamp: new Date().toString()
-          });
-          this.heldMessages.push(reply);
+          if (result && result.code !== "1") {
+            console.error(`ERROR ${mac} ${result.code} - ${result.message}`);
+            const reply = makeErrorMessage({
+              message: result.msg,
+              worker: this.macaddr,
+              device: data.device,
+              action: data.action,
+              code: result.code,
+              timestamp: new Date().toString()
+            });
+            this.heldMessages.push(reply);
+          }
         }
       }
     }
