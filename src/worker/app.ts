@@ -431,10 +431,12 @@ export class App {
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
       if (this.formatMacAddress(plug.device) === mac) {
-        if (data.action === "on") {
+        if (data.action === "on" && plug.state === "off") {
           plug.on();
-        } else {
+        } else if (data.action === "off" && plug.state === "on") {
           plug.off();
+        } else {
+          console.log("action matches plug state");
         }
       }
     });
