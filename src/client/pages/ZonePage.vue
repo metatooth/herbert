@@ -80,6 +80,75 @@
           </div>
         </div>
       </div>
+
+      <div class="card-content">
+        <div class="field is-horizontal">
+          <div class="field-label is-medium">
+            <label class="label">Meters</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-multiple">
+                  <select multiple v-model="meters">
+                    <option
+                      v-for="meter in zone.meters"
+                      :key="meter.device"
+                      :value="meter.device"
+                      >{{ meter.name }}</option
+                    >
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <div class="field is-horizontal">
+          <div class="field-label is-medium">
+            <label class="label">Devices</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-multiple">
+                  <select multiple v-model="devices">
+                    <option
+                      v-for="device in zone.devices"
+                      :key="device.device"
+                      :value="device.device"
+                      >{{ device.name }}</option
+                    >
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <div class="field is-horizontal">
+          <div class="field-label is-medium">
+            <label class="label">Children</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-multiple">
+                  <select multiple v-model="children">
+                    <option v-for="id in zone.children" :key="id" :value="id">{{
+                      lookupZone(id).nickname
+                    }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <zone-detail :zone="zone" :units="settings.units" v-else />
@@ -121,6 +190,9 @@ const ZonePage = Vue.extend({
       lamponleafdiff: 0,
       lampoffleafdiff: 0,
       maxirrigators: 0,
+      meters: [],
+      devices: [],
+      children: [],
       editing: false
     };
   },
@@ -138,6 +210,18 @@ const ZonePage = Vue.extend({
     }
 
     this.maxirrigators = this.zone.maxirrigators;
+
+    this.zone.meters.forEach(m => {
+      this.meters.push(m.device);
+    });
+
+    this.zone.devices.forEach(d => {
+      this.devices.push(d.device);
+    });
+
+    this.zone.children.forEach(c => {
+      this.children.push(c);
+    });
   },
 
   computed: {
@@ -159,7 +243,18 @@ const ZonePage = Vue.extend({
       this.editing = true;
     },
 
+    lookupZone(id: string) {
+      const found = this.zones.filter(z => {
+        return z.id === id;
+      });
+      return found[0];
+    },
+
     save() {
+      console.log("meters", this.meters);
+      console.log("devices", this.devices);
+      console.log("children", this.children);
+
       let lampon = this.lamponleafdiff;
       let lampoff = this.lampoffleafdiff;
       if (this.units === "F") {

@@ -115,7 +115,7 @@
               <font-awesome-icon icon="grip-horizontal" />
             </span>
             <span class="tag has-text-black is-medium">{{
-              zone.nickname
+              lookupZone(child).nickname
             }}</span>
           </div>
         </div>
@@ -220,15 +220,22 @@ const ZoneDetail = Vue.extend({
       });
     },
 
-    deviceClass(device) {
-      return `tag has-background-grey-darker is-medium ${device.textClass}`;
-    },
-
     clickMeter(meter) {
       this.$router.push({
         name: "readings",
         params: { name: meter.name, device: meter.device }
       });
+    },
+
+    deviceClass(device) {
+      return `tag has-background-grey-darker is-medium ${device.textClass}`;
+    },
+
+    lookupZone(id: string) {
+      const found = this.zones.filter(z => {
+        return z.id === id;
+      });
+      return found[0];
     },
 
     ...mapActions("zones", [
