@@ -90,9 +90,9 @@
             <div class="field is-narrow">
               <div class="control">
                 <div class="select is-multiple">
-                  <select multiple v-model="meters">
+                  <select multiple v-model="zonemeters">
                     <option
-                      v-for="meter in zone.meters"
+                      v-for="meter in meters"
                       :key="meter.device"
                       :value="meter.device"
                       >{{ meter.name }}</option
@@ -114,9 +114,9 @@
             <div class="field is-narrow">
               <div class="control">
                 <div class="select is-multiple">
-                  <select multiple v-model="devices">
+                  <select multiple v-model="zonedevices">
                     <option
-                      v-for="device in zone.devices"
+                      v-for="device in devices"
                       :key="device.device"
                       :value="device.device"
                       >{{ device.name }}</option
@@ -138,10 +138,13 @@
             <div class="field is-narrow">
               <div class="control">
                 <div class="select is-multiple">
-                  <select multiple v-model="children">
-                    <option v-for="id in zone.children" :key="id" :value="id">{{
-                      lookupZone(id).nickname
-                    }}</option>
+                  <select multiple v-model="zonechildren">
+                    <option
+                      v-for="zone in zones"
+                      :key="zone.id"
+                      :value="zone.id"
+                      >{{ zone.nickname }}</option
+                    >
                   </select>
                 </div>
               </div>
@@ -190,9 +193,9 @@ const ZonePage = Vue.extend({
       lamponleafdiff: 0,
       lampoffleafdiff: 0,
       maxirrigators: 0,
-      meters: [],
-      devices: [],
-      children: [],
+      zonemeters: [],
+      zonedevices: [],
+      zonechildren: [],
       editing: false
     };
   },
@@ -212,15 +215,15 @@ const ZonePage = Vue.extend({
     this.maxirrigators = this.zone.maxirrigators;
 
     this.zone.meters.forEach(m => {
-      this.meters.push(m.device);
+      this.zonemeters.push(m.device);
     });
 
     this.zone.devices.forEach(d => {
-      this.devices.push(d.device);
+      this.zonedevices.push(d.device);
     });
 
     this.zone.children.forEach(c => {
-      this.children.push(c);
+      this.zonechildren.push(c);
     });
   },
 
@@ -235,7 +238,9 @@ const ZonePage = Vue.extend({
 
     ...mapGetters("settings", ["settings"]),
     ...mapGetters("profiles", ["profiles"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("devices", ["devices"]),
+    ...mapGetters("meters", ["meters"])
   },
 
   methods: {
@@ -243,18 +248,7 @@ const ZonePage = Vue.extend({
       this.editing = true;
     },
 
-    lookupZone(id: string) {
-      const found = this.zones.filter(z => {
-        return z.id === id;
-      });
-      return found[0];
-    },
-
     save() {
-      console.log("meters", this.meters);
-      console.log("devices", this.devices);
-      console.log("children", this.children);
-
       let lampon = this.lamponleafdiff;
       let lampoff = this.lampoffleafdiff;
       if (this.units === "F") {
@@ -268,7 +262,10 @@ const ZonePage = Vue.extend({
         profileid: this.profileid,
         lamponleafdiff: lampon,
         lampoffleafdiff: lampoff,
-        maxirrigators: this.maxirrigators
+        maxirrigators: this.maxirrigators,
+        meters: this.zonemeters,
+        devices: this.zonedevices,
+        children: this.zonechildren
       };
       this.edit(zone);
       this.editing = false;

@@ -26,6 +26,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
+
   const { rows } = await query<Zone>(
     "UPDATE zones SET nickname = $1, profileid = $2, active = $3, maxirrigators = $4, lamponleafdiff = $5, lampoffleafdiff= $6, updatedat = CURRENT_TIMESTAMP WHERE id = $7 RETURNING id",
     [
@@ -38,6 +39,22 @@ router.put("/:id", async (req, res) => {
       id
     ]
   );
+
+  const devices = req.body.devices;
+  devices.push(...req.body.meters);
+
+  await query<Record<string, number>>(
+    "DELETE FROM zone_devices WHERE zoneid = $1",
+    [id]
+  );
+
+  devices.forEach(async dev => {
+    query<Record<string, number>>(
+      "INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)",
+      [id, dev]
+    );
+  });
+
   const zone = await readZone(rows[0].id);
   res.status(200).json(zone);
 });
