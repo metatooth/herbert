@@ -161,18 +161,18 @@ export class App {
       this.switchStatus(plug.status());
     });
 
-    this.plugs.forEach(wyze => {
-      const plug = new WyzeSwitch(this.formatMacAddress(wyze.mac));
+    this.plugs.forEach(plug => {
+      const ws = new WyzeSwitch(this.formatMacAddress(plug.mac));
 
-      if (wyze.conn_state === 0) {
-        plug.state = "disconnected";
-      } else if (wyze.device_params.switch_state === 1) {
-        plug.state = "on";
+      if (plug.conn_state === 0) {
+        ws.state = "disconnected";
+      } else if (plug.device_params.switch_state === 1) {
+        ws.state = "on";
       } else {
-        plug.state = "off";
+        ws.state = "off";
       }
 
-      this.switchStatus(plug);
+      this.switchStatus(ws);
     });
 
     if (this.runTimeout) {
@@ -382,7 +382,6 @@ export class App {
 
       if (plugs.length !== 0) {
         const device = plugs[0];
-        const plug = new WyzeSwitch(this.formatMacAddress(data.device));
 
         console.log(
           "action is",
@@ -391,37 +390,37 @@ export class App {
           device.device_params.switch_state
         );
 
-        if (device) {
-          let result;
-          if (data.action === "on" && device.device_params.switch_state === 0) {
-            console.log("WILL TURN ON");
-            device.device_params["switch_state"] = 1;
-            plug.state = "on";
-            result = await this.wyze.turnOn(device);
-          } else if (
-            data.action === "off" &&
-            device.device_params.switch_state === 1
-          ) {
-            console.log("WILL TURN OFF");
-            device.device_params["switch_state"] = 0;
-            plug.state = "off";
-            result = await this.wyze.turnOff(device);
-          } else {
-            console.log("NO ACTION - matches current state.");
-          }
+        const plug = new WyzeSwitch(this.formatMacAddress(data.device));
 
-          if (result && result.code !== "1") {
-            console.error(`ERROR ${mac} ${result.code} - ${result.message}`);
-            const reply = makeErrorMessage({
-              message: result.msg,
-              worker: this.macaddr,
-              device: data.device,
-              action: data.action,
-              code: result.code,
-              timestamp: new Date().toString()
-            });
-            this.heldMessages.push(reply);
-          }
+        let result;
+        if (data.action === "on" && device.device_params.switch_state === 0) {
+          console.log("WILL TURN ON");
+          device.device_params["switch_state"] = 1;
+          plug.state = "on";
+          result = await this.wyze.turnOn(device);
+        } else if (
+          data.action === "off" &&
+          device.device_params.switch_state === 1
+        ) {
+          console.log("WILL TURN OFF");
+          device.device_params["switch_state"] = 0;
+          plug.state = "off";
+          result = await this.wyze.turnOff(device);
+        } else {
+          console.log("NO ACTION - matches current state.");
+        }
+
+        if (result && result.code !== "1") {
+          console.error(`ERROR ${mac} ${result.code} - ${result.message}`);
+          const reply = makeErrorMessage({
+            message: result.msg,
+            worker: this.macaddr,
+            device: data.device,
+            action: data.action,
+            code: result.code,
+            timestamp: new Date().toString()
+          });
+          this.heldMessages.push(reply);
         }
       }
     }
