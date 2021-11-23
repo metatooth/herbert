@@ -400,7 +400,7 @@ export class App {
             result = await this.wyze.turnOn(device);
           } else if (
             data.action === "off" &&
-              device.device_params.switch_state === 1
+            device.device_params.switch_state === 1
           ) {
             console.log("WILL TURN OFF");
             device.device_params["switch_state"] = 0;
