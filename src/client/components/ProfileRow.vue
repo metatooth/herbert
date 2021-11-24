@@ -416,7 +416,11 @@ const ProfileRow = Vue.extend({
         lampontemperature: ontemp,
         lamponhumidity: this.lamponhumidity,
         lampofftemperature: offtemp,
-        lampoffhumidity: this.lampoffhumidity
+        lampoffhumidity: this.lampoffhumidity,
+        bloweractive: this.bloweractive * 1000,
+        blowercycle: this.blowercycle * 1000,
+        irrigationperday: this.irrigationperday,
+        irrigationduration: this.irrigationduration * 1000
       };
 
       this.edit(profile);
