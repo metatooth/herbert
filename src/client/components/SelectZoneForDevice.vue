@@ -23,12 +23,12 @@ import { mapGetters } from "vuex";
 
 const SelectZoneForDevice = Vue.extend({
   props: {
-    zone: Number
+    zoneid: Number
   },
 
   data() {
     return {
-      selected: this.zone
+      selected: this.zoneid
     };
   },
 
@@ -38,7 +38,6 @@ const SelectZoneForDevice = Vue.extend({
 
   watch: {
     selected(val: string) {
-      console.log("select method", val);
       this.$emit("select-zone", val);
     }
   }

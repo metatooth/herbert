@@ -14,6 +14,9 @@
       </div>
     </td>
     <td>
+      {{ zonename }}
+    </td>
+    <td>
       <span class="tags has-addons" @click="toggle" v-if="!editing">
         <span :class="iconClass">
           <span class="icon">
@@ -31,17 +34,14 @@
         />
       </div>
     </td>
-    <td>
-      <readable :timestamp="new Date(Date.parse(device.updatedat))" />
-    </td>
-    <td>
+    <td class="is-italic">
       <router-link
         :to="{
           name: 'statuses',
           params: { name: device.nickname, device: device.device }
         }"
       >
-        &gt;&gt;&gt;
+        <readable :timestamp="new Date(Date.parse(device.updatedat))" />
       </router-link>
     </td>
     <td>
@@ -60,7 +60,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapActions } from "vuex";
+import { mapActions, mapGetters, mapState } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
@@ -123,7 +123,36 @@ const DeviceRow = Vue.extend({
       return style;
     },
 
-    ...mapState("notifications", ["notifications"])
+    zone() {
+      const found = this.zones.filter(zone => {
+        const devices = zone.devices.filter(device => {
+          return this.device.device === device.device;
+        });
+        return devices.length !== 0;
+      });
+
+      return found.length !== 0 ? found[0] : null;
+    },
+
+    zoneid() {
+      const zone = this.zone;
+
+      if (zone) {
+        return zone.id;
+      }
+      return 0;
+    },
+
+    zonename() {
+      const zone = this.zone;
+      if (zone) {
+        return zone.nickname;
+      }
+      return "";
+    },
+
+    ...mapState("notifications", ["notifications"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   methods: {

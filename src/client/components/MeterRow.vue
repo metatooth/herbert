@@ -17,19 +17,19 @@
       </span>
     </td>
     <td>
+      {{ zonename }}
+    </td>
+    <td>
       <meter-actual :meter="meter" :units="units" />
     </td>
     <td class="is-italic">
-      <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
-    </td>
-    <td class="is-size-5">
       <router-link
         :to="{
           name: 'readings',
           params: { name: meter.nickname, device: meter.device }
         }"
       >
-        &gt;&gt;&gt;
+        <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
       </router-link>
     </td>
     <td class="is-size-5">
@@ -48,7 +48,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapActions } from "vuex";
+import { mapActions, mapGetters } from "vuex";
 
 import EditControls from "@/components/EditControls.vue";
 import MeterActual from "@/components/MeterActual.vue";
@@ -80,6 +80,37 @@ const MeterRow = Vue.extend({
     meter() {
       this.updating = false;
     }
+  },
+
+  computed: {
+    zone() {
+      const found = this.zones.filter(zone => {
+        const meters = zone.meters.filter(meter => {
+          return this.meter.device === meter.device;
+        });
+        return meters.length !== 0;
+      });
+
+      return found.length !== 0 ? found[0] : null;
+    },
+
+    zoneid() {
+      const zone = this.zone;
+      if (zone) {
+        return zone.id;
+      }
+      return 0;
+    },
+
+    zonename() {
+      const zone = this.zone;
+      if (zone) {
+        return zone.nickname;
+      }
+      return "";
+    },
+
+    ...mapGetters("zones", ["zones"])
   },
 
   methods: {
