@@ -13,6 +13,9 @@ import { IrrigationTimer } from "../shared/irrigation-timer";
 import { Clime } from "../shared/clime";
 import { LampTimer } from "../shared/lamp-timer";
 import { TargetTempHumidity } from "../shared/target-temp-humidity";
+import { HiLo } from "../shared/hi-lo";
+import { ConstantVpd } from "../shared/constant-vpd";
+import { vaporPressureDeficit } from "../shared/utils";
 import { zonedTimeToUtc } from "date-fns-tz";
 import {
   makeSendByDeviceIDMessage,
@@ -104,26 +107,42 @@ async function run() {
         zone.profile.blowercycle / 1000
       );
 
+      const delta = lamp.isOn(hour)
+        ? zone.lamponleafdiff
+        : zone.lampoffleafdiff;
+
       let target;
-      let delta;
 
       console.log("active zone", zone.id, zone.nickname);
       console.log("check hour", hour);
+      console.log("control type", zone.profile.controltype);
 
-      if (lamp.isOn(hour)) {
-        console.log("lamps", lamp, "ON");
-        target = new TargetTempHumidity([
+      if (zone.profile.controltype === "HI_LO") {
+        target = new HiLo([
           zone.profile.lampontemperature,
-          zone.profile.lamponhumidity
-        ]);
-        delta = -0.6;
-      } else {
-        console.log("lamps", lamp, "OFF");
-        target = new TargetTempHumidity([
           zone.profile.lampofftemperature,
+          zone.profile.lamponhumidity,
           zone.profile.lampoffhumidity
         ]);
-        delta = 0.6;
+      } else if (zone.profile.controltype === "VPD") {
+        const vpd = vaporPressureDeficit(
+          zone.profile.lampontemperature,
+          delta,
+          zone.profile.lamponhumidity
+        );
+        target = new ConstantVpd([vpd, 100]);
+      } else {
+        if (lamp.isOn(hour)) {
+          target = new TargetTempHumidity([
+            zone.profile.lampontemperature,
+            zone.profile.lamponhumidity
+          ]);
+        } else {
+          target = new TargetTempHumidity([
+            zone.profile.lampofftemperature,
+            zone.profile.lampoffhumidity
+          ]);
+        }
       }
 
       const directives = new AirDirectives(target);

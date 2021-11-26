@@ -40,8 +40,23 @@ router.put("/:id", async (req, res) => {
     ]
   );
 
-  const devices = req.body.devices;
-  devices.push(...req.body.meters);
+  const devices = [];
+
+  req.body.devices.forEach(device => {
+    if (typeof device === "string") {
+      devices.push(device);
+    } else if (typeof device === "object") {
+      devices.push(device.device);
+    }
+  });
+
+  req.body.meters.forEach(meter => {
+    if (typeof meter === "string") {
+      devices.push(meter);
+    } else if (typeof meter === "object") {
+      devices.push(meter.device);
+    }
+  });
 
   await query<Record<string, number>>(
     "DELETE FROM zone_devices WHERE zoneid = $1",

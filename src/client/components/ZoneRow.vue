@@ -160,7 +160,6 @@ const ZoneRow = Vue.extend({
         ...this.zone,
         active: !this.zone.active
       };
-
       this.edit(zone);
     },
 

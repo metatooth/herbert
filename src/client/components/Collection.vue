@@ -212,6 +212,7 @@ const Collection = Vue.extend({
           "Name",
           "Day Start",
           "Duration",
+          "Control Type",
           "Day Temp & RH",
           "Night Temp & RH",
           "Blower",

@@ -31,6 +31,16 @@
       </span>
     </td>
     <td>
+      <select-control-type
+        :controltype="controltype"
+        @select-controltype="selected"
+        v-if="editing"
+      />
+      <span v-else>
+        {{ controltype }}
+      </span>
+    </td>
+    <td>
       <div class="field is-grouped is-grouped-multiline" v-if="editing">
         <div class="control has-icons-left">
           <input
@@ -224,6 +234,7 @@ import Vue from "vue";
 import { mapActions } from "vuex";
 import Target from "@/components/Target.vue";
 import EditControls from "@/components/EditControls.vue";
+import SelectControlType from "@/components/SelectControlType.vue";
 import {
   celsius2fahrenheit,
   celsius2kelvin,
@@ -275,6 +286,7 @@ const ProfileRow = Vue.extend({
       blowercycle: this.profile.blowercycle / 1000,
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
+      controltype: this.profile.controltype,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
       editing: false
     };
@@ -282,6 +294,7 @@ const ProfileRow = Vue.extend({
 
   components: {
     EditControls,
+    SelectControlType,
     Target
   },
 
@@ -380,6 +393,15 @@ const ProfileRow = Vue.extend({
   },
 
   methods: {
+    cancel() {
+      this.editing = false;
+    },
+
+    destroy() {
+      this.remove(this.profile);
+      this.editing = false;
+    },
+
     editable() {
       this.editing = true;
     },
@@ -420,20 +442,16 @@ const ProfileRow = Vue.extend({
         bloweractive: this.bloweractive * 1000,
         blowercycle: this.blowercycle * 1000,
         irrigationperday: this.irrigationperday,
-        irrigationduration: this.irrigationduration * 1000
+        irrigationduration: this.irrigationduration * 1000,
+        controltype: this.controltype
       };
 
       this.edit(profile);
       this.editing = false;
     },
 
-    destroy() {
-      this.remove(this.profile);
-      this.editing = false;
-    },
-
-    cancel() {
-      this.editing = false;
+    selected(val: string) {
+      this.controltype = val;
     },
 
     ...mapActions("profiles", ["edit", "remove"])

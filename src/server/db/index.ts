@@ -33,7 +33,7 @@ export async function readAccount(id: number): Promise<Account> {
 
 export async function readProfile(id: string): Promise<Profile> {
   const { rows } = await query<Profile>(
-    "SELECT id, profile, lampstart, lampduration, lampontemperature, lamponhumidity, lampofftemperature, lampoffhumidity, bloweractive, blowercycle, irrigationperday, irrigationduration, updatedat FROM profiles WHERE id = $1",
+    "SELECT id, profile, lampstart, lampduration, lampontemperature, lamponhumidity, lampofftemperature, lampoffhumidity, bloweractive, blowercycle, irrigationperday, irrigationduration, controltype, updatedat FROM profiles WHERE id = $1",
     [id]
   );
   return rows[0];
