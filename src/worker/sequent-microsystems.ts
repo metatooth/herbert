@@ -9,6 +9,7 @@ export class SequentMicrosystems extends Switch {
     super(device, "SequentMicrosystems");
     this.board = board;
     this.channel = channel;
+    this.status();
   }
 
   public on() {

@@ -13,46 +13,47 @@
                 @keyup.esc="cancel"
               />
             </div>
-            <div class="control">
-              <select-device-type
-                :devicetype="device.devicetype"
-                @select-devicetype="selectdevicetype"
-              />
-            </div>
-            <div class="control">
-              <select-zone-for-device
-                :zoneid="zoneid"
-                @select-zone="selectzone"
-              />
-            </div>
           </div>
         </div>
         <span v-else>{{ device.name }}</span>
       </div>
+
       <p class="subtitle">
         {{ device.device }}
       </p>
+
       <p class="subtitle">
-        {{ zonename }}
+        <select-zone-for-device
+          :zoneid="zoneid"
+          @select-zone="selectzone"
+          v-if="editing"
+        />
+        <span v-else>{{ zonename }}</span>
       </p>
+
       <div class="content">
-        <button class="button" @click="toggle">
+        <div class="control" v-if="editing">
+          <select-device-type
+            :devicetype="device.devicetype"
+            @select-devicetype="selectdevicetype"
+          />
+        </div>
+        <button class="button" @click="toggle" v-else>
           <font-awesome-icon :class="deviceClass" :icon="device.icon" />
           <span>{{ status }}</span>
         </button>
       </div>
       <div class="content">
-        <readable
-          class="is-italic"
-          :timestamp="new Date(Date.parse(device.updatedat))"
-        />
         <router-link
           :to="{
             name: 'statuses',
             params: { name: device.nickname, device: device.device }
           }"
         >
-          &gt;&gt;&gt;
+          <readable
+            class="is-italic"
+            :timestamp="new Date(Date.parse(device.updatedat))"
+          />
         </router-link>
       </div>
       <div class="content">
@@ -72,7 +73,6 @@
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
-import { Notification } from "@/store/notifications/types";
 import Readable from "@/components/Readable.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
@@ -102,13 +102,9 @@ const DeviceTile = Vue.extend({
 
   computed: {
     deviceClass(): string {
-      const found = this.notifications.find((n: Notification) => {
-        return n.id === this.device.device;
-      });
-
       let style;
 
-      if (found || this.status === "disconnected") {
+      if (this.status === "disconnected") {
         style = "icon has-text-danger";
       } else if (this.status === "on") {
         style = "icon has-text-success";
@@ -148,6 +144,7 @@ const DeviceTile = Vue.extend({
 
     zoneid() {
       const zone = this.zone;
+
       if (zone) {
         return zone.id;
       }
@@ -162,7 +159,6 @@ const DeviceTile = Vue.extend({
       return "";
     },
 
-    ...mapGetters("notifications", ["notifications"]),
     ...mapGetters("settings", ["settings"]),
     ...mapGetters("zones", ["zones"])
   },

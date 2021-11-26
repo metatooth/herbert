@@ -161,6 +161,20 @@ export class App {
       this.switchStatus(plug.status());
     });
 
+    this.plugs.forEach(plug => {
+      const ws = new WyzeSwitch(this.formatMacAddress(plug.mac));
+
+      if (plug.conn_state === 0) {
+        ws.state = "disconnected";
+      } else if (plug.device_params.switch_state === 1) {
+        ws.state = "on";
+      } else {
+        ws.state = "off";
+      }
+
+      this.switchStatus(ws);
+    });
+
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
       this.runTimeout = undefined;
@@ -218,17 +232,16 @@ export class App {
     return Promise.resolve(true);
   };
 
-  private initDevices() {
+  private async initDevices() {
     const meters = [];
     const switches = [];
-    const plugs = [];
 
     const devices =
       this.config && this.config.devices && Array.isArray(this.config.devices)
         ? (this.config.devices as ConfigDevice[])
         : ([] as ConfigDevice[]);
 
-    devices.forEach(dev => {
+    devices.forEach(async dev => {
       console.debug("DEVICE", dev);
       const mac = this.formatMacAddress(dev.id);
       if (dev.manufacturer === "WYZE") {
@@ -239,22 +252,7 @@ export class App {
 
         this.wyze = new Wyze(options);
 
-        const wyzes = this.wyze.getDeviceList();
-        wyzes.forEach(async (wyze: WyzeDevice) => {
-          this.plugs.push(wyze);
-
-          const plug = new WyzeSwitch(this.formatMacAddress(wyze.mac));
-
-          if (wyze.conn_state === 0) {
-            plug.state = "disconnected";
-          } else if (wyze.device_params.switch_state === 1) {
-            plug.state = "on";
-          } else {
-            plug.state = "off";
-          }
-
-          plugs.push(plug);
-        });
+        this.plugs = await this.wyze.getDeviceList();
       } else if (dev.manufacturer === "herbert") {
         if (dev.pin) {
           switches.push(new Herbert(mac, parseInt(dev.pin)));
@@ -282,7 +280,7 @@ export class App {
     this.meters = meters;
     this.switches = switches;
 
-    const all = [...this.meters, ...this.switches, ...plugs].map(d => d.device);
+    const all = [...this.meters, ...this.switches].map(d => d.device);
     this.socket.emit("join", {
       room: "workers",
       workerID: this.macaddr,
@@ -350,8 +348,6 @@ export class App {
         console.error("!! ERROR !!", data.payload);
         return;
       }
-
-      console.debug("unhandled socket message", data);
     } catch (e) {
       console.error("socket message error:", e);
     }
@@ -384,24 +380,35 @@ export class App {
         return p.mac === mac;
       });
 
-      const device = plugs[0];
-      const plug = new WyzeSwitch(this.formatMacAddress(data.device));
+      if (plugs.length !== 0) {
+        const device = plugs[0];
 
-      if (device) {
+        console.log(
+          "action is",
+          data.action,
+          " ?? ",
+          device.device_params.switch_state
+        );
+
+        const plug = new WyzeSwitch(this.formatMacAddress(data.device));
+
         let result;
         if (data.action === "on" && device.device_params.switch_state === 0) {
+          console.log("WILL TURN ON");
           device.device_params["switch_state"] = 1;
           plug.state = "on";
           result = await this.wyze.turnOn(device);
-        } else if (device.device_params.switch_state === 1) {
+        } else if (
+          data.action === "off" &&
+          device.device_params.switch_state === 1
+        ) {
+          console.log("WILL TURN OFF");
           device.device_params["switch_state"] = 0;
           plug.state = "off";
           result = await this.wyze.turnOff(device);
         } else {
-          console.info("Action matches current state.");
+          console.log("NO ACTION - matches current state.");
         }
-
-        this.switchStatus(plug);
 
         if (result && result.code !== "1") {
           console.error(`ERROR ${mac} ${result.code} - ${result.message}`);
@@ -423,10 +430,12 @@ export class App {
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
       if (this.formatMacAddress(plug.device) === mac) {
-        if (data.action === "on") {
+        if (data.action === "on" && plug.state === "off") {
           plug.on();
-        } else {
+        } else if (data.action === "off" && plug.state === "on") {
           plug.off();
+        } else {
+          console.log("action matches plug state");
         }
       }
     });

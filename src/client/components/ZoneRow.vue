@@ -8,7 +8,7 @@
     </td>
     <td>
       <device-tag
-        v-for="device in zone.devices"
+        v-for="device in sorted"
         :key="device.device"
         :device="device"
       />
@@ -34,6 +34,7 @@ import DeviceTag from "@/components/DeviceTag.vue";
 import Readable from "@/components/Readable.vue";
 import ZoneActual from "@/components/ZoneActual.vue";
 import ZoneTag from "@/components/ZoneTag.vue";
+import { Device } from "@/store/devices/types";
 import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
@@ -64,6 +65,16 @@ const ZoneRow = Vue.extend({
       } else {
         return "background-color: #7a7a7a";
       }
+    },
+
+    sorted() {
+      const devices = [];
+      this.zone.devices.forEach(d => {
+        devices.push(Object.assign(new Device(), d));
+      });
+      return devices.sort((a, b) => {
+        return a.devicetype > b.devicetype;
+      });
     },
 
     lastupdate() {
@@ -149,7 +160,6 @@ const ZoneRow = Vue.extend({
         ...this.zone,
         active: !this.zone.active
       };
-
       this.edit(zone);
     },
 

@@ -19,9 +19,14 @@ export const mutations: MutationTree<ZonesState> = {
     });
   },
   ADD_METER(state, payload: { zone: Zone; meter: Meter }) {
-    state.zones.find((el: Zone) => {
-      if (el.id === payload.zone.id) {
-        el.meters.push(payload.meter);
+    state.zones.find((zone: Zone) => {
+      if (zone.id === payload.zone.id) {
+        const found = zone.meters.find((m: Meter) => {
+          return m.device === meter;
+        });
+        if (!found) {
+          zone.meters.push(payload.meter);
+        }
       }
     });
   },

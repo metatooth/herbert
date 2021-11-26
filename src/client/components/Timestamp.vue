@@ -14,6 +14,11 @@
     <div class="level-item" v-if="!abbreviated">
       <em>Updated <readable :timestamp="local"/></em>
     </div>
+    <div class="level-item" v-if="!abbreviated">
+      <button class="button" @click="reload">
+        <font-awesome-icon icon="sync" />
+      </button>
+    </div>
   </nav>
 </template>
 
@@ -72,6 +77,10 @@ const Timestamp = Vue.extend({
   },
 
   methods: {
+    reload() {
+      window.location.reload(true);
+    },
+
     zeroes(n: number): string {
       if (n < 10) {
         return `0${n}`;

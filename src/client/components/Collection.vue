@@ -204,14 +204,15 @@ const Collection = Vue.extend({
 
     headings() {
       if (this.isMeter) {
-        return ["Name", "Temp & RH", "Last Ping", "History", "MAC", ""];
+        return ["Name", "Zone?", "Temp & RH", "Last Ping", "MAC", ""];
       } else if (this.isDevice) {
-        return ["Name", "Status & Type", "Last Ping", "History", "MAC", ""];
+        return ["Name", "Zone?", "Status & Type", "Last Ping", "MAC", ""];
       } else if (this.isProfile) {
         return [
           "Name",
           "Day Start",
           "Duration",
+          "Control Type",
           "Day Temp & RH",
           "Night Temp & RH",
           "Blower",

@@ -80,6 +80,78 @@
           </div>
         </div>
       </div>
+
+      <div class="card-content">
+        <div class="field is-horizontal">
+          <div class="field-label is-medium">
+            <label class="label">Meters</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-multiple">
+                  <select multiple v-model="zonemeters">
+                    <option
+                      v-for="meter in meters"
+                      :key="meter.device"
+                      :value="meter.device"
+                      >{{ meter.name }}</option
+                    >
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <div class="field is-horizontal">
+          <div class="field-label is-medium">
+            <label class="label">Devices</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-multiple">
+                  <select multiple v-model="zonedevices">
+                    <option
+                      v-for="device in devices"
+                      :key="device.device"
+                      :value="device.device"
+                      >{{ device.name }}</option
+                    >
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-content">
+        <div class="field is-horizontal">
+          <div class="field-label is-medium">
+            <label class="label">Children</label>
+          </div>
+          <div class="field-body">
+            <div class="field is-narrow">
+              <div class="control">
+                <div class="select is-multiple">
+                  <select multiple v-model="zonechildren">
+                    <option
+                      v-for="zone in zones"
+                      :key="zone.id"
+                      :value="zone.id"
+                      >{{ zone.nickname }}</option
+                    >
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <zone-detail :zone="zone" :units="settings.units" v-else />
@@ -121,6 +193,9 @@ const ZonePage = Vue.extend({
       lamponleafdiff: 0,
       lampoffleafdiff: 0,
       maxirrigators: 0,
+      zonemeters: [],
+      zonedevices: [],
+      zonechildren: [],
       editing: false
     };
   },
@@ -138,6 +213,18 @@ const ZonePage = Vue.extend({
     }
 
     this.maxirrigators = this.zone.maxirrigators;
+
+    this.zone.meters.forEach(m => {
+      this.zonemeters.push(m.device);
+    });
+
+    this.zone.devices.forEach(d => {
+      this.zonedevices.push(d.device);
+    });
+
+    this.zone.children.forEach(c => {
+      this.zonechildren.push(c);
+    });
   },
 
   computed: {
@@ -151,7 +238,9 @@ const ZonePage = Vue.extend({
 
     ...mapGetters("settings", ["settings"]),
     ...mapGetters("profiles", ["profiles"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("devices", ["devices"]),
+    ...mapGetters("meters", ["meters"])
   },
 
   methods: {
@@ -173,7 +262,10 @@ const ZonePage = Vue.extend({
         profileid: this.profileid,
         lamponleafdiff: lampon,
         lampoffleafdiff: lampoff,
-        maxirrigators: this.maxirrigators
+        maxirrigators: this.maxirrigators,
+        meters: this.zonemeters,
+        devices: this.zonedevices,
+        children: this.zonechildren
       };
       this.edit(zone);
       this.editing = false;

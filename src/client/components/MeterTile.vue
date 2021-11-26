@@ -15,23 +15,37 @@
             </div>
           </div>
         </span>
-        <span v-else>{{ meter.name }}</span>
+        <span v-else>
+          {{ meter.name }}
+        </span>
       </p>
       <p class="subtitle">
         {{ meter.device }}
+      </p>
+      <p class="subtitle">
+        <span v-if="editing">
+          <div class="control">
+            <select-zone-for-device
+              :zoneid="zoneid"
+              @select-zone="selectzone"
+            />
+          </div>
+        </span>
+        <span v-else>
+          {{ zonename }}
+        </span>
       </p>
       <div class="content">
         <meter-actual :meter="meter" />
       </div>
       <div class="content">
-        <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
         <router-link
           :to="{
             name: 'readings',
             params: { name: meter.nickname, device: meter.device }
           }"
         >
-          &gt;&gt;&gt;
+          <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
         </router-link>
       </div>
       <div class="content">
@@ -54,6 +68,7 @@ import { Notification } from "@/store/notifications/types";
 import MeterActual from "@/components/MeterActual.vue";
 import Readable from "@/components/Readable.vue";
 import EditControls from "@/components/EditControls.vue";
+import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
 const MeterTile = Vue.extend({
   props: {
@@ -70,7 +85,8 @@ const MeterTile = Vue.extend({
   components: {
     EditControls,
     MeterActual,
-    Readable
+    Readable,
+    SelectZoneForDevice
   },
 
   computed: {
@@ -86,10 +102,49 @@ const MeterTile = Vue.extend({
       return "has-text-success";
     },
 
-    ...mapGetters("notifications", ["notifications"])
+    zone() {
+      const found = this.zones.filter(zone => {
+        const meters = zone.meters.filter(meter => {
+          return this.meter.device === meter.device;
+        });
+        return meters.length !== 0;
+      });
+
+      return found.length !== 0 ? found[0] : null;
+    },
+
+    zoneid() {
+      const zone = this.zone;
+      if (zone) {
+        return zone.id;
+      }
+      return 0;
+    },
+
+    zonename() {
+      const zone = this.zone;
+      if (zone) {
+        return zone.nickname;
+      }
+      return "";
+    },
+
+    ...mapGetters("notifications", ["notifications"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   methods: {
+    cancel() {
+      this.nickname = this.meter.nickname;
+      this.editing = false;
+    },
+
+    destroy() {
+      if (confirm("OK to remove?")) {
+        this.remove(this.meter);
+      }
+    },
+
     editable() {
       this.editing = true;
     },
@@ -102,18 +157,31 @@ const MeterTile = Vue.extend({
       this.editing = false;
     },
 
-    destroy() {
-      if (confirm("OK to remove?")) {
-        this.remove(this.meter);
+    selectzone(zone: number) {
+      const target = this.zones.filter(z => {
+        return zone === z.id;
+      });
+
+      if (target.length !== 0) {
+        const payload = { zone: target[0], device: this.meter.device };
+
+        this.zones.forEach(zone => {
+          zone.meters.forEach(meter => {
+            if (meter.device === this.meter.device) {
+              const doomed = { zone: zone, device: this.meter.device };
+              this.removeDevice(doomed);
+            }
+          });
+
+          if (payload.zone.id === zone.id) {
+            this.addDevice(payload);
+          }
+        });
       }
     },
 
-    cancel() {
-      this.nickname = this.meter.nickname;
-      this.editing = false;
-    },
-
-    ...mapActions("meters", ["edit", "remove"])
+    ...mapActions("meters", ["edit", "remove"]),
+    ...mapActions("zones", ["addDevice", "removeDevice"])
   }
 });
 
