@@ -1,6 +1,7 @@
 import Router from "express-promise-router";
 
-import { createReading, query } from "../db";
+import { createReading, query, readAccount } from "../db";
+import { Reading } from "../../shared/types";
 
 const router = Router();
 
@@ -63,9 +64,30 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const { body } = req;
   const { meter, temperature, humidity, pressure, ts } = body;
-  const dateObj = new Date(ts);
-  await createReading(meter, temperature, humidity, pressure, dateObj);
-  res.status(204).send();
+  console.log("body", body);
+  const observedat = new Date(ts);
+
+  const { rows } = await query<Reading>(
+    "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
+    [meter]
+  );
+
+  if (rows.length !== 0) {
+    const last = observedat.getTime();
+    const curr = new Date(rows[0].timestamp).getTime();
+
+    const account = await readAccount(1);
+
+    if (curr - last > account.reportingperiod) {
+      await createReading(meter, temperature, humidity, pressure, observedat);
+      res.status(204).send();
+    } else {
+      res.status(201).send();
+    }
+  } else {
+    await createReading(meter, temperature, humidity, pressure, observedat);
+    res.status(204).send();
+  }
 });
 
 export default router;
