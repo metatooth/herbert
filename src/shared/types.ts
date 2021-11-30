@@ -6,7 +6,7 @@ export interface Account {
   locale: string;
   timezone: string;
   logo: Uint8Array;
-  controltype: string;
+  reportingperiod: number;
 }
 
 export interface Config {

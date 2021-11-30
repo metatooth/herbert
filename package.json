@@ -1,7 +1,7 @@
 {
   "name": "herbert",
-  "version": "0.30.0",
-  "description": "Control your grow environment.",
+  "version": "0.30.1",
+  "description": "Automation for Agriculture",
   "main": "index.js",
   "engines": {
     "node": "14.16.1"

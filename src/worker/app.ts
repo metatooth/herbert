@@ -222,6 +222,8 @@ export class App {
       this.meters.push(meter);
     }
 
+    console.log("service data", ad.serviceData);
+
     meter.clime.temperature = ad.serviceData.temperature.c;
     meter.clime.delta = 0.6; // WARNING!
     meter.clime.humidity = ad.serviceData.humidity / 100.0;
