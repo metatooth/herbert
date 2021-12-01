@@ -72,7 +72,7 @@ export interface Reading {
   temperature: number;
   humidity: number;
   pressure: number;
-  timestamp: Date;
+  observedat: Date;
 }
 
 export interface Worker {
