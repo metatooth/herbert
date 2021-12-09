@@ -11,20 +11,6 @@ export class BlowerTimer {
   }
 
   isOn(seconds: number): boolean {
-    let result = false;
-
-    console.log(
-      "blower calc",
-      seconds,
-      this.cycle,
-      this.active,
-      seconds % this.cycle
-    );
-
-    if (seconds % this.cycle < this.active) {
-      result = true;
-    }
-
-    return result;
+    return seconds % this.cycle < this.active;
   }
 }
