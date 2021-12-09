@@ -1,8 +1,4 @@
-import {
-  vaporPressureAir,
-  vaporPressureDeficit,
-  saturatedVaporPressure
-} from "../shared/utils";
+import { vaporPressureDeficit } from "../shared/utils";
 
 export class Environment {
   temp: number;
@@ -38,18 +34,7 @@ export class Environment {
     delta: number,
     humidity: number
   ): Map<string, boolean> {
-    const sat = saturatedVaporPressure(temperature - delta);
-    const air = vaporPressureAir(temperature, humidity);
     const deficit = vaporPressureDeficit(temperature, delta, humidity);
-
-    console.info(`TARGET TEMP ${this.temp.toFixed(1)} C`);
-    console.info(`ACTUAL TEMP ${temperature.toFixed(1)} C`);
-    console.info(`TARGET RH ${this.humidity.toFixed(2)}`);
-    console.info(`ACTUAL RH ${humidity.toFixed(2)}`);
-    console.debug(`CALC VPsat ${sat.toFixed(0)} pascals`);
-    console.debug(`CALC VPair ${air.toFixed(0)} pascals`);
-    console.info(`TARGET VPd ${this.vpd.toFixed(0)} pascals`);
-    console.info(`ACTUAL VPd ${deficit.toFixed(0)} pascals`);
 
     const systems = new Map([
       ["heat", false],
