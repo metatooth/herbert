@@ -43,17 +43,18 @@ afterEach(() => {
 test("does run", async () => {
   app.macaddr = "98765";
   app.inet = "172.10.10.10";
-  await app.init();
-  app.run().then(() => {
-    expect(true).toBe(true);
+  app.init().then(() => {
+    app.run().then(() => {
+      expect(true).toBe(true);
+    });
   });
 });
 
-test("successfully initializes", () => {
+test("successfully initializes", async () => {
   app.macaddr = "123456";
   app.inet = "172.20.20.20";
 
-  return app.init().then(() => {
+  app.init().then(() => {
     expect(true).toBe(true);
   });
 });
