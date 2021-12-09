@@ -11,7 +11,7 @@ if (role === "client") {
     console.log(`Herbert ${role} listing at ${port}`);
   });
 } else if (role === "socket-server") {
-  process.env.API_PORT = process.env.PORT;
+  process.env.WSS_PORT = process.env.PORT;
   require("./dist/socket-server/main");
 } else {
   process.env.API_PORT = process.env.PORT;
