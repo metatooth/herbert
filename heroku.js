@@ -17,5 +17,6 @@ if (role === "client") {
 } else {
   process.env.API_PORT = process.env.PORT;
   console.log(`Herbert Server listening on ${process.env.API_PORT}`);
+  console.log("trivial change");
   require("./dist/server/main");
 }
