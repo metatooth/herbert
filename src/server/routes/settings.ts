@@ -35,7 +35,7 @@ router.put("/", async (req, res) => {
     );
   } else {
     await query(
-      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, interval = $4, locale = $5, timezone = $6, title = $7, openweather = $8, cityname = $9, statecode = $10, reportingpeiod = $11, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
+      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, interval = $4, locale = $5, timezone = $6, title = $7, openweather = $8, cityname = $9, statecode = $10, reportingperiod = $11, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
       [
         req.body.units,
         req.body.refresh,
