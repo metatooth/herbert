@@ -151,7 +151,7 @@ export class HerbertSocket {
 
   private async processMessage(msg: AnySocketMessage) {
     console.log("process message", msg);
-    
+
     if (messageIsFrom(makeMeterStatusMessage, msg)) {
       await this.handleMeterStatusMsg(msg.payload);
       return;

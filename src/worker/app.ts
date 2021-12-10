@@ -87,10 +87,6 @@ export class App {
   }
 
   public async init(): Promise<void> {
-    console.info("=====================================");
-    console.info("== Herbert Worker = Starting up... ==");
-    console.info("=====================================");
-
     const interfaces = networkInterfaces();
 
     let net;
@@ -104,8 +100,6 @@ export class App {
       this.macaddr = net[0]["mac"];
       this.inet = net[0]["address"];
     }
-
-    console.info("device network info", this.macaddr, this.inet);
 
     await this.createSocket();
 
@@ -125,14 +119,12 @@ export class App {
   }
 
   public readonly run = async (): Promise<void> => {
-    console.info("Starting run...");
+    console.info("RUN...");
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
 
     this.workerStatus();
-
-    console.debug("run with config", this.config);
 
     const polling: number = 1000 * (this.config.polling || 5);
     const interval: number = 1000 * (this.config.interval || 30);
@@ -161,6 +153,8 @@ export class App {
       this.switchStatus(plug.status());
     });
 
+    this.plugs = await this.wyze.getDeviceList();
+
     this.plugs.forEach(plug => {
       const ws = new WyzeSwitch(this.formatMacAddress(plug.mac));
 
@@ -180,9 +174,8 @@ export class App {
       this.runTimeout = undefined;
     }
 
-    console.info("Set timeout", interval);
     this.runTimeout = setTimeout(this.run, interval);
-    console.info("Done.");
+    console.info("Done. Run again in", interval, "ms");
   };
 
   public stop() {
@@ -222,8 +215,6 @@ export class App {
       this.meters.push(meter);
     }
 
-    console.log("service data", ad.serviceData);
-
     meter.clime.temperature = ad.serviceData.temperature.c;
     meter.clime.delta = 0.6; // WARNING!
     meter.clime.humidity = ad.serviceData.humidity / 100.0;
@@ -244,7 +235,6 @@ export class App {
         : ([] as ConfigDevice[]);
 
     devices.forEach(async dev => {
-      console.debug("DEVICE", dev);
       const mac = this.formatMacAddress(dev.id);
       if (dev.manufacturer === "WYZE") {
         const options = {
@@ -339,10 +329,8 @@ export class App {
       }
 
       if (messageIsFrom(makeCommandMessage, data)) {
-        console.info("!! ACTION !!", data.payload);
         await this.updateWYZE(data.payload);
         this.updateSwitches(data.payload);
-        console.info("Done.");
         return;
       }
 
@@ -385,18 +373,10 @@ export class App {
       if (plugs.length !== 0) {
         const device = plugs[0];
 
-        console.log(
-          "action is",
-          data.action,
-          " ?? ",
-          device.device_params.switch_state
-        );
-
         const plug = new WyzeSwitch(this.formatMacAddress(data.device));
 
         let result;
         if (data.action === "on" && device.device_params.switch_state === 0) {
-          console.log("WILL TURN ON");
           device.device_params["switch_state"] = 1;
           plug.state = "on";
           result = await this.wyze.turnOn(device);
@@ -404,12 +384,9 @@ export class App {
           data.action === "off" &&
           device.device_params.switch_state === 1
         ) {
-          console.log("WILL TURN OFF");
           device.device_params["switch_state"] = 0;
           plug.state = "off";
           result = await this.wyze.turnOff(device);
-        } else {
-          console.log("NO ACTION - matches current state.");
         }
 
         if (result && result.code !== "1") {
@@ -436,8 +413,6 @@ export class App {
           plug.on();
         } else if (data.action === "off" && plug.state === "on") {
           plug.off();
-        } else {
-          console.log("action matches plug state");
         }
       }
     });
