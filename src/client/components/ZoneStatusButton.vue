@@ -48,8 +48,6 @@ const ZoneStatusButton = Vue.extend({
         ...this.zone,
         active: this.active
       };
-      console.log("edit zone", zone);
-
       this.edit(zone);
     },
 

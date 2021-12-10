@@ -157,13 +157,8 @@ const Collection = Vue.extend({
           return el.device.match(this.filter);
         }
 
-        console.log("not nickname or device");
-        console.log(typeof el.id, el.id);
-        console.log(typeof this.filter, this.filter);
-
         if (el.id) {
           if (typeof el.id === "number" && this.filter !== "") {
-            console.log("will search for", parseInt(this.filter));
             return el.id === parseInt(this.filter);
           }
         }
