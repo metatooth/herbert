@@ -16,7 +16,7 @@ const getSocketClient = () => {
 
 export const sendSocketMessage = (msg: AnySocketMessage) => {
   try {
-    console.log("socket url", getSocketUrl());
+    console.log("socket url", getSocketURL());
     const ws = getSocketClient();
     ws.emit("message", msg);
     console.log("did emit", msg);
