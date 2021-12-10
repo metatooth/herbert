@@ -12,8 +12,10 @@ if (role === "client") {
   });
 } else if (role === "socket-server") {
   process.env.WSS_PORT = process.env.PORT;
+  console.log(`Herbert Socket Server listening on ${process.env.WSS_PORT}`);
   require("./dist/socket-server/main");
 } else {
   process.env.API_PORT = process.env.PORT;
+  console.log(`Herbert Server listening on ${process.env.API_PORT}`);
   require("./dist/server/main");
 }
