@@ -17,6 +17,7 @@ const getSocketClient = () => {
 export const sendSocketMessage = (msg: AnySocketMessage) => {
   try {
     const ws = getSocketClient();
+    console.log("THIS SOCKET", ws);
     ws.emit("message", msg);
   } catch (e) {
     console.error(e.message);
