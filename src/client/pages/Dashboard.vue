@@ -85,6 +85,7 @@ const Dashboard = Vue.extend({
 
       this.ts = new Date();
 
+      console.log("set timeout for refresh", this.settings.refresh);
       setTimeout(this.refresh, this.settings.refresh);
     },
 
