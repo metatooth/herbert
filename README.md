@@ -7,9 +7,10 @@ An environment control system for Raspberry Pi, SwitchBot Meter, and WYZE PLUG.
 Using Ubuntu 21.10 or Raspberry Pi OS Lite 5.10 2021-05-07
 
 ```
-$ sudo apt remove npm nodejs
+$ sudo apt-get remove npm nodejs
 $ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 $ sudo apt-get install -y nodejs
+$ sudo apt-get install -y build-essential
 $ sudo apt-get install -y bluetooth bluez libbluetooth-dev libudev-dev # needed for worker role only 
 $ git clone https://github.com/metatooth/herbert.git
 ```
