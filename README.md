@@ -212,4 +212,4 @@ make logs
 
 ## License
 
-Copyright 2021 Metatooth LLC. See the [LICENSE](LICENSE).
+Copyright 2022 Metatooth LLC. See the [LICENSE](LICENSE).
