@@ -28,6 +28,8 @@ import {
   faHistory,
   faLightbulb,
   faList,
+  faLock,
+  faLockOpen,
   faMoon,
   faPencilAlt,
   faPlus,
@@ -72,6 +74,8 @@ library.add(faGripVertical);
 library.add(faHistory);
 library.add(faLightbulb);
 library.add(faList);
+library.add(faLock);
+library.add(faLockOpen);
 library.add(faMoon);
 library.add(faPencilAlt);
 library.add(faPlus);

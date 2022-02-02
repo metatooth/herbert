@@ -50,6 +50,7 @@
       </div>
       <div class="content">
         <edit-controls
+          v-if="!locked"
           @on-edit="editable"
           @on-save="save"
           @on-destroy="destroy"
@@ -72,6 +73,7 @@ import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
 const MeterTile = Vue.extend({
   props: {
+    locked: Boolean,
     meter: Meter
   },
 

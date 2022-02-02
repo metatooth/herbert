@@ -1,5 +1,10 @@
 <template>
-  <button class="button" :class="deviceClass" @click="toggle">
+  <button
+    class="button"
+    :disabled="locked"
+    :class="deviceClass"
+    @click="toggle"
+  >
     <span class="icon">
       <font-awesome-icon :icon="deviceIcon" />
     </span>
@@ -13,7 +18,8 @@ import { Device } from "@/store/devices/types";
 
 const DeviceTag = Vue.extend({
   props: {
-    device: Device
+    device: Device,
+    locked: Boolean
   },
 
   data() {

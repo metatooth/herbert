@@ -6,7 +6,11 @@ export interface Account {
   locale: string;
   timezone: string;
   logo: Uint8Array;
+  openweather: string;
+  cityname: string;
+  statecode: string;
   reportingperiod: number;
+  pin: number;
 }
 
 export interface Config {

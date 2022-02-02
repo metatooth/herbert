@@ -220,6 +220,7 @@
     </td>
     <td>
       <edit-controls
+        v-if="!locked"
         @on-edit="editable"
         @on-save="save"
         @on-destroy="destroy"
@@ -246,6 +247,7 @@ import { Profile } from "@/store/profiles/types";
 
 const ProfileRow = Vue.extend({
   props: {
+    locked: Boolean,
     profile: Profile,
     units: String
   },

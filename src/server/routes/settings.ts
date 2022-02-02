@@ -17,7 +17,7 @@ router.put("/", async (req, res) => {
     console.log("IMAGE", arr[0]);
     console.log("DATA", arr[1]);
     await query(
-      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, interval = $4, locale = $5, timezone = $6, title = $7, logo = decode($8, 'base64'), openweather = $9, cityname = $10, statecode = $11, reportingperiod = $12, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
+      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, interval = $4, locale = $5, timezone = $6, title = $7, logo = decode($8, 'base64'), openweather = $9, cityname = $10, statecode = $11, reportingperiod = $12, pin = $13, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
       [
         req.body.units,
         req.body.refresh,
@@ -30,12 +30,13 @@ router.put("/", async (req, res) => {
         req.body.openweather,
         req.body.cityname,
         req.body.statecode,
-        req.body.reportingperiod
+        req.body.reportingperiod,
+        req.body.pin
       ]
     );
   } else {
     await query(
-      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, interval = $4, locale = $5, timezone = $6, title = $7, openweather = $8, cityname = $9, statecode = $10, reportingperiod = $11, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
+      "UPDATE accounts SET units = $1, refresh = $2, timeout = $3, interval = $4, locale = $5, timezone = $6, title = $7, openweather = $8, cityname = $9, statecode = $10, reportingperiod = $11, pin = $12, updatedat = CURRENT_TIMESTAMP, deleted = false WHERE id = 1",
       [
         req.body.units,
         req.body.refresh,
@@ -47,7 +48,8 @@ router.put("/", async (req, res) => {
         req.body.openweather,
         req.body.cityname,
         req.body.statecode,
-        req.body.reportingperiod
+        req.body.reportingperiod,
+        req.body.pin
       ]
     );
   }

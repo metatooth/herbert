@@ -1,5 +1,10 @@
 <template>
-  <button class="button" :class="statusClass" @click="toggle">
+  <button
+    class="button"
+    :disabled="locked"
+    :class="statusClass"
+    @click="toggle"
+  >
     <span class="icon">
       <font-awesome-icon :icon="statusIcon" />
     </span>
@@ -14,6 +19,7 @@ import { Zone } from "@/store/zones/types";
 
 const ZoneStatusButton = Vue.extend({
   props: {
+    locked: Boolean,
     zone: Zone
   },
 

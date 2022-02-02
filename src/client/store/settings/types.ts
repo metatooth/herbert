@@ -11,6 +11,8 @@ export class Settings {
   openweather: string;
   cityname: string;
   statecode: string;
+  reportingperiod: number;
+  pin: number;
   createdat: Date;
   updatedat: Date;
   deleted: boolean;
@@ -22,6 +24,7 @@ export class Settings {
     this.refresh = 30000;
     this.timeout = 300000;
     this.interval = 30000;
+    this.reportingperiod = 60000;
     this.locale = "us_EN";
     this.timezone = "America/New_York";
     this.openweather = "";

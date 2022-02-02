@@ -223,6 +223,7 @@
       </div>
       <div class="content">
         <edit-controls
+          v-if="!locked"
           @on-edit="editable"
           @on-save="save"
           @on-destroy="destroy"
@@ -249,6 +250,7 @@ import Readable from "@/components/Readable.vue";
 
 const ProfileTile = Vue.extend({
   props: {
+    locked: Boolean,
     profile: Profile,
     units: String
   },

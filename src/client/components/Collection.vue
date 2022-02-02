@@ -24,9 +24,19 @@
       </div>
     </nav>
 
-    <narrow-table v-if="single && table" :items="activeSet" :type="type" />
+    <narrow-table
+      v-if="single && table"
+      :items="activeSet"
+      :type="type"
+      :locked="locked"
+    />
 
-    <single-column v-if="single && !table" :items="activeSet" :type="type" />
+    <single-column
+      v-if="single && !table"
+      :items="activeSet"
+      :type="type"
+      :locked="locked"
+    />
 
     <three-columns
       v-if="!single && !table"
@@ -34,6 +44,7 @@
       :middle="middle"
       :right="right"
       :type="type"
+      :locked="locked"
     />
 
     <full-table
@@ -41,9 +52,10 @@
       :headings="headings"
       :items="activeSet"
       :type="type"
+      :locked="locked"
     />
 
-    <div class="box" v-if="allowed">
+    <div class="box" v-if="allowed && !locked">
       <p class="title">
         <add-controls @on-add="addable" @on-save="save" @on-cancel="cancel" />
       </p>
@@ -83,6 +95,7 @@ import { Zone } from "@/store/zones/types.ts";
 const Collection = Vue.extend({
   props: {
     filter: String,
+    locked: Boolean,
     type: String
   },
 

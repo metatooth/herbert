@@ -10,6 +10,7 @@ import { Herbert } from "./herbert";
 import { SequentMicrosystems } from "./sequent-microsystems";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
+import { ThermoPro } from "./thermo-pro";
 import {
   AnySocketMessage,
   CommandPayload,
@@ -78,7 +79,6 @@ export class App {
   inet = "";
   heldMessages: AnySocketMessage[] = [];
   wyze?: Wyze;
-  switchbot: Switchbot | undefined;
   runTimeout: NodeJS.Timeout | undefined;
 
   public constructor() {
@@ -92,8 +92,12 @@ export class App {
     let net;
     if (interfaces["wlan0"]) {
       net = interfaces["wlan0"];
-    } else {
+    } else if (interfaces["eth0"]) {
       net = interfaces["eth0"];
+    } else if (interfaces["wlo1"]) {
+      net = interfaces["wlo1"];
+    } else {
+      console.error("Undefined interface!");
     }
 
     if (net && net.length) {
@@ -113,6 +117,7 @@ export class App {
           worker: this.macaddr,
           inet: this.inet
         });
+        console.log("send this message", msg);
         this.send(msg);
       }, 2000);
     });
@@ -135,7 +140,8 @@ export class App {
       switchbot.startScan();
       switchbot.wait(polling);
       switchbot.stopScan();
-      this.switchbot = switchbot;
+
+      const thermopro = new ThermoPro();
     }
 
     this.meters.forEach(meter => {
@@ -153,7 +159,9 @@ export class App {
       this.switchStatus(plug.status());
     });
 
-    this.plugs = await this.wyze.getDeviceList();
+    if (this.wyze) {
+      this.plugs = await this.wyze.getDeviceList();
+    }
 
     this.plugs.forEach(plug => {
       const ws = new WyzeSwitch(this.formatMacAddress(plug.mac));
@@ -175,18 +183,13 @@ export class App {
     }
 
     this.runTimeout = setTimeout(this.run, interval);
-    console.info("Done. Run again in", interval, "ms");
+    console.info("Done. Run again in", interval / 1000, "seconds.");
   };
 
   public stop() {
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
       this.runTimeout = undefined;
-    }
-
-    if (this.switchbot) {
-      this.switchbot.stopScan();
-      this.switchbot.onadvertisement = undefined;
     }
 
     if (this.socket) {
@@ -243,8 +246,6 @@ export class App {
         };
 
         this.wyze = new Wyze(options);
-
-        this.plugs = await this.wyze.getDeviceList();
       } else if (dev.manufacturer === "herbert") {
         if (dev.pin) {
           switches.push(new Herbert(mac, parseInt(dev.pin)));
@@ -373,7 +374,10 @@ export class App {
       if (plugs.length !== 0) {
         const device = plugs[0];
 
-        const plug = new WyzeSwitch(this.formatMacAddress(data.device));
+        const plug = new WyzeSwitch(mac);
+
+        console.log("update wyze", mac);
+        console.log(data.action, device.device_params.switch_state);
 
         let result;
         if (data.action === "on" && device.device_params.switch_state === 0) {
@@ -388,6 +392,8 @@ export class App {
           plug.state = "off";
           result = await this.wyze.turnOff(device);
         }
+
+        console.log("result", result);
 
         if (result && result.code !== "1") {
           console.error(`ERROR ${mac} ${result.code} - ${result.message}`);

@@ -10,7 +10,7 @@ import Vue from "vue";
 
 const Button = Vue.extend({
   props: {
-    show: Boolean,
+    show: { type: Boolean, default: true },
     callback: Function,
     label: String,
     icon: { type: String, default: "cannabis" },
