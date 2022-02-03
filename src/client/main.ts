@@ -1,6 +1,7 @@
 import "@/assets/main.scss";
 
 import Vue from "vue";
+import VueCookies from "vue-cookies";
 
 import router from "@/router";
 import store from "@/store";
@@ -99,6 +100,8 @@ library.add(faUpload);
 library.add(faWind);
 
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
+
+Vue.use(VueCookies);
 
 Vue.config.productionTip = false;
 

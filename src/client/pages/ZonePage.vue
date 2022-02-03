@@ -160,7 +160,7 @@
       <div class="card-footer">
         <div class="card-footer-item">
           <edit-controls
-            v-if="locked"
+            v-if="!locked"
             @on-edit="editable"
             @on-save="save"
             @on-destroy="destroy"

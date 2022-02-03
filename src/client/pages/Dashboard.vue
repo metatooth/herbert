@@ -96,6 +96,11 @@ const Dashboard = Vue.extend({
   },
 
   mounted() {
+    const locked = this.$cookies.get("locked");
+    console.log("cookie locked", locked);
+    this.locked = (locked === "true");
+    console.log("this locked", this.locked);
+
     this.refresh();
   },
 
@@ -144,6 +149,7 @@ const Dashboard = Vue.extend({
           this.locked = false;
         }
       }
+      this.$cookies.set("locked", this.locked);
     },
 
     ...mapActions([
