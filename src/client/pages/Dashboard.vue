@@ -98,7 +98,7 @@ const Dashboard = Vue.extend({
   mounted() {
     const locked = this.$cookies.get("locked");
     console.log("cookie locked", locked);
-    this.locked = (locked === "true");
+    this.locked = locked === "true";
     console.log("this locked", this.locked);
 
     this.refresh();

@@ -15,7 +15,16 @@
             </div>
           </div>
         </span>
-        <span v-else>{{ profile.profile }}</span>
+        <span v-else>{{ name }}</span>
+      </div>
+      <div class="subtitle">
+        <span v-if="editing">
+          <select-control-type
+            :controltype="controltype"
+            @select-controltype="selected"
+          />
+        </span>
+        <span v-else>{{ controltype }}</span>
       </div>
       <div v-if="editing" class="content">
         <div class="field is-grouped">
@@ -166,14 +175,14 @@
         <div class="field is-grouped is-grouped-multiline">
           <target
             icon="thermometer-half"
-            :value="dayTemperature"
+            :value="parseFloat(lampontemperature)"
             units="°"
             size="small"
             color="#ffe08a"
           />
           <target
             icon="tint"
-            :value="dayHumidity"
+            :value="parseFloat(lamponhumidity)"
             units="%"
             size="small"
             color="#ffe08a"
@@ -183,14 +192,14 @@
         <div class="field is-grouped is-grouped-multiline">
           <target
             icon="thermometer-half"
-            :value="nightTemperature"
+            :value="parseFloat(lampofftemperature)"
             units="°"
             size="small"
             color="#7a7a7a"
           />
           <target
             icon="tint"
-            :value="nightHumidity"
+            :value="parseFloat(lampoffhumidity)"
             units="%"
             size="small"
             color="#7a7a7a"
@@ -247,6 +256,7 @@ import { Profile } from "@/store/profiles/types";
 import EditControls from "@/components/EditControls.vue";
 import Target from "@/components/Target.vue";
 import Readable from "@/components/Readable.vue";
+import SelectControlType from "@/components/SelectControlType.vue";
 
 const ProfileTile = Vue.extend({
   props: {
@@ -257,8 +267,9 @@ const ProfileTile = Vue.extend({
 
   components: {
     EditControls,
-    Target,
-    Readable
+    Readable,
+    SelectControlType,
+    Target
   },
 
   data() {
@@ -274,8 +285,8 @@ const ProfileTile = Vue.extend({
       hourString = hourInt.toString();
     }
 
-    let lampon = this.profile.lampontemperature;
-    let lampoff = this.profile.lampofftemperature;
+    let lampon = parseFloat(this.profile.lampontemperature);
+    let lampoff = parseFloat(this.profile.lampofftemperature);
 
     if (this.units === "F") {
       lampon = celsius2fahrenheit(lampon);
@@ -285,8 +296,16 @@ const ProfileTile = Vue.extend({
       lampoff = celsius2kelvin(lampoff);
     }
 
+    console.log(
+      "lampon profile",
+      this.profile.lampontemperature,
+      typeof this.lampontemperature
+    );
+    console.log("lampon", lampon, typeof lampon);
+
     return {
       name: this.profile.profile,
+      controltype: this.profile.controltype,
       lampstart: `${hourString}:${start[1]}:00`,
       lampduration: this.profile.lampduration["hours"],
       lampontemperature: lampon,
@@ -304,16 +323,16 @@ const ProfileTile = Vue.extend({
 
   computed: {
     durationWithUnits(): string {
-      return this.profile.lampduration["hours"] + "hrs";
+      return this.lampduration + "hrs";
     },
 
     lamponMinute(): string {
-      const start = this.profile.lampstart.split(":");
+      const start = this.lampstart.split(":");
       return start[1];
     },
 
     lamponHour(): string {
-      const start = this.profile.lampstart.split(":");
+      const start = this.lampstart.split(":");
       const hour = parseInt(start[0]);
 
       if (hour < 0) {
@@ -323,34 +342,6 @@ const ProfileTile = Vue.extend({
       } else {
         return hour.toString();
       }
-    },
-
-    dayTemperature(): number {
-      if (this.units === "F") {
-        return celsius2fahrenheit(this.profile.lampontemperature);
-      } else if (this.units === "K") {
-        return celsius2kelvin(this.profile.lampontemperature);
-      }
-
-      return this.profile.lampontemperature;
-    },
-
-    nightTemperature(): number {
-      if (this.units === "F") {
-        return celsius2fahrenheit(this.profile.lampofftemperature);
-      } else if (this.units === "K") {
-        return celsius2kelvin(this.profile.lampofftemperature);
-      }
-
-      return this.profile.lampofftemperature;
-    },
-
-    dayHumidity(): number {
-      return this.profile.lamponhumidity;
-    },
-
-    nightHumidity(): number {
-      return this.profile.lampoffhumidity;
     },
 
     lampMin(): number {
@@ -395,8 +386,17 @@ const ProfileTile = Vue.extend({
         hourString = hourInt.toString();
       }
 
-      let ontemp = this.lampontemperature;
-      let offtemp = this.lampofftemperature;
+      let ontemp = parseFloat(this.lampontemperature);
+      let offtemp = parseFloat(this.lampofftemperature);
+
+      console.log(
+        "lamp on",
+        this.lampontemperature,
+        typeof this.lampontemperature
+      );
+      console.log("lamp on", ontemp, typeof ontemp);
+      console.log("this units", this.units);
+
       if (this.units === "F") {
         ontemp = fahrenheit2celsius(ontemp);
         offtemp = fahrenheit2celsius(offtemp);
@@ -405,9 +405,12 @@ const ProfileTile = Vue.extend({
         offtemp = kelvin2celsius(offtemp);
       }
 
+      console.log("lampon", ontemp);
+
       const profile = {
         id: this.profile.id,
         profile: this.name,
+        controltype: this.controltype,
         lampstart: `${hourString}:${start[1]}:00`,
         lampduration: `${this.lampduration} hours`,
         lampontemperature: ontemp,
@@ -422,6 +425,10 @@ const ProfileTile = Vue.extend({
 
       this.edit(profile);
       this.editing = false;
+    },
+
+    selected(val: string) {
+      this.controltype = val;
     },
 
     destroy() {

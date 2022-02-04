@@ -32,12 +32,11 @@
       </p>
 
       <div class="content">
-        <div class="control" v-if="editing">
-          <select-device-type
-            :devicetype="device.devicetype"
-            @select-devicetype="selectdevicetype"
-          />
-        </div>
+        <select-device-type
+          v-if="editing"
+          :devicetype="device.devicetype"
+          @select-devicetype="selectdevicetype"
+        />
         <button class="button" :disabled="locked" @click="toggle" v-else>
           <font-awesome-icon :class="deviceClass" :icon="device.icon" />
           <span>{{ status }}</span>
