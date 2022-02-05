@@ -11,7 +11,7 @@
       <div class="copyright has-text-centered is-size-7">
         <p>
           {{ appVersion }} &#169;
-          <a href="https://metatooth.com">Metatooth</a> 2021
+          <a href="https://metatooth.com">Metatooth</a> 2022
         </p>
       </div>
     </footer>
