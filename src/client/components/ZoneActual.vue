@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span v-if="zone.meters.length > 0">
     <span class="title" :style="temperatureStyle">
       {{ temperature.toFixed(0) }}&#176;
     </span>
