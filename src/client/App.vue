@@ -3,7 +3,7 @@
     <router-view></router-view>
     <footer>
       <a
-        href="https://github.com/metatooth/herbert"
+        href="https://growherbert.com"
         class="content has-text-centered"
       >
         <p>Powered by <img src="./assets/images/logo.png" /><br /></p>
