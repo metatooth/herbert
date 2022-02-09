@@ -1,6 +1,6 @@
 {
   "name": "herbert",
-  "version": "0.30.1",
+  "version": "0.31.o",
   "description": "Automation for Horticulture",
   "main": "index.js",
   "engines": {
