@@ -1,16 +1,17 @@
 # Herbert
 
-An environment control system with Raspiberry Pi, SwitchBot, and WYZE.
+An environment control system for Raspberry Pi, SwitchBot Meter, and WYZE PLUG.
 
 ## Getting Started
 
-Using Ubuntu 20.04 or Raspberry Pi OS Lite 5.10 2021-05-07
+Using Ubuntu 21.10 or Raspberry Pi OS Lite 5.10 2021-05-07
 
 ```
-$ sudo apt remove npm nodejs
+$ sudo apt-get remove npm nodejs
 $ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 $ sudo apt-get install -y nodejs
-$ sudo apt-get install -y git bluetooth bluez libbluetooth-dev libudev-dev
+$ sudo apt-get install -y build-essential
+$ sudo apt-get install -y bluetooth bluez libbluetooth-dev libudev-dev # needed for worker role only 
 $ git clone https://github.com/metatooth/herbert.git
 ```
 
@@ -211,4 +212,4 @@ make logs
 
 ## License
 
-Copyright 2021 Metatooth LLC. See the [LICENSE](LICENSE).
+Copyright 2022 Metatooth LLC. See the [LICENSE](LICENSE).
