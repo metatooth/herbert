@@ -16,7 +16,7 @@
       apt:
         update_cache: yes
         state: latest
-        name: ['bluetooth', 'bluez', 'git', 'gcc', 'g++', 'libbluetooth-dev', 'libudev-dev', 'lirc', 'make']
+        name: ['motion', 'bluetooth', 'bluez', 'git', 'gcc', 'g++', 'libbluetooth-dev', 'libudev-dev', 'lirc', 'make']
 
     - name: Clone 8relind-rpi
       git:
@@ -79,7 +79,6 @@
       file:
         path: '{{ appDir }}'
         state: directory
-
     - name: Create {{ appDir }}/dist
       file:
         path: '{{ appDir }}/dist'
