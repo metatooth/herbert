@@ -218,13 +218,13 @@ const Collection = Vue.extend({
       } else if (this.isProfile) {
         return [
           "Name",
-          "Day Start",
+          "Start",
           "Duration",
-          "Control Type",
-          "Day Temp & RH",
-          "Night Temp & RH",
+          "Type",
+          "Day",
+          "Night",
           "Blower",
-          "Irrigation",
+          "Water",
           ""
         ];
       } else if (this.isZone) {

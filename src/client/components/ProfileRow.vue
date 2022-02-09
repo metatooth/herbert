@@ -78,6 +78,7 @@
           units="°"
           size="small"
           color="#ffe08a"
+          simple="true"
         />
         <target
           icon="tint"
@@ -86,6 +87,7 @@
           units="%"
           size="small"
           color="#ffe08a"
+          simple="true"
         />
       </span>
     </td>
@@ -127,6 +129,7 @@
           units="°"
           size="small"
           color="#7a7a7a"
+          simple="true"
         />
         <target
           icon="tint"
@@ -135,6 +138,7 @@
           units="%"
           size="small"
           color="#7a7a7a"
+          simple="true"
         />
       </span>
     </td>
@@ -169,9 +173,6 @@
       </div>
 
       <div class="tags has-addons" v-else>
-        <span class="tag is-small has-text-success has-background-black-bis">
-          <font-awesome-icon icon="wind" />
-        </span>
         <span class="tag is-small has-text-dark is-success"
           >{{ bloweractive }}s / {{ blowercycle }}s</span
         >
@@ -207,9 +208,6 @@
         </div>
       </div>
       <div class="tags has-addons" v-else>
-        <span class="tag is-small has-text-success has-background-black-bis">
-          <font-awesome-icon icon="cloud-rain" />
-        </span>
         <span class="tag is-small has-text-dark is-success"
           >{{ irrigationduration }}s</span
         >

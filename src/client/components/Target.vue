@@ -1,7 +1,7 @@
 <template>
   <div class="control">
     <div class="tags has-addons">
-      <span :class="iconClass" :style="text">
+      <span :class="iconClass" :style="text" v-if="!simple">
         <font-awesome-icon :icon="icon" />
       </span>
       <span :class="displayClass" :style="background">
@@ -21,7 +21,8 @@ const Target = Vue.extend({
     precision: { type: Number, default: 0 },
     units: String,
     color: { type: String, default: "#ffffff" },
-    size: { type: String, default: "medium" }
+    size: { type: String, default: "medium" },
+    simple: { type: Boolean, default: false }
   },
 
   computed: {
