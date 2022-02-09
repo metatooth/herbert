@@ -45,6 +45,7 @@ router.put("/:id", async (req, res) => {
 
 router.put("/:id/:action", async (req, res) => {
   const { id, action } = req.params;
+  console.log("ready to", action, "for", id);
   const device = await readDevice(id);
   const cmd = makeCommandMessage({
     device: device.device,
@@ -52,6 +53,7 @@ router.put("/:id/:action", async (req, res) => {
     timestamp: new Date().toString()
   });
   const payload = { device: device.device, msg: cmd };
+  console.log("send by device id", payload);
   sendSocketMessage(makeSendByDeviceIDMessage(payload));
   res.status(204).send();
 });

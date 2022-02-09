@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td>
-      <zone-tag :zone="zone" />
+      <zone-tag :zone="zone" :locked="locked" />
     </td>
     <td>
       <zone-actual :zone="zone" :units="settings.units" />
@@ -11,17 +11,14 @@
         v-for="device in sorted"
         :key="device.device"
         :device="device"
+        :locked="locked"
       />
     </td>
     <td class="is-italic">
       <readable :timestamp="lastupdate" />
     </td>
     <td>
-      <button class="button" :class="statusClass" @click="toggle">
-        <span class="icon">
-          <font-awesome-icon :icon="statusIcon" />
-        </span>
-      </button>
+      <zone-status-button :zone="zone" :locked="locked" />
     </td>
   </tr>
 </template>
@@ -33,12 +30,14 @@ import { mapGetters, mapActions } from "vuex";
 import DeviceTag from "@/components/DeviceTag.vue";
 import Readable from "@/components/Readable.vue";
 import ZoneActual from "@/components/ZoneActual.vue";
+import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 import ZoneTag from "@/components/ZoneTag.vue";
 import { Device } from "@/store/devices/types";
 import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
   props: {
+    locked: Boolean,
     zone: Zone,
     units: String
   },
@@ -55,6 +54,7 @@ const ZoneRow = Vue.extend({
     DeviceTag,
     Readable,
     ZoneActual,
+    ZoneStatusButton,
     ZoneTag
   },
 

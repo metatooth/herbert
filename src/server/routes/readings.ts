@@ -64,7 +64,6 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const { body } = req;
   const { meter, temperature, humidity, pressure, ts } = body;
-  console.log("body", body);
   const observedat = new Date(ts);
 
   const { rows } = await query<Reading>(
@@ -74,11 +73,11 @@ router.post("/", async (req, res) => {
 
   if (rows.length !== 0) {
     const last = observedat.getTime();
-    const curr = new Date(rows[0].timestamp).getTime();
+    const curr = new Date(rows[0].observedat).getTime();
 
     const account = await readAccount(1);
 
-    if (curr - last > account.reportingperiod) {
+    if (last - curr >= account.reportingperiod) {
       await createReading(meter, temperature, humidity, pressure, observedat);
       res.status(204).send();
     } else {

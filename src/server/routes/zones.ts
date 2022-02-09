@@ -76,7 +76,10 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   const { id } = req.params;
-  await query("DELETE FROM zones WHERE id = $1", [id]);
+  await query(
+    "UPDATE zones SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE id = $1",
+    [id]
+  );
   res.status(204).json({});
 });
 

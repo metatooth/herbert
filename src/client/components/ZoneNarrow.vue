@@ -2,9 +2,6 @@
   <nav class="level is-mobile">
     <div class="level-left">
       <div class="level-item">
-        <zone-status-button :zone="zone" />
-      </div>
-      <div class="level-item">
         <div class="tag has-background-black-bis is-medium" :style="iconStyle">
           <span class="icon">
             <font-awesome-icon icon="lightbulb" />
@@ -39,7 +36,6 @@
 import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 import { Zone } from "@/store/zones/types";
 import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 
@@ -52,10 +48,6 @@ const ZoneNarrow = Vue.extend({
     return {
       now: new Date()
     };
-  },
-
-  components: {
-    ZoneStatusButton
   },
 
   computed: {

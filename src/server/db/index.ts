@@ -25,7 +25,7 @@ export async function query<T>(text, params): Promise<QueryResult<T>> {
 
 export async function readAccount(id: number): Promise<Account> {
   const { rows } = await query<Account>(
-    "SELECT title, logo, locale, timezone, units, refresh, timeout, interval, openweather, cityname, statecode, updatedat FROM accounts WHERE id = $1",
+    "SELECT title, logo, locale, timezone, units, refresh, timeout, interval, openweather, cityname, statecode, reportingperiod, pin, updatedat FROM accounts WHERE id = $1",
     [id]
   );
   return rows[0];

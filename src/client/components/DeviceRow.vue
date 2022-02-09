@@ -17,16 +17,10 @@
       {{ zonename }}
     </td>
     <td>
-      <span class="tags has-addons" @click="toggle" v-if="!editing">
-        <span :class="iconClass">
-          <span class="icon">
-            <font-awesome-icon :icon="device.icon" />
-          </span>
-        </span>
-        <span :class="labelClass">
-          {{ device.devicetype }}
-        </span>
-      </span>
+      <button class="button" :disabled="locked" @click="toggle" v-if="!editing">
+        <font-awesome-icon :class="deviceClass" :icon="device.icon" />
+        <span>{{ device.devicetype }}</span>
+      </button>
       <div class="control" v-else>
         <select-device-type
           :devicetype="device.devicetype"
@@ -49,6 +43,7 @@
     </td>
     <td>
       <edit-controls
+        v-if="!locked"
         @on-edit="editable"
         @on-save="save"
         @on-destroy="destroy"
@@ -70,13 +65,15 @@ import EditControls from "@/components/EditControls.vue";
 const DeviceRow = Vue.extend({
   props: {
     device: Device,
+    locked: Boolean,
     units: String
   },
 
   data() {
     return {
       nickname: this.device.nickname,
-      editing: false
+      editing: false,
+      status: this.device.status
     };
   },
 
@@ -87,6 +84,20 @@ const DeviceRow = Vue.extend({
   },
 
   computed: {
+    deviceClass(): string {
+      let style;
+
+      if (this.status === "disconnected") {
+        style = "icon has-text-danger";
+      } else if (this.status === "on") {
+        style = "icon has-text-success";
+      } else if (this.status === "off") {
+        style = "icon has-text-warning";
+      }
+
+      return style;
+    },
+
     iconClass(): string {
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.device.device;
@@ -181,10 +192,12 @@ const DeviceRow = Vue.extend({
     },
 
     toggle() {
-      if (this.device.status === "off") {
+      if (this.status === "off") {
         this.on(this.device.device);
-      } else if (this.device.status === "on") {
+        this.status = "on";
+      } else if (this.status === "on") {
         this.off(this.device.device);
+        this.status = "off";
       }
     },
 

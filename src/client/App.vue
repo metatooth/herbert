@@ -3,7 +3,7 @@
     <router-view></router-view>
     <footer>
       <a
-        href="https://github.com/metatooth/herbert"
+        href="https://growherbert.com"
         class="content has-text-centered"
       >
         <p>Powered by <img src="./assets/images/logo.png" /><br /></p>
@@ -11,7 +11,7 @@
       <div class="copyright has-text-centered is-size-7">
         <p>
           {{ appVersion }} &#169;
-          <a href="https://metatooth.com">Metatooth</a> 2021
+          <a href="https://metatooth.com">Metatooth</a> 2022
         </p>
       </div>
     </footer>

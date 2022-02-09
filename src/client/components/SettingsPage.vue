@@ -79,6 +79,13 @@
     </div>
 
     <div class="field">
+      <label class="label">Reporting Period (seconds)</label>
+      <div class="control">
+        <input class="input" type="number" v-model="reportingperiod" />
+      </div>
+    </div>
+
+    <div class="field">
       <label class="label">OpenWeather API Key</label>
       <div class="control">
         <input class="input" type="text" v-model="openweather" />
@@ -100,25 +107,22 @@
     </div>
 
     <div class="field">
+      <label class="label">PIN</label>
+      <div class="control">
+        <input class="input" type="text" size="8" v-model="pin" />
+      </div>
+    </div>
+
+    <div class="field">
       <label class="label">API Base URL</label>
       <div class="control">
         <a target="_blank" :href="url">{{ url }}</a>
       </div>
     </div>
 
-    <div class="field is-grouped">
-      <herbert-button
-        color="success"
-        icon="check"
-        :show="changed"
-        @on-click="save"
-      />
-      <herbert-button
-        color="danger"
-        icon="times"
-        :show="changed"
-        @on-click="cancel"
-      />
+    <div class="field is-grouped" v-if="changed">
+      <herbert-button color="success" icon="check" @on-click="save" />
+      <herbert-button color="danger" icon="times" @on-click="cancel" />
     </div>
   </section>
 </template>
@@ -148,6 +152,8 @@ const SettingsPage = Vue.extend({
       openweather: this.settings.openweather,
       cityname: this.settings.cityname,
       statecode: this.settings.statecode,
+      reportingperiod: this.settings.reportingperiod / 1000,
+      pin: this.settings.pin,
       name: "",
       filedata: ""
     };
@@ -160,6 +166,8 @@ const SettingsPage = Vue.extend({
 
   computed: {
     changed(): boolean {
+      console.log(this.settings.pin, this.pin, this.settings.pin !== this.pin);
+
       if (
         this.settings.title !== this.title ||
         this.name !== "" ||
@@ -172,10 +180,13 @@ const SettingsPage = Vue.extend({
         this.settings.interval !== 1000 * this.interval ||
         this.settings.openweather !== this.openweather ||
         this.settings.cityname !== this.cityname ||
-        this.settings.statecode !== this.statecode
+        this.settings.statecode !== this.statecode ||
+        this.settings.reportingperiod !== 1000 * this.reportingperiod ||
+        this.settings.pin !== this.pin
       ) {
         return true;
       }
+      console.log("false?");
       return false;
     },
 
@@ -201,6 +212,8 @@ const SettingsPage = Vue.extend({
       this.openweather = this.settings.openweather;
       this.cityname = this.settings.cityname;
       this.statecode = this.settings.statecode;
+      this.reportingperiod = this.settings.reportingperiod / 1000;
+      this.pin = this.settings.pin;
     },
 
     pick() {
@@ -243,6 +256,8 @@ const SettingsPage = Vue.extend({
         openweather: this.openweather,
         cityname: this.cityname,
         statecode: this.statecode,
+        reportingperiod: 1000 * this.reportingperiod,
+        pin: this.pin,
         createdat: this.settings.createdat,
         updatedat: new Date(),
         deleted: false

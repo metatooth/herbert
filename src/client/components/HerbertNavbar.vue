@@ -79,6 +79,7 @@
           class="navbar-item herbert-navbar-item"
           @click="pick('configs')"
           :class="is('configs')"
+          v-if="!locked"
         >
           <span class="icon has-text-success">
             <font-awesome-icon icon="file-code" />
@@ -89,12 +90,22 @@
           class="navbar-item herbert-navbar-item"
           @click="pick('settings')"
           :class="is('settings')"
+          v-if="!locked"
         >
           <span class="icon has-text-success">
             <font-awesome-icon icon="cog" />
           </span>
           <span>Settings</span>
         </a>
+        <button
+          ref="lockIcon"
+          class="navbar-item herbert-navbar-lock-icon"
+          @click.prevent="toggle"
+        >
+          <span class="icon">
+            <font-awesome-icon :icon="lockIcon" />
+          </span>
+        </button>
       </div>
     </div>
     <div ref="search" class="herbert-search">
@@ -123,6 +134,10 @@ import Vue from "vue";
 import { mapGetters } from "vuex";
 
 const HerbertNavbar = Vue.extend({
+  props: {
+    locked: { type: Boolean, default: true }
+  },
+
   data() {
     return {
       filter: ""
@@ -130,6 +145,10 @@ const HerbertNavbar = Vue.extend({
   },
 
   computed: {
+    lockIcon() {
+      return this.locked ? "lock" : "lock-open";
+    },
+
     logo() {
       if (this.settings.logo) {
         return this.settings.logo;
@@ -179,6 +198,10 @@ const HerbertNavbar = Vue.extend({
       if (this.$refs.search.classList.contains("herbert-is-visible")) {
         this.$refs.herbertSearch.focus();
       }
+    },
+
+    toggle() {
+      this.$emit("toggle");
     }
   }
 });
@@ -212,10 +235,17 @@ export default HerbertNavbar;
   width: 3.25rem;
 }
 
+.herbert-navbar .herbert-navbar-lock-icon {
+  justify-content: center;
+  padding: 0;
+  width: 3.25rem;
+}
+
 .herbert-navbar .navbar-burger {
   margin-left: 0;
 }
 
+.herbert-navbar-lock-icon,
 .herbert-navbar-search-icon,
 .navbar-burger {
   appearance: none;
@@ -227,6 +257,12 @@ export default HerbertNavbar;
 }
 
 .herbert-navbar-search-icon {
+  color: #00d1b2;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.herbert-navbar-lock-icon {
   color: #00d1b2;
   cursor: pointer;
   margin-left: auto;

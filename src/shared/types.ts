@@ -6,7 +6,11 @@ export interface Account {
   locale: string;
   timezone: string;
   logo: Uint8Array;
+  openweather: string;
+  cityname: string;
+  statecode: string;
   reportingperiod: number;
+  pin: number;
 }
 
 export interface Config {
@@ -72,7 +76,7 @@ export interface Reading {
   temperature: number;
   humidity: number;
   pressure: number;
-  timestamp: Date;
+  observedat: Date;
 }
 
 export interface Worker {

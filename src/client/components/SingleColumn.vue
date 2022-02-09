@@ -6,6 +6,7 @@
         :key="`item-${index}`"
         :device="item"
         :units="settings.units"
+        :locked="locked"
       />
     </div>
     <div class="tile is-4 is-vertical" v-if="type === 'meter'">
@@ -14,6 +15,7 @@
         :key="`item-${index}`"
         :meter="item"
         :units="settings.units"
+        :locked="locked"
       />
     </div>
     <div class="tile is-4 is-vertical" v-if="type === 'profile'">
@@ -22,6 +24,7 @@
         :key="`item-${index}`"
         :profile="item"
         :units="settings.units"
+        :locked="locked"
       />
     </div>
     <div class="tile is-4 is-vertical" v-if="type === 'zone'">
@@ -30,6 +33,7 @@
         :key="`item-${index}`"
         :zone="item"
         :units="settings.units"
+        :locked="locked"
       />
     </div>
     <div class="tile is-4 is-vertical" v-if="type === 'zone-detail'">
@@ -38,6 +42,7 @@
         :key="`item-${index}`"
         :zone="item"
         :units="settings.units"
+        :locked="locked"
       />
     </div>
     <div class="tile is-4 is-vertical" v-if="type === 'worker'">
@@ -46,6 +51,7 @@
         :key="`item-${index}`"
         :worker="item"
         :units="settings.units"
+        :locked="locked"
       />
     </div>
     <div class="tile is-4 is-vertical" v-if="type === 'config'">
@@ -54,6 +60,7 @@
         :key="`item-${index}`"
         :config="item"
         :units="settings.units"
+        :locked="locked"
       />
     </div>
   </div>
@@ -74,6 +81,7 @@ import ConfigTile from "@/components/ConfigTile.vue";
 const SingleColumn = Vue.extend({
   props: {
     items: [],
+    locked: Boolean,
     type: String
   },
 

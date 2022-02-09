@@ -32,13 +32,12 @@
       </p>
 
       <div class="content">
-        <div class="control" v-if="editing">
-          <select-device-type
-            :devicetype="device.devicetype"
-            @select-devicetype="selectdevicetype"
-          />
-        </div>
-        <button class="button" @click="toggle" v-else>
+        <select-device-type
+          v-if="editing"
+          :devicetype="device.devicetype"
+          @select-devicetype="selectdevicetype"
+        />
+        <button class="button" :disabled="locked" @click="toggle" v-else>
           <font-awesome-icon :class="deviceClass" :icon="device.icon" />
           <span>{{ status }}</span>
         </button>
@@ -58,6 +57,7 @@
       </div>
       <div class="content">
         <edit-controls
+          v-if="!locked"
           class="edit-controls"
           @on-edit="editable"
           @on-save="save"
@@ -80,7 +80,8 @@ import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
 const DeviceTile = Vue.extend({
   props: {
-    device: Device
+    device: Device,
+    locked: Boolean
   },
 
   data() {
@@ -101,6 +102,10 @@ const DeviceTile = Vue.extend({
   },
 
   computed: {
+    buttonClass(): string {
+      return this.locked ? "button disabled" : "button";
+    },
+
     deviceClass(): string {
       let style;
 

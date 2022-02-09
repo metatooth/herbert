@@ -37,6 +37,7 @@
     </td>
     <td>
       <edit-controls
+        v-if="!locked"
         @on-edit="editable"
         @on-save="save"
         @on-destroy="destroy"
@@ -58,6 +59,7 @@ import { Meter } from "@/store/meters/types";
 const MeterRow = Vue.extend({
   props: {
     meter: Meter,
+    locked: Boolean,
     units: String
   },
 

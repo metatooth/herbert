@@ -5,6 +5,7 @@ import {
   query,
   readConfig,
   readWorker,
+  readWorkers,
   registerWorker,
   updateWorker
 } from "../db";
@@ -13,11 +14,7 @@ import { sendSocketMessage } from "../util";
 const router = Router();
 
 router.get("/", async (req, res) => {
-  const { rows } = await query<Worker>(
-    "SELECT * FROM workers ORDER BY createdat DESC",
-    []
-  );
-  res.status(200).json(rows);
+  res.status(200).json(await readWorkers());
 });
 
 router.post("/", async (req, res) => {

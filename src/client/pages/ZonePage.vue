@@ -160,6 +160,7 @@
       <div class="card-footer">
         <div class="card-footer-item">
           <edit-controls
+            v-if="!locked"
             @on-edit="editable"
             @on-save="save"
             @on-destroy="destroy"
@@ -228,6 +229,10 @@ const ZonePage = Vue.extend({
   },
 
   computed: {
+    locked() {
+      return this.$route.params.locked;
+    },
+
     zone() {
       const id = this.$route.params.id;
       const z = this.zones.filter(z => {

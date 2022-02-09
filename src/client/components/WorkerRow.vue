@@ -36,7 +36,12 @@
       <readable :timestamp="new Date(Date.parse(worker.updatedat))" />
     </td>
     <td>
-      <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
+      <edit-controls
+        v-if="!locked"
+        @on-edit="editable"
+        @on-save="save"
+        @on-cancel="cancel"
+      />
     </td>
   </tr>
 </template>
@@ -51,6 +56,7 @@ import { Worker } from "@/store/workers/types";
 
 const WorkerRow = Vue.extend({
   props: {
+    locked: Boolean,
     worker: Worker
   },
 

@@ -1,6 +1,7 @@
 import "@/assets/main.scss";
 
 import Vue from "vue";
+import VueCookies from "vue-cookies";
 
 import router from "@/router";
 import store from "@/store";
@@ -28,6 +29,8 @@ import {
   faHistory,
   faLightbulb,
   faList,
+  faLock,
+  faLockOpen,
   faMoon,
   faPencilAlt,
   faPlus,
@@ -72,6 +75,8 @@ library.add(faGripVertical);
 library.add(faHistory);
 library.add(faLightbulb);
 library.add(faList);
+library.add(faLock);
+library.add(faLockOpen);
 library.add(faMoon);
 library.add(faPencilAlt);
 library.add(faPlus);
@@ -95,6 +100,8 @@ library.add(faUpload);
 library.add(faWind);
 
 Vue.component("FontAwesomeIcon", FontAwesomeIcon);
+
+Vue.use(VueCookies);
 
 Vue.config.productionTip = false;
 

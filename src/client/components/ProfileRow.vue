@@ -8,7 +8,7 @@
         v-model="name"
         placeHolder="profile name"
       />
-      <span v-else>{{ profile.profile }}</span>
+      <span v-else>{{ name }}</span>
     </td>
     <td>
       <input v-if="editing" class="input" type="time" v-model="lampstart" />
@@ -73,19 +73,21 @@
       <span class="field is-grouped" v-else>
         <target
           icon="thermometer-half"
-          :value="dayTemperature"
+          :value="parseFloat(lampontemperature)"
           :precision="1"
           units="°"
           size="small"
           color="#ffe08a"
+          simple="true"
         />
         <target
           icon="tint"
-          :value="dayHumidity"
+          :value="parseFloat(lamponhumidity)"
           :precision="0"
           units="%"
           size="small"
           color="#ffe08a"
+          simple="true"
         />
       </span>
     </td>
@@ -122,19 +124,21 @@
       <span class="field is-grouped is-grouped-multiline" v-else>
         <target
           icon="thermometer-half"
-          :value="nightTemperature"
+          :value="parseFloat(lampofftemperature)"
           :precision="1"
           units="°"
           size="small"
           color="#7a7a7a"
+          simple="true"
         />
         <target
           icon="tint"
-          :value="nightHumidity"
+          :value="parseFloat(lampoffhumidity)"
           :precision="0"
           units="%"
           size="small"
           color="#7a7a7a"
+          simple="true"
         />
       </span>
     </td>
@@ -169,9 +173,6 @@
       </div>
 
       <div class="tags has-addons" v-else>
-        <span class="tag is-small has-text-success has-background-black-bis">
-          <font-awesome-icon icon="wind" />
-        </span>
         <span class="tag is-small has-text-dark is-success"
           >{{ bloweractive }}s / {{ blowercycle }}s</span
         >
@@ -207,9 +208,6 @@
         </div>
       </div>
       <div class="tags has-addons" v-else>
-        <span class="tag is-small has-text-success has-background-black-bis">
-          <font-awesome-icon icon="cloud-rain" />
-        </span>
         <span class="tag is-small has-text-dark is-success"
           >{{ irrigationduration }}s</span
         >
@@ -220,6 +218,7 @@
     </td>
     <td>
       <edit-controls
+        v-if="!locked"
         @on-edit="editable"
         @on-save="save"
         @on-destroy="destroy"
@@ -246,6 +245,7 @@ import { Profile } from "@/store/profiles/types";
 
 const ProfileRow = Vue.extend({
   props: {
+    locked: Boolean,
     profile: Profile,
     units: String
   },
@@ -263,8 +263,8 @@ const ProfileRow = Vue.extend({
       hourString = hourInt.toString();
     }
 
-    let lampon = this.profile.lampontemperature;
-    let lampoff = this.profile.lampofftemperature;
+    let lampon = parseFloat(this.profile.lampontemperature);
+    let lampoff = parseFloat(this.profile.lampofftemperature);
 
     if (this.units === "F") {
       lampon = celsius2fahrenheit(lampon);
@@ -276,6 +276,7 @@ const ProfileRow = Vue.extend({
 
     return {
       name: this.profile.profile,
+      controltype: this.profile.controltype,
       lampstart: `${hourString}:${start[1]}:00`,
       lampduration: this.profile.lampduration["hours"],
       lampontemperature: lampon,
@@ -286,7 +287,6 @@ const ProfileRow = Vue.extend({
       blowercycle: this.profile.blowercycle / 1000,
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
-      controltype: this.profile.controltype,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
       editing: false
     };
@@ -321,34 +321,6 @@ const ProfileRow = Vue.extend({
       }
     },
 
-    dayTemperature(): number {
-      if (this.units === "F") {
-        return celsius2fahrenheit(this.profile.lampontemperature);
-      } else if (this.units === "K") {
-        return celsius2kelvin(this.profile.lampontemperature);
-      }
-
-      return this.profile.lampontemperature;
-    },
-
-    nightTemperature(): number {
-      if (this.units === "F") {
-        return celsius2fahrenheit(this.profile.lampofftemperature);
-      } else if (this.units === "K") {
-        return celsius2kelvin(this.profile.lampofftemperature);
-      }
-
-      return this.profile.lampofftemperature;
-    },
-
-    dayHumidity(): number {
-      return this.profile.lamponhumidity;
-    },
-
-    nightHumidity(): number {
-      return this.profile.lampoffhumidity;
-    },
-
     lampMin(): number {
       let min = 15;
       if (this.units === "F") {
@@ -369,31 +341,47 @@ const ProfileRow = Vue.extend({
       }
 
       return max;
-    },
-
-    dayPressure(): number {
-      return (
-        vaporPressureDeficit(
-          this.profile.lampontemperature,
-          0.6,
-          this.profile.lamponhumidity / 100
-        ) / 1000
-      );
-    },
-
-    nightPressure(): number {
-      return (
-        vaporPressureDeficit(
-          this.profile.lampofftemperature,
-          -0.6,
-          this.profile.lampoffhumidity / 100
-        ) / 1000
-      );
     }
   },
 
   methods: {
     cancel() {
+      const start = this.profile.lampstart.split(":");
+      let hourInt = parseInt(start[0]);
+      if (hourInt < 0) {
+        hourInt = 24 + hourInt;
+      }
+      let hourString;
+      if (hourInt < 10) {
+        hourString = "0" + hourInt;
+      } else {
+        hourString = hourInt.toString();
+      }
+
+      let lampon = parseFloat(this.profile.lampontemperature);
+      let lampoff = parseFloat(this.profile.lampofftemperature);
+
+      if (this.units === "F") {
+        lampon = celsius2fahrenheit(lampon);
+        lampoff = celsius2fahrenheit(lampoff);
+      } else if (this.units === "K") {
+        lampon = celsius2kelvin(lampon);
+        lampoff = celsius2kelvin(lampoff);
+      }
+
+      this.name = this.profile.profile;
+      this.controltype = this.profile.controltype;
+      this.lampstart = `${hourString}:${start[1]}:00`;
+      this.lampduration = this.profile.lampduration["hours"];
+      this.lampontemperature = lampon;
+      this.lampofftemperature = lampoff;
+      this.lamponhumidity = this.profile.lamponhumidity;
+      this.lampoffhumidity = this.profile.lampoffhumidity;
+      this.bloweractive = this.profile.bloweractive / 1000;
+      this.blowercycle = this.profile.blowercycle / 1000;
+      this.irrigationperday = parseInt(this.profile.irrigationperday);
+      this.irrigationduration = this.profile.irrigationduration / 1000;
+
       this.editing = false;
     },
 

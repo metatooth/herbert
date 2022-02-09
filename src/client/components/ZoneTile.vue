@@ -2,18 +2,19 @@
   <div class="tile is-parent">
     <div class="tile is-child box">
       <div class="title">
-        <zone-tag :zone="zone" />
+        <zone-tag :zone="zone" :locked="locked" />
       </div>
       <div class="content">
         <zone-actual :zone="zone" :units="settings.units" />
       </div>
       <div class="content">
-        <zone-status-button :zone="zone" />
+        <zone-status-button :zone="zone" :locked="locked" />
         &nbsp;
         <device-tag
           v-for="device in sorted"
           :key="device.device"
           :device="device"
+          :locked="locked"
         />
       </div>
       <div class="content is-italic">
@@ -37,6 +38,7 @@ import { Zone } from "@/store/zones/types";
 
 const ZoneTile = Vue.extend({
   props: {
+    locked: Boolean,
     zone: Zone
   },
 

@@ -54,7 +54,9 @@ const EditControls = Vue.extend({
     },
 
     destroy() {
-      this.$emit("on-destroy");
+      if (confirm("OK to trash?")) {
+        this.$emit("on-destroy");
+      }
     },
 
     cancel() {

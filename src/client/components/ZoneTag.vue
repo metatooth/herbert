@@ -18,6 +18,7 @@ import { zeroes } from "../../shared/utils";
 
 const ZoneTag = Vue.extend({
   props: {
+    locked: Boolean,
     zone: Zone
   },
 
@@ -61,7 +62,7 @@ const ZoneTag = Vue.extend({
     clicked() {
       this.$router.push({
         name: "zone",
-        params: { id: this.zone.id }
+        params: { id: this.zone.id, locked: this.locked }
       });
     }
   }
