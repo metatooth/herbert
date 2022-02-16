@@ -2,23 +2,34 @@
   <div class="card">
     <div class="card-header">
       <div class="card-header-title">
-        <p class="title">{{ zone.nickname }}</p>
-        <p class="subtitle">{{ zone.profile.profile }}</p>
+        <div class="title">{{ zone.nickname }}</div>
+        <div class="subtitle">{{ zone.profile.profile }}</div>
       </div>
     </div>
 
     <div class="card-content">
       <nav class="level is-mobile">
-        <div class="level-left">
-          <div class="level-item">
-            <zone-target class="box has-background-grey-darker" :zone="zone" />
-          </div>
-          <div class="level-item">
-            <zone-actual class="box has-background-grey-darker" :zone="zone" />
-          </div>
+        <div class="level-item">
+          <zone-status-button :zone="zone" :locked="false" />
         </div>
-        <div class="level-right" />
+
+        <div class="level-item" v-if="zone.meters.length !== 0">
+          <p class="title" :style="temperatureStyle">
+            {{ temperature.toFixed(0) }}&#176;
+          </p>
+        </div>
+        <div class="level-item" v-if="zone.meters.length !== 0">
+          <p class="title" :style="humidityStyle">{{ humidity.toFixed(0) }}%</p>
+        </div>
       </nav>
+    </div>
+
+    <div class="card-content">
+      <narrow-table :items="zone.devices" type="device" />
+    </div>
+
+    <div class="card-content">
+      <narrow-table :items="zone.meters" type="meter" />
     </div>
 
     <div class="card-content">
@@ -27,17 +38,7 @@
           <div class="tags has-addons">
             <span
               class="tag has-background-grey-darker is-medium"
-              :class="activeClass"
-            >
-              <font-awesome-icon :icon="activeIcon" />
-            </span>
-          </div>
-        </div>
-        <div class="control" v-if="isDay">
-          <div class="tags has-addons">
-            <span
-              class="tag has-background-grey-darker is-medium"
-              style="color: #ffe08a"
+              :style="leafdiffStyle"
             >
               <font-awesome-icon icon="cannabis" />
             </span>
@@ -46,19 +47,7 @@
             >
           </div>
         </div>
-        <div class="control" v-else>
-          <div class="tags has-addons">
-            <span
-              class="tag has-background-grey-darker is-medium"
-              style="color: #7a7a7a"
-            >
-              <font-awesome-icon icon="cannabis" />
-            </span>
-            <span class="tag has-text-black is-medium"
-              >{{ lampoffleafdiff.toFixed(1) }}&#176;</span
-            >
-          </div>
-        </div>
+
         <div class="control" v-if="zone.children.length > 0">
           <div class="tags has-addons">
             <span
@@ -69,54 +58,6 @@
             <span class="tag has-text-black is-medium"
               >{{ maxirrigators }} max</span
             >
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-content">
-      <div class="field is-grouped is-grouped-multiline">
-        <div
-          class="control"
-          v-for="(meter, index) in zone.meters"
-          :key="`meter-${index}`"
-        >
-          <div class="clickable tags has-addons" @click="clickMeter(meter)">
-            <span
-              class="tag has-background-grey-darker has-text-success is-medium"
-            >
-              <font-awesome-icon icon="tachometer-alt" />
-            </span>
-            <span class="tag has-text-black is-medium">{{ meter.name }}</span>
-          </div>
-        </div>
-        <div
-          class="control"
-          v-for="(device, index) in zone.devices"
-          :key="`device-${index}`"
-        >
-          <div class="clickable tags has-addons" @click="clickDevice(device)">
-            <span :class="deviceClass(device)">
-              <font-awesome-icon :icon="device.icon" />
-            </span>
-            <span class="tag has-text-black is-medium">{{ device.name }}</span>
-          </div>
-        </div>
-        <div
-          class="control"
-          v-for="(child, index) in zone.children"
-          :key="`child-${index}`"
-          @click="clickChild(child)"
-        >
-          <div class="clickable tags has-addons">
-            <span
-              class="tag has-background-grey-darker has-text-info is-medium"
-            >
-              <font-awesome-icon icon="grip-horizontal" />
-            </span>
-            <span class="tag has-text-black is-medium">{{
-              lookupZone(child).nickname
-            }}</span>
           </div>
         </div>
       </div>
@@ -135,8 +76,10 @@ import Readable from "@/components/Readable.vue";
 import Vue from "vue";
 import { Zone } from "@/store/zones/types";
 import { mapGetters, mapActions } from "vuex";
-import ZoneActual from "@/components/ZoneActual.vue";
-import ZoneTarget from "@/components/ZoneTarget.vue";
+import NarrowTable from "@/components/NarrowTable.vue";
+import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
+
+import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 
 const ZoneDetail = Vue.extend({
   props: {
@@ -158,14 +101,15 @@ const ZoneDetail = Vue.extend({
       profileid: parseInt(this.zone.profileid),
       maxirrigators: parseInt(this.zone.maxirrigators),
       lamponleafdiff: lampon,
-      lampoffleafdiff: lampoff
+      lampoffleafdiff: lampoff,
+      now: new Date()
     };
   },
 
   components: {
-    ZoneActual,
-    ZoneTarget,
-    Readable
+    NarrowTable,
+    Readable,
+    ZoneStatusButton
   },
 
   computed: {
@@ -185,8 +129,18 @@ const ZoneDetail = Vue.extend({
       }
     },
 
-    linkto() {
-      return `#zone-details-${this.zone.id}`;
+    humidity(): number {
+      return this.zone.meanHumidity() * 100;
+    },
+
+    humidityColor(): string {
+      const diff =
+        100 * this.zone.meanHumidity() - this.zone.targetHumidity(this.now);
+      return color(diff, 5);
+    },
+
+    humidityStyle(): string {
+      return `color: ${this.humidityColor};`;
     },
 
     isDay() {
@@ -199,6 +153,38 @@ const ZoneDetail = Vue.extend({
         if (d.updatedat < lastupdate) lastupdate = d.updatedat;
       });
       return lastupdate;
+    },
+
+    leafdiffStyle() {
+      if (this.isDay) {
+        return "color: #ffe08a";
+      } else {
+        return "color: #7a7a7a";
+      }
+    },
+
+    linkto() {
+      return `#zone-details-${this.zone.id}`;
+    },
+
+    temperature(): number {
+      const mean = this.zone.meanTemperature();
+      if (this.settings.units === "F") {
+        return celsius2fahrenheit(mean);
+      } else if (this.settings.units === "K") {
+        return celsius2kelvin(mean);
+      }
+      return mean;
+    },
+
+    temperatureColor(): string {
+      const diff =
+        this.zone.meanTemperature() - this.zone.targetTemperature(this.now);
+      return color(diff, 3);
+    },
+
+    temperatureStyle(): string {
+      return `color: ${this.temperatureColor};`;
     },
 
     ...mapGetters("devices", ["devices"]),
