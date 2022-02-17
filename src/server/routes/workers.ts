@@ -6,8 +6,7 @@ import {
   readConfig,
   readWorker,
   readWorkers,
-  registerWorker,
-  updateWorker
+  registerWorker
 } from "../db";
 import { sendSocketMessage } from "../util";
 
@@ -31,7 +30,19 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  await updateWorker(id);
+
+  if (req.body.camera) {
+    await query<Worker>(
+      "UPDATE workers SET camera = decode($1, 'base64'), updatedat = CURRENT_TIMESTAMP, deleted = false WHERE worker = $2",
+      [req.body.camera, id]
+    );
+  } else {
+    await query<Worker>(
+      "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE worker = $1",
+      [id]
+    );
+  }
+
   res.status(204).send();
 });
 

@@ -46,6 +46,8 @@ export const mutations: MutationTree<ZonesState> = {
     const found = state.zones.find((el: Zone) => {
       return el.id === zone.id;
     });
+    console.log("found", found);
+    console.log("zone", zone);
     if (found) {
       const index = state.zones.indexOf(found);
       state.zones.splice(index, 1, zone);

@@ -307,17 +307,6 @@ export async function registerWorker(macaddr: string, inet: string) {
   );
 }
 
-export async function updateWorker(id: string) {
-  return query("SELECT * FROM workers WHERE worker = $1", [id]).then(res => {
-    if (res.rowCount !== 0) {
-      return query(
-        "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE worker = $1",
-        [id]
-      );
-    }
-  });
-}
-
 export async function createReading(
   meter: string,
   temperature: number,

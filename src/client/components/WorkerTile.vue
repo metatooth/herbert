@@ -32,6 +32,9 @@
       <div class="content">
         <span class="is-family-code">{{ worker.inet }}</span>
       </div>
+      <div class="content">
+        <img :src="camera" />
+      </div>
       <div class="content is-italic">
         Updated <readable :timestamp="new Date(worker.updatedat)" />
       </div>
@@ -84,6 +87,13 @@ const WorkerTile = Vue.extend({
   },
 
   computed: {
+    camera() {
+      if (this.worker.camera) {
+        return this.worker.camera;
+      }
+      return null;
+    },
+
     ...mapGetters("configs", ["configs"])
   },
 
