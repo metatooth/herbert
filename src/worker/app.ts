@@ -119,14 +119,12 @@ export class App {
           worker: this.macaddr,
           inet: this.inet
         });
-        console.log("send this message", msg);
         this.send(msg);
       }, 2000);
     });
   }
 
   public readonly run = async (): Promise<void> => {
-    console.info("RUN...");
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
@@ -188,7 +186,6 @@ export class App {
     }
 
     this.runTimeout = setTimeout(this.run, interval);
-    console.info("Done. Run again in", interval / 1000, "seconds.");
   };
 
   public stop() {
@@ -459,7 +456,6 @@ export class App {
       camera: this.camera,
       timestamp: new Date().toString()
     });
-    console.log("send worker status", msg);
     this.send(msg);
   }
 
