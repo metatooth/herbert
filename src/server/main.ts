@@ -61,8 +61,6 @@ server.listen(port);
 console.log("http server listening on %d", port);
 
 async function run() {
-  console.debug("RUN", new Date());
-
   const account = await readAccount(1);
   const zones = await readActiveZones();
 
