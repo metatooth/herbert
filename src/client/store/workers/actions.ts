@@ -14,6 +14,11 @@ export const actions: ActionTree<WorkersState, RootState> = {
     HTTP.get("/workers").then(response => {
       const payload: Worker[] = [];
       response.data.forEach((json: object) => {
+        if (json.camera) {
+          let camera = "data:image/jpeg;base64,";
+          camera += btoa(String.fromCharCode(...json.camera.data));
+          json.camera = camera;
+        }
         payload.push(Object.assign(new Worker(), json));
       });
       commit("SET", payload);

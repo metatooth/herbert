@@ -10,7 +10,6 @@ import { Herbert } from "./herbert";
 import { SequentMicrosystems } from "./sequent-microsystems";
 import { WyzeSwitch } from "./wyze-switch";
 import { IRSend } from "./i-r-send";
-import { ThermoPro } from "./thermo-pro";
 import {
   AnySocketMessage,
   CommandPayload,
@@ -29,6 +28,8 @@ import {
 
 import Switchbot, { WoSensorTH } from "node-switchbot";
 import Wyze, { WyzeDevice } from "wyze-node";
+
+import WebCamera from "./web-camera";
 
 try {
   fs.mkdirSync("./log");
@@ -77,6 +78,7 @@ export class App {
   plugs: Array<WyzeDevice> = [];
   macaddr = "";
   inet = "";
+  camera = "";
   heldMessages: AnySocketMessage[] = [];
   wyze?: Wyze;
   runTimeout: NodeJS.Timeout | undefined;
@@ -117,17 +119,20 @@ export class App {
           worker: this.macaddr,
           inet: this.inet
         });
-        console.log("send this message", msg);
         this.send(msg);
       }, 2000);
     });
   }
 
   public readonly run = async (): Promise<void> => {
-    console.info("RUN...");
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
+
+    const cam = new WebCamera("8081");
+    cam.fetch().then(image => {
+      this.camera = (image as Buffer).toString("base64");
+    });
 
     this.workerStatus();
 
@@ -140,8 +145,6 @@ export class App {
       switchbot.startScan();
       switchbot.wait(polling);
       switchbot.stopScan();
-
-      const thermopro = new ThermoPro();
     }
 
     this.meters.forEach(meter => {
@@ -183,7 +186,6 @@ export class App {
     }
 
     this.runTimeout = setTimeout(this.run, interval);
-    console.info("Done. Run again in", interval / 1000, "seconds.");
   };
 
   public stop() {
@@ -451,6 +453,7 @@ export class App {
       worker: this.macaddr,
       inet: this.inet,
       config: JSON.stringify(this.config),
+      camera: this.camera,
       timestamp: new Date().toString()
     });
     this.send(msg);

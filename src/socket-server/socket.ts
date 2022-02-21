@@ -211,7 +211,17 @@ export class HerbertSocket {
 
   private async handleWorkerStatusMsg(payload: WorkerStatusPayload) {
     try {
-      await HTTP.put(`/workers/${payload.worker}`);
+      const body = {
+        device: payload.worker,
+        inet: payload.inet,
+        camera: payload.camera
+      };
+
+      await HTTP({
+        method: "put",
+        url: `/workers/${payload.worker}`,
+        data: body
+      });
     } catch (e) {
       console.error("handle worker status", e.message);
     }

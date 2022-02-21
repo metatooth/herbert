@@ -12,7 +12,7 @@ export const actions: ActionTree<SettingsState, RootState> = {
   },
   fetchData({ commit }) {
     HTTP.get("/settings").then(response => {
-      if (response.data.log) {
+      if (response.data.logo) {
         let logo = "data:image/png;base64,";
         logo += btoa(String.fromCharCode(...response.data.logo.data));
         response.data.logo = logo;

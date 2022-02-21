@@ -2,6 +2,7 @@ export class Worker {
   worker: string;
   nickname: string;
   inet?: string;
+  camera?: Uint8Array;
   createdat: Date;
   updatedat: Date;
   deleted: boolean;

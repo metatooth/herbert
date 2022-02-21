@@ -41,6 +41,7 @@
         @on-edit="editable"
         @on-save="save"
         @on-cancel="cancel"
+        @on-destroy="destroy"
       />
     </td>
   </tr>
@@ -102,9 +103,7 @@ const WorkerRow = Vue.extend({
     },
 
     destroy() {
-      if (confirm("OK to remove?")) {
-        this.remove(this.worker);
-      }
+      this.remove(this.worker);
     },
 
     cancel() {

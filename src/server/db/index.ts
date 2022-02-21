@@ -245,19 +245,19 @@ export async function reading(device: string) {
 }
 
 export async function readWorkers() {
-  const workers: Worker[] = [];
+  const workers = [];
 
   const { rows } = await query<Worker>(
     "SELECT worker FROM workers WHERE deleted <> true",
     []
   );
 
-  rows.forEach(async row => {
-    const w = await readWorker(row.worker);
+  rows.forEach(row => {
+    const w = readWorker(row.worker);
     workers.push(w);
   });
 
-  return workers;
+  return Promise.all(workers);
 }
 
 export async function registerDevice(macaddr: string, manufacturer: string) {
@@ -299,23 +299,12 @@ export async function registerWorker(macaddr: string, inet: string) {
         );
       } else {
         return query(
-          "UPDATE workers SET inet = $1, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
+          "UPDATE workers SET inet = $1, deleted = false, deletedat = NULL, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
           [inet, macaddr]
         );
       }
     }
   );
-}
-
-export async function updateWorker(id: string) {
-  return query("SELECT * FROM workers WHERE worker = $1", [id]).then(res => {
-    if (res.rowCount !== 0) {
-      return query(
-        "UPDATE workers SET updatedat = CURRENT_TIMESTAMP, deleted = false WHERE worker = $1",
-        [id]
-      );
-    }
-  });
 }
 
 export async function createReading(

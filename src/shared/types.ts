@@ -84,6 +84,7 @@ export interface Worker {
   nickname: string;
   config: string;
   configname: string;
+  camera: Uint8Array;
   timestamp: Date;
 }
 
@@ -172,6 +173,7 @@ export interface WorkerStatusPayload {
   worker: string;
   inet: string;
   config: string;
+  camera: string;
   timestamp: string;
 }
 
