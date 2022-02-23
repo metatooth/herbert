@@ -31,6 +31,8 @@ import Wyze, { WyzeDevice } from "wyze-node";
 
 import WebCamera from "./web-camera";
 
+import ThermoPro from "./thermo-pro";
+
 try {
   fs.mkdirSync("./log");
 } catch (e) {
@@ -139,12 +141,17 @@ export class App {
     const polling: number = 1000 * (this.config.polling || 5);
     const interval: number = 1000 * (this.config.interval || 30);
 
+    console.log("RUN");
+
     if (!isMockWorker()) {
       const switchbot = new Switchbot();
       switchbot.onadvertisement = this.switchBotHandler;
       switchbot.startScan();
       switchbot.wait(polling);
       switchbot.stopScan();
+
+      const thermopro = new ThermoPro();
+      thermopro.scan();
     }
 
     this.meters.forEach(meter => {
@@ -221,10 +228,10 @@ export class App {
     }
 
     meter.clime.temperature = ad.serviceData.temperature.c;
-    meter.clime.delta = 0.6; // WARNING!
     meter.clime.humidity = ad.serviceData.humidity / 100.0;
     meter.clime.timestamp = new Date();
 
+    console.log("meter status", meter);
     this.meterStatus(meter);
 
     return Promise.resolve(true);
