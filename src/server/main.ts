@@ -30,7 +30,7 @@ console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
 app.use(favicon(path.join(__dirname, "favicon.ico")));
 console.log("favicon!");
 
-app.use(express.json());
+app.use(express.json({limit: "50mb"));
 console.log("JSON support");
 
 app.use(cors());
