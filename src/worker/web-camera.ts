@@ -72,6 +72,10 @@ const webStream = {
       });
     });
 
+    clientRequest.on("error", function(err) {
+      console.log(err);
+    });
+
     return {
       url: url,
       handler: clientRequest,
