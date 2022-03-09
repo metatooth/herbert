@@ -43,9 +43,9 @@ export default App;
   height: 1rem;
 }
 .copyright {
-  color: #2d2d2d;
+  color: #fdfdfd;
 }
 a {
-  color: #2d2d2d;
+  color: #fdfdfd;
 }
 </style>
