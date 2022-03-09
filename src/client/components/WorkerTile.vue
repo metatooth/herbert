@@ -39,6 +39,7 @@
         Updated <readable :timestamp="new Date(worker.updatedat)" />
       </div>
       <edit-controls
+        v-if="!locked"
         @on-edit="editable"
         @on-save="save"
         @on-cancel="cancel"
@@ -58,6 +59,7 @@ import { mapActions, mapGetters } from "vuex";
 
 const WorkerTile = Vue.extend({
   props: {
+    locked: Boolean,
     worker: Worker
   },
 
