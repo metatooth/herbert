@@ -212,6 +212,7 @@ async function run() {
       console.log("irr", irrigator);
 
       if (num > 1) {
+
         let counter = 0;
         zone.children.forEach(async child => {
           const zone = await readZone(child);
@@ -231,6 +232,7 @@ async function run() {
             }
           });
         });
+        
       } else {
         zone.devices.forEach(device => {
           if (device.devicetype === "irrigator") {
@@ -248,6 +250,8 @@ async function run() {
           }
         });
       }
+    }
+
   });
 
   setTimeout(run, account.interval);
