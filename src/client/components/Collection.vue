@@ -15,7 +15,7 @@
               style="margin: 20px"
               :show="true"
               :icon="icon"
-              color="grey-darker"
+              color="grey-lighter"
               size="small"
               @on-click="toggle"
             />
@@ -223,7 +223,6 @@ const Collection = Vue.extend({
           "Type",
           "Day",
           "Night",
-          "Blower",
           "Water",
           ""
         ];
