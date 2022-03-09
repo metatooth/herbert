@@ -20,7 +20,7 @@
           </div>
           <div class="level-item">
             <p class="text">
-              <em><readable :timestamp="worker.updatedat"/></em>
+              <em><readable :timestamp="new Date(worker.updatedat)"/></em>
             </p>
           </div>
         </div>
