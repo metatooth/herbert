@@ -29,7 +29,6 @@ const SelectDeviceType = Vue.extend({
   data() {
     return {
       devicetypes: [
-        "blower",
         "cooler",
         "dehumidifier",
         "fan",

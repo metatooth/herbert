@@ -109,35 +109,6 @@
             <input
               class="input"
               type="number"
-              v-model="bloweractive"
-              min="0"
-              max="180"
-              size="3"
-            />
-            <span class="icon is-left">
-              <font-awesome-icon icon="wind" class="is-left" />
-            </span>
-          </div>
-          <div class="control has-icons-left">
-            <input
-              class="input"
-              type="number"
-              v-model="blowercycle"
-              min="30"
-              max="864000000"
-              size="3"
-            />
-            <span class="icon is-left">
-              <font-awesome-icon icon="wind" class="is-left" />
-            </span>
-          </div>
-        </div>
-
-        <div class="field is-grouped">
-          <div class="control has-icons-left">
-            <input
-              class="input"
-              type="number"
               v-model="irrigationduration"
               min="0"
               max="3600"
@@ -204,15 +175,6 @@
             size="small"
             color="#7a7a7a"
           />
-        </div>
-
-        <div class="tags has-addons">
-          <span class="tag is-small has-text-success has-background-black-bis">
-            <font-awesome-icon icon="wind" />
-          </span>
-          <span class="tag is-small has-text-dark is-success"
-            >{{ bloweractive }}s / {{ blowercycle }}s</span
-          >
         </div>
 
         <div class="tags has-addons">

@@ -30,7 +30,7 @@ console.log("Node.js, Express, WebSocket, and PostgreSQL application created.");
 app.use(favicon(path.join(__dirname, "favicon.ico")));
 console.log("favicon!");
 
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 console.log("JSON support");
 
 app.use(cors());
@@ -199,24 +199,43 @@ async function run() {
         });
       });
 
+      const num = zone.children.length > 0 ? zone.children.length : 1;
+
       const irrigator = new IrrigationTimer(
         parseInt(zone.profile.irrigationperday),
         parseInt(zone.profile.irrigationduration),
-        zone.children.length,
+        num,
         parseInt(zone.maxirrigators),
         utc.getHours()
       );
 
       console.log("irr", irrigator);
 
-      let counter = 0;
-      zone.children.forEach(async child => {
-        const zone = await readZone(child);
+      if (num > 1) {
+        let counter = 0;
+        zone.children.forEach(async child => {
+          const zone = await readZone(child);
+          zone.devices.forEach(device => {
+            if (device.devicetype === "irrigator") {
+              const action = irrigator.isOn(ms % 86400000, ++counter)
+                ? "on"
+                : "off";
+              console.log("multi zone", counter, action);
+              const cmd = makeCommandMessage({
+                device: device.device,
+                action: action,
+                timestamp: new Date().toString()
+              });
+              const payload = { device: device.device, msg: cmd };
+              sendSocketMessage(makeSendByDeviceIDMessage(payload));
+            }
+          });
+        });
+      } else {
         zone.devices.forEach(device => {
           if (device.devicetype === "irrigator") {
-            const action = irrigator.isOn(ms % 86400000, ++counter)
-              ? "on"
-              : "off";
+            const action = irrigator.isOn(ms % 86400000, 0) ? "on" : "off";
+            console.log("single zone", action);
             const cmd = makeCommandMessage({
               device: device.device,
               action: action,
@@ -226,7 +245,7 @@ async function run() {
             sendSocketMessage(makeSendByDeviceIDMessage(payload));
           }
         });
-      });
+      }
     }
   });
 

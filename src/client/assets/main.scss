@@ -6,3 +6,17 @@ $control-border-width: 2px;
 
 // Bulma Import
 @import '~bulma';
+
+body {
+    background-color: #2d2d2d;
+}
+
+.box, .button, .navbar, .navbar-burger, .navbar-menu, .table, .table thead th {
+    background-color: #3d3d3d;
+    color: #fdfdfd;
+}
+
+.title, .text, .subtitle, .navbar-item, .copyright, .subtitle strong, strong {
+    color: #fdfdfd;
+}
+

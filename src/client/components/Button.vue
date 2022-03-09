@@ -20,7 +20,7 @@ const Button = Vue.extend({
 
   computed: {
     buttonClass() {
-      return `button is-${this.size} is-${this.color}`;
+      return `button is-${this.size} has-text-${this.color}`;
     }
   }
 });

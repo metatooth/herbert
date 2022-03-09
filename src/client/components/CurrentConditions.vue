@@ -1,7 +1,6 @@
 <template>
-  <nav class="level">
-    <div class="level-left" />
-    <div class="level-right" v-if="ready">
+  <div>
+    <div v-if="ready">
       <div class="level-item">
         <p class="subtitle">
           {{ settings.cityname }}, {{ settings.statecode }}
@@ -19,14 +18,14 @@
         <p class="title">{{ humidity.toFixed(0) }}%</p>
       </div>
     </div>
-    <div class="level-right" v-else>
+    <div v-else>
       <div class="level-item">
         <p class="subtitle">
           Loading...
         </p>
       </div>
     </div>
-  </nav>
+  </div>
 </template>
 
 <script lang="ts">

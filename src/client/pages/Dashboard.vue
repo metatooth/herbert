@@ -8,7 +8,25 @@
       @toggle="toggle"
     />
 
-    <current-conditions />
+    <nav class="level">
+      <div class="level-left" />
+      <div class="level-right">
+        <div v-for="worker in workers" :key="worker.worker">
+          <div class="level-item">
+            <p class="subtitle">{{ worker.name }}</p>
+          </div>
+          <div class="level-item" v-if="worker.camera">
+            <img :src="worker.camera" width="200" />
+          </div>
+          <div class="level-item">
+            <p class="text">
+              <em><readable :timestamp="worker.updatedat"/></em>
+            </p>
+          </div>
+        </div>
+        <current-conditions />
+      </div>
+    </nav>
 
     <div class="box">
       <collection
@@ -69,6 +87,7 @@ import Collection from "@/components/Collection.vue";
 import CurrentConditions from "@/components/CurrentConditions.vue";
 import HerbertNavbar from "@/components/HerbertNavbar.vue";
 import Notifications from "@/components/Notifications.vue";
+import Readable from "@/components/Readable.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
 
@@ -87,12 +106,14 @@ const Dashboard = Vue.extend({
     CurrentConditions,
     HerbertNavbar,
     Notifications,
+    Readable,
     SettingsPage,
     Timestamp
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
+    ...mapGetters("workers", ["workers"])
   },
 
   mounted() {

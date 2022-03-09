@@ -139,12 +139,15 @@ export class App {
     const polling: number = 1000 * (this.config.polling || 5);
     const interval: number = 1000 * (this.config.interval || 30);
 
+    console.log("RUN");
+
     if (!isMockWorker()) {
       const switchbot = new Switchbot();
       switchbot.onadvertisement = this.switchBotHandler;
       switchbot.startScan();
       switchbot.wait(polling);
       switchbot.stopScan();
+
     }
 
     this.meters.forEach(meter => {
@@ -164,6 +167,7 @@ export class App {
 
     if (this.wyze) {
       this.plugs = await this.wyze.getDeviceList();
+      console.log("PLUGS", this.plugs);
     }
 
     this.plugs.forEach(plug => {
@@ -221,10 +225,10 @@ export class App {
     }
 
     meter.clime.temperature = ad.serviceData.temperature.c;
-    meter.clime.delta = 0.6; // WARNING!
     meter.clime.humidity = ad.serviceData.humidity / 100.0;
     meter.clime.timestamp = new Date();
 
+    console.log("meter status", meter);
     this.meterStatus(meter);
 
     return Promise.resolve(true);
@@ -417,6 +421,9 @@ export class App {
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
       if (this.formatMacAddress(plug.device) === mac) {
+        console.log("plug state", plug.state);
+        console.log("plug status", plug.status());
+        console.log("plug state", plug.state);
         if (data.action === "on" && plug.state === "off") {
           plug.on();
         } else if (data.action === "off" && plug.state === "on") {
