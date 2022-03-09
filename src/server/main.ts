@@ -212,15 +212,14 @@ async function run() {
       console.log("irr", irrigator);
 
       if (num > 1) {
-
         let counter = 0;
         zone.children.forEach(async child => {
           const zone = await readZone(child);
           zone.devices.forEach(device => {
             if (device.devicetype === "irrigator") {
               const action = irrigator.isOn(ms % 86400000, ++counter)
-                    ? "on"
-                    : "off";
+                ? "on"
+                : "off";
               console.log("multi zone", counter, action);
               const cmd = makeCommandMessage({
                 device: device.device,
@@ -232,13 +231,10 @@ async function run() {
             }
           });
         });
-        
       } else {
         zone.devices.forEach(device => {
           if (device.devicetype === "irrigator") {
-            const action = irrigator.isOn(ms % 86400000, 0)
-                  ? "on"
-                  : "off";
+            const action = irrigator.isOn(ms % 86400000, 0) ? "on" : "off";
             console.log("single zone", action);
             const cmd = makeCommandMessage({
               device: device.device,
@@ -251,7 +247,6 @@ async function run() {
         });
       }
     }
-
   });
 
   setTimeout(run, account.interval);

@@ -31,8 +31,6 @@ import Wyze, { WyzeDevice } from "wyze-node";
 
 import WebCamera from "./web-camera";
 
-import ThermoPro from "./thermo-pro";
-
 try {
   fs.mkdirSync("./log");
 } catch (e) {
@@ -150,8 +148,6 @@ export class App {
       switchbot.wait(polling);
       switchbot.stopScan();
 
-      const thermopro = new ThermoPro();
-      thermopro.scan();
     }
 
     this.meters.forEach(meter => {
@@ -171,6 +167,7 @@ export class App {
 
     if (this.wyze) {
       this.plugs = await this.wyze.getDeviceList();
+      console.log("PLUGS", this.plugs);
     }
 
     this.plugs.forEach(plug => {
@@ -424,6 +421,9 @@ export class App {
     const mac = this.formatMacAddress(data.device);
     this.switches.forEach(plug => {
       if (this.formatMacAddress(plug.device) === mac) {
+        console.log("plug state", plug.state);
+        console.log("plug status", plug.status());
+        console.log("plug state", plug.state);
         if (data.action === "on" && plug.state === "off") {
           plug.on();
         } else if (data.action === "off" && plug.state === "on") {
