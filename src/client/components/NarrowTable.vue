@@ -12,6 +12,7 @@
         v-for="(item, index) in items"
         :key="`item-${index}`"
         :device="item"
+        :locked="locked"
       />
     </div>
     <div v-if="type === 'meter'">
@@ -58,7 +59,8 @@ import ZoneNarrow from "@/components/ZoneNarrow.vue";
 const NarrowTable = Vue.extend({
   props: {
     items: [],
-    type: String
+    type: String,
+    locked: Boolean
   },
 
   components: {

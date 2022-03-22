@@ -10,7 +10,7 @@
     <div class="card-content">
       <nav class="level is-mobile">
         <div class="level-item">
-          <zone-status-button :zone="zone" :locked="false" />
+          <zone-status-button :zone="zone" :locked="locked" />
         </div>
 
         <div class="level-item" v-if="zone.meters.length !== 0">
@@ -25,7 +25,7 @@
     </div>
 
     <div class="card-content">
-      <narrow-table :items="zone.devices" type="device" />
+      <narrow-table :items="zone.devices" :locked="locked" type="device" />
     </div>
 
     <div class="card-content">
@@ -84,7 +84,8 @@ import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 const ZoneDetail = Vue.extend({
   props: {
     zone: Zone,
-    units: String
+    units: String,
+    locked: Boolean
   },
 
   data() {
