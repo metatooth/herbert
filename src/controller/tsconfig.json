@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/controller",
+    "composite": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["**/*.test.ts"],
+  "references": [{ "path": "../shared" }]
+}

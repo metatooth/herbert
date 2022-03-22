@@ -11,17 +11,19 @@
     "clean": "rm -rf dist",
     "lint": "vue-cli-service lint",
     "serve:client": "vue-cli-service serve src/client/main.ts",
+    "serve:controller": "tsc-watch --noClear -b ./src/controller/tsconfig.json --onSuccess \"node --enable-source-maps dist/controller/main.js\"",
     "serve:server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps dist/server/main.js\"",
     "serve:socket-server": "tsc-watch --noClear -b ./src/socket-server/tsconfig.json --onSuccess \"node --enable-source-maps dist/socket-server/main.js\"",
     "serve:worker": "tsc-watch --noClear -b ./src/worker/tsconfig.json --onSuccess \"node --enable-source-maps dist/worker/main.js\"",
     "start": "node index.js",
     "copy:favicon": "cp src/server/favicon.ico dist/server/",
     "build:client": "vue-cli-service build src/client/main.ts",
+    "build:controller": "tsc -b src/controller",
     "build:server": "tsc -b src/server && npm run copy:favicon",
     "build:socket-server": "tsc -b src/socket-server",
     "build:worker": "tsc -b src/worker",
-    "serve": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,SOCKET,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgCyan.bold,bgRed.bold\"  \"npm run serve:client\" \"npm run serve:server\" \"npm run serve:socket-server\" \"npm run serve:worker\"",
-    "build": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,SOCKET,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgCyan.bold,bgRed.bold\"  \"npm run build:client\" \"npm run build:server\" \"npm run build:socket-server\" \"npm run build:worker\""
+    "serve": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,SOCKET,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgOrange.bold,bgCyan.bold,bgRed.bold\"  \"npm run serve:client\" \"npm run serve:server\" \"npm run server:controller\" \"npm run serve:socket-server\" \"npm run serve:worker\"",
+    "build": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,SOCKET,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgOrange.bold,bgCyan.bold,bgRed.bold\"  \"npm run build:client\" \"npm run build:server\" \"npm run build:controller\" \"npm run build:socket-server\" \"npm run build:worker\""
   },
   "repository": {
     "type": "git",

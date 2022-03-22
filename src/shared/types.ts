@@ -67,7 +67,30 @@ export interface Profile {
   blowercycle: number;
   irrigationperday: number;
   irrigationduration: number;
+  controltype: string;
   timestamp: Date;
+}
+
+export interface DateDim {
+  id: number;
+  year: number;
+  month: number;
+  date: number;
+}
+
+export interface TimeDim {
+  id: number;
+  hour: number;
+  minute: number;
+}
+
+export interface MeterFact {
+  id: number;
+  dateid: number;
+  timeid: number;
+  meter: string;
+  reading: number;
+  units: string;
 }
 
 export interface Reading {
@@ -96,6 +119,8 @@ export interface Zone {
   children: Zone[];
   meters: Meter[];
   devices: Device[];
+  lamponleafdiff: number;
+  lampoffleafdiff: number;
   timestamp: Date;
 }
 

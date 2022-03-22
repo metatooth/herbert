@@ -23,14 +23,7 @@
       <meter-actual :meter="meter" :units="units" />
     </td>
     <td class="is-italic">
-      <router-link
-        :to="{
-          name: 'readings',
-          params: { name: meter.nickname, device: meter.device }
-        }"
-      >
-        <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
-      </router-link>
+      <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
     </td>
     <td class="is-size-5">
       {{ meter.device }}

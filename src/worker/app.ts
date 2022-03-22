@@ -147,7 +147,6 @@ export class App {
       switchbot.startScan();
       switchbot.wait(polling);
       switchbot.stopScan();
-
     }
 
     this.meters.forEach(meter => {

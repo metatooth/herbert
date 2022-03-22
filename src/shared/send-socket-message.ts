@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { AnySocketMessage, SocketMessageMap } from "../shared/types";
+import { AnySocketMessage, SocketMessageMap } from "./types";
 
 let socket: Socket<SocketMessageMap>;
 

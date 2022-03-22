@@ -154,7 +154,7 @@
       </div>
     </div>
 
-  <zone-detail :zone="zone" :units="settings.units" :locked="locked" v-else />
+    <zone-detail :zone="zone" :units="settings.units" :locked="locked" v-else />
 
     <div class="card">
       <div class="card-footer">
