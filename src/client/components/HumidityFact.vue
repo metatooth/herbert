@@ -1,5 +1,5 @@
 <template>
-  <sparkline :id="id" :data="humidities"> </sparkline>
+  <sparkline :id="id" :data="humidities" color="rgb(0,187,238)" />
 </template>
 
 <script lang="ts">

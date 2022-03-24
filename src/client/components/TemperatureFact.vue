@@ -1,5 +1,11 @@
 <template>
-  <sparkline :id="id" :data="temperatures" :width="width" :height="height" />
+  <sparkline
+    :id="id"
+    :data="temperatures"
+    color="rgb(255,119,0)"
+    :width="width"
+    :height="height"
+    />
 </template>
 
 <script lang="ts">
