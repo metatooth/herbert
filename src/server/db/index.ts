@@ -84,7 +84,7 @@ export async function createMeterFact(
       "UPDATE devices SET temperature = $1, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
       [reading, meter]
     );
-  } else if (units === "RH%") {
+  } else if (units === "%RH") {
     await query(
       "UPDATE devices SET humidity = $1, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
       [reading, meter]
@@ -92,8 +92,8 @@ export async function createMeterFact(
   }
 
   return query<MeterFact>(
-    "SELECT * FROM meter_facts WHERE meter = $1 AND dateid = $2 AND timeid = $3",
-    [meter, datedim.id, timedim.id]
+    "SELECT * FROM meter_facts WHERE meter = $1 AND units = $2 AND dateid = $3 AND timeid = $4",
+    [meter, units, datedim.id, timedim.id]
   ).then(async res => {
     if (res.rowCount !== 0) {
       return query<MeterFact>(

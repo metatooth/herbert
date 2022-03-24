@@ -11,12 +11,18 @@
     <nav class="level">
       <div class="level-left" />
       <div class="level-right">
-        <div v-for="worker in workers" :key="worker.worker">
+        <current-conditions width="300px" />
+
+        <div
+          class="herbert-worker"
+          v-for="worker in workers"
+          :key="worker.worker"
+        >
           <div class="level-item">
             <p class="subtitle">{{ worker.name }}</p>
           </div>
           <div class="level-item" v-if="worker.camera">
-            <img :src="worker.camera" width="200" />
+            <img :src="worker.camera" width="300px" />
           </div>
           <div class="level-item">
             <p class="text">
@@ -24,7 +30,6 @@
             </p>
           </div>
         </div>
-        <current-conditions />
       </div>
     </nav>
 
@@ -190,3 +195,9 @@ const Dashboard = Vue.extend({
 
 export default Dashboard;
 </script>
+
+<style scoped>
+.herbert-worker {
+  width: 300px;
+}
+</style>

@@ -166,7 +166,6 @@ export class App {
 
     if (this.wyze) {
       this.plugs = await this.wyze.getDeviceList();
-      console.log("PLUGS", this.plugs);
     }
 
     this.plugs.forEach(plug => {
@@ -227,7 +226,6 @@ export class App {
     meter.clime.humidity = ad.serviceData.humidity / 100.0;
     meter.clime.timestamp = new Date();
 
-    console.log("meter status", meter);
     this.meterStatus(meter);
 
     return Promise.resolve(true);
@@ -441,6 +439,7 @@ export class App {
       humidity: meter.clime.humidity,
       timestamp: new Date().toString()
     });
+    console.log("send this message", msg);
     this.send(msg);
   }
 

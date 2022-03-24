@@ -36,17 +36,10 @@
         </span>
       </p>
       <div class="content">
-        <meter-actual :meter="meter" />
+        <meter-actual :meter="meter" width="200px" />
       </div>
       <div class="content">
-        <router-link
-          :to="{
-            name: 'readings',
-            params: { name: meter.nickname, device: meter.device }
-          }"
-        >
-          <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
-        </router-link>
+        <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
       </div>
       <div class="content">
         <edit-controls

@@ -1,5 +1,5 @@
 <template>
-  <canvas :id="id" width="400px" height="400px" />
+  <canvas :id="id" :width="width" :height="height" />
 </template>
 
 <script>
@@ -17,7 +17,9 @@ const Chart = Vue.extend({
     suggestedMin: { type: Number },
     suggestedMax: { type: Number },
     stepSize: { type: Number },
-    range: { type: Number }
+    range: { type: Number },
+    width: { type: String, default: "400px" },
+    height: { type: String, default: "400px" }
   },
 
   data() {

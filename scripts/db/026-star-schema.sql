@@ -15,14 +15,21 @@ create table time_dim (
   unique(hour, minute)
 );
 
+create table unit_types (
+  units varchar(32) primary key,
+  createdat timestamp default current_timestamp
+);
+
+insert into unit_types (units) values ('CELSIUS'), ('%RH');
+
 create table meter_facts (
   id serial primary key,
   meter macaddr references devices(device),
   dateid integer references date_dim(id),
   timeid integer references time_dim(id),
   reading numeric not null,
-  units varchar(32) not null,
-  unique(meter, dateid, timeid)
+  units varchar(32) references unit_types(units),
+  unique(meter, units, dateid, timeid)
 );
 
 commit;

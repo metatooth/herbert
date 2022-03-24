@@ -9,11 +9,6 @@
 
       <form class="control">
         Last&nbsp;
-        <label for="year" class="radio">
-          <input id="year" v-model="range" type="radio" value="year" />
-          Year
-        </label>
-        &nbsp;
         <label for="month" class="radio">
           <input id="month" v-model="range" type="radio" value="month" />
           Month
@@ -27,6 +22,11 @@
         <label for="day" class="radio">
           <input id="day" v-model="range" type="radio" value="day" />
           Day
+        </label>
+        &nbsp;
+        <label for="halfday" class="radio">
+          <input id="halfday" v-model="range" type="radio" value="halfday" />
+          Half Day
         </label>
         &nbsp;
         <label for="hour" class="radio">
@@ -83,7 +83,7 @@ interface MeterReading {
 const Readings = Vue.extend({
   data() {
     return {
-      range: "hour",
+      range: "day",
       temperatures: [] as MeterReading[],
       humidities: [] as MeterReading[],
       pressures: [] as MeterReading[],
@@ -120,6 +120,7 @@ const Readings = Vue.extend({
 
       xhr.onload = () => {
         const data = JSON.parse(xhr.response);
+        console.log("data", data);
         if (!data.error) {
           this.temperatures = [];
           this.humidities = [];
