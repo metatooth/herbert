@@ -2,7 +2,6 @@ import Vue from "vue";
 import Vuex, { StoreOptions } from "vuex";
 import { RootState } from "./types";
 import { zones } from "./zones";
-import { notifications } from "./notifications";
 import { profiles } from "./profiles";
 import { devices } from "./devices";
 import { meters } from "./meters";
@@ -19,7 +18,6 @@ const store: StoreOptions<RootState> = {
   },
   modules: {
     zones,
-    notifications,
     profiles,
     devices,
     meters,

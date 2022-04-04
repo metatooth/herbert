@@ -1,7 +1,7 @@
 <template>
   <sparkline
     :id="id"
-    :data="temperatures"
+    :data="statuses"
     color="rgb(255,119,0)"
     :width="width"
     :height="height"
@@ -11,7 +11,7 @@
 <script lang="ts">
 import Vue from "vue";
 
-import { Meter } from "@/store/meters/types";
+import { Device } from "@/store/meters/types";
 
 import Sparkline from "@/components/Sparkline.vue";
 
@@ -22,16 +22,16 @@ interface Fact {
   y: number;
 }
 
-const TemperatureFact = Vue.extend({
+const StatusFact = Vue.extend({
   props: {
-    meter: Meter,
+    device: Device,
     width: { type: String, default: "300px" },
     height: { type: String, default: "50px" }
   },
 
   data() {
     return {
-      temperatures: [] as Fact[]
+      statuses: [] as Fact[]
     };
   },
 
@@ -45,7 +45,7 @@ const TemperatureFact = Vue.extend({
 
   computed: {
     id() {
-      return `${this.meter.device}-temperature`;
+      return `${this.device.device}-status`;
     }
   },
 
@@ -54,12 +54,12 @@ const TemperatureFact = Vue.extend({
       const xhr = new XMLHttpRequest();
       const url = process.env.VUE_APP_API_URL;
 
-      xhr.open("GET", `${url}/facts/?meter=${this.meter.device}&units=CELSIUS`);
+      xhr.open("GET", `${url}/facts/?meter=${this.device.device}&units=STATUS`);
 
       xhr.onload = () => {
         const data = JSON.parse(xhr.response);
         if (!data.error) {
-          this.temperatures = [];
+          this.statuses = [];
           const timeZone = "America/New_York";
           data.forEach(
             (d: {
@@ -82,7 +82,7 @@ const TemperatureFact = Vue.extend({
                 y: d.reading as number
               };
 
-              this.temperatures.push(temperature);
+              this.statuses.push(temperature);
             }
           );
         }
@@ -93,7 +93,7 @@ const TemperatureFact = Vue.extend({
   }
 });
 
-export default TemperatureFact;
+export default StatusFact;
 </script>
 
 <style></style>

@@ -97,8 +97,8 @@ export async function createMeterFact(
   ).then(async res => {
     if (res.rowCount !== 0) {
       return query<MeterFact>(
-        "UPDATE meter_facts SET reading = $1, units = $2 WHERE id = $3",
-        [reading, units, res.rows[0].id]
+        "UPDATE meter_facts SET reading = $1 WHERE id = $2",
+        [reading, res.rows[0].id]
       ).then(async res => {
         return res.rows[0];
       });

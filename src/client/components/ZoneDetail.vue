@@ -25,6 +25,10 @@
     </div>
 
     <div class="card-content">
+      <zone-chart :zone="zone" :units="settings.units" />
+    </div>
+
+    <div class="card-content">
       <narrow-table :items="zone.devices" :locked="locked" type="device" />
     </div>
 
@@ -77,6 +81,7 @@ import Vue from "vue";
 import { Zone } from "@/store/zones/types";
 import { mapGetters, mapActions } from "vuex";
 import NarrowTable from "@/components/NarrowTable.vue";
+import ZoneChart from "@/components/ZoneChart.vue";
 import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 
 import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
@@ -110,6 +115,7 @@ const ZoneDetail = Vue.extend({
   components: {
     NarrowTable,
     Readable,
+    ZoneChart,
     ZoneStatusButton
   },
 

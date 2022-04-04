@@ -26,7 +26,7 @@
       {{ zonename }}
     </td>
     <td>
-      <meter-actual :meter="meter" :units="units" />
+      <meter-actual :meter="meter" :units="units" width="500px" />
     </td>
     <td>
       <edit-controls
@@ -35,6 +35,7 @@
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
+        :stacked="true"
       />
     </td>
   </tr>

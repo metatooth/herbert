@@ -59,7 +59,7 @@ const HumidityFact = Vue.extend({
             }) => {
               const observedat = new Date(
                 d.year,
-                d.month,
+                d.month - 1,
                 d.date,
                 d.hour,
                 d.minute

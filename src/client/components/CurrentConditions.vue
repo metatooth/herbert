@@ -1,11 +1,9 @@
 <template>
-  <div>
+  <div class="level-right">
+    <div class="level-item">
+      <p class="subtitle">{{ settings.cityname }}, {{ settings.statecode }}</p>
+    </div>
     <div v-if="ready">
-      <div class="level-item">
-        <p class="subtitle">
-          {{ settings.cityname }}, {{ settings.statecode }}
-        </p>
-      </div>
       <div class="level-item">
         <p class="title">
           {{ main }}
@@ -18,12 +16,10 @@
         <p class="title">{{ humidity.toFixed(0) }}%</p>
       </div>
     </div>
-    <div v-else>
-      <div class="level-item">
-        <p class="subtitle">
-          Loading...
-        </p>
-      </div>
+    <div v-else class="level-item">
+      <p class="subtitle">
+        Loading...
+      </p>
     </div>
   </div>
 </template>
@@ -31,6 +27,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
+import { io, Socket } from "socket.io-client";
+import { makeMeterStatusMessage } from "../../shared/message-creators";
 
 import Openweathermap from "../api/openweathermap";
 
@@ -41,7 +39,8 @@ const CurrentConditions = Vue.extend({
       timestamp: Date,
       temperature: Number,
       humidity: Number,
-      main: String
+      main: String,
+      socket: Socket
     };
   },
 
@@ -76,6 +75,8 @@ const CurrentConditions = Vue.extend({
   },
 
   mounted() {
+    this.socket = io(process.env.VUE_APP_WSS_URL);
+
     this.refresh();
   },
 
@@ -98,10 +99,28 @@ const CurrentConditions = Vue.extend({
           this.humidity = res.data.main.humidity;
           this.main = res.data.weather[0].main;
           this.ready = true;
+
+          let mac = this.settings.openweather.slice(-12);
+          mac = mac.replace(/(.{2})/g, "$1:");
+          mac = mac
+            .split(":")
+            .slice(0, -1)
+            .join(":");
+
+          const msg = makeMeterStatusMessage({
+            device: mac,
+            type: "meter",
+            manufacturer: "OpenWeather",
+            temperature: this.temperature,
+            humidity: this.humidity / 100,
+            timestamp: new Date().toString()
+          });
+
+          this.socket.emit("message", msg);
         });
       }
 
-      const refresh = this.settings.refresh ? this.settings.refresh : 1000;
+      const refresh = this.settings.refresh ? this.settings.refresh : 60000;
       setTimeout(this.refresh, refresh);
     }
   }

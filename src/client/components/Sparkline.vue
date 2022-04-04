@@ -56,9 +56,6 @@ const Sparkline = Vue.extend({
 
   watch: {
     data(val) {
-      console.log("new data!", val);
-      console.log("old", this.chart.data.datasets);
-
       this.chart.data.datasets.push({
         data: val,
         fill: false,
@@ -68,8 +65,6 @@ const Sparkline = Vue.extend({
         borderColor: this.color,
         backgroundColor: this.color
       });
-
-      console.log("new", this.chart.data.datasets);
 
       this.chart.options = {
         responsive: false,
