@@ -11,11 +11,10 @@ const SystemHumidityChart = Vue.extend({
   components: {
     HumidityChart
   },
-  
+
   computed: {
     ...mapGetters("meters", ["meters"])
   }
-
 });
 
 export default SystemHumidityChart;

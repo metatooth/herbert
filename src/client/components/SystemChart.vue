@@ -2,9 +2,15 @@
   <nav class="level">
     <div class="level-left" />
     <div class="level-right">
-      <system-temperature-chart class="level-item" />
-      <system-humidity-chart class="level-item" />
-      <system-device-chart class="level-item" />
+      <div class="level-item">
+        <system-temperature-chart class="box" />
+      </div>
+      <div class="level-item">
+        <system-humidity-chart class="box" />
+      </div>
+      <div class="level-item">
+        <system-device-chart class="box" />
+      </div>
     </div>
   </nav>
 </template>
@@ -28,18 +34,18 @@ export default SystemChart;
 
 <style scoped>
 .level-item {
-  width: 400px;
+  width: 300px;
 }
 
 @media screen and (min-width: 769px) {
   .level-item {
-    width: 300px;
+    width: 200px;
   }
 }
 
 @media screen and (min-width: 1216px) {
   .level-item {
-    width: 400px;
+    width: 300px;
   }
 }
 </style>

@@ -25,3 +25,11 @@ test("directive is to cool & humidify", () => {
   expect(directives.temperature).toBe("cool");
   expect(directives.humidity).toBe("humidify");
 });
+
+test("heat to raise VPD", () => {
+  const directives = new AirDirectives(new ConstantVpd([1000, 1]));
+  directives.clime = new Clime(19, -1.67, 0.82);
+  directives.monitor();
+  expect(directives.temperature).toBe("heat");
+  expect(directives.humidity).toBe("dehumidify");
+});

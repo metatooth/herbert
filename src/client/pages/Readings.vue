@@ -1,12 +1,19 @@
 <template>
-  <div id="readings">
-    <section class="section">
-      <back-to-dashboard />
-    </section>
-    <section class="section">
-      <h2 class="title">{{ $route.params.name }} Meter Reading</h2>
-      <h2 class="subtitle">{{ $route.params.device }}</h2>
-
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-title">
+        <p class="title">{{ $route.params.name }} Meter Reading</p>
+        <p class="subtitle">{{ $route.params.device }}</p>
+      </div>
+      <div class="card-header-icon"> 
+        <router-link :to="{ name: 'dashboard' }">
+          <span class="icon">
+            <font-awesome-icon icon="times-circle" />
+          </span>
+        </router-link>
+      </div>
+    </div>
+    <div class="card-content">      
       <form class="control">
         Last&nbsp;
         <label for="month" class="radio">
@@ -37,7 +44,15 @@
 
       <div class="columns">
         <div class="column is-half">
-          <temperature-chart id="tempchart" v-bind:data="temperatures" />
+          <chart
+            id="temperaturechart"
+            v-bind:data="temperatures"
+            title="Temperature"
+            label="Celius (C)"
+            v-bind:suggestedMin="min"
+            v-bind:suggestedMax="max"
+            v-bind:stepSize="1"
+          />
         </div>
         <div class="column is-half">
           <chart
@@ -51,29 +66,17 @@
           />
         </div>
       </div>
-
-      <div class="columns">
-        <div class="column is-half">
-          <chart
-            id="pressurechart"
-            v-bind:data="pressures"
-            title="Vapor Pressure Deficit"
-            label="hectopascals (hPa)"
-            v-bind:suggestedMin="0"
-            v-bind:suggestedMax="3"
-          />
-        </div>
-      </div>
-    </section>
+      
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
+import { mapGetters } from "vuex";
+
 import Chart from "@/components/Chart.vue";
-import TemperatureChart from "@/components/TemperatureChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
-import BackToDashboard from "@/components/BackToDashboard.vue";
 
 interface MeterReading {
   x: Date;
@@ -86,18 +89,19 @@ const Readings = Vue.extend({
       range: "day",
       temperatures: [] as MeterReading[],
       humidities: [] as MeterReading[],
-      pressures: [] as MeterReading[],
       min: 100,
       max: 0
     };
   },
 
   components: {
-    BackToDashboard,
-    Chart,
-    TemperatureChart
+    Chart
   },
 
+  computed: {
+    ...mapGetters("settings", ["settings"])
+  },
+  
   mounted() {
     this.refresh();
   },
@@ -110,60 +114,74 @@ const Readings = Vue.extend({
 
   methods: {
     refresh() {
-      const xhr = new XMLHttpRequest();
       const url = process.env.VUE_APP_API_URL;
+      const timeZone = this.settings.timezone;
 
-      xhr.open(
+      const temp = new XMLHttpRequest();
+
+      temp.open(
         "GET",
-        `${url}/readings/?meter=${this.$route.params.device}&last=${this.range}`
+        `${url}/facts?meter=${this.$route.params.device}&units=CELSIUS&last=${this.range}`
       );
 
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        console.log("data", data);
+      temp.onload = () => {
+        const data = JSON.parse(temp.response);
         if (!data.error) {
           this.temperatures = [];
-          this.humidities = [];
-          const timeZone = "America/New_York";
-          data.forEach(
-            (d: {
-              observedat: Date;
-              temperature: number;
-              humidity: number;
-              pressure: number;
-            }) => {
-              const ts = convertToLocalTime(d.observedat, { timeZone });
-              const temperature = {
-                x: ts,
-                y: d.temperature as number
-              };
-              const humidity = {
-                x: ts,
-                y: 100 * d.humidity
-              };
 
-              if (humidity.y < this.min) {
-                this.min = humidity.y;
-              }
+          data.forEach(d => {
+            const observedat = new Date(
+              d.year,
+              d.month - 1,
+              d.date,
+              d.hour,
+              d.minute
+            );
+            
+            const temperature = {
+              x: convertToLocalTime(observedat, { timeZone }),
+              y: d.reading as number
+            };
+            
+            this.temperatures.push(temperature);            
+          });
 
-              if (humidity.y > this.max) {
-                this.max = humidity.y;
-              }
-
-              const pressure = {
-                x: ts,
-                y: d.pressure / 1000
-              };
-
-              this.temperatures.push(temperature);
-              this.humidities.push(humidity);
-              this.pressures.push(pressure);
-            }
-          );
         }
-      };
+      }
+      
+      const humid = new XMLHttpRequest();
 
-      xhr.send();
+      humid.open(
+        "GET",
+        `${url}/facts?meter=${this.$route.params.device}&units=%RH&last=${this.range}`
+      );
+
+      humid.onload = () => {
+        const data = JSON.parse(humid.response);
+        if (!data.error) {
+          this.humidities = [];
+
+          data.forEach(d => {
+            const observedat = new Date(
+              d.year,
+              d.month - 1,
+              d.date,
+              d.hour,
+              d.minute
+            );
+
+            const humidity = {
+              x: convertToLocalTime(observedat, { timeZone }),
+              y: (d.reading as number) * 100
+            };
+
+            this.humidities.push(humidity);            
+          });
+        }
+      }
+
+      temp.send();
+      humid.send();
     }
   }
 });

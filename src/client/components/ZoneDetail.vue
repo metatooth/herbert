@@ -9,18 +9,23 @@
 
     <div class="card-content">
       <nav class="level is-mobile">
-        <div class="level-item">
-          <zone-status-button :zone="zone" :locked="locked" />
-        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <zone-status-button :zone="zone" :locked="locked" />
+          </div>
 
-        <div class="level-item" v-if="zone.meters.length !== 0">
-          <p class="title" :style="temperatureStyle">
-            {{ temperature.toFixed(0) }}&#176;
-          </p>
+          <div class="level-item" v-if="zone.meters.length !== 0">
+            <p class="title" :style="temperatureStyle">
+              {{ temperature.toFixed(0) }}&#176;
+            </p>
+          </div>
+          <div class="level-item" v-if="zone.meters.length !== 0">
+            <p class="title" :style="humidityStyle">
+              {{ humidity.toFixed(0) }}%
+            </p>
+          </div>
         </div>
-        <div class="level-item" v-if="zone.meters.length !== 0">
-          <p class="title" :style="humidityStyle">{{ humidity.toFixed(0) }}%</p>
-        </div>
+        <div class="level-left" />
       </nav>
     </div>
 

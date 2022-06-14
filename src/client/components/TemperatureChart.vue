@@ -14,7 +14,7 @@ const TemperatureChart = Vue.extend({
   props: {
     meters: []
   },
-  
+
   data() {
     return {
       chart: ChartJS
@@ -30,7 +30,7 @@ const TemperatureChart = Vue.extend({
     this.chart = new ChartJS(ctx, {
       type: "line",
       options: {
-        responsive: false,
+        responsive: true,
         legend: {
           display: false
         },
@@ -59,7 +59,7 @@ const TemperatureChart = Vue.extend({
     this.meters.forEach(m => {
       HTTP.get(`/facts?meter=${m.device}&units=CELSIUS`).then(resp => {
         const temperatures = [];
-        
+
         resp.data.forEach(d => {
           const observedat = new Date(
             d.year,
@@ -78,7 +78,7 @@ const TemperatureChart = Vue.extend({
 
         let color = "#ff7700";
         if (m.manufacturer === "OpenWeather") {
-          color = "#2d2d2d";
+          color = "#aa2200";
         }
 
         this.chart.data.datasets.push({

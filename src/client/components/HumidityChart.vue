@@ -14,7 +14,7 @@ const SystemHumidityChart = Vue.extend({
   props: {
     meters: []
   },
-  
+
   data() {
     return {
       chart: ChartJS
@@ -30,7 +30,7 @@ const SystemHumidityChart = Vue.extend({
     this.chart = new ChartJS(ctx, {
       type: "line",
       options: {
-        responsive: false,
+        responsive: true,
         legend: {
           display: false
         },
@@ -78,7 +78,7 @@ const SystemHumidityChart = Vue.extend({
 
         let color = "#00bbee";
         if (m.manufacturer === "OpenWeather") {
-          color = "#2d2d2d";
+          color = "#005577";
         }
 
         this.chart.data.datasets.push({
@@ -90,10 +90,10 @@ const SystemHumidityChart = Vue.extend({
         this.chart.update();
       });
     });
-                                      }
+  }
 });
 
 export default SystemHumidityChart;
 </script>
 
-  <style scoped></style>
+<style scoped></style>

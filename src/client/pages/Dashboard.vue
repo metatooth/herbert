@@ -9,24 +9,8 @@
       @toggle="toggle"
     />
 
-    <nav v-if="is('overview')" class="level box">
-      <div class="level-left" />
-      <current-conditions width="300px" />
-
-      <div class="level-right" v-for="worker in cameras" :key="worker.worker">
-        <div class="level-item">
-          <p class="subtitle">{{ worker.name }}</p>
-        </div>
-        <div class="level-item">
-          <img :src="worker.camera" width="300px" height="225px" />
-        </div>
-      </div>
-    </nav>
-
-    <div v-if="is('overview')" class="box">
-      <system-chart />
-    </div>
-
+    <top-panel v-if="is('overview')" />
+    
     <div v-else class="box">
       <collection
         v-if="is('devices')"
@@ -81,11 +65,10 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
 import Collection from "@/components/Collection.vue";
-import CurrentConditions from "@/components/CurrentConditions.vue";
 import HerbertNavbar from "@/components/HerbertNavbar.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
-import SystemChart from "@/components/SystemChart.vue";
+import TopPanel from "@/components/TopPanel.vue";
 
 const Dashboard = Vue.extend({
   data() {
@@ -99,10 +82,9 @@ const Dashboard = Vue.extend({
 
   components: {
     Collection,
-    CurrentConditions,
     HerbertNavbar,
     SettingsPage,
-    SystemChart,
+    TopPanel,
     Timestamp
   },
 
@@ -200,8 +182,27 @@ const Dashboard = Vue.extend({
 export default Dashboard;
 </script>
 
-<style scoped>
+<style>
+ 
 .herbert-worker {
   width: 300px;
 }
+
+.card-content {
+color: #00dd77;
+align: center;
+}
+
+.card-image .logo {
+height: 2rem;
+}
+
+.card-footer {
+  border-top: 0px;
+}
+
+a, .card-header-title {
+  color: #00dd77;
+}
+
 </style>

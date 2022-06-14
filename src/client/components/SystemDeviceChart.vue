@@ -11,11 +11,10 @@ const SystemDeviceChart = Vue.extend({
   components: {
     DeviceChart
   },
-  
+
   computed: {
     ...mapGetters("devices", ["devices"])
   }
-
 });
 
 export default SystemDeviceChart;

@@ -14,7 +14,7 @@ const DeviceChart = Vue.extend({
   props: {
     devices: []
   },
-  
+
   data() {
     return {
       chart: ChartJS
@@ -30,7 +30,7 @@ const DeviceChart = Vue.extend({
     this.chart = new ChartJS(ctx, {
       type: "line",
       options: {
-        responsive: false,
+        responsive: true,
         legend: {
           display: false
         },
@@ -55,7 +55,7 @@ const DeviceChart = Vue.extend({
     });
 
     const timeZone = this.settings.timezone;
-    
+
     this.devices.forEach(d => {
       if (d.devicetype === "irrigator" || d.devicetype === "lamp") {
         HTTP.get(`/facts?device=${d.device}&units=STATUS`).then(resp => {
@@ -91,7 +91,7 @@ const DeviceChart = Vue.extend({
           this.chart.update();
         });
       }
-    });    
+    });
   }
 });
 

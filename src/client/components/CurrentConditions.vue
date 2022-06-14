@@ -1,25 +1,21 @@
 <template>
-  <div class="level-right">
-    <div class="level-item">
-      <p class="subtitle">{{ settings.cityname }}, {{ settings.statecode }}</p>
-    </div>
-    <div v-if="ready">
-      <div class="level-item">
-        <p class="title">
-          {{ main }}
+  <div class="box">
+    <div class="card">
+      <div class="card-header">
+        <p class="subtitle">
+          {{ settings.cityname }}, {{ settings.statecode }}
         </p>
       </div>
-      <div class="level-item">
+      <div v-if="ready" class="card-content">
+        <p class="title">{{ main }}</p>
         <p class="title">{{ temperature.toFixed(0) }}&#176;</p>
-      </div>
-      <div class="level-item">
         <p class="title">{{ humidity.toFixed(0) }}%</p>
       </div>
-    </div>
-    <div v-else class="level-item">
-      <p class="subtitle">
-        Loading...
-      </p>
+      <div v-else class="card-content">
+        <p class="subtitle">
+          Loading...
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -134,5 +130,9 @@ export default CurrentConditions;
   border-top-color: #efefef;
   border-top-width: 2px;
   border-top-style: solid;
+}
+
+.title, .subtitle {
+  color: #00dd77;
 }
 </style>

@@ -11,11 +11,10 @@ const SystemTemperatureChart = Vue.extend({
   components: {
     TemperatureChart
   },
-  
+
   computed: {
     ...mapGetters("meters", ["meters"])
   }
-
 });
 
 export default SystemTemperatureChart;

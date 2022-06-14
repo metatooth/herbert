@@ -34,6 +34,12 @@
         <span v-else>
           {{ zonename }}
         </span>
+        <button class="button has-text-info" @click="history">
+          <span class="icon">
+            <font-awesome-icon icon="history" />
+          </span>
+        </button>
+        
       </p>
       <div class="content">
         <meter-actual :meter="meter" width="200px" />
@@ -142,6 +148,13 @@ const MeterTile = Vue.extend({
 
     editable() {
       this.editing = true;
+    },
+
+    history() {
+      this.$router.push({
+        name: "readings",
+        params: { name: this.meter.nickname, device: this.meter.device }
+      });
     },
 
     save() {
