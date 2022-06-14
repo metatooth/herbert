@@ -1,6 +1,18 @@
 <template>
-  <div class="container" ref="zonepage">
-    <back-to-dashboard />
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-title">
+        <p class="title"></p>
+        <p class="subtitle"></p>
+      </div>
+      <div class="card-header-icon">
+        <router-link :to="{ name: 'dashboard' }">
+          <span class="icon">
+            <font-awesome-icon icon="times-circle" />
+          </span>
+        </router-link>
+      </div>
+    </div>
     <div class="card" v-if="editing">
       <div class="card-header">
         <div class="card-header-title">
@@ -154,7 +166,7 @@
       </div>
     </div>
 
-    <zone-detail :zone="zone" :units="settings.units" v-else />
+    <zone-detail :zone="zone" :units="settings.units" :locked="locked" v-else />
 
     <div class="card">
       <div class="card-footer">
@@ -176,13 +188,11 @@
 import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
-import BackToDashboard from "@/components/BackToDashboard.vue";
 import ZoneDetail from "@/components/ZoneDetail.vue";
 import EditControls from "@/components/EditControls.vue";
 
 const ZonePage = Vue.extend({
   components: {
-    BackToDashboard,
     EditControls,
     ZoneDetail
   },

@@ -1,7 +1,7 @@
 import Router from "express-promise-router";
 import { Zone } from "../../shared/types";
 
-import { query, readZones, readZone } from "../db";
+import { query, readZones, readZone, parentZone } from "../db";
 
 const router = Router();
 
@@ -22,6 +22,11 @@ router.post("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
   res.status(200).json(await readZone(parseInt(id)));
+});
+
+router.get("/:id/parent", async (req, res) => {
+  const { id } = req.params;
+  res.status(200).json(await parentZone(parseInt(id)));
 });
 
 router.put("/:id", async (req, res) => {

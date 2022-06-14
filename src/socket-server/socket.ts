@@ -126,6 +126,7 @@ export class HerbertSocket {
 
       if (data.payload) {
         const payload = JSON.parse(JSON.stringify(data.payload));
+        console.log("payload", payload);
         if (payload.device) {
           ws.join(`devices:${payload.device}`);
         }
@@ -274,6 +275,8 @@ export class HerbertSocket {
         url: "/meters",
         data: body
       });
+
+      console.log("handle meter status msg", body);
 
       const resp = await HTTP.get<Meter>(`/meters/${payload.device}`);
       const meter = resp.data;

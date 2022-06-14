@@ -1,6 +1,7 @@
 <template>
   <div class="container" id="dashboard">
     <herbert-navbar
+      class="box"
       :active="picked"
       :locked="locked"
       @search-on="setFilter"
@@ -8,27 +9,9 @@
       @toggle="toggle"
     />
 
-    <nav class="level">
-      <div class="level-left" />
-      <div class="level-right">
-        <div v-for="worker in workers" :key="worker.worker">
-          <div class="level-item">
-            <p class="subtitle">{{ worker.name }}</p>
-          </div>
-          <div class="level-item" v-if="worker.camera">
-            <img :src="worker.camera" width="200" />
-          </div>
-          <div class="level-item">
-            <p class="text">
-              <em><readable :timestamp="new Date(worker.updatedat)"/></em>
-            </p>
-          </div>
-        </div>
-        <current-conditions />
-      </div>
-    </nav>
-
-    <div class="box">
+    <top-panel v-if="is('overview')" />
+    
+    <div v-else class="box">
       <collection
         v-if="is('devices')"
         type="device"
@@ -60,7 +43,7 @@
         :locked="locked"
       />
       <collection
-        v-if="is('zones') || is('overview')"
+        v-if="is('zones')"
         type="zone"
         :filter="filter"
         :locked="locked"
@@ -73,8 +56,6 @@
       />
     </div>
 
-    <notifications class="box" v-if="is('overview')" />
-
     <timestamp class="box" :timestamp="ts" />
   </div>
 </template>
@@ -84,12 +65,10 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
 import Collection from "@/components/Collection.vue";
-import CurrentConditions from "@/components/CurrentConditions.vue";
 import HerbertNavbar from "@/components/HerbertNavbar.vue";
-import Notifications from "@/components/Notifications.vue";
-import Readable from "@/components/Readable.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
+import TopPanel from "@/components/TopPanel.vue";
 
 const Dashboard = Vue.extend({
   data() {
@@ -103,17 +82,29 @@ const Dashboard = Vue.extend({
 
   components: {
     Collection,
-    CurrentConditions,
     HerbertNavbar,
-    Notifications,
-    Readable,
     SettingsPage,
+    TopPanel,
     Timestamp
   },
 
   computed: {
+    cameras() {
+      return this.workers.filter(worker => {
+        return worker.camera !== null;
+      });
+    },
+
+    logo() {
+      if (this.settings.logo) {
+        return this.settings.logo;
+      }
+      return null;
+    },
+
     ...mapGetters("settings", ["settings"]),
-    ...mapGetters("workers", ["workers"])
+    ...mapGetters("workers", ["workers"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   mounted() {
@@ -190,3 +181,28 @@ const Dashboard = Vue.extend({
 
 export default Dashboard;
 </script>
+
+<style>
+ 
+.herbert-worker {
+  width: 300px;
+}
+
+.card-content {
+color: #00dd77;
+align: center;
+}
+
+.card-image .logo {
+height: 2rem;
+}
+
+.card-footer {
+  border-top: 0px;
+}
+
+a, .card-header-title {
+  color: #00dd77;
+}
+
+</style>

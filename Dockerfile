@@ -34,6 +34,17 @@ RUN npm run build:server
 
 CMD ["npm", "run", "serve:server"]
 
+FROM base as controller
+
+COPY config ./config
+COPY src/controller ./src/controller
+COPY src/shared src/shared
+COPY tsconfig.json tsconfig.base.json ./
+
+RUN npm run build:controller
+
+CMD ["npm", "run", "serve:controller"]
+
 FROM base as socket-server
 
 COPY config ./config

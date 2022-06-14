@@ -2,13 +2,10 @@
   <div>
     <router-view></router-view>
     <footer>
-      <a href="https://growherbert.com" class="content has-text-centered">
-        <p>Powered by <img src="./assets/images/logo.png" /><br /></p>
-      </a>
       <div class="copyright has-text-centered is-size-7">
         <p>
           {{ appVersion }} &#169;
-          <a href="https://metatooth.com">Metatooth</a> 2022
+          2022 <a href="https://metatooth.com">Metatooth LLC</a>
         </p>
       </div>
     </footer>

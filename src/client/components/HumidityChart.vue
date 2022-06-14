@@ -1,5 +1,5 @@
 <template>
-  <canvas id="temperatures" />
+  <canvas id="humidities" />
 </template>
 
 <script lang="ts">
@@ -10,7 +10,7 @@ import { convertToLocalTime } from "date-fns-timezone";
 import ChartJS from "chart.js";
 import "chartjs-adapter-date-fns";
 
-const TemperatureChart = Vue.extend({
+const SystemHumidityChart = Vue.extend({
   props: {
     meters: []
   },
@@ -26,7 +26,7 @@ const TemperatureChart = Vue.extend({
   },
 
   mounted() {
-    const ctx = document.getElementById("temperatures");
+    const ctx = document.getElementById("humidities");
     this.chart = new ChartJS(ctx, {
       type: "line",
       options: {
@@ -57,8 +57,8 @@ const TemperatureChart = Vue.extend({
     const timeZone = this.settings.timezone;
 
     this.meters.forEach(m => {
-      HTTP.get(`/facts?meter=${m.device}&units=CELSIUS`).then(resp => {
-        const temperatures = [];
+      HTTP.get(`/facts?meter=${m.device}&units=%RH`).then(resp => {
+        const humidities = [];
 
         resp.data.forEach(d => {
           const observedat = new Date(
@@ -69,20 +69,20 @@ const TemperatureChart = Vue.extend({
             d.minute
           );
 
-          const temperature = {
+          const humidity = {
             x: convertToLocalTime(observedat, { timeZone }),
-            y: d.reading as number
+            y: (d.reading as number) * 100
           };
-          temperatures.push(temperature);
+          humidities.push(humidity);
         });
 
-        let color = "#ff7700";
+        let color = "#00bbee";
         if (m.manufacturer === "OpenWeather") {
-          color = "#aa2200";
+          color = "#005577";
         }
 
         this.chart.data.datasets.push({
-          data: temperatures,
+          data: humidities,
           borderColor: color,
           fill: false
         });
@@ -93,7 +93,7 @@ const TemperatureChart = Vue.extend({
   }
 });
 
-export default TemperatureChart;
+export default SystemHumidityChart;
 </script>
 
 <style scoped></style>

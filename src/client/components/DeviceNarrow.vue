@@ -11,7 +11,7 @@
     </div>
     <div class="level-right">
       <div class="level-item">
-        <button class="button" @click="toggle">
+        <button class="button" :disabled="locked" @click="toggle">
           <font-awesome-icon :class="deviceClass" :icon="device.icon" />
           <span>{{ status.slice(0, 3) }}</span>
         </button>
@@ -35,7 +35,8 @@ import { Device } from "@/store/meters/types";
 
 const DeviceNarrow = Vue.extend({
   props: {
-    device: Device
+    device: Device,
+    locked: Boolean
   },
 
   data() {

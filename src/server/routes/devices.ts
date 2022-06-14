@@ -5,7 +5,7 @@ import {
 } from "../../shared/message-creators";
 import { Device } from "../../shared/types";
 import { query, readDevice, readDevices, registerDevice } from "../db";
-import { sendSocketMessage } from "../util";
+import { sendSocketMessage } from "../../shared/send-socket-message";
 
 const router = Router();
 

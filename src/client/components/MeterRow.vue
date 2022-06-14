@@ -12,28 +12,21 @@
           />
         </div>
       </div>
-      <span class="is-size-5" v-else>
-        {{ meter.name }}
-      </span>
+      <div v-else>
+        <div class="is-size-5">{{ meter.name }}</div>
+        <div class="is-size-7">{{ meter.device }}</div>
+        <em
+          ><readable
+            class="is-size-7"
+            :timestamp="new Date(Date.parse(meter.timestamp))"
+        /></em>
+      </div>
     </td>
     <td>
       {{ zonename }}
     </td>
     <td>
-      <meter-actual :meter="meter" :units="units" />
-    </td>
-    <td class="is-italic">
-      <router-link
-        :to="{
-          name: 'readings',
-          params: { name: meter.nickname, device: meter.device }
-        }"
-      >
-        <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
-      </router-link>
-    </td>
-    <td class="is-size-5">
-      {{ meter.device }}
+      <meter-actual :meter="meter" :units="units" width="500px" />
     </td>
     <td>
       <edit-controls
@@ -42,6 +35,7 @@
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
+        :stacked="true"
       />
     </td>
   </tr>

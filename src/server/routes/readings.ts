@@ -1,6 +1,6 @@
 import Router from "express-promise-router";
 
-import { createReading, query, readAccount } from "../db";
+import { createMeterFact, query } from "../db";
 import { Reading } from "../../shared/types";
 
 const router = Router();
@@ -14,6 +14,8 @@ router.get("/", async (req, res) => {
     one = true;
   } else if (req.query.last === "hour") {
     // default
+  } else if (req.query.last === "halfday") {
+    limit = now - 43200000;
   } else if (req.query.last === "day") {
     limit = now - 86400000;
   } else if (req.query.last === "week") {
@@ -27,7 +29,6 @@ router.get("/", async (req, res) => {
   }
 
   const startDate = new Date(limit);
-  console.log("startDate", startDate);
 
   const start = startDate
     .toISOString()
@@ -66,27 +67,10 @@ router.post("/", async (req, res) => {
   const { meter, temperature, humidity, pressure, ts } = body;
   const observedat = new Date(ts);
 
-  const { rows } = await query<Reading>(
-    "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
-    [meter]
-  );
+  await createMeterFact(meter, temperature, "CELSIUS", observedat);
+  await createMeterFact(meter, humidity, "%RH", observedat);
 
-  if (rows.length !== 0) {
-    const last = observedat.getTime();
-    const curr = new Date(rows[0].observedat).getTime();
-
-    const account = await readAccount(1);
-
-    if (last - curr >= account.reportingperiod) {
-      await createReading(meter, temperature, humidity, pressure, observedat);
-      res.status(204).send();
-    } else {
-      res.status(201).send();
-    }
-  } else {
-    await createReading(meter, temperature, humidity, pressure, observedat);
-    res.status(204).send();
-  }
+  res.status(204).send();
 });
 
 export default router;
