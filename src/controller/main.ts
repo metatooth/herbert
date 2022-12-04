@@ -88,34 +88,43 @@ async function run() {
     console.log("active zone", zone.id, zone.nickname);
     console.log("check hour", hour);
     console.log("control type", zone.profile.controltype);
-    
+
     if (zone.profile.controltype === "HI_LO") {
       target = new HiLo([
-        zone.profile.lampOnTemperature,
-        zone.profile.lampOffTemperature,
-        zone.profile.lampOnHumidity,
-        zone.profile.lampOffHumidity
+        zone.profile.lampontemperature,
+        zone.profile.lampofftemperature,
+        zone.profile.lamponhumidity,
+        zone.profile.lampoffhumidity
       ]);
     } else if (zone.profile.controltype === "VPD") {
       const vpd = vaporPressureDeficit(
-        zone.profile.lampOnTemperature / 1,
+        zone.profile.lampontemperature / 1,
         delta / 1,
-        zone.profile.lampOnHumidity / 1000
+        zone.profile.lamponhumidity / 1000
       );
       target = new ConstantVpd(vpd);
     } else {
+      console.log("it is targets?", zone.profile.controltype);
+      console.log(zone.profile);
+
       if (lamp.isOn(hour)) {
         target = new TargetTempHumidity([
-          zone.profile.lampOnTemperature,
-          zone.profile.lampOnHumidity
+          zone.profile.lampontemperature,
+          zone.profile.lamponhumidity
         ]);
       } else {
         target = new TargetTempHumidity([
-          zone.profile.lampOffTemperature,
-          zone.profile.lampOffHumidity
+          zone.profile.lampofftemperature,
+          zone.profile.lampoffhumidity
         ]);
       }
     }
+
+    console.log("target", target);
+
+    console.log("temperature", temperature);
+    console.log("delta", delta);
+    console.log("humidity", humidity);
     
     const directives = new AirDirectives(target);
     directives.clime = new Clime(temperature, delta / 1, humidity);
