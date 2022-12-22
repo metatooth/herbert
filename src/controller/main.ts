@@ -22,25 +22,18 @@ process.env.TZ = "ETC/Utc";
 const apiUrl = process.env.API_URL || "";
 const HTTP = axios.create({ baseURL: apiUrl });
 
-let initialized = false;
 let account;
 let zones;
 
-async function init() {
-
-}
-
 async function run() {
-  if (!initialized) {
-    const R1 = await HTTP.get<Account>("/settings");
-    account = R1.data;
+  console.log("RUN");
   
-    const R2 = await HTTP.get<[Zone]>("/zones");
-    zones = R2.data.filter((z) => { return z.profile });
+  const R1 = await HTTP.get<Account>("/settings");
+  account = R1.data;
+  
+  const R2 = await HTTP.get<[Zone]>("/zones");
+  zones = R2.data.filter((z) => { if (z.active) return z.profile });
 
-    initialized = true;
-  }
-  
   zones.forEach(async zone => {
     const now = new Date();
 
