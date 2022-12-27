@@ -7,6 +7,7 @@ import {
   Meter,
   MeterFact,
   Profile,
+  StatusFact,
   TimeDim,
   Worker,
   Zone
@@ -65,6 +66,39 @@ export async function findOrCreateTimeDim(date: Date): Promise<TimeDim> {
         rows[0].id
       ]).then(async res => {
         return res.rows[0];
+      });
+    }
+  });
+}
+
+export async function createStatusFact(
+  device: string,
+  status: string,
+  observedat: Date
+): Promise<StatusFact> {
+  const datedim = await findOrCreateDateDim(observedat);
+  const timedim = await findOrCreateTimeDim(observedat);
+
+  await query(
+    "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
+    [status, device]
+  );
+
+  return query<StatusFact>(
+    "SELECT * FROM status_facts WHERE device = $1 AND dateid = $3 AND timeid = $4",
+    [device, datedim.id, timedim.id]
+  ).then(async res => {
+    if (res.rowCount === 0) {
+      return query<StatusFact>(
+        "INSERT INTO status_facts (device, dateid, timeid, status) VALUES ($1, $2, $3, $4) RETURNING id",
+        [device, datedim.id, timedim.id, status]
+      ).then(async res => {
+        return query<StatusFact>(
+          "SELECT * FROM status_facts WHERE id = $1",
+          res.rows[0].id
+        ).then(async res => {
+          return res.rows[0];
+        });
       });
     }
   });

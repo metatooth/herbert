@@ -23,7 +23,11 @@
       {{ zonename }}
     </td>
     <td>
-      <device-actual v-if="!editing" :device="device" :locked="locked" />
+      <device-actual
+        v-if="!editing"
+        :device="device"
+        :locked="locked"
+        @on-toggle="toggle" />
       <div class="control" v-else>
         <select-device-type
           :devicetype="device.devicetype"

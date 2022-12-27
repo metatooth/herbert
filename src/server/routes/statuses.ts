@@ -1,6 +1,7 @@
 import Router from "express-promise-router";
 
-import { createMeterFact, query, readAccount } from "../db";
+import { Device } from "../../shared/types";
+import { createMeterFact, createStatusFact, query, readAccount, readDevice } from "../db";
 
 const router = Router();
 
@@ -61,14 +62,27 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  console.log("POST /statuses/");
   const { body } = req;
   const { device, status, ts } = body;
   const observedat = new Date(ts);
-
+  console.log("STATUS?", status);
   const val = status === "on" ? 1 : 0;
 
-  await createMeterFact(device, val, "STATUS", observedat);
+  console.log("QUERY FOR", device);
+    
+  const dev = await readDevice(device);
 
+  console.log("this device is", dev);
+
+  if (dev.devicetype === "meter") {
+    await createMeterFact(device, val, "STATUS", observedat);
+  } else {
+    await createStatusFact(device, status, observedat);
+  }
+  
+  console.log("done");
+  
   res.status(204).send();
 });
 

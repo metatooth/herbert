@@ -19,9 +19,12 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  console.log("got post", req);
   const { body } = req;
   const { device, manufacturer } = body;
+  console.log(device, manufacturer);
   await registerDevice(device, manufacturer);
+  console.log("did register");
   res.status(204).send();
 });
 

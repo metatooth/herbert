@@ -4,7 +4,7 @@
       <status-fact :device="device" :width="width" :height="height" />
     </div>
     <div class="level-item">
-      <button class="button" :disabled="!locked" @click="toggle">
+      <button class="button" :disabled="locked" @click="toggle">
         <font-awesome-icon :class="deviceClass" :icon="device.icon" />
         <span>{{ device.devicetype }}</span>
       </button>
@@ -40,7 +40,7 @@ const DeviceActual = Vue.extend({
   computed: {
     deviceClass(): string {
       let style;
-
+console.log("deviceClass", this.device.device, this.device.status);
       if (this.device.status === "disconnected") {
         style = "icon has-text-danger";
       } else if (this.device.status === "on") {
@@ -59,7 +59,7 @@ const DeviceActual = Vue.extend({
 
   methods: {
     toggle() {
-      this.$emit();
+      this.$emit("on-toggle");
     }
   }
 });

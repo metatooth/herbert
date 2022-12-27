@@ -93,6 +93,14 @@ export interface MeterFact {
   units: string;
 }
 
+export interface StatusFact {
+  id: number;
+  dateid: number;
+  timeid: number;
+  device: string;
+  status: number;
+}
+
 export interface Reading {
   id: string;
   meter: string;
@@ -113,6 +121,7 @@ export interface Worker {
 
 export interface Zone {
   id: number;
+  active: boolean;
   nickname: string;
   maxirrigators: number;
   profile: Profile;
