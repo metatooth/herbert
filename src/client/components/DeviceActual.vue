@@ -40,13 +40,15 @@ const DeviceActual = Vue.extend({
   computed: {
     deviceClass(): string {
       let style;
-console.log("deviceClass", this.device.device, this.device.status);
+      console.log("deviceClass", this.device.device, this.device.status);
       if (this.device.status === "disconnected") {
         style = "icon has-text-danger";
       } else if (this.device.status === "on") {
         style = "icon has-text-success";
       } else if (this.device.status === "off") {
         style = "icon has-text-warning";
+      } else {
+        style = "icon has-text-info";
       }
 
       return style;
