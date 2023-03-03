@@ -1,17 +1,25 @@
 <template>
-  <div class="box">
-    <div class="card">
-      <div class="card-header">
+  <div>
+    <div v-if="ready">
+      <div class="level-item">
         <p class="subtitle">
           {{ settings.cityname }}, {{ settings.statecode }}
         </p>
       </div>
-      <div v-if="ready" class="card-content">
-        <p class="title">{{ main }}</p>
+      <div class="level-item">
+        <p class="title">
+          {{ main }}
+        </p>
+      </div>
+      <div class="level-item">
         <p class="title">{{ temperature.toFixed(0) }}&#176;</p>
+      </div>
+      <div class="level-item">
         <p class="title">{{ humidity.toFixed(0) }}%</p>
       </div>
-      <div v-else class="card-content">
+    </div>
+    <div v-else>
+      <div class="level-item">
         <p class="subtitle">
           Loading...
         </p>

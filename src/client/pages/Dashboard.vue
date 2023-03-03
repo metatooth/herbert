@@ -83,7 +83,9 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
 import Collection from "@/components/Collection.vue";
+import CurrentConditions from "@/components/CurrentConditions.vue";
 import HerbertNavbar from "@/components/HerbertNavbar.vue";
+import Readable from "@/components/Readable.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
 
@@ -99,9 +101,11 @@ const Dashboard = Vue.extend({
 
   components: {
     Collection,
+    CurrentConditions,
     HerbertNavbar,
+    Readable,
     SettingsPage,
-    Timestamp
+    Timestamp,
   },
 
   computed: {
