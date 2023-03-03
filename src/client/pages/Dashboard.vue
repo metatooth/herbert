@@ -8,10 +8,28 @@
       @selected="selected"
       @toggle="toggle"
     />
-
-    <top-panel v-if="is('overview')" />
     
-    <div v-else class="box">
+    <nav class="level">
+      <div class="level-left" />
+      <div class="level-right">
+        <div v-for="worker in workers" :key="worker.worker">
+          <div class="level-item">
+            <p class="subtitle">{{ worker.name }}</p>
+          </div>
+          <div class="level-item" v-if="worker.camera">
+            <img :src="worker.camera" width="200" />
+          </div>
+          <div class="level-item">
+            <p class="text">
+              <em><readable :timestamp="new Date(worker.updatedat)"/></em>
+            </p>
+          </div>
+        </div>
+        <current-conditions />
+      </div>
+    </nav>
+    
+    <div class="box">
       <collection
         v-if="is('devices')"
         type="device"
@@ -43,7 +61,7 @@
         :locked="locked"
       />
       <collection
-        v-if="is('zones')"
+        v-if="is('overview') || is('zones')"
         type="zone"
         :filter="filter"
         :locked="locked"
@@ -68,7 +86,6 @@ import Collection from "@/components/Collection.vue";
 import HerbertNavbar from "@/components/HerbertNavbar.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
 import Timestamp from "@/components/Timestamp.vue";
-import TopPanel from "@/components/TopPanel.vue";
 
 const Dashboard = Vue.extend({
   data() {
@@ -84,7 +101,6 @@ const Dashboard = Vue.extend({
     Collection,
     HerbertNavbar,
     SettingsPage,
-    TopPanel,
     Timestamp
   },
 
