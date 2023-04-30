@@ -1,10 +1,14 @@
-FROM node:14.17.4 as base
+FROM node:18-alpine3.16 as base
+
+RUN apk update && apk add python3 make g++
+
+RUN npm update -g npm
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-RUN npm install --unsafe-perms
+RUN npm install
 
 FROM base as client
 
@@ -58,8 +62,8 @@ CMD ["npm", "run", "serve:socket-server"]
 
 FROM base as worker
 
-RUN apt update \
-  && apt install -y \
+RUN apt-get update \
+  && apt-get install -y \
   bluetooth \
   bluez \
   libbluetooth-dev \
