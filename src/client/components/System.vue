@@ -10,14 +10,14 @@ import Vue from "vue";
 enum SystemStatus {
   OFF = 0,
   ON = 1,
-  ERROR = 2
+  ERROR = 2,
 }
 
 const System = Vue.extend({
   name: "System",
   props: {
     name: { type: String, default: "" },
-    status: { type: Number, default: 0 }
+    status: { type: Number, default: 0 },
   },
   computed: {
     stateClass() {
@@ -28,8 +28,8 @@ const System = Vue.extend({
       } else {
         return "is-danger";
       }
-    }
-  }
+    },
+  },
 });
 export default System;
 </script>

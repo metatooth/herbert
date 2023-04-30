@@ -20,12 +20,12 @@ import { Zone } from "@/store/zones/types";
 const ZoneStatusButton = Vue.extend({
   props: {
     locked: Boolean,
-    zone: Zone
+    zone: Zone,
   },
 
   data() {
     return {
-      active: this.zone.active
+      active: this.zone.active,
     };
   },
 
@@ -44,7 +44,7 @@ const ZoneStatusButton = Vue.extend({
       } else {
         return "toggle-off";
       }
-    }
+    },
   },
 
   methods: {
@@ -52,13 +52,13 @@ const ZoneStatusButton = Vue.extend({
       this.active = !this.active;
       const zone = {
         ...this.zone,
-        active: this.active
+        active: this.active,
       };
       this.edit(zone);
     },
 
-    ...mapActions("zones", ["edit"])
-  }
+    ...mapActions("zones", ["edit"]),
+  },
 });
 
 export default ZoneStatusButton;

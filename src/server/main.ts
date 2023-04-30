@@ -19,7 +19,7 @@ import { vaporPressureDeficit } from "../shared/utils";
 import { zonedTimeToUtc } from "date-fns-tz";
 import {
   makeSendByDeviceIDMessage,
-  makeCommandMessage
+  makeCommandMessage,
 } from "../shared/message-creators";
 import { sendSocketMessage } from "../shared/send-socket-message";
 
@@ -45,11 +45,11 @@ app.get("/", (req, res) => {
   res.send("OK");
 });
 
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({
     message: err.message,
-    error: err
+    error: err,
   });
   next();
 });

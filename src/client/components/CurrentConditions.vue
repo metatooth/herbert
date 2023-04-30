@@ -20,9 +20,7 @@
     </div>
     <div v-else>
       <div class="level-item">
-        <p class="subtitle">
-          Loading...
-        </p>
+        <p class="subtitle">Loading...</p>
       </div>
     </div>
   </div>
@@ -44,7 +42,7 @@ const CurrentConditions = Vue.extend({
       temperature: Number,
       humidity: Number,
       main: String,
-      socket: Socket
+      socket: Socket,
     };
   },
 
@@ -75,7 +73,7 @@ const CurrentConditions = Vue.extend({
       );
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   mounted() {
@@ -96,8 +94,8 @@ const CurrentConditions = Vue.extend({
         }
 
         Openweathermap.get("/data/2.5/weather", {
-          params: { q: q, units: units, appid: this.settings.openweather }
-        }).then(res => {
+          params: { q: q, units: units, appid: this.settings.openweather },
+        }).then((res) => {
           this.timestamp = new Date();
           this.temperature = res.data.main.temp;
           this.humidity = res.data.main.humidity;
@@ -106,10 +104,7 @@ const CurrentConditions = Vue.extend({
 
           let mac = this.settings.openweather.slice(-12);
           mac = mac.replace(/(.{2})/g, "$1:");
-          mac = mac
-            .split(":")
-            .slice(0, -1)
-            .join(":");
+          mac = mac.split(":").slice(0, -1).join(":");
 
           const msg = makeMeterStatusMessage({
             device: mac,
@@ -117,7 +112,7 @@ const CurrentConditions = Vue.extend({
             manufacturer: "OpenWeather",
             temperature: this.temperature,
             humidity: this.humidity / 100,
-            timestamp: new Date().toString()
+            timestamp: new Date().toString(),
           });
 
           this.socket.emit("message", msg);
@@ -126,8 +121,8 @@ const CurrentConditions = Vue.extend({
 
       const refresh = this.settings.refresh ? this.settings.refresh : 60000;
       setTimeout(this.refresh, refresh);
-    }
-  }
+    },
+  },
 });
 
 export default CurrentConditions;
@@ -140,7 +135,8 @@ export default CurrentConditions;
   border-top-style: solid;
 }
 
-.title, .subtitle {
+.title,
+.subtitle {
   color: #00dd77;
 }
 </style>

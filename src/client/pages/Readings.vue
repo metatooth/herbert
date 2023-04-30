@@ -5,7 +5,7 @@
         <p class="title">{{ $route.params.name }} Meter Reading</p>
         <p class="subtitle">{{ $route.params.device }}</p>
       </div>
-      <div class="card-header-icon"> 
+      <div class="card-header-icon">
         <router-link :to="{ name: 'dashboard' }">
           <span class="icon">
             <font-awesome-icon icon="times-circle" />
@@ -13,7 +13,7 @@
         </router-link>
       </div>
     </div>
-    <div class="card-content">      
+    <div class="card-content">
       <form class="control">
         Last&nbsp;
         <label for="month" class="radio">
@@ -66,7 +66,6 @@
           />
         </div>
       </div>
-      
     </div>
   </div>
 </template>
@@ -90,18 +89,18 @@ const Readings = Vue.extend({
       temperatures: [] as MeterReading[],
       humidities: [] as MeterReading[],
       min: 100,
-      max: 0
+      max: 0,
     };
   },
 
   components: {
-    Chart
+    Chart,
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
-  
+
   mounted() {
     this.refresh();
   },
@@ -109,7 +108,7 @@ const Readings = Vue.extend({
   watch: {
     range() {
       this.refresh();
-    }
+    },
   },
 
   methods: {
@@ -129,7 +128,7 @@ const Readings = Vue.extend({
         if (!data.error) {
           this.temperatures = [];
 
-          data.forEach(d => {
+          data.forEach((d) => {
             const observedat = new Date(
               d.year,
               d.month - 1,
@@ -137,18 +136,17 @@ const Readings = Vue.extend({
               d.hour,
               d.minute
             );
-            
+
             const temperature = {
               x: convertToLocalTime(observedat, { timeZone }),
-              y: d.reading as number
+              y: d.reading as number,
             };
-            
-            this.temperatures.push(temperature);            
-          });
 
+            this.temperatures.push(temperature);
+          });
         }
-      }
-      
+      };
+
       const humid = new XMLHttpRequest();
 
       humid.open(
@@ -161,7 +159,7 @@ const Readings = Vue.extend({
         if (!data.error) {
           this.humidities = [];
 
-          data.forEach(d => {
+          data.forEach((d) => {
             const observedat = new Date(
               d.year,
               d.month - 1,
@@ -172,18 +170,18 @@ const Readings = Vue.extend({
 
             const humidity = {
               x: convertToLocalTime(observedat, { timeZone }),
-              y: (d.reading as number) * 100
+              y: (d.reading as number) * 100,
             };
 
-            this.humidities.push(humidity);            
+            this.humidities.push(humidity);
           });
         }
-      }
+      };
 
       temp.send();
       humid.send();
-    }
-  }
+    },
+  },
 });
 export default Readings;
 </script>

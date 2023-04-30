@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: SettingsState = {
   settings: new Settings(),
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,5 +17,5 @@ export const settings: Module<SettingsState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

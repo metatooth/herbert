@@ -58,34 +58,34 @@ import { Worker } from "@/store/workers/types";
 const WorkerRow = Vue.extend({
   props: {
     locked: Boolean,
-    worker: Worker
+    worker: Worker,
   },
 
   data() {
     return {
       nickname: this.worker.nickname,
       configname: this.worker.configname,
-      editing: false
+      editing: false,
     };
   },
 
   components: {
     EditControls,
-    Readable
+    Readable,
   },
 
   watch: {
     configname() {
-      this.configs.forEach(config => {
+      this.configs.forEach((config) => {
         if (this.configname === config.nickname) {
           this.config = config.config;
         }
       });
-    }
+    },
   },
 
   computed: {
-    ...mapGetters("configs", ["configs"])
+    ...mapGetters("configs", ["configs"]),
   },
 
   methods: {
@@ -97,7 +97,7 @@ const WorkerRow = Vue.extend({
       this.edit({
         ...this.worker,
         nickname: this.nickname,
-        configname: this.configname
+        configname: this.configname,
       });
       this.editing = false;
     },
@@ -112,8 +112,8 @@ const WorkerRow = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit", "remove"])
-  }
+    ...mapActions("workers", ["edit", "remove"]),
+  },
 });
 
 export default WorkerRow;

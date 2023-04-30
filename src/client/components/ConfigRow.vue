@@ -40,7 +40,7 @@ import { mapActions } from "vuex";
 
 const ConfigTile = Vue.extend({
   props: {
-    config: Config
+    config: Config,
   },
 
   data() {
@@ -48,19 +48,19 @@ const ConfigTile = Vue.extend({
       nickname: this.config.nickname,
       configStr: this.config.toString(),
       readable: true,
-      editing: false
+      editing: false,
     };
   },
 
   components: {
     EditControls,
-    Readable
+    Readable,
   },
 
   computed: {
     lastupdate() {
       return new Date(Date.parse(this.config.updatedat));
-    }
+    },
   },
 
   methods: {
@@ -73,7 +73,7 @@ const ConfigTile = Vue.extend({
         ...this.config,
         nickname: this.nickname,
         config: this.configStr,
-        currentName: this.config.nickname
+        currentName: this.config.nickname,
       });
       this.editing = false;
     },
@@ -84,8 +84,8 @@ const ConfigTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("configs", ["edit"])
-  }
+    ...mapActions("configs", ["edit"]),
+  },
 });
 
 export default ConfigTile;

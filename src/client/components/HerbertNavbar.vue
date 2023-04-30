@@ -112,7 +112,7 @@
       <p class="control has-icons-left">
         <span
           class="herbert-autocomplete"
-          style="position: relative; display: inline-block; direction: ltr;"
+          style="position: relative; display: inline-block; direction: ltr"
         >
           <input
             ref="herbertSearch"
@@ -135,12 +135,12 @@ import { mapGetters } from "vuex";
 
 const HerbertNavbar = Vue.extend({
   props: {
-    locked: { type: Boolean, default: true }
+    locked: { type: Boolean, default: true },
   },
 
   data() {
     return {
-      filter: ""
+      filter: "",
     };
   },
 
@@ -160,13 +160,13 @@ const HerbertNavbar = Vue.extend({
       return this.settings.title || "Grow More";
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   watch: {
     filter(val: string) {
       this.$emit("search-on", val);
-    }
+    },
   },
 
   methods: {
@@ -202,8 +202,8 @@ const HerbertNavbar = Vue.extend({
 
     toggle() {
       this.$emit("toggle");
-    }
-  }
+    },
+  },
 });
 
 export default HerbertNavbar;

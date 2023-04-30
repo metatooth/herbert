@@ -39,14 +39,14 @@ const ZoneRow = Vue.extend({
   props: {
     locked: Boolean,
     zone: Zone,
-    units: String
+    units: String,
   },
 
   data() {
     return {
       nickname: this.zone.nickname,
       profileid: this.zone.profileid,
-      editing: false
+      editing: false,
     };
   },
 
@@ -55,7 +55,7 @@ const ZoneRow = Vue.extend({
     Readable,
     ZoneActual,
     ZoneStatusButton,
-    ZoneTag
+    ZoneTag,
   },
 
   computed: {
@@ -69,7 +69,7 @@ const ZoneRow = Vue.extend({
 
     sorted() {
       const devices = [];
-      this.zone.devices.forEach(d => {
+      this.zone.devices.forEach((d) => {
         devices.push(Object.assign(new Device(), d));
       });
       return devices.sort((a, b) => {
@@ -79,7 +79,7 @@ const ZoneRow = Vue.extend({
 
     lastupdate() {
       let last = null;
-      this.zone.meters.forEach(meter => {
+      this.zone.meters.forEach((meter) => {
         const updatedat = new Date(meter.updatedat);
         if (last === null || updatedat > last) {
           last = updatedat;
@@ -117,7 +117,7 @@ const ZoneRow = Vue.extend({
     },
 
     ...mapGetters("profiles", ["profiles"]),
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
@@ -125,7 +125,7 @@ const ZoneRow = Vue.extend({
       this.$router.push({
         name: "zone",
         hash: this.linkto,
-        params: { id: this.zone.id }
+        params: { id: this.zone.id },
       });
     },
 
@@ -137,7 +137,7 @@ const ZoneRow = Vue.extend({
       const zone = {
         id: this.zone.id,
         nickname: this.nickname,
-        profileid: this.profileid
+        profileid: this.profileid,
       };
 
       this.edit(zone);
@@ -158,13 +158,13 @@ const ZoneRow = Vue.extend({
     toggle() {
       const zone = {
         ...this.zone,
-        active: !this.zone.active
+        active: !this.zone.active,
       };
       this.edit(zone);
     },
 
-    ...mapActions("zones", ["edit", "remove"])
-  }
+    ...mapActions("zones", ["edit", "remove"]),
+  },
 });
 
 export default ZoneRow;

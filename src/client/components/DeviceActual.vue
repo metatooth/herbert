@@ -24,17 +24,17 @@ const DeviceActual = Vue.extend({
     device: Device,
     locked: { type: Boolean, default: true },
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" }
+    height: { type: String, default: "50px" },
   },
 
   data() {
     return {
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
   components: {
-    StatusFact
+    StatusFact,
   },
 
   computed: {
@@ -56,14 +56,14 @@ const DeviceActual = Vue.extend({
 
     status() {
       return this.device.status === "on";
-    }
+    },
   },
 
   methods: {
     toggle() {
       this.$emit("on-toggle");
-    }
-  }
+    },
+  },
 });
 
 export default DeviceActual;

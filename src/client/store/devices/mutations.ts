@@ -50,5 +50,5 @@ export const mutations: MutationTree<DevicesState> = {
   DEVICES_ERROR(state) {
     state.error = true;
     state.devices = [];
-  }
+  },
 };

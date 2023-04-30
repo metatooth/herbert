@@ -36,5 +36,5 @@ export const mutations: MutationTree<ProfilesState> = {
       const index = state.profiles.indexOf(found);
       state.profiles.splice(index, 1);
     }
-  }
+  },
 };

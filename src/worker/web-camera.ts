@@ -5,15 +5,15 @@ const soi = Buffer.from([0xff, 0xd8]);
 const eoi = Buffer.from([0xff, 0xd9]);
 
 const webStream = {
-  get: function(url, callback) {
-    const clientRequest = http.get(url, function(response) {
+  get: function (url, callback) {
+    const clientRequest = http.get(url, function (response) {
       let buffer = null;
 
       let reading = false;
       let contentLength = null;
       let bytesWritten = 0;
 
-      response.on("data", function(chunk) {
+      response.on("data", function (chunk) {
         const start = chunk.indexOf(soi);
         const end = chunk.indexOf(eoi);
         const len = (regex.exec(chunk.toString("ascii")) || [])[1];
@@ -72,21 +72,21 @@ const webStream = {
       });
     });
 
-    clientRequest.on("error", function(err) {
+    clientRequest.on("error", function (err) {
       console.log(err);
     });
 
     return {
       url: url,
       handler: clientRequest,
-      on: function(type, listener) {
+      on: function (type, listener) {
         clientRequest.on(type, listener);
       },
-      abort: function() {
+      abort: function () {
         clientRequest.abort();
-      }
+      },
     };
-  }
+  },
 };
 
 export default class WebCamera {
@@ -99,7 +99,7 @@ export default class WebCamera {
 
   async fetch() {
     return new Promise((resolve, reject) => {
-      webStream.get(`http://localhost:${this.port}`, data => {
+      webStream.get(`http://localhost:${this.port}`, (data) => {
         resolve(data);
       });
     });

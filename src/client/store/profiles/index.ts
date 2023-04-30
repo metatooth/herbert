@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: ProfilesState = {
   profiles: [] as Profile[],
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,5 +17,5 @@ export const profiles: Module<ProfilesState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

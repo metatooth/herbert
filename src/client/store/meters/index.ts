@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: MetersState = {
   meters: [] as Meter[],
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,5 +17,5 @@ export const meters: Module<MetersState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

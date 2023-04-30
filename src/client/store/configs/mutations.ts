@@ -21,5 +21,5 @@ export const mutations: MutationTree<ConfigState> = {
   CONFIGS_ERROR(state) {
     state.error = true;
     state.configs = [];
-  }
+  },
 };

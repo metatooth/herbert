@@ -40,7 +40,7 @@ export class Environment {
       ["heat", false],
       ["cool", false],
       ["humidify", false],
-      ["dehumidify", false]
+      ["dehumidify", false],
     ]);
 
     if (temperature < this.mintemp) {

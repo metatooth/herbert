@@ -11,5 +11,5 @@ export const getters: GetterTree<MetersState, RootState> = {
   metersCount(state): number {
     const { meters } = state;
     return meters.length;
-  }
+  },
 };

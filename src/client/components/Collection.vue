@@ -96,7 +96,7 @@ const Collection = Vue.extend({
   props: {
     filter: String,
     locked: Boolean,
-    type: String
+    type: String,
   },
 
   data() {
@@ -104,7 +104,7 @@ const Collection = Vue.extend({
       adding: false,
       nickname: "",
       single: false,
-      table: true
+      table: true,
     };
   },
 
@@ -114,7 +114,7 @@ const Collection = Vue.extend({
     HerbertButton,
     NarrowTable,
     SingleColumn,
-    ThreeColumns
+    ThreeColumns,
   },
 
   mounted() {
@@ -154,7 +154,7 @@ const Collection = Vue.extend({
         selected = this.configs;
       }
 
-      const active = selected.filter(el => {
+      const active = selected.filter((el) => {
         if (this.filter === "") {
           return true;
         }
@@ -224,7 +224,7 @@ const Collection = Vue.extend({
           "Day",
           "Night",
           "Water",
-          ""
+          "",
         ];
       } else if (this.isZone) {
         return [
@@ -232,7 +232,7 @@ const Collection = Vue.extend({
           "Temp & RH",
           "Devices",
           "Last Ping",
-          "Active?"
+          "Active?",
         ];
       } else if (this.isWorker) {
         return ["MAC", "INET", "Name", "Configuration", "Last Ping", ""];
@@ -326,7 +326,7 @@ const Collection = Vue.extend({
         }
       }
       return items;
-    }
+    },
   },
 
   methods: {
@@ -380,8 +380,8 @@ const Collection = Vue.extend({
 
     toggle() {
       this.table = !this.table;
-    }
-  }
+    },
+  },
 });
 
 export default Collection;

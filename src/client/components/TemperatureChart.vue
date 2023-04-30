@@ -12,17 +12,17 @@ import "chartjs-adapter-date-fns";
 
 const TemperatureChart = Vue.extend({
   props: {
-    meters: []
+    meters: [],
   },
 
   data() {
     return {
-      chart: ChartJS
+      chart: ChartJS,
     };
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   mounted() {
@@ -32,7 +32,7 @@ const TemperatureChart = Vue.extend({
       options: {
         responsive: true,
         legend: {
-          display: false
+          display: false,
         },
         elements: { point: { radius: 0 } },
         scales: {
@@ -41,26 +41,26 @@ const TemperatureChart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
-              display: true
-            }
-          ]
-        }
-      }
+              display: true,
+            },
+          ],
+        },
+      },
     });
 
     const timeZone = this.settings.timezone;
 
-    this.meters.forEach(m => {
-      HTTP.get(`/facts?meter=${m.device}&units=CELSIUS`).then(resp => {
+    this.meters.forEach((m) => {
+      HTTP.get(`/facts?meter=${m.device}&units=CELSIUS`).then((resp) => {
         const temperatures = [];
 
-        resp.data.forEach(d => {
+        resp.data.forEach((d) => {
           const observedat = new Date(
             d.year,
             d.month - 1,
@@ -71,7 +71,7 @@ const TemperatureChart = Vue.extend({
 
           const temperature = {
             x: convertToLocalTime(observedat, { timeZone }),
-            y: d.reading as number
+            y: d.reading as number,
           };
           temperatures.push(temperature);
         });
@@ -84,13 +84,13 @@ const TemperatureChart = Vue.extend({
         this.chart.data.datasets.push({
           data: temperatures,
           borderColor: color,
-          fill: false
+          fill: false,
         });
 
         this.chart.update();
       });
     });
-  }
+  },
 });
 
 export default TemperatureChart;

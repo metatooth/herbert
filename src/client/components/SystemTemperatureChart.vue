@@ -9,12 +9,12 @@ import TemperatureChart from "@/components/TemperatureChart.vue";
 
 const SystemTemperatureChart = Vue.extend({
   components: {
-    TemperatureChart
+    TemperatureChart,
   },
 
   computed: {
-    ...mapGetters("meters", ["meters"])
-  }
+    ...mapGetters("meters", ["meters"]),
+  },
 });
 
 export default SystemTemperatureChart;

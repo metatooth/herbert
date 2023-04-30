@@ -21,5 +21,5 @@ export const mutations: MutationTree<NotificationsState> = {
       const index = state.notifications.indexOf(found);
       state.notifications.splice(index, 1);
     }
-  }
+  },
 };

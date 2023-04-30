@@ -128,7 +128,7 @@ export function color(diff, range): string {
   const c = [
     start[0] * alpha + (1 - alpha) * end[0],
     start[1] * alpha + (1 - alpha) * end[1],
-    start[2] * alpha + (1 - alpha) * end[2]
+    start[2] * alpha + (1 - alpha) * end[2],
   ];
 
   return "#" + convertToHex(c);

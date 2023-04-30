@@ -46,8 +46,8 @@ export class Device {
   }
 
   get zone() {
-    const found = this.zones.filter(zone => {
-      const devices = zone.devices.filter(device => {
+    const found = this.zones.filter((zone) => {
+      const devices = zone.devices.filter((device) => {
         return this.device.device === device.device;
       });
       return devices.length !== 0;

@@ -6,12 +6,12 @@ import { RootState } from "../types";
 export const actions: ActionTree<SettingsState, RootState> = {
   edit({ commit }, payload: Settings) {
     const json = JSON.stringify(payload);
-    HTTP.put("/settings", json).then(response => {
+    HTTP.put("/settings", json).then((response) => {
       commit("SET", Object.assign(new Settings(), response.data));
     });
   },
   fetchData({ commit }) {
-    HTTP.get("/settings").then(response => {
+    HTTP.get("/settings").then((response) => {
       if (response.data.logo) {
         let logo = "data:image/png;base64,";
         logo += btoa(String.fromCharCode(...response.data.logo.data));
@@ -19,5 +19,5 @@ export const actions: ActionTree<SettingsState, RootState> = {
       }
       commit("SET", Object.assign(new Settings(), response.data));
     });
-  }
+  },
 };

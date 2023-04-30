@@ -144,7 +144,7 @@ export enum SocketMessageType {
   Error = "ERROR",
   SendWorkerConfig = "SEND_WORKER_CONFIG",
   BroadcastAll = "BROADCAST_ALL",
-  SendByDeviceID = "SEND_BY_DEVICE_ID"
+  SendByDeviceID = "SEND_BY_DEVICE_ID",
 }
 
 // Represents a simple message consisting only of a type

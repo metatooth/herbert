@@ -9,6 +9,7 @@ const getSocketURL = () => {
 
 const getSocketClient = () => {
   if (!socket) {
+    console.log(`SOCKET URL ${getSocketURL()}`);
     socket = io(getSocketURL());
   }
   return socket;

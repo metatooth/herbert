@@ -9,12 +9,12 @@ import HumidityChart from "@/components/HumidityChart.vue";
 
 const SystemHumidityChart = Vue.extend({
   components: {
-    HumidityChart
+    HumidityChart,
   },
 
   computed: {
-    ...mapGetters("meters", ["meters"])
-  }
+    ...mapGetters("meters", ["meters"]),
+  },
 });
 
 export default SystemHumidityChart;

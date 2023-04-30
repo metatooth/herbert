@@ -95,7 +95,7 @@ const ZoneDetail = Vue.extend({
   props: {
     zone: Zone,
     units: String,
-    locked: Boolean
+    locked: Boolean,
   },
 
   data() {
@@ -113,7 +113,7 @@ const ZoneDetail = Vue.extend({
       maxirrigators: parseInt(this.zone.maxirrigators),
       lamponleafdiff: lampon,
       lampoffleafdiff: lampoff,
-      now: new Date()
+      now: new Date(),
     };
   },
 
@@ -121,7 +121,7 @@ const ZoneDetail = Vue.extend({
     NarrowTable,
     Readable,
     ZoneChart,
-    ZoneStatusButton
+    ZoneStatusButton,
   },
 
   computed: {
@@ -161,7 +161,7 @@ const ZoneDetail = Vue.extend({
 
     lastupdate() {
       let lastupdate;
-      this.zone.devices.forEach(d => {
+      this.zone.devices.forEach((d) => {
         if (d.updatedat < lastupdate) lastupdate = d.updatedat;
       });
       return lastupdate;
@@ -203,7 +203,7 @@ const ZoneDetail = Vue.extend({
     ...mapGetters("meters", ["meters"]),
     ...mapGetters("profiles", ["profiles"]),
     ...mapGetters("zones", ["zones"]),
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
@@ -214,14 +214,14 @@ const ZoneDetail = Vue.extend({
     clickDevice(device) {
       this.$router.push({
         name: "statuses",
-        params: { name: device.name, device: device.device }
+        params: { name: device.name, device: device.device },
       });
     },
 
     clickMeter(meter) {
       this.$router.push({
         name: "readings",
-        params: { name: meter.name, device: meter.device }
+        params: { name: meter.name, device: meter.device },
       });
     },
 
@@ -230,7 +230,7 @@ const ZoneDetail = Vue.extend({
     },
 
     lookupZone(id: string) {
-      const found = this.zones.filter(z => {
+      const found = this.zones.filter((z) => {
         return z.id === id;
       });
       return found[0];
@@ -242,9 +242,9 @@ const ZoneDetail = Vue.extend({
       "edit",
       "fetchData",
       "removeDevice",
-      "removeChild"
-    ])
-  }
+      "removeChild",
+    ]),
+  },
 });
 
 export default ZoneDetail;

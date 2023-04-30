@@ -25,8 +25,8 @@ const SystemChart = Vue.extend({
   components: {
     SystemDeviceChart,
     SystemHumidityChart,
-    SystemTemperatureChart
-  }
+    SystemTemperatureChart,
+  },
 });
 
 export default SystemChart;

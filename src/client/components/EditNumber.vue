@@ -46,17 +46,17 @@ const EditNumber = Vue.extend({
     size: String,
     label: String,
     icon: String,
-    color: { type: String, default: "#ffffff" }
+    color: { type: String, default: "#ffffff" },
   },
 
   components: {
-    HerbertButton
+    HerbertButton,
   },
 
   data() {
     return {
       edited: this.num,
-      editing: false
+      editing: false,
     };
   },
 
@@ -78,7 +78,7 @@ const EditNumber = Vue.extend({
         return "text";
       }
       return "title";
-    }
+    },
   },
 
   methods: {
@@ -94,8 +94,8 @@ const EditNumber = Vue.extend({
     cancel() {
       this.edited = this.num;
       this.editing = false;
-    }
-  }
+    },
+  },
 });
 export default EditNumber;
 </script>

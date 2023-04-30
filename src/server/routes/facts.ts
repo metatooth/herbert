@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
     req.query.units,
     limit.getFullYear(),
     limit.getMonth() + 1,
-    limit.getDate()
+    limit.getDate(),
   ]);
   const { rows } = await query<MeterFact>(
     "SELECT * FROM meter_facts \
@@ -29,7 +29,7 @@ ORDER BY hour ASC, minute ASC",
       req.query.units,
       limit.getFullYear(),
       limit.getMonth() + 1,
-      limit.getDate()
+      limit.getDate(),
     ]
   );
 

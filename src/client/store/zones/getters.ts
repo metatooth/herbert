@@ -11,5 +11,5 @@ export const getters: GetterTree<ZonesState, RootState> = {
   zonesCount(state): number {
     const { zones } = state;
     return zones.length;
-  }
+  },
 };

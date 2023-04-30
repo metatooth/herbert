@@ -60,7 +60,7 @@ import { mapActions, mapGetters } from "vuex";
 const WorkerTile = Vue.extend({
   props: {
     locked: Boolean,
-    worker: Worker
+    worker: Worker,
   },
 
   data() {
@@ -69,23 +69,23 @@ const WorkerTile = Vue.extend({
       configname: this.worker.configname,
       config: JSON.stringify(this.worker.config),
       readable: true,
-      editing: false
+      editing: false,
     };
   },
 
   components: {
     EditControls,
-    Readable
+    Readable,
   },
 
   watch: {
     configname() {
-      this.configs.forEach(config => {
+      this.configs.forEach((config) => {
         if (this.configname === config.nickname) {
           this.config = config.config;
         }
       });
-    }
+    },
   },
 
   computed: {
@@ -96,7 +96,7 @@ const WorkerTile = Vue.extend({
       return null;
     },
 
-    ...mapGetters("configs", ["configs"])
+    ...mapGetters("configs", ["configs"]),
   },
 
   methods: {
@@ -108,7 +108,7 @@ const WorkerTile = Vue.extend({
       this.edit({
         ...this.worker,
         nickname: this.nickname,
-        configname: this.configname
+        configname: this.configname,
       });
       this.editing = false;
     },
@@ -125,8 +125,8 @@ const WorkerTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit", "remove"])
-  }
+    ...mapActions("workers", ["edit", "remove"]),
+  },
 });
 
 export default WorkerTile;

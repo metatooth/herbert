@@ -38,13 +38,13 @@ import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const ProfileNarrow = Vue.extend({
   props: {
-    profile: Profile
+    profile: Profile,
   },
 
   data() {
     return {
       day: true,
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
@@ -86,14 +86,14 @@ const ProfileNarrow = Vue.extend({
       return temp;
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
     toggle() {
       this.day = !this.day;
-    }
-  }
+    },
+  },
 });
 
 export default ProfileNarrow;

@@ -16,12 +16,12 @@ import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const ZoneTarget = Vue.extend({
   props: {
-    zone: Zone
+    zone: Zone,
   },
 
   data() {
     return {
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
@@ -48,8 +48,8 @@ const ZoneTarget = Vue.extend({
       return this.zone.targetHumidity(this.ts);
     },
 
-    ...mapGetters("settings", ["settings"])
-  }
+    ...mapGetters("settings", ["settings"]),
+  },
 });
 
 export default ZoneTarget;

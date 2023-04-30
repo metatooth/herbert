@@ -36,12 +36,12 @@ import { Device } from "@/store/meters/types";
 const DeviceNarrow = Vue.extend({
   props: {
     device: Device,
-    locked: Boolean
+    locked: Boolean,
   },
 
   data() {
     return {
-      status: this.device.status
+      status: this.device.status,
     };
   },
 
@@ -58,7 +58,7 @@ const DeviceNarrow = Vue.extend({
       }
 
       return style;
-    }
+    },
   },
 
   methods: {
@@ -67,8 +67,8 @@ const DeviceNarrow = Vue.extend({
         name: "statuses",
         params: {
           name: this.device.nickname,
-          device: this.device.device
-        }
+          device: this.device.device,
+        },
       });
     },
 
@@ -82,8 +82,8 @@ const DeviceNarrow = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["on", "off"])
-  }
+    ...mapActions("devices", ["on", "off"]),
+  },
 });
 
 export default DeviceNarrow;

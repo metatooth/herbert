@@ -22,12 +22,12 @@ import Vue from "vue";
 
 const UnitsSelector = Vue.extend({
   props: {
-    units: { type: String, default: "F" }
+    units: { type: String, default: "F" },
   },
 
   data() {
     return {
-      selected: this.units
+      selected: this.units,
     };
   },
 
@@ -36,8 +36,8 @@ const UnitsSelector = Vue.extend({
   watch: {
     selected(val) {
       this.$emit("change-units", val);
-    }
-  }
+    },
+  },
 });
 export default UnitsSelector;
 </script>

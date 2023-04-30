@@ -10,13 +10,13 @@ import {
   StatusFact,
   TimeDim,
   Worker,
-  Zone
+  Zone,
 } from "../../shared/types";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   max: 30,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
 });
 
 export async function query<T>(text, params): Promise<QueryResult<T>> {
@@ -31,7 +31,7 @@ export async function findOrCreateDateDim(date: Date): Promise<DateDim> {
   return query<DateDim>(
     "SELECT * FROM date_dim WHERE year = $1 AND month = $2 AND date = $3",
     [date.getFullYear(), date.getMonth() + 1, date.getDate()]
-  ).then(async res => {
+  ).then(async (res) => {
     if (res.rowCount !== 0) {
       return res.rows[0];
     } else {
@@ -41,8 +41,8 @@ export async function findOrCreateDateDim(date: Date): Promise<DateDim> {
       );
 
       return query<DateDim>("SELECT * FROM date_dim WHERE id = $1", [
-        rows[0].id
-      ]).then(async res => {
+        rows[0].id,
+      ]).then(async (res) => {
         return res.rows[0];
       });
     }
@@ -53,7 +53,7 @@ export async function findOrCreateTimeDim(date: Date): Promise<TimeDim> {
   return query<TimeDim>(
     "SELECT * FROM time_dim WHERE hour = $1 AND minute = $2",
     [date.getHours(), date.getMinutes()]
-  ).then(async res => {
+  ).then(async (res) => {
     if (res.rowCount !== 0) {
       return res.rows[0];
     } else {
@@ -63,8 +63,8 @@ export async function findOrCreateTimeDim(date: Date): Promise<TimeDim> {
       );
 
       return query<TimeDim>("SELECT * FROM time_dim WHERE id = $1", [
-        rows[0].id
-      ]).then(async res => {
+        rows[0].id,
+      ]).then(async (res) => {
         return res.rows[0];
       });
     }
@@ -87,16 +87,16 @@ export async function createStatusFact(
   return query<StatusFact>(
     "SELECT * FROM status_facts WHERE device = $1 AND dateid = $3 AND timeid = $4",
     [device, datedim.id, timedim.id]
-  ).then(async res => {
+  ).then(async (res) => {
     if (res.rowCount === 0) {
       return query<StatusFact>(
         "INSERT INTO status_facts (device, dateid, timeid, status) VALUES ($1, $2, $3, $4) RETURNING id",
         [device, datedim.id, timedim.id, status]
-      ).then(async res => {
+      ).then(async (res) => {
         return query<StatusFact>(
           "SELECT * FROM status_facts WHERE id = $1",
           res.rows[0].id
-        ).then(async res => {
+        ).then(async (res) => {
           return res.rows[0];
         });
       });
@@ -128,23 +128,23 @@ export async function createMeterFact(
   return query<MeterFact>(
     "SELECT * FROM meter_facts WHERE meter = $1 AND units = $2 AND dateid = $3 AND timeid = $4",
     [meter, units, datedim.id, timedim.id]
-  ).then(async res => {
+  ).then(async (res) => {
     if (res.rowCount !== 0) {
       return query<MeterFact>(
         "UPDATE meter_facts SET reading = $1 WHERE id = $2",
         [reading, res.rows[0].id]
-      ).then(async res => {
+      ).then(async (res) => {
         return res.rows[0];
       });
     } else {
       return query<MeterFact>(
         "INSERT INTO meter_facts (meter, dateid, timeid, reading, units) VALUES ($1, $2, $3, $4, $5) RETURNING id",
         [meter, datedim.id, timedim.id, reading, units]
-      ).then(async res => {
+      ).then(async (res) => {
         return query<MeterFact>(
           "SELECT * FROM meter_facts WHERE id = $1",
           res.rows[0].id
-        ).then(async res => {
+        ).then(async (res) => {
           return res.rows[0];
         });
       });
@@ -195,7 +195,7 @@ export async function readZone(id: number) {
   promises.push(res.rows[0]);
 
   const profile = await query<Profile>("SELECT * FROM profiles WHERE id = $1", [
-    promises[0].profileid
+    promises[0].profileid,
   ]);
 
   if (profile) {
@@ -208,7 +208,7 @@ export async function readZone(id: number) {
   );
 
   if (devices.rowCount > 0) {
-    devices.rows.forEach(row => {
+    devices.rows.forEach((row) => {
       promises.push(readDevice(row.device));
     });
   }
@@ -219,7 +219,7 @@ export async function readZone(id: number) {
   );
 
   if (meters.rowCount > 0) {
-    meters.rows.forEach(row => {
+    meters.rows.forEach((row) => {
       promises.push(readMeter(row.device));
     });
   }
@@ -230,17 +230,17 @@ export async function readZone(id: number) {
   );
 
   if (children.rowCount > 0) {
-    children.rows.forEach(row => {
+    children.rows.forEach((row) => {
       promises.push(row);
     });
   }
 
-  return await Promise.all(promises).then(values => {
+  return await Promise.all(promises).then((values) => {
     values[0].devices = [];
     values[0].meters = [];
     values[0].children = [];
 
-    values.forEach(value => {
+    values.forEach((value) => {
       if (value.device) {
         if (value.devicetype == "meter") {
           values[0].meters.push(value);
@@ -276,7 +276,7 @@ export async function readZones() {
     []
   );
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     const z = readZone(row.id);
     zones.push(z);
   });
@@ -292,7 +292,7 @@ export async function readActiveZones() {
     []
   );
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     const z = readZone(row.id);
     zones.push(z);
   });
@@ -308,7 +308,7 @@ export async function readZoneDevices(device: string) {
     [device]
   );
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     const z = readZone(row.id);
     zones.push(z);
   });
@@ -324,7 +324,7 @@ export async function readDevices() {
     []
   );
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     const d = readDevice(row.device);
     devices.push(d);
   });
@@ -340,7 +340,7 @@ export async function readMeters() {
     []
   );
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     const d = readMeter(row.device);
     meters.push(d);
   });
@@ -358,15 +358,13 @@ export async function readConfig(name: string) {
 
 export async function readWorker(macaddr: string) {
   const { rows } = await query("SELECT * FROM workers WHERE worker = $1", [
-    macaddr
+    macaddr,
   ]);
   return rows[0] as Worker;
 }
 
 export async function reading(device: string) {
-  const {
-    rows
-  } = await query(
+  const { rows } = await query(
     "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
     [device]
   );
@@ -381,7 +379,7 @@ export async function readWorkers() {
     []
   );
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     const w = readWorker(row.worker);
     workers.push(w);
   });
@@ -391,7 +389,7 @@ export async function readWorkers() {
 
 export async function registerDevice(macaddr: string, manufacturer: string) {
   return query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(
-    res => {
+    (res) => {
       if (res.rowCount === 0) {
         return query(
           "INSERT INTO devices (device, manufacturer) VALUES ($1, $2)",
@@ -404,7 +402,7 @@ export async function registerDevice(macaddr: string, manufacturer: string) {
 
 export async function registerMeter(macaddr: string, manufacturer: string) {
   return query("SELECT * FROM devices WHERE device = $1", [macaddr]).then(
-    res => {
+    (res) => {
       if (res.rowCount === 0) {
         return query(
           "INSERT INTO devices (device, devicetype, manufacturer) VALUES ($1, 'meter', $2)",
@@ -417,7 +415,7 @@ export async function registerMeter(macaddr: string, manufacturer: string) {
 
 export async function registerWorker(macaddr: string, inet: string) {
   return query("SELECT * FROM workers WHERE worker = $1", [macaddr]).then(
-    async res => {
+    async (res) => {
       if (res.rowCount === 0) {
         const defaultConfig = "default";
         const config = await readConfig(defaultConfig);
@@ -444,7 +442,7 @@ export async function createReading(
   ts: Date
 ) {
   return query("SELECT * FROM devices WHERE device = $1", [meter]).then(
-    async res => {
+    async (res) => {
       if (res.rowCount !== 0) {
         await query(
           "UPDATE devices SET temperature = $1, humidity = $2, pressure = $3, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $4",
@@ -461,7 +459,7 @@ export async function createReading(
 
 export async function createStatus(device: string, status: string, ts: Date) {
   return query("SELECT * FROM devices WHERE device = $1", [device]).then(
-    async res => {
+    async (res) => {
       if (res.rowCount !== 0) {
         await query(
           "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",

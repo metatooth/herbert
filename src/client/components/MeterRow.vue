@@ -54,7 +54,7 @@ const MeterRow = Vue.extend({
   props: {
     meter: Meter,
     locked: Boolean,
-    units: String
+    units: String,
   },
 
   data() {
@@ -62,26 +62,26 @@ const MeterRow = Vue.extend({
       nickname: this.meter.nickname,
       updatedat: new Date(Date.parse(this.meter.updatedat)),
       updating: false,
-      editing: false
+      editing: false,
     };
   },
 
   components: {
     EditControls,
     MeterActual,
-    Readable
+    Readable,
   },
 
   watch: {
     meter() {
       this.updating = false;
-    }
+    },
   },
 
   computed: {
     zone() {
-      const found = this.zones.filter(zone => {
-        const meters = zone.meters.filter(meter => {
+      const found = this.zones.filter((zone) => {
+        const meters = zone.meters.filter((meter) => {
           return this.meter.device === meter.device;
         });
         return meters.length !== 0;
@@ -106,7 +106,7 @@ const MeterRow = Vue.extend({
       return "";
     },
 
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
@@ -117,7 +117,7 @@ const MeterRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.meter,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
@@ -133,8 +133,8 @@ const MeterRow = Vue.extend({
       }
     },
 
-    ...mapActions("meters", ["edit", "remove"])
-  }
+    ...mapActions("meters", ["edit", "remove"]),
+  },
 });
 
 export default MeterRow;

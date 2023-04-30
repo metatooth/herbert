@@ -22,7 +22,7 @@ const Target = Vue.extend({
     units: String,
     color: { type: String, default: "#ffffff" },
     size: { type: String, default: "medium" },
-    simple: { type: Boolean, default: false }
+    simple: { type: Boolean, default: false },
   },
 
   computed: {
@@ -44,8 +44,8 @@ const Target = Vue.extend({
 
     formatted(): string {
       return this.value.toFixed(this.precision);
-    }
-  }
+    },
+  },
 });
 
 export default Target;

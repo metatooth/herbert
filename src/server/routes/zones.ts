@@ -41,13 +41,13 @@ router.put("/:id", async (req, res) => {
       req.body.maxirrigators,
       req.body.lamponleafdiff,
       req.body.lampoffleafdiff,
-      id
+      id,
     ]
   );
 
   const devices = [];
 
-  req.body.devices.forEach(device => {
+  req.body.devices.forEach((device) => {
     if (typeof device === "string") {
       devices.push(device);
     } else if (typeof device === "object") {
@@ -55,7 +55,7 @@ router.put("/:id", async (req, res) => {
     }
   });
 
-  req.body.meters.forEach(meter => {
+  req.body.meters.forEach((meter) => {
     if (typeof meter === "string") {
       devices.push(meter);
     } else if (typeof meter === "object") {
@@ -68,7 +68,7 @@ router.put("/:id", async (req, res) => {
     [id]
   );
 
-  devices.forEach(async dev => {
+  devices.forEach(async (dev) => {
     query<Record<string, number>>(
       "INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)",
       [id, dev]
@@ -94,7 +94,7 @@ router.post("/:id/devices", async (req, res) => {
   try {
     await query("INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)", [
       id,
-      req.body.device
+      req.body.device,
     ]);
   } catch (err) {
     console.log("ERROR", err);
@@ -107,7 +107,7 @@ router.delete("/:id/devices/:device", async (req, res) => {
   const { id, device } = req.params;
   await query("DELETE FROM zone_devices WHERE zoneid = $1 AND device = $2", [
     id,
-    device
+    device,
   ]);
   res.status(204).json({});
 });

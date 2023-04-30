@@ -11,5 +11,5 @@ export const getters: GetterTree<NotificationsState, RootState> = {
   notificationsCount(state): number {
     const { notifications } = state;
     return notifications.length;
-  }
+  },
 };

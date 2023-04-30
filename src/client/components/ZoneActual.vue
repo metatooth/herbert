@@ -18,12 +18,12 @@ import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 const ZoneActual = Vue.extend({
   props: {
     zone: Zone,
-    size: { type: String, default: "medium" }
+    size: { type: String, default: "medium" },
   },
 
   data() {
     return {
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
@@ -62,8 +62,8 @@ const ZoneActual = Vue.extend({
       return `color: ${this.humidityColor};`;
     },
 
-    ...mapGetters("settings", ["settings"])
-  }
+    ...mapGetters("settings", ["settings"]),
+  },
 });
 
 export default ZoneActual;

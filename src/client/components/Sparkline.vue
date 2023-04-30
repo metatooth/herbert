@@ -13,12 +13,12 @@ const Sparkline = Vue.extend({
     data: { type: Array },
     color: { type: String, default: "rgb(255, 119, 0)" },
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" }
+    height: { type: String, default: "50px" },
   },
 
   data() {
     return {
-      chart: ChartJS
+      chart: ChartJS,
     };
   },
 
@@ -29,10 +29,10 @@ const Sparkline = Vue.extend({
       options: {
         responsive: false,
         legend: {
-          display: false
+          display: false,
         },
         title: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -40,17 +40,17 @@ const Sparkline = Vue.extend({
               display: false,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
-              display: false
-            }
-          ]
-        }
-      }
+              display: false,
+            },
+          ],
+        },
+      },
     });
   },
 
@@ -63,16 +63,16 @@ const Sparkline = Vue.extend({
         spanGaps: true,
         tension: 0.2,
         borderColor: this.color,
-        backgroundColor: this.color
+        backgroundColor: this.color,
       });
 
       this.chart.options = {
         responsive: false,
         legend: {
-          display: false
+          display: false,
         },
         title: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -80,21 +80,21 @@ const Sparkline = Vue.extend({
               display: false,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm",
+              },
+            },
           ],
           yAxes: [
             {
-              display: false
-            }
-          ]
-        }
+              display: false,
+            },
+          ],
+        },
       };
 
       this.chart.update();
-    }
-  }
+    },
+  },
 });
 export default Sparkline;
 </script>

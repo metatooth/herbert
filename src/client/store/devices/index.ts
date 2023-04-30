@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: DevicesState = {
   devices: [] as Device[],
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,5 +17,5 @@ export const devices: Module<DevicesState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

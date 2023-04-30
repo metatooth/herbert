@@ -12,17 +12,17 @@ import "chartjs-adapter-date-fns";
 
 const DeviceChart = Vue.extend({
   props: {
-    devices: []
+    devices: [],
   },
 
   data() {
     return {
-      chart: ChartJS
+      chart: ChartJS,
     };
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   mounted() {
@@ -32,7 +32,7 @@ const DeviceChart = Vue.extend({
       options: {
         responsive: true,
         legend: {
-          display: false
+          display: false,
         },
         elements: { point: { radius: 0 } },
         scales: {
@@ -41,27 +41,27 @@ const DeviceChart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
-              display: true
-            }
-          ]
-        }
-      }
+              display: true,
+            },
+          ],
+        },
+      },
     });
 
     const timeZone = this.settings.timezone;
 
-    this.devices.forEach(d => {
+    this.devices.forEach((d) => {
       if (d.devicetype === "irrigator" || d.devicetype === "lamp") {
-        HTTP.get(`/facts?device=${d.device}&units=STATUS`).then(resp => {
+        HTTP.get(`/facts?device=${d.device}&units=STATUS`).then((resp) => {
           const statuses = [];
 
-          resp.data.forEach(d => {
+          resp.data.forEach((d) => {
             const observedat = new Date(
               d.year,
               d.month - 1,
@@ -72,7 +72,7 @@ const DeviceChart = Vue.extend({
 
             const status = {
               x: convertToLocalTime(observedat, { timeZone }),
-              y: d.reading as number
+              y: d.reading as number,
             };
             statuses.push(status);
           });
@@ -85,14 +85,14 @@ const DeviceChart = Vue.extend({
           this.chart.data.datasets.push({
             data: statuses,
             borderColor: "#00dd77",
-            fill: false
+            fill: false,
           });
 
           this.chart.update();
         });
       }
     });
-  }
+  },
 });
 
 export default DeviceChart;

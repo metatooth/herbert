@@ -13,17 +13,17 @@ import { convertToLocalTime } from "date-fns-timezone";
 
 const HumidityFact = Vue.extend({
   props: {
-    meter: Meter
+    meter: Meter,
   },
 
   data() {
     return {
-      humidities: []
+      humidities: [],
     };
   },
 
   components: {
-    Sparkline
+    Sparkline,
   },
 
   mounted() {
@@ -33,7 +33,7 @@ const HumidityFact = Vue.extend({
   computed: {
     id() {
       return `${this.meter.device}-humidity`;
-    }
+    },
   },
 
   methods: {
@@ -67,7 +67,7 @@ const HumidityFact = Vue.extend({
 
               const humidity = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number
+                y: d.reading as number,
               };
 
               this.humidities.push(humidity);
@@ -77,8 +77,8 @@ const HumidityFact = Vue.extend({
       };
 
       xhr.send();
-    }
-  }
+    },
+  },
 });
 
 export default HumidityFact;

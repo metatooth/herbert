@@ -10,7 +10,7 @@ import {
   makeSendWorkerConfigMessage,
   makeSwitchStatusMessage,
   makeWorkerRegisterMessage,
-  makeWorkerStatusMessage
+  makeWorkerStatusMessage,
 } from "../shared/message-creators";
 import {
   AnySocketMessage,
@@ -21,7 +21,7 @@ import {
   SocketMessageMap,
   SwitchStatusPaylaod,
   Worker,
-  WorkerStatusPayload
+  WorkerStatusPayload,
 } from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import { vaporPressureDeficit } from "../shared/utils";
@@ -94,7 +94,7 @@ export class HerbertSocket {
     const msg = makeConfigureMessage({
       worker: worker.worker,
       config: worker.config,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
 
     this.sendToWorkerID(id, msg);
@@ -102,7 +102,7 @@ export class HerbertSocket {
 
   private readonly onConnection = (ws: IO.Socket<SocketMessageMap>) => {
     console.log("websocket connection open");
-    ws.on("join", data => {
+    ws.on("join", (data) => {
       ws.join(data.room);
       if (data.workerID) {
         ws.join(`workers:${data.workerID}`);
@@ -140,7 +140,7 @@ export class HerbertSocket {
   private sendError(ws: IO.Socket<SocketMessageMap>, message: string) {
     const messageObject = makeErrorMessage({
       message,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
 
     this.send(ws, messageObject);
@@ -195,13 +195,13 @@ export class HerbertSocket {
     try {
       const body = {
         device: payload.worker,
-        inet: payload.inet
+        inet: payload.inet,
       };
 
       await HTTP({
         method: "post",
         url: "/workers",
-        data: body
+        data: body,
       });
 
       this.sendWorkerConfig(payload.worker);
@@ -215,13 +215,13 @@ export class HerbertSocket {
       const body = {
         device: payload.worker,
         inet: payload.inet,
-        camera: payload.camera
+        camera: payload.camera,
       };
 
       await HTTP({
         method: "put",
         url: `/workers/${payload.worker}`,
-        data: body
+        data: body,
       });
     } catch (e) {
       console.error("handle worker status", e.message);
@@ -232,34 +232,34 @@ export class HerbertSocket {
     try {
       const body = {
         device: payload.device,
-        manufacturer: payload.manufacturer
+        manufacturer: payload.manufacturer,
       };
 
       await HTTP({
         method: "post",
         url: "/devices",
-        data: body
+        data: body,
       });
 
       console.log("DID POST /devices", body);
-      
+
       const resp = await HTTP.get<Device>(`/devices/${payload.device}`);
       console.log("DID GET /devices/:id", resp);
       const device = resp.data;
       const ts = new Date(device.timestamp).getTime();
       const diff = Date.parse(payload.timestamp) - ts;
-      
+
       if (device.status != payload.status || diff > this.limit) {
         const body = {
           device: payload.device,
           status: payload.status,
-          ts: payload.timestamp
+          ts: payload.timestamp,
         };
         console.log("READY TO POST /statuses", body);
         await HTTP({
           method: "post",
           url: "/statuses",
-          data: body
+          data: body,
         });
         console.log("DONE");
       }
@@ -272,13 +272,13 @@ export class HerbertSocket {
     try {
       const body = {
         macaddr: payload.device,
-        manufacturer: payload.manufacturer
+        manufacturer: payload.manufacturer,
       };
 
       await HTTP({
         method: "post",
         url: "/meters",
-        data: body
+        data: body,
       });
 
       console.log("handle meter status msg", body);
@@ -302,13 +302,13 @@ export class HerbertSocket {
             0,
             payload.humidity
           ),
-          ts: payload.timestamp
+          ts: payload.timestamp,
         };
 
         await HTTP({
           method: "post",
           url: "/readings",
-          data: body
+          data: body,
         });
       }
     } catch (e) {

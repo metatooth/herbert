@@ -8,7 +8,7 @@
       @selected="selected"
       @toggle="toggle"
     />
-    
+
     <nav class="level">
       <div class="level-left" />
       <div class="level-right">
@@ -21,14 +21,14 @@
           </div>
           <div class="level-item">
             <p class="text">
-              <em><readable :timestamp="new Date(worker.updatedat)"/></em>
+              <em><readable :timestamp="new Date(worker.updatedat)" /></em>
             </p>
           </div>
         </div>
         <current-conditions />
       </div>
     </nav>
-    
+
     <div class="box">
       <collection
         v-if="is('devices')"
@@ -95,7 +95,7 @@ const Dashboard = Vue.extend({
       filter: "",
       picked: "overview",
       locked: true,
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
@@ -110,7 +110,7 @@ const Dashboard = Vue.extend({
 
   computed: {
     cameras() {
-      return this.workers.filter(worker => {
+      return this.workers.filter((worker) => {
         return worker.camera !== null;
       });
     },
@@ -124,7 +124,7 @@ const Dashboard = Vue.extend({
 
     ...mapGetters("settings", ["settings"]),
     ...mapGetters("workers", ["workers"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   mounted() {
@@ -194,35 +194,34 @@ const Dashboard = Vue.extend({
       "configs/fetchData",
       "zones/fetchData",
       "settings/fetchData",
-      "settings/edit"
-    ])
-  }
+      "settings/edit",
+    ]),
+  },
 });
 
 export default Dashboard;
 </script>
 
 <style>
- 
 .herbert-worker {
   width: 300px;
 }
 
 .card-content {
-color: #00dd77;
-align: center;
+  color: #00dd77;
+  align: center;
 }
 
 .card-image .logo {
-height: 2rem;
+  height: 2rem;
 }
 
 .card-footer {
   border-top: 0px;
 }
 
-a, .card-header-title {
+a,
+.card-header-title {
   color: #00dd77;
 }
-
 </style>

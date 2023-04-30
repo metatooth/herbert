@@ -27,7 +27,8 @@
         v-if="!editing"
         :device="device"
         :locked="locked"
-        @on-toggle="toggle" />
+        @on-toggle="toggle"
+      />
       <div class="control" v-else>
         <select-device-type
           :devicetype="device.devicetype"
@@ -62,14 +63,14 @@ const DeviceRow = Vue.extend({
   props: {
     device: Device,
     locked: Boolean,
-    units: String
+    units: String,
   },
 
   data() {
     return {
       nickname: this.device.nickname,
       editing: false,
-      status: this.device.status
+      status: this.device.status,
     };
   },
 
@@ -77,7 +78,7 @@ const DeviceRow = Vue.extend({
     DeviceActual,
     EditControls,
     SelectDeviceType,
-    Readable
+    Readable,
   },
 
   computed: {
@@ -132,8 +133,8 @@ const DeviceRow = Vue.extend({
     },
 
     zone() {
-      const found = this.zones.filter(zone => {
-        const devices = zone.devices.filter(device => {
+      const found = this.zones.filter((zone) => {
+        const devices = zone.devices.filter((device) => {
           return this.device.device === device.device;
         });
         return devices.length !== 0;
@@ -160,7 +161,7 @@ const DeviceRow = Vue.extend({
     },
 
     ...mapState("notifications", ["notifications"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
@@ -171,7 +172,7 @@ const DeviceRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.device,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
@@ -179,7 +180,7 @@ const DeviceRow = Vue.extend({
     saveDeviceType(devicetype: string): void {
       this.edit({
         ...this.device,
-        devicetype: devicetype
+        devicetype: devicetype,
       });
     },
 
@@ -204,8 +205,8 @@ const DeviceRow = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["edit", "remove", "on", "off"])
-  }
+    ...mapActions("devices", ["edit", "remove", "on", "off"]),
+  },
 });
 
 export default DeviceRow;

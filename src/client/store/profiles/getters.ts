@@ -11,5 +11,5 @@ export const getters: GetterTree<ProfilesState, RootState> = {
   profilesCount(state): number {
     const { profiles } = state;
     return profiles.length;
-  }
+  },
 };

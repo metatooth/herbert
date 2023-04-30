@@ -212,7 +212,7 @@ import {
   celsius2fahrenheit,
   celsius2kelvin,
   fahrenheit2celsius,
-  kelvin2celsius
+  kelvin2celsius,
 } from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 import EditControls from "@/components/EditControls.vue";
@@ -224,14 +224,14 @@ const ProfileTile = Vue.extend({
   props: {
     locked: Boolean,
     profile: Profile,
-    units: String
+    units: String,
   },
 
   components: {
     EditControls,
     Readable,
     SelectControlType,
-    Target
+    Target,
   },
 
   data() {
@@ -279,7 +279,7 @@ const ProfileTile = Vue.extend({
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
-      editing: false
+      editing: false,
     };
   },
 
@@ -326,7 +326,7 @@ const ProfileTile = Vue.extend({
       }
 
       return max;
-    }
+    },
   },
 
   methods: {
@@ -382,7 +382,7 @@ const ProfileTile = Vue.extend({
         bloweractive: this.bloweractive * 1000,
         blowercycle: this.blowercycle * 1000,
         irrigationperday: this.irrigationperday,
-        irrigationduration: this.irrigationduration * 1000
+        irrigationduration: this.irrigationduration * 1000,
       };
 
       this.edit(profile);
@@ -402,8 +402,8 @@ const ProfileTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("profiles", ["edit", "remove"])
-  }
+    ...mapActions("profiles", ["edit", "remove"]),
+  },
 });
 
 export default ProfileTile;

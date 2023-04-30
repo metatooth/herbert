@@ -9,12 +9,12 @@ import DeviceChart from "@/components/DeviceChart.vue";
 
 const SystemDeviceChart = Vue.extend({
   components: {
-    DeviceChart
+    DeviceChart,
   },
 
   computed: {
-    ...mapGetters("devices", ["devices"])
-  }
+    ...mapGetters("devices", ["devices"]),
+  },
 });
 
 export default SystemDeviceChart;

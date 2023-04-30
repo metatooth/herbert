@@ -1,7 +1,13 @@
 import Router from "express-promise-router";
 
 import { Device } from "../../shared/types";
-import { createMeterFact, createStatusFact, query, readAccount, readDevice } from "../db";
+import {
+  createMeterFact,
+  createStatusFact,
+  query,
+  readAccount,
+  readDevice,
+} from "../db";
 
 const router = Router();
 
@@ -29,31 +35,22 @@ router.get("/", async (req, res) => {
   const startDate = new Date(limit);
   console.log("startDate", startDate);
 
-  const start = startDate
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
+  const start = startDate.toISOString().slice(0, 19).replace("T", " ");
 
   if (one) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM statuses WHERE device = $1 ORDER BY id DESC LIMIT 1",
       [req.query.device]
     );
     res.status(200).json(rows[0]);
   } else if (req.query.device) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM statuses WHERE device = $1 AND observedat > $2 ORDER BY id DESC",
       [req.query.device, start]
     );
     res.status(200).json(rows);
   } else {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM statuses WHERE observedat > $1 ORDER BY id DESC",
       [start]
     );
@@ -70,7 +67,7 @@ router.post("/", async (req, res) => {
   const val = status === "on" ? 1 : 0;
 
   console.log("QUERY FOR", device);
-    
+
   const dev = await readDevice(device);
 
   console.log("this device is", dev);
@@ -80,9 +77,9 @@ router.post("/", async (req, res) => {
   } else {
     await createStatusFact(device, status, observedat);
   }
-  
+
   console.log("done");
-  
+
   res.status(204).send();
 });
 

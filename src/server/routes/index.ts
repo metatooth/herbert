@@ -9,7 +9,7 @@ import zones from "./zones";
 import settings from "./settings";
 import configs from "./configs";
 
-export default app => {
+export default (app) => {
   app.use("/workers", workers);
   app.use("/devices", devices);
   app.use("/meters", meters);

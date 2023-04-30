@@ -1,7 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import fs from "fs";
 import { networkInterfaces } from "os";
-import MerossCloud from "meross-cloud";
 
 import { Meter } from "./meter";
 import { MockMeter } from "./mock-meter";
@@ -9,12 +8,12 @@ import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
 import { SequentMicrosystems } from "./sequent-microsystems";
-import { MerossSwitch } from "./meross-switch";
+import { MerossController } from "./meross-controller";
 import { IRSend } from "./i-r-send";
 import {
   AnySocketMessage,
   CommandPayload,
-  SocketMessageMap
+  SocketMessageMap,
 } from "../shared/types";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import {
@@ -24,7 +23,7 @@ import {
   makeMeterStatusMessage,
   makeSwitchStatusMessage,
   makeWorkerRegisterMessage,
-  makeWorkerStatusMessage
+  makeWorkerStatusMessage,
 } from "../shared/message-creators";
 
 import WebCamera from "./web-camera";
@@ -74,6 +73,7 @@ export class App {
   private wsUrl = process.env.WSS_URL || "";
   private monitorPort = process.env.MONITOR_PORT || "";
   private closed = false;
+  private channel: number;
   initialized = false;
   socket?: Socket<SocketMessageMap> = undefined;
   meters: Array<Meter> = [];
@@ -81,9 +81,10 @@ export class App {
   macaddr = "";
   inet = "";
   camera = "";
+  meross: MerossController = undefined;
   heldMessages: AnySocketMessage[] = [];
   runTimeout: NodeJS.Timeout | undefined;
-  
+
   public constructor() {
     App.instance = App.instance || this;
     return App.instance;
@@ -114,8 +115,8 @@ export class App {
     thermopro = new ThermoPro();
     thermopro.scan();
     */
-    
-    return new Promise(resolve => {
+
+    return new Promise((resolve) => {
       const i = setInterval(() => {
         if (this.initialized) {
           clearInterval(i);
@@ -123,7 +124,7 @@ export class App {
         }
         const msg = makeWorkerRegisterMessage({
           worker: this.macaddr,
-          inet: this.inet
+          inet: this.inet,
         });
         this.send(msg);
       }, 5000);
@@ -137,27 +138,39 @@ export class App {
 
     if (this.monitorPort !== "") {
       const cam = new WebCamera(this.monitorPort);
-      cam.fetch().then(image => {
-        this.camera = (image as Buffer).toString("base64");
-      }).catch(e => {
-        console.log("ERROR", e);
-      });
+      cam
+        .fetch()
+        .then((image) => {
+          this.camera = (image as Buffer).toString("base64");
+        })
+        .catch((e) => {
+          console.log("ERROR", e);
+        });
     }
-    
+
     this.workerStatus();
 
     const polling: number = 1000 * (this.config.polling || 5);
     const interval: number = 1000 * (this.config.interval || 30);
 
-    console.log("RUN");
+    console.log(new Date(), " RUN");
 
-    this.meters.forEach(meter => {
+    this.meters.forEach((meter) => {
       this.meterStatus(meter);
     });
 
-    this.switches.forEach(plug => {
+    this.switches.forEach((plug) => {
       this.switchStatus(plug.status());
     });
+
+    if (this.meross) {
+      this.meross.switches.forEach((plug) => {
+        if (plug.state === "") {
+          plug.off();
+        }
+        this.switchStatus(plug.status());
+      });
+    }
 
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
@@ -196,45 +209,21 @@ export class App {
         ? (this.config.devices as ConfigDevice[])
         : ([] as ConfigDevice[]);
 
-    let meross;
-    
-    devices.forEach(async dev => {
+    devices.forEach(async (dev) => {
       const mac = this.formatMacAddress(dev.id);
       if (dev.manufacturer === "meross") {
         const options = {
-          'email': dev.username,
-          'password': dev.password,
-          'logger': console.log,
-          'localHttpFirst': true 
+          email: dev.username,
+          password: dev.password,
+          logger: console.log,
+          localHttpFirst: true,
         };
-        
-        meross = new MerossCloud(options);
 
-        meross.on('deviceInitialized', async (id, def, device) => {
-          device.on('connected', () => {
-            console.log('CONNECTED');
-            this.switches.push(new MerossSwitch(device));
-            this.join();
-          });
-          
-          device.on('data', (namespace, payload) => {
-            console.log('DEVICE', id);
-            console.log('NAMESPACE', namespace);
-            console.log(JSON.stringify(payload));
-          });
-        });
-        
-        meross.on('data', (id, payload) => {
-          console.log('DATA', id);
-          console.log(JSON.stringify(payload));
-        });
+        this.meross = new MerossController(options);
 
-        meross.connect((error) => {
-          if (error) {
-            console.error('connect error: ' + error);
-          }
+        this.meross.on("update", (e) => {
+          console.log(`got an update, ${e}`);
         });
-
       } else if (dev.manufacturer === "herbert") {
         if (dev.pin) {
           this.switches.push(new Herbert(mac, parseInt(dev.pin)));
@@ -262,11 +251,13 @@ export class App {
       this.initialized = true;
     });
   }
-  
+
   private async createSocket() {
     if (this.socket) {
       this.stop();
     }
+
+    console.log("TRYING TO CONNECT ", this.wsUrl);
 
     this.socket = io(this.wsUrl);
     this.socket.on("connect", () => {
@@ -278,15 +269,15 @@ export class App {
   }
 
   private join = async () => {
-    const all = [...this.meters, ...this.switches].map(d => d.device);
+    const all = [...this.meters, ...this.switches].map((d) => d.device);
     console.log("ALL", all);
     this.socket.emit("join", {
       room: "workers",
       workerID: this.macaddr,
-      devices: all
+      devices: all,
     });
   };
-  
+
   private readonly onSocketError = (err: Error) => {
     console.error(err);
   };
@@ -357,20 +348,43 @@ export class App {
   }
 
   private updateSwitches(data: CommandPayload) {
+    console.log("App::updateSwitches", data);
     const mac = this.formatMacAddress(data.device);
-    this.switches.forEach(plug => {
+    this.switches.forEach((plug) => {
+      console.log(
+        "checking",
+        plug.device,
+        this.formatMacAddress(plug.device),
+        mac
+      );
       if (this.formatMacAddress(plug.device) === mac) {
         const state = plug.state ? "on" : "off";
         console.log("plug state", state, data.action, plug.device);
-        if (data.action === "on" && state === "off") {
-          console.log("ON");
+        if (data.action === "on") {
+          console.log("App::updateSwitches ON");
           plug.on();
-        } else if (data.action === "off" && state === "on") {
-          console.log("OFF");
+        } else if (data.action === "off") {
+          console.log("App::updateSwitches OFF");
           plug.off();
         }
       }
     });
+
+    if (this.meross) {
+      this.meross.switches.forEach((plug) => {
+        if (this.formatMacAddress(plug.device) === mac) {
+          const state = plug.state ? "on" : "off";
+          console.log("plug state", state, data.action, plug.device);
+          if (data.action === "on" && state === "off") {
+            console.log("ON");
+            plug.on();
+          } else if (data.action === "off" && state === "on") {
+            console.log("OFF");
+            plug.off();
+          }
+        }
+      });
+    }
   }
 
   private async meterStatus(meter: Meter) {
@@ -380,7 +394,7 @@ export class App {
       manufacturer: meter.manufacturer,
       temperature: meter.clime.temperature,
       humidity: meter.clime.humidity,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
     console.log("send this message", msg);
     this.send(msg);
@@ -391,7 +405,7 @@ export class App {
       device: this.formatMacAddress(switcher.device),
       manufacturer: switcher.manufacturer,
       status: switcher.state,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
     console.log("SEND", msg);
     this.send(msg);
@@ -403,7 +417,7 @@ export class App {
       inet: this.inet,
       config: JSON.stringify(this.config),
       camera: this.camera,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
     this.send(msg);
   }
@@ -425,10 +439,6 @@ export class App {
     mac = mac.replace(/(.{2})/g, "$1:");
 
     // remove trailing colon
-    return mac
-      .split(":")
-      .slice(0, -1)
-      .join(":");
+    return mac.split(":").slice(0, -1).join(":");
   }
-
 }

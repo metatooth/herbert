@@ -19,12 +19,12 @@ import { zeroes } from "../../shared/utils";
 const ZoneTag = Vue.extend({
   props: {
     locked: Boolean,
-    zone: Zone
+    zone: Zone,
   },
 
   data() {
     return {
-      now: new Date()
+      now: new Date(),
     };
   },
 
@@ -55,17 +55,17 @@ const ZoneTag = Vue.extend({
       }
 
       return this.zone.nickname;
-    }
+    },
   },
 
   methods: {
     clicked() {
       this.$router.push({
         name: "zone",
-        params: { id: this.zone.id, locked: this.locked }
+        params: { id: this.zone.id, locked: this.locked },
       });
-    }
-  }
+    },
+  },
 });
 
 export default ZoneTag;

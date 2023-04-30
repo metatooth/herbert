@@ -14,7 +14,7 @@ Vue.use(Vuex);
 const store: StoreOptions<RootState> = {
   strict: true,
   state: {
-    version: "1.0.0"
+    version: "1.0.0",
   },
   modules: {
     zones,
@@ -23,8 +23,8 @@ const store: StoreOptions<RootState> = {
     meters,
     workers,
     settings,
-    configs
-  }
+    configs,
+  },
 };
 
 export default new Vuex.Store<RootState>(store);

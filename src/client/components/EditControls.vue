@@ -41,17 +41,17 @@ import HerbertButton from "@/components/Button.vue";
 
 const EditControls = Vue.extend({
   props: {
-    stacked: { type: Boolean, default: false }
+    stacked: { type: Boolean, default: false },
   },
 
   data() {
     return {
-      editing: false
+      editing: false,
     };
   },
 
   components: {
-    HerbertButton
+    HerbertButton,
   },
 
   computed: {
@@ -63,7 +63,7 @@ const EditControls = Vue.extend({
         div += "is-grouped-right";
       }
       return div;
-    }
+    },
   },
 
   methods: {
@@ -84,8 +84,8 @@ const EditControls = Vue.extend({
     cancel() {
       this.$emit("on-cancel");
       this.editing = false;
-    }
-  }
+    },
+  },
 });
 export default EditControls;
 </script>

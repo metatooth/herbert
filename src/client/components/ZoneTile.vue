@@ -39,13 +39,13 @@ import { Zone } from "@/store/zones/types";
 const ZoneTile = Vue.extend({
   props: {
     locked: Boolean,
-    zone: Zone
+    zone: Zone,
   },
 
   data() {
     return {
       readable: true,
-      editable: false
+      editable: false,
     };
   },
 
@@ -54,13 +54,13 @@ const ZoneTile = Vue.extend({
     Readable,
     ZoneActual,
     ZoneStatusButton,
-    ZoneTag
+    ZoneTag,
   },
 
   computed: {
     lastupdate() {
       let last = null;
-      this.zone.meters.forEach(meter => {
+      this.zone.meters.forEach((meter) => {
         const updatedat = new Date(meter.updatedat);
         if (last === null || updatedat > last) {
           last = updatedat;
@@ -71,7 +71,7 @@ const ZoneTile = Vue.extend({
 
     sorted(): Device[] {
       const devices = [];
-      this.zone.devices.forEach(d => {
+      this.zone.devices.forEach((d) => {
         devices.push(Object.assign(new Device(), d));
       });
       devices.sort((a, b) => {
@@ -80,21 +80,21 @@ const ZoneTile = Vue.extend({
       return devices;
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
     toggle() {
       const zone = {
         ...this.zone,
-        active: !this.zone.active
+        active: !this.zone.active,
       };
 
       this.edit(zone);
     },
 
-    ...mapActions("zones", ["edit"])
-  }
+    ...mapActions("zones", ["edit"]),
+  },
 });
 
 export default ZoneTile;

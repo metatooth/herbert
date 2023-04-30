@@ -31,7 +31,7 @@ router.put("/", async (req, res) => {
         req.body.cityname,
         req.body.statecode,
         req.body.reportingperiod,
-        req.body.pin
+        req.body.pin,
       ]
     );
   } else {
@@ -49,7 +49,7 @@ router.put("/", async (req, res) => {
         req.body.cityname,
         req.body.statecode,
         req.body.reportingperiod,
-        req.body.pin
+        req.body.pin,
       ]
     );
   }

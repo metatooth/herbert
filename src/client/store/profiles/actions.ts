@@ -6,7 +6,7 @@ import { RootState } from "../types";
 export const actions: ActionTree<ProfilesState, RootState> = {
   add({ commit }, payload: Profile) {
     const json = JSON.stringify(payload);
-    HTTP.post("/profiles", json).then(response => {
+    HTTP.post("/profiles", json).then((response) => {
       const profile = Object.assign(new Profile(), response.data);
       profile.lampontemperature = parseFloat(response.data.lampontemperature);
       profile.lamponhumidity = parseFloat(response.data.lamponhumidity);
@@ -21,7 +21,7 @@ export const actions: ActionTree<ProfilesState, RootState> = {
   },
   edit({ commit }, payload: Profile) {
     const json = JSON.stringify(payload);
-    HTTP.put(`/profiles/${payload.id}`, json).then(response => {
+    HTTP.put(`/profiles/${payload.id}`, json).then((response) => {
       const profile = Object.assign(new Profile(), response.data);
       profile.lampontemperature = parseFloat(response.data.lampontemperature);
       profile.lamponhumidity = parseFloat(response.data.lamponhumidity);
@@ -35,7 +35,7 @@ export const actions: ActionTree<ProfilesState, RootState> = {
     });
   },
   fetchData({ commit }) {
-    HTTP.get("/profiles").then(response => {
+    HTTP.get("/profiles").then((response) => {
       const payload: Profile[] = [];
       response.data.forEach((data: object) => {
         const profile = Object.assign(new Profile(), data);
@@ -58,5 +58,5 @@ export const actions: ActionTree<ProfilesState, RootState> = {
   remove({ commit }, payload: Profile) {
     HTTP.delete(`/profiles/${payload.id}`);
     commit("REMOVE", payload);
-  }
+  },
 };

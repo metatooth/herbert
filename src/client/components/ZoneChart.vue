@@ -22,13 +22,13 @@ import TemperatureChart from "@/components/TemperatureChart.vue";
 const ZoneChart = Vue.extend({
   props: {
     zone: Zone,
-    units: String
+    units: String,
   },
 
   components: {
     DeviceChart,
     HumidityChart,
-    TemperatureChart
+    TemperatureChart,
   },
 });
 

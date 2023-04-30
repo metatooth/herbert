@@ -6,5 +6,5 @@ export const getters: GetterTree<SettingsState, RootState> = {
   settings(state): Settings {
     const { settings } = state;
     return settings;
-  }
+  },
 };

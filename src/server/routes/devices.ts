@@ -1,7 +1,7 @@
 import Router from "express-promise-router";
 import {
   makeCommandMessage,
-  makeSendByDeviceIDMessage
+  makeSendByDeviceIDMessage,
 } from "../../shared/message-creators";
 import { Device } from "../../shared/types";
 import { query, readDevice, readDevices, registerDevice } from "../db";
@@ -53,7 +53,7 @@ router.put("/:id/:action", async (req, res) => {
   const cmd = makeCommandMessage({
     device: device.device,
     action: action,
-    timestamp: new Date().toString()
+    timestamp: new Date().toString(),
   });
   const payload = { device: device.device, msg: cmd };
   console.log("send by device id", payload);

@@ -30,31 +30,22 @@ router.get("/", async (req, res) => {
 
   const startDate = new Date(limit);
 
-  const start = startDate
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
+  const start = startDate.toISOString().slice(0, 19).replace("T", " ");
 
   if (one) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
       [req.query.meter]
     );
     res.status(200).json(rows[0]);
   } else if (req.query.meter) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM readings WHERE meter = $1 AND observedat > $2 ORDER BY id DESC",
       [req.query.meter, start]
     );
     res.status(200).json(rows);
   } else {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM readings WHERE observedat > $1 ORDER BY id DESC",
       [start]
     );

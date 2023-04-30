@@ -23,7 +23,7 @@ import Vue from "vue";
 
 const SelectDeviceType = Vue.extend({
   props: {
-    devicetype: String
+    devicetype: String,
   },
 
   data() {
@@ -35,16 +35,16 @@ const SelectDeviceType = Vue.extend({
         "heater",
         "humidifier",
         "irrigator",
-        "lamp"
+        "lamp",
       ],
-      selected: this.devicetype
+      selected: this.devicetype,
     };
   },
 
   watch: {
     selected(val: string) {
       this.$emit("select-devicetype", val);
-    }
+    },
   },
 
   computed: {
@@ -68,8 +68,8 @@ const SelectDeviceType = Vue.extend({
       }
 
       return "circle";
-    }
-  }
+    },
+  },
 });
 
 export default SelectDeviceType;

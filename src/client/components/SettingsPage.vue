@@ -26,9 +26,7 @@
             />
             <span class="file-cta" @click="pick">
               <font-awesome-icon icon="upload" />
-              <span class="file-label">
-                Choose a file…
-              </span>
+              <span class="file-label"> Choose a file… </span>
               <span class="file-name">
                 {{ filename }}
               </span>
@@ -136,7 +134,7 @@ import HerbertButton from "@/components/Button.vue";
 
 const SettingsPage = Vue.extend({
   props: {
-    settings: Settings
+    settings: Settings,
   },
 
   data() {
@@ -155,13 +153,13 @@ const SettingsPage = Vue.extend({
       reportingperiod: this.settings.reportingperiod / 1000,
       pin: this.settings.pin,
       name: "",
-      filedata: ""
+      filedata: "",
     };
   },
 
   components: {
     HerbertButton,
-    UnitsSelector
+    UnitsSelector,
   },
 
   computed: {
@@ -196,7 +194,7 @@ const SettingsPage = Vue.extend({
 
     url(): string {
       return process.env.VUE_APP_API_URL || "http://localhost:5000";
-    }
+    },
   },
 
   methods: {
@@ -260,7 +258,7 @@ const SettingsPage = Vue.extend({
         pin: this.pin,
         createdat: this.settings.createdat,
         updatedat: new Date(),
-        deleted: false
+        deleted: false,
       };
       this.edit(data);
     },
@@ -269,8 +267,8 @@ const SettingsPage = Vue.extend({
       this.units = units;
     },
 
-    ...mapActions("settings", ["edit"])
-  }
+    ...mapActions("settings", ["edit"]),
+  },
 });
 
 export default SettingsPage;
