@@ -21,7 +21,7 @@ export class MerossController extends EventEmitter {
 
     const switches = this.switches;
 
-    this.meross.on("deviceInitialized", async (id, device) => {
+    this.meross.on("deviceInitialized", async (id, definition, device) => {
       device.on("connected", () => {
         device["deviceConnected"] = true;
         switches.push(new MerossSwitch(device));

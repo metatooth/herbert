@@ -62,12 +62,7 @@ CMD ["npm", "run", "serve:socket-server"]
 
 FROM base as worker
 
-RUN apt-get update \
-  && apt-get install -y \
-  bluetooth \
-  bluez \
-  libbluetooth-dev \
-  libudev-dev
+RUN apk add gnome-bluetooth
 
 COPY src/worker ./src/worker
 COPY src/shared src/shared
