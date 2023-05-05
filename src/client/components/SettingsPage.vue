@@ -130,7 +130,7 @@ import Vue from "vue";
 import { mapActions } from "vuex";
 import { Settings } from "@/store/settings/types";
 import UnitsSelector from "@/components/UnitsSelector.vue";
-import HerbertButton from "@/components/Button.vue";
+import HerbertButton from "@/components/HerbertButton.vue";
 
 const SettingsPage = Vue.extend({
   props: {

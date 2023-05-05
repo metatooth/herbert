@@ -1,13 +1,6 @@
 import Router from "express-promise-router";
 
-import { Device } from "../../shared/types";
-import {
-  createMeterFact,
-  createStatusFact,
-  query,
-  readAccount,
-  readDevice,
-} from "../db";
+import { createMeterFact, createStatusFact, query, readDevice } from "../db";
 
 const router = Router();
 

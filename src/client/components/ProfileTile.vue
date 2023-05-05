@@ -144,14 +144,14 @@
         </div>
 
         <div class="field is-grouped is-grouped-multiline">
-          <target
+          <zone-target
             icon="thermometer-half"
             :value="parseFloat(lampontemperature)"
             units="°"
             size="small"
             color="#ffe08a"
           />
-          <target
+          <zone-target
             icon="tint"
             :value="parseFloat(lamponhumidity)"
             units="%"
@@ -161,14 +161,14 @@
         </div>
 
         <div class="field is-grouped is-grouped-multiline">
-          <target
+          <zone-target
             icon="thermometer-half"
             :value="parseFloat(lampofftemperature)"
             units="°"
             size="small"
             color="#7a7a7a"
           />
-          <target
+          <zone-target
             icon="tint"
             :value="parseFloat(lampoffhumidity)"
             units="%"
@@ -190,7 +190,7 @@
         </div>
       </div>
       <div class="content is-italic">
-        Updated <readable :timestamp="updatedat" />
+        Updated <readable-timestamp :timestamp="updatedat" />
       </div>
       <div class="content">
         <edit-controls
@@ -216,8 +216,8 @@ import {
 } from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 import EditControls from "@/components/EditControls.vue";
-import Target from "@/components/Target.vue";
-import Readable from "@/components/Readable.vue";
+import ZoneTarget from "@/components/ZoneTarget.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import SelectControlType from "@/components/SelectControlType.vue";
 
 const ProfileTile = Vue.extend({
@@ -229,9 +229,9 @@ const ProfileTile = Vue.extend({
 
   components: {
     EditControls,
-    Readable,
+    ReadableTimestamp,
     SelectControlType,
-    Target,
+    ZoneTarget,
   },
 
   data() {

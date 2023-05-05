@@ -7,7 +7,7 @@ import Vue from "vue";
 import ChartJS from "chart.js";
 import "chartjs-adapter-date-fns";
 
-const Sparkline = Vue.extend({
+const SparklineDisplay = Vue.extend({
   props: {
     id: { type: String, default: "sparkline" },
     data: { type: Array },
@@ -96,5 +96,5 @@ const Sparkline = Vue.extend({
     },
   },
 });
-export default Sparkline;
+export default SparklineDisplay;
 </script>

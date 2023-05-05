@@ -1,16 +1,16 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Dashboard from "@/pages/Dashboard.vue";
-import Readings from "@/pages/Readings.vue";
-import Statuses from "@/pages/Statuses.vue";
+import HomePage from "@/pages/HomePage.vue";
+import MeterReadings from "@/pages/MeterReadings.vue";
+import DeviceStatuses from "@/pages/DeviceStatuses.vue";
 import ZonePage from "@/pages/ZonePage.vue";
 
 Vue.use(VueRouter);
 
 const routes = [
-  { path: "/dashboard", name: "dashboard", component: Dashboard },
-  { path: "/readings/:device", name: "readings", component: Readings },
-  { path: "/statuses/:device", name: "statuses", component: Statuses },
+  { path: "/dashboard", name: "dashboard", component: HomePage },
+  { path: "/readings/:device", name: "readings", component: MeterReadings },
+  { path: "/statuses/:device", name: "statuses", component: DeviceStatuses },
   { path: "/zones/:id", name: "zone", component: ZonePage },
 ];
 

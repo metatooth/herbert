@@ -25,17 +25,12 @@
 <script lang="ts">
 import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
-import Readable from "@/components/Readable.vue";
 
-const Timestamp = Vue.extend({
+const FullTimestamp = Vue.extend({
   props: {
     timestamp: { default: new Date(), type: Date },
     abbreviated: { default: false, type: Boolean },
     timezone: { default: "America/New_York", type: String },
-  },
-
-  components: {
-    Readable,
   },
 
   computed: {
@@ -89,5 +84,5 @@ const Timestamp = Vue.extend({
     },
   },
 });
-export default Timestamp;
+export default FullTimestamp;
 </script>

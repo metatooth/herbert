@@ -28,10 +28,6 @@ import {
 
 import WebCamera from "./web-camera";
 
-import ThermoPro from "./thermo-pro";
-
-let thermopro;
-
 try {
   fs.mkdirSync("./log");
 } catch (e) {
@@ -40,14 +36,6 @@ try {
     process.exit(1);
   }
 }
-
-const isMockWorker = (): boolean => {
-  const envVar = process.env.NODE_ENV;
-  return (
-    envVar !== undefined &&
-    (envVar.toLowerCase() === "docker" || envVar.toLowerCase() === "unit_test")
-  );
-};
 
 interface ConfigDevice {
   id: string;
@@ -150,7 +138,6 @@ export class App {
 
     this.workerStatus();
 
-    const polling: number = 1000 * (this.config.polling || 5);
     const interval: number = 1000 * (this.config.interval || 30);
 
     console.log(new Date(), " RUN");

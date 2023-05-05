@@ -74,14 +74,14 @@
 
     <footer class="card-footer">
       <div class="card-footer-item">
-        <readable class="is-italic" :timestamp="lastupdate" />
+        <readable-timestamp class="is-italic" :timestamp="lastupdate" />
       </div>
     </footer>
   </div>
 </template>
 
 <script lang="ts">
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import Vue from "vue";
 import { Zone } from "@/store/zones/types";
 import { mapGetters, mapActions } from "vuex";
@@ -119,7 +119,7 @@ const ZoneDetail = Vue.extend({
 
   components: {
     NarrowTable,
-    Readable,
+    ReadableTimestamp,
     ZoneChart,
     ZoneStatusButton,
   },

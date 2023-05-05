@@ -1,7 +1,6 @@
 import Router from "express-promise-router";
 
 import { createMeterFact, query } from "../db";
-import { Reading } from "../../shared/types";
 
 const router = Router();
 
@@ -55,7 +54,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const { body } = req;
-  const { meter, temperature, humidity, pressure, ts } = body;
+  const { meter, temperature, humidity, ts } = body;
   const observedat = new Date(ts);
 
   await createMeterFact(meter, temperature, "CELSIUS", observedat);

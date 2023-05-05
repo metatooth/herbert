@@ -36,7 +36,7 @@
         <img :src="camera" />
       </div>
       <div class="content is-italic">
-        Updated <readable :timestamp="new Date(worker.updatedat)" />
+        Updated <readable-timestamp :timestamp="new Date(worker.updatedat)" />
       </div>
       <edit-controls
         v-if="!locked"
@@ -53,7 +53,7 @@
 import Vue from "vue";
 
 import EditControls from "@/components/EditControls.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import { Worker } from "@/store/workers/types";
 import { mapActions, mapGetters } from "vuex";
 
@@ -75,7 +75,7 @@ const WorkerTile = Vue.extend({
 
   components: {
     EditControls,
-    Readable,
+    ReadableTimestamp,
   },
 
   watch: {

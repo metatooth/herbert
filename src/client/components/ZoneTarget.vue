@@ -1,56 +1,52 @@
 <template>
-  <span>
-    <span class="title" :style="style">
-      {{ temperature.toFixed(0) }}&#176;
-    </span>
-    <span class="title" :style="style"> {{ humidity.toFixed(0) }}% </span>
-  </span>
+  <div class="control">
+    <div class="tags has-addons">
+      <span :class="iconClass" :style="text" v-if="!simple">
+        <font-awesome-icon :icon="icon" />
+      </span>
+      <span :class="displayClass" :style="background">
+        {{ formatted }}{{ units }}
+      </span>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { mapGetters } from "vuex";
 
-import { Zone } from "@/store/zones/types";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
-
-const ZoneTarget = Vue.extend({
+const Target = Vue.extend({
   props: {
-    zone: Zone,
-  },
-
-  data() {
-    return {
-      ts: new Date(),
-    };
+    icon: String,
+    value: Number,
+    precision: { type: Number, default: 0 },
+    units: String,
+    color: { type: String, default: "#ffffff" },
+    size: { type: String, default: "medium" },
+    simple: { type: Boolean, default: false },
   },
 
   computed: {
-    color(): string {
-      return this.zone.isDay(this.ts) ? "#ffe08a" : "#7a7a7a";
+    background(): string {
+      return `background-color: ${this.color};`;
     },
 
-    style(): string {
+    text(): string {
       return `color: ${this.color};`;
     },
 
-    temperature(): number {
-      const target = this.zone.targetTemperature(this.ts);
-      if (this.settings.units === "F") {
-        return celsius2fahrenheit(target);
-      } else if (this.settings.units === "K") {
-        return celsius2kelvin(target);
-      }
-      return target;
+    displayClass(): string {
+      return `tag has-text-black-bis has-text-weight-bold is-${this.size}`;
     },
 
-    humidity(): number {
-      return this.zone.targetHumidity(this.ts);
+    iconClass(): string {
+      return `tag has-background-black-bis is-${this.size}`;
     },
 
-    ...mapGetters("settings", ["settings"]),
+    formatted(): string {
+      return this.value.toFixed(this.precision);
+    },
   },
 });
 
-export default ZoneTarget;
+export default Target;
 </script>

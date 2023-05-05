@@ -16,7 +16,7 @@
         <div class="is-size-5">{{ meter.name }}</div>
         <div class="is-size-7">{{ meter.device }}</div>
         <em
-          ><readable
+          ><readable-timestamp
             class="is-size-7"
             :timestamp="new Date(Date.parse(meter.timestamp))"
         /></em>
@@ -47,7 +47,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import EditControls from "@/components/EditControls.vue";
 import MeterActual from "@/components/MeterActual.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import { Meter } from "@/store/meters/types";
 
 const MeterRow = Vue.extend({
@@ -69,7 +69,7 @@ const MeterRow = Vue.extend({
   components: {
     EditControls,
     MeterActual,
-    Readable,
+    ReadableTimestamp,
   },
 
   watch: {

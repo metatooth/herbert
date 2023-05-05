@@ -44,7 +44,7 @@
 
       <div class="columns">
         <div class="column is-half">
-          <chart
+          <zone-chart
             id="temperaturechart"
             v-bind:data="temperatures"
             title="Temperature"
@@ -55,7 +55,7 @@
           />
         </div>
         <div class="column is-half">
-          <chart
+          <zone-chart
             id="humiditychart"
             v-bind:data="humidities"
             title="Relative Humidity"
@@ -74,7 +74,7 @@
 import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import Chart from "@/components/Chart.vue";
+import ZoneChart from "@/components/ZoneChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
 interface MeterReading {
@@ -94,7 +94,7 @@ const Readings = Vue.extend({
   },
 
   components: {
-    Chart,
+    ZoneChart,
   },
 
   computed: {

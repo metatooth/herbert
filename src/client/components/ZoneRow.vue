@@ -15,7 +15,7 @@
       />
     </td>
     <td class="is-italic">
-      <readable :timestamp="lastupdate" />
+      <readable-timestamp :timestamp="lastupdate" />
     </td>
     <td>
       <zone-status-button :zone="zone" :locked="locked" />
@@ -28,7 +28,7 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
 import DeviceTag from "@/components/DeviceTag.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import ZoneActual from "@/components/ZoneActual.vue";
 import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 import ZoneTag from "@/components/ZoneTag.vue";
@@ -52,7 +52,7 @@ const ZoneRow = Vue.extend({
 
   components: {
     DeviceTag,
-    Readable,
+    ReadableTimestamp,
     ZoneActual,
     ZoneStatusButton,
     ZoneTag,

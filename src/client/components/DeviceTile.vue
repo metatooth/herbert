@@ -49,7 +49,7 @@
             params: { name: device.nickname, device: device.device },
           }"
         >
-          <readable
+          <readable-timestamp
             class="is-italic"
             :timestamp="new Date(Date.parse(device.updatedat))"
           />
@@ -73,7 +73,7 @@
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import { Device } from "@/store/devices/types";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
@@ -98,7 +98,7 @@ const DeviceTile = Vue.extend({
     EditControls,
     SelectDeviceType,
     SelectZoneForDevice,
-    Readable,
+    ReadableTimestamp,
   },
 
   computed: {

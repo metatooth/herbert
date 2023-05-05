@@ -44,7 +44,10 @@
         <meter-actual :meter="meter" width="200px" />
       </div>
       <div class="content">
-        <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
+        <readable-timestamp
+          class="is-italic"
+          :timestamp="new Date(meter.updatedat)"
+        />
       </div>
       <div class="content">
         <edit-controls
@@ -65,7 +68,7 @@ import { mapActions, mapGetters } from "vuex";
 import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
 import MeterActual from "@/components/MeterActual.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
@@ -85,7 +88,7 @@ const MeterTile = Vue.extend({
   components: {
     EditControls,
     MeterActual,
-    Readable,
+    ReadableTimestamp,
     SelectZoneForDevice,
   },
 

@@ -19,12 +19,12 @@ import { Device } from "@/store/devices/types";
 const DeviceTag = Vue.extend({
   props: {
     device: Device,
-    locked: Boolean
+    locked: Boolean,
   },
 
   data() {
     return {
-      status: this.device.status
+      status: this.device.status,
     };
   },
 
@@ -59,7 +59,7 @@ const DeviceTag = Vue.extend({
       } else {
         return "has-text-warning";
       }
-    }
+    },
   },
 
   methods: {
@@ -73,8 +73,8 @@ const DeviceTag = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["on", "off"])
-  }
+    ...mapActions("devices", ["on", "off"]),
+  },
 });
 
 export default DeviceTag;

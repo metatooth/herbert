@@ -81,7 +81,7 @@ import { mapGetters } from "vuex";
 
 import AddControls from "@/components/AddControls.vue";
 
-import HerbertButton from "@/components/Button.vue";
+import HerbertButton from "@/components/HerbertButton.vue";
 
 import NarrowTable from "@/components/NarrowTable.vue";
 import SingleColumn from "@/components/SingleColumn.vue";

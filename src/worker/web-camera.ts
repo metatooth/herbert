@@ -100,6 +100,7 @@ export default class WebCamera {
   async fetch() {
     return new Promise((resolve, reject) => {
       webStream.get(`http://localhost:${this.port}`, (data) => {
+        if (data === null) reject();
         resolve(data);
       });
     });

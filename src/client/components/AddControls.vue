@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import HerbertButton from "@/components/Button.vue";
+import HerbertButton from "@/components/HerbertButton.vue";
 
 const AddControls = Vue.extend({
   data() {

@@ -1,5 +1,5 @@
 <template>
-  <sparkline
+  <sparkline-display
     :id="id"
     :data="temperatures"
     color="rgb(255,119,0)"
@@ -13,7 +13,7 @@ import Vue from "vue";
 
 import { Meter } from "@/store/meters/types";
 
-import Sparkline from "@/components/Sparkline.vue";
+import SparklineDisplay from "@/components/SparklineDisplay.vue";
 
 import { convertToLocalTime } from "date-fns-timezone";
 
@@ -36,7 +36,7 @@ const TemperatureFact = Vue.extend({
   },
 
   components: {
-    Sparkline,
+    SparklineDisplay,
   },
 
   mounted() {

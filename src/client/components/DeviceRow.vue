@@ -6,7 +6,8 @@
         <div class="is-size-5">{{ device.device }}</div>
         <div class="is-size-7">
           <em
-            ><readable :timestamp="new Date(Date.parse(device.updatedat))"
+            ><readable-timestamp
+              :timestamp="new Date(Date.parse(device.updatedat))"
           /></em>
         </div>
       </span>
@@ -55,7 +56,7 @@ import { mapActions, mapGetters, mapState } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 import DeviceActual from "@/components/DeviceActual.vue";
 
@@ -78,7 +79,7 @@ const DeviceRow = Vue.extend({
     DeviceActual,
     EditControls,
     SelectDeviceType,
-    Readable,
+    ReadableTimestamp,
   },
 
   computed: {

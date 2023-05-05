@@ -157,17 +157,7 @@
 import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
-import BackToDashboard from "@/components/BackToDashboard.vue";
-import ZoneDetail from "@/components/ZoneDetail.vue";
-import EditControls from "@/components/EditControls.vue";
-
 const ZonePage = Vue.extend({
-  components: {
-    BackToDashboard,
-    EditControls,
-    ZoneDetail,
-  },
-
   data() {
     return {
       nickname: "",

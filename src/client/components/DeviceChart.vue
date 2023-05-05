@@ -84,7 +84,7 @@ const DeviceChart = Vue.extend({
 
           this.chart.data.datasets.push({
             data: statuses,
-            borderColor: "#00dd77",
+            borderColor: color,
             fill: false,
           });
 

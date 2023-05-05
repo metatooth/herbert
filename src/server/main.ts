@@ -2,26 +2,9 @@ import express from "express";
 import cors from "cors";
 import http from "http";
 import mountRoutes from "./routes";
-import { parentZone, readAccount, readActiveZones, readZone } from "./db";
 
 import path from "path";
 import favicon from "serve-favicon";
-
-import { AirDirectives } from "../shared/air-directives";
-import { BlowerTimer } from "../shared/blower-timer";
-import { IrrigationTimer } from "../shared/irrigation-timer";
-import { Clime } from "../shared/clime";
-import { LampTimer } from "../shared/lamp-timer";
-import { TargetTempHumidity } from "../shared/target-temp-humidity";
-import { HiLo } from "../shared/hi-lo";
-import { ConstantVpd } from "../shared/constant-vpd";
-import { vaporPressureDeficit } from "../shared/utils";
-import { zonedTimeToUtc } from "date-fns-tz";
-import {
-  makeSendByDeviceIDMessage,
-  makeCommandMessage,
-} from "../shared/message-creators";
-import { sendSocketMessage } from "../shared/send-socket-message";
 
 const app = express();
 console.log("== Herbert Server == Starting Up ==");

@@ -21,7 +21,9 @@
           </div>
           <div class="level-item">
             <p class="text">
-              <em><readable :timestamp="new Date(worker.updatedat)" /></em>
+              <em
+                ><readable-timestamp :timestamp="new Date(worker.updatedat)"
+              /></em>
             </p>
           </div>
         </div>
@@ -30,37 +32,37 @@
     </nav>
 
     <div class="box">
-      <collection
+      <herbert-collection
         v-if="is('devices')"
         type="device"
         :filter="filter"
         :locked="locked"
       />
-      <collection
+      <herbert-collection
         v-if="is('meters')"
         type="meter"
         :filter="filter"
         :locked="locked"
       />
-      <collection
+      <herbert-collection
         v-if="is('profiles')"
         type="profile"
         :filter="filter"
         :locked="locked"
       />
-      <collection
+      <herbert-collection
         v-if="is('workers')"
         type="worker"
         :filter="filter"
         :locked="locked"
       />
-      <collection
+      <herbert-collection
         v-if="is('configs')"
         type="config"
         :filter="filter"
         :locked="locked"
       />
-      <collection
+      <herbert-collection
         v-if="is('overview') || is('zones')"
         type="zone"
         :filter="filter"
@@ -74,7 +76,7 @@
       />
     </div>
 
-    <timestamp class="box" :timestamp="ts" />
+    <full-timestamp class="box" :timestamp="ts" />
   </div>
 </template>
 
@@ -82,12 +84,12 @@
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
-import Collection from "@/components/Collection.vue";
+import HerbertCollection from "@/components/HerbertCollection.vue";
 import CurrentConditions from "@/components/CurrentConditions.vue";
 import HerbertNavbar from "@/components/HerbertNavbar.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import SettingsPage from "@/components/SettingsPage.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import FullTimestamp from "@/components/FullTimestamp.vue";
 
 const Dashboard = Vue.extend({
   data() {
@@ -100,12 +102,12 @@ const Dashboard = Vue.extend({
   },
 
   components: {
-    Collection,
     CurrentConditions,
+    FullTimestamp,
+    HerbertCollection,
     HerbertNavbar,
-    Readable,
+    ReadableTimestamp,
     SettingsPage,
-    Timestamp,
   },
 
   computed: {

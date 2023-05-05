@@ -13,8 +13,8 @@ enum SystemStatus {
   ERROR = 2,
 }
 
-const System = Vue.extend({
-  name: "System",
+const SystemDisplay = Vue.extend({
+  name: "SystemDisplay",
   props: {
     name: { type: String, default: "" },
     status: { type: Number, default: 0 },
@@ -31,5 +31,5 @@ const System = Vue.extend({
     },
   },
 });
-export default System;
+export default SystemDisplay;
 </script>

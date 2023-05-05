@@ -37,7 +37,7 @@
 
       <div class="columns">
         <div class="column is-half">
-          <chart
+          <device-chart
             id="statuschart"
             v-bind:data="statuses"
             label="Device Status"
@@ -54,7 +54,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import Chart from "@/components/Chart.vue";
+import DeviceChart from "@/components/DeviceChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 import BackToDashboard from "@/components/BackToDashboard.vue";
 
@@ -65,7 +65,7 @@ const Statuses = Vue.extend({
 
   components: {
     BackToDashboard,
-    Chart,
+    DeviceChart,
   },
 
   data() {
