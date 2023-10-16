@@ -7,7 +7,6 @@ export class TargetTempHumidity extends ClimeControl {
 
   constructor(targets: [string, string]) {
     super();
-    console.log("target temp humidity", targets);
     this.temp = +targets[0];
     this.humidity = +targets[1];
   }
