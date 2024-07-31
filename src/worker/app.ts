@@ -434,6 +434,7 @@ export class App {
   private updateSwitches(data: CommandPayload) {
     console.log("App::updateSwitches", data);
     const mac = this.formatMacAddress(data.device);
+    console.log("MAC", mac);
     this.switches.forEach((plug) => {
       console.log(
         "checking",
@@ -459,10 +460,10 @@ export class App {
         if (this.formatMacAddress(plug.device) === mac) {
           const state = plug.state ? "on" : "off";
           console.log("plug state", state, data.action, plug.device);
-          if (data.action === "on" && state === "off") {
+          if (data.action === "on") {
             console.log("ON");
             plug.on();
-          } else if (data.action === "off" && state === "on") {
+          } else if (data.action === "off") {
             console.log("OFF");
             plug.off();
           }
