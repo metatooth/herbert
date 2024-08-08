@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres
+    image: postgres:13.15
     environment:
       POSTGRES_PASSWORD: bar
       POSTGRES_USER: postgres
