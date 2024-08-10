@@ -41,6 +41,14 @@ try {
   }
 }
 
+const isMockWorker = (): boolean => {
+  const envVar = process.env.NODE_ENV;
+  return (
+    envVar !== undefined &&
+    (envVar.toLowerCase() === "docker" || envVar.toLowerCase() === "unit_test")
+  );
+};
+
 interface ConfigDevice {
   id: string;
   manufacturer: string;
@@ -145,10 +153,19 @@ export class App {
 
     this.workerStatus();
 
+    const polling: number = 1000 * (this.config.polling || 5);
     const interval: number = 1000 * (this.config.interval || 30);
 
     console.log(new Date(), " RUN");
 
+    if (!isMockWorker()) {
+      const switchbot = new Switchbot();
+      switchbot.onadvertisement = this.switchBotHandler;
+      switchbot.startScan();
+      switchbot.wait(polling);
+      switchbot.stopScan();
+    }
+      
     this.meters.forEach((meter) => {
       this.meterStatus(meter);
     });
@@ -213,6 +230,28 @@ export class App {
     App.instance = undefined;
   }
 
+  private readonly switchBotHandler = async (
+    ad: WoSensorTH
+  ): Promise<boolean> => {
+    let meter = this.meters.find(el => {
+      return el.device === ad.id;
+    });
+
+    if (!meter) {
+      meter = new Meter(ad.id, "SwitchBot");
+      this.meters.push(meter);
+    }
+
+    meter.clime.temperature = ad.serviceData.temperature.c;
+    meter.clime.delta = 0.6; // WARNING!
+    meter.clime.humidity = ad.serviceData.humidity / 100.0;
+    meter.clime.timestamp = new Date();
+
+    this.meterStatus(meter);
+
+    return Promise.resolve(true);
+  };
+    
   private async initDevices() {
     this.meters = [];
     this.switches = [];
