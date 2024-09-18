@@ -8,7 +8,6 @@ import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
 import { SequentMicrosystems } from "./sequent-microsystems";
-import { WyzeSwitch } from "./wyze-switch";
 import { MerossController } from "./meross-controller";
 import { IRSend } from "./i-r-send";
 import {
@@ -28,7 +27,6 @@ import {
 } from "../shared/message-creators";
 
 import Switchbot, { WoSensorTH } from "node-switchbot";
-import Wyze, { WyzeDevice } from "wyze-node"
 
 import WebCamera from "./web-camera";
 
@@ -79,12 +77,10 @@ export class App {
   socket?: Socket<SocketMessageMap> = undefined;
   meters: Array<Meter> = [];
   switches: Array<Switch> = [];
-  plugs: Array<WyzeDevice> = [];
   macaddr = "";
   inet = "";
   camera = "";
   meross: MerossController = undefined;
-  wyze?: Wyze;
   heldMessages: AnySocketMessage[] = [];
   runTimeout: NodeJS.Timeout | undefined;
 
@@ -173,25 +169,7 @@ export class App {
     this.switches.forEach((plug) => {
       this.switchStatus(plug.status());
     });
-
-    if (this.wyze) {
-      this.plugs = await this.wyze.getDeviceList();
-    }
-
-    this.plugs.forEach(plug => {
-      const ws = new WyzeSwitch(this.formatMacAddress(plug.mac));
-      
-      if (plug.conn_state === 0) {
-        ws.state = "disconnected";
-      } else if (plug.device_params.switch_state === 1) {
-        ws.state = "on";
-      } else {
-        ws.state = "off";
-      }
-      
-      this.switchStatus(ws);
-    });
-    
+   
     if (this.meross) {
       this.meross.switches.forEach((plug) => {
         console.log("for this plug", plug);
@@ -273,16 +251,7 @@ export class App {
     
     devices.forEach(async (dev) => {
       const mac = this.formatMacAddress(dev.id);
-      if (dev.manufacturer === "WYZE") {
-        const options = {
-          username: dev.username,
-          password: dev.password,
-          xApiKey: dev.xApiKey
-        }
-
-        this.wyze = new Wyze(options);
-        
-      } else if (dev.manufacturer === "meross") {
+      if (dev.manufacturer === "meross") {
         const options = {
           email: dev.username,
           password: dev.password,
@@ -386,10 +355,6 @@ export class App {
       }
 
       if (messageIsFrom(makeCommandMessage, data)) {
-        console.log("IS COMMAND");
-        console.log(data.payload);
-        console.log("COMMAND COMMAND");
-        await this.updateWYZE(data.payload);
         this.updateSwitches(data.payload);
         return;
       }
@@ -422,54 +387,7 @@ export class App {
       console.error("failed to send message:", e);
     }
   }
-
-  private async updateWYZE(data: CommandPayload) {
-    if (this.wyze) {
-      const mac = this.formatWyzeMacAddress(data.device);
-      const plugs = this.plugs.filter(p => {
-        return p.mac === mac;
-      });
-
-      if (plugs.length !== 0) {
-        const device = plugs[0];
-
-        const plug = new WyzeSwitch(mac);
-
-        console.log("update wyze", mac);
-        console.log(data.action, device.device_params.switch_state);
-
-        let result;
-        if (data.action === "on" && device.device_params.switch_state === 0) {
-          device.device_params["switch_state"] = 1;
-          plug.state = "on";
-          result = await this.wyze.turnOn(device);
-        } else if (
-          data.action === "off" &&
-          device.device_params.switch_state === 1
-        ) {
-          device.device_params["switch_state"] = 0;
-          plug.state = "off";
-          result = await this.wyze.turnOff(device);
-        }
-
-        console.log("result", result);
-
-        if (result && result.code !== "1") {
-          console.error(`ERROR ${mac} ${result.code} - ${result.message}`);
-          const reply = makeErrorMessage({
-            message: result.msg,
-            worker: this.macaddr,
-            device: data.device,
-            action: data.action,
-            code: result.code,
-            timestamp: new Date().toString()
-          });
-          this.heldMessages.push(reply);
-        }
-      }
-    }
-  }
-  
+ 
   private updateSwitches(data: CommandPayload) {
     console.log("App::updateSwitches", data);
     const mac = this.formatMacAddress(data.device);
@@ -566,19 +484,4 @@ export class App {
     return mac.split(":").slice(0, -1).join(":");
   }
 
-  private formatWyzeMacAddress(id: string) {
-    if (!id) {
-      return "";
-    }
-    
-    if (id.length != 12 && id.length != 17) {
-      console.warn("bad format for mac address:", id);
-      return "";
-    }
-    
-    // Remove all but alphanumeric characters
-    const mac = id.replace(/\W/gi, "");
-
-    return mac.toUpperCase();
-  }
 }
