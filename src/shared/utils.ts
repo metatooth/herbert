@@ -146,3 +146,25 @@ export function zeroes(n: number): string {
   }
   return n.toString();
 }
+
+/**
+ * Returns a well-formated MAC address string
+ */
+export function formatMacAddress(id: string): string {
+  if (id == undefined) {
+    return "";
+  }
+
+  if (id.length != 12 && id.length != 17) {
+    console.warn("bad format for mac address:", id);
+    return "";
+  }
+
+  // Remove all but alphanumeric characters
+  let mac = id.replace(/\W/gi, "").toLowerCase();
+  // Append a colon after every two characters
+  mac = mac.replace(/(.{2})/g, "$1:");
+
+  // remove trailing colon
+  return mac.split(":").slice(0, -1).join(":");
+}

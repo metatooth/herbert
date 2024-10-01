@@ -3,6 +3,7 @@ import fs from "fs";
 import { networkInterfaces } from "os";
 
 import { Meter } from "./meter";
+import { MeterController } from "./meter-controller";
 import { MockMeter } from "./mock-meter";
 import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
@@ -10,6 +11,7 @@ import { Herbert } from "./herbert";
 import { SequentMicrosystems } from "./sequent-microsystems";
 import { MerossController } from "./meross-controller";
 import { IRSend } from "./i-r-send";
+import { formatMacAddress } from "../shared/utils";
 import {
   AnySocketMessage,
   CommandPayload,
@@ -20,13 +22,10 @@ import {
   makeCommandMessage,
   makeConfigureMessage,
   makeErrorMessage,
-  makeMeterStatusMessage,
   makeSwitchStatusMessage,
   makeWorkerRegisterMessage,
   makeWorkerStatusMessage,
 } from "../shared/message-creators";
-
-import Switchbot, { WoSensorTH } from "node-switchbot";
 
 import WebCamera from "./web-camera";
 
@@ -75,11 +74,11 @@ export class App {
   private channel: number;
   initialized = false;
   socket?: Socket<SocketMessageMap> = undefined;
-  meters: Array<Meter> = [];
   switches: Array<Switch> = [];
   macaddr = "";
   inet = "";
   camera = "";
+  metered: MeterController = undefined;
   meross: MerossController = undefined;
   heldMessages: AnySocketMessage[] = [];
   runTimeout: NodeJS.Timeout | undefined;
@@ -109,11 +108,6 @@ export class App {
     }
 
     await this.createSocket();
-
-    /**
-    thermopro = new ThermoPro();
-    thermopro.scan();
-    */
 
     return new Promise((resolve) => {
       const i = setInterval(() => {
@@ -155,17 +149,12 @@ export class App {
     console.log(new Date(), " RUN");
 
     if (!isMockWorker()) {
-      const switchbot = new Switchbot();
-      switchbot.onadvertisement = this.switchBotHandler;
-      switchbot.startScan();
-      switchbot.wait(polling);
-      switchbot.stopScan();
+      this.metered = new MeterController({
+          polling: 5, 
+          send: this.send
+      });
     }
       
-    this.meters.forEach((meter) => {
-      this.meterStatus(meter);
-    });
-
     this.switches.forEach((plug) => {
       this.switchStatus(plug.status());
     });
@@ -208,30 +197,7 @@ export class App {
     App.instance = undefined;
   }
 
-  private readonly switchBotHandler = async (
-    ad: WoSensorTH
-  ): Promise<boolean> => {
-    let meter = this.meters.find(el => {
-      return el.device === ad.id;
-    });
-
-    if (!meter) {
-      meter = new Meter(ad.id, "SwitchBot");
-      this.meters.push(meter);
-    }
-
-    meter.clime.temperature = ad.serviceData.temperature.c;
-    meter.clime.delta = 0.6; // WARNING!
-    meter.clime.humidity = ad.serviceData.humidity / 100.0;
-    meter.clime.timestamp = new Date();
-
-    this.meterStatus(meter);
-
-    return Promise.resolve(true);
-  };
-    
   private async initDevices() {
-    this.meters = [];
     this.switches = [];
 
     console.log("**init devices**");
@@ -250,7 +216,7 @@ export class App {
     console.log("devices", devices);
     
     devices.forEach(async (dev) => {
-      const mac = this.formatMacAddress(dev.id);
+      const mac = formatMacAddress(dev.id);
       if (dev.manufacturer === "meross") {
         const options = {
           email: dev.username,
@@ -283,7 +249,7 @@ export class App {
         }
       } else if (dev.manufacturer === "mockmeter") {
         const meter = new MockMeter(mac);
-        this.meters.push(meter);
+        this.metered.add(meter);
       } else if (dev.manufacturer === "mockplug") {
         const plug = new MockPlug(mac);
         plug.off();
@@ -313,7 +279,7 @@ export class App {
   }
 
   private join = async () => {
-    const all = [...this.meters, ...this.switches].map((d) => d.device);
+    const all = [...this.switches].map((d) => d.device);
     console.log("ALL", all);
     this.socket.emit("join", {
       room: "workers",
@@ -368,7 +334,7 @@ export class App {
     }
   };
 
-  private async send(data: AnySocketMessage) {
+  async send(data: AnySocketMessage) {
     if (this.socket === undefined) {
       this.heldMessages.push(data);
       return;
@@ -390,16 +356,16 @@ export class App {
  
   private updateSwitches(data: CommandPayload) {
     console.log("App::updateSwitches", data);
-    const mac = this.formatMacAddress(data.device);
+    const mac = formatMacAddress(data.device);
     console.log("MAC", mac);
     this.switches.forEach((plug) => {
       console.log(
         "checking",
         plug.device,
-        this.formatMacAddress(plug.device),
+        formatMacAddress(plug.device),
         mac
       );
-      if (this.formatMacAddress(plug.device) === mac) {
+      if (formatMacAddress(plug.device) === mac) {
         const state = plug.state ? "on" : "off";
         console.log("plug state", state, data.action, plug.device);
         if (data.action === "on") {
@@ -414,7 +380,7 @@ export class App {
 
     if (this.meross) {
       this.meross.switches.forEach((plug) => {
-        if (this.formatMacAddress(plug.device) === mac) {
+        if (formatMacAddress(plug.device) === mac) {
           const state = plug.state ? "on" : "off";
           console.log("plug state", state, data.action, plug.device);
           if (data.action === "on") {
@@ -429,22 +395,9 @@ export class App {
     }
   }
 
-  private async meterStatus(meter: Meter) {
-    const msg = makeMeterStatusMessage({
-      device: this.formatMacAddress(meter.device),
-      type: "meter",
-      manufacturer: meter.manufacturer,
-      temperature: meter.clime.temperature,
-      humidity: meter.clime.humidity,
-      timestamp: new Date().toString(),
-    });
-    console.log("send this message", msg);
-    this.send(msg);
-  }
-
   private async switchStatus(switcher: Switch) {
     const msg = makeSwitchStatusMessage({
-      device: this.formatMacAddress(switcher.device),
+      device: formatMacAddress(switcher.device),
       manufacturer: switcher.manufacturer,
       status: switcher.state,
       timestamp: new Date().toString(),
@@ -462,26 +415,6 @@ export class App {
       timestamp: new Date().toString(),
     });
     this.send(msg);
-  }
-
-  private formatMacAddress(id: string) {
-    if (!id) {
-      return "";
-    }
-
-    if (id.length != 12 && id.length != 17) {
-      console.warn("bad format for mac address:", id);
-      return "";
-    }
-
-    // Remove all but alphanumeric characters
-    let mac = id.replace(/\W/gi, "").toLowerCase();
-
-    // Append a colon after every two characters
-    mac = mac.replace(/(.{2})/g, "$1:");
-
-    // remove trailing colon
-    return mac.split(":").slice(0, -1).join(":");
   }
 
 }
