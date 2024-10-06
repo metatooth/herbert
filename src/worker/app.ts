@@ -9,8 +9,10 @@ import { MockPlug } from "./mock-plug";
 import { Switch } from "./switch";
 import { Herbert } from "./herbert";
 import { SequentMicrosystems } from "./sequent-microsystems";
-import { MerossController } from "./meross-controller";
 import { IRSend } from "./i-r-send";
+import { SwitchController } from "./switch-controller";
+import { MerossController } from "./meross-controller";
+
 import { formatMacAddress } from "../shared/utils";
 import {
   AnySocketMessage,
@@ -79,6 +81,7 @@ export class App {
   inet = "";
   camera = "";
   metered: MeterController = undefined;
+  switched: SwitchController = undefined;
   meross: MerossController = undefined;
   heldMessages: AnySocketMessage[] = [];
   runTimeout: NodeJS.Timeout | undefined;
@@ -88,7 +91,8 @@ export class App {
     return App.instance;
   }
 
-  public async init(): Promise<void> {
+    public async init(): Promise<void> {
+        console.log("INIT");
     const interfaces = networkInterfaces();
 
     let net;
@@ -102,33 +106,47 @@ export class App {
       console.error("Undefined interface!");
     }
 
-    if (net && net.length) {
-      this.macaddr = net[0]["mac"];
-      this.inet = net[0]["address"];
-    }
-
-    await this.createSocket();
-
-    return new Promise((resolve) => {
-      const i = setInterval(() => {
-        if (this.initialized) {
-          clearInterval(i);
-          return resolve();
+        if (net && net.length) {
+            this.macaddr = net[0]["mac"];
+            this.inet = net[0]["address"];
         }
-        const msg = makeWorkerRegisterMessage({
-          worker: this.macaddr,
-          inet: this.inet,
+        
+        console.log("Create socket...");
+        await this.createSocket();
+        console.log("Done");
+        
+        return new Promise(async (resolve) => {
+            console.log("Ready to resolve init?");
+            try {
+                await this.run();
+            } catch (e) {
+                console.log(`ERROR: caught on run - ${e}`);
+            }
+            console.log("Done run.");
+            const i = setInterval(() => {
+                console.log("Interval has been reached.");
+                console.log(`Initialized yet? ${this.initialized}`);
+                if (this.initialized) {
+                    clearInterval(i);
+                    return resolve();
+                }
+                console.log("make worker register message");
+                const msg = makeWorkerRegisterMessage({
+                    worker: this.macaddr,
+                    inet: this.inet,
+                });
+                console.log(`Will send this - ${msg.payload.worker}`);
+                this.send(msg);
+            }, 5000);
         });
-        this.send(msg);
-      }, 5000);
-    });
-  }
-
-  public readonly run = async (): Promise<void> => {
+    }
+    
+    public readonly run = async (): Promise<void> => {
+    console.log("RUN");
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
-
+        console.log("past initialized check");
     if (this.monitorPort !== "") {
       const cam = new WebCamera(this.monitorPort);
       cam
@@ -143,37 +161,37 @@ export class App {
 
     this.workerStatus();
 
-    const polling: number = 1000 * (this.config.polling || 5);
-    const interval: number = 1000 * (this.config.interval || 30);
-
     console.log(new Date(), " RUN");
 
-    if (!isMockWorker()) {
-      this.metered = new MeterController({
-          polling: 5, 
-          send: this.send
-      });
-    }
-      
-    this.switches.forEach((plug) => {
-      this.switchStatus(plug.status());
-    });
-   
-    if (this.meross) {
-      this.meross.switches.forEach((plug) => {
-        console.log("for this plug", plug);
-        if (plug.state === "") {
-          plug.off();
+        if (!isMockWorker() && !this.metered) {
+            const polling: number = 1000 * (this.config.polling || 5);
+            this.metered = new MeterController({
+                polling: polling, 
+                send: this.send
+            });
         }
-        this.switchStatus(plug.status());
-      });
-    }
+        
+        if (!this.switched) {
+            this.switched = new SwitchController({
+                send: this.send
+            });
+        }
+        
+      if (this.meross) {
+          this.meross.switches.forEach((plug) => {
+              if (plug.state === "") {
+                  plug.off();
+              }
+              this.switched.switchStatus(plug.status());
+          });
+      }
 
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
       this.runTimeout = undefined;
     }
 
+    const interval: number = 1000 * (this.config.interval || 30);
     this.runTimeout = setTimeout(this.run, interval);
   };
 
@@ -197,23 +215,11 @@ export class App {
     App.instance = undefined;
   }
 
-  private async initDevices() {
+  private async initDevices(config) {
     this.switches = [];
 
-    console.log("**init devices**");
-    console.log("this.config", this.config); 
-    console.log("this.config['devices']", this.config["devices"]);
-    console.log("Array.isArray(this.config['devices'])",
-                Array.isArray(this.config["devices"]));
-   
-    const devices =
-          this.config &&
-          this.config["devices"] &&
-          Array.isArray(this.config["devices"])
-        ? (this.config["devices"] as ConfigDevice[])
-        : ([] as ConfigDevice[]);
-
-    console.log("devices", devices);
+    const devices = config.devices;
+    console.log("init devices devices", devices);
     
     devices.forEach(async (dev) => {
       const mac = formatMacAddress(dev.id);
@@ -235,9 +241,9 @@ export class App {
         
       } else if (dev.manufacturer === "herbert") {
         if (dev.pin) {
-          this.switches.push(new Herbert(mac, parseInt(dev.pin)));
+          this.switched.add(new Herbert(mac, parseInt(dev.pin)));
         } else if (dev.board && dev.channel) {
-          this.switches.push(
+          this.switched.add(
             new SequentMicrosystems(
               mac,
               parseInt(dev.board),
@@ -245,7 +251,7 @@ export class App {
             )
           );
         } else if (dev.remote && dev.mode) {
-          this.switches.push(new IRSend(mac, dev.remote, dev.mode));
+          this.switched.add(new IRSend(mac, dev.remote, dev.mode));
         }
       } else if (dev.manufacturer === "mockmeter") {
         const meter = new MockMeter(mac);
@@ -253,7 +259,7 @@ export class App {
       } else if (dev.manufacturer === "mockplug") {
         const plug = new MockPlug(mac);
         plug.off();
-        this.switches.push(plug);
+        this.switched.add(plug);
       }
 
       this.join();
@@ -305,8 +311,9 @@ export class App {
     await this.run();
   };
 
-  private readonly handleSocketMessage = async (data: AnySocketMessage) => {
-    try {
+    private readonly handleSocketMessage = async (data: AnySocketMessage) => {
+         console.log("REC", data);
+     try {
       if (!isSocketMessage(data)) {
         console.warn("unknown message format:", data);
         return;
@@ -314,14 +321,13 @@ export class App {
 
       if (messageIsFrom(makeConfigureMessage, data)) {
         if (data.payload.worker === this.macaddr) {
-          this.config = JSON.parse(data.payload.config);
-          this.initDevices();
+          this.initDevices(data.payload.config);
         }
         return;
       }
 
       if (messageIsFrom(makeCommandMessage, data)) {
-        this.updateSwitches(data.payload);
+        this.switched.handle(data.payload);
         return;
       }
 
@@ -352,58 +358,6 @@ export class App {
     } catch (e) {
       console.error("failed to send message:", e);
     }
-  }
- 
-  private updateSwitches(data: CommandPayload) {
-    console.log("App::updateSwitches", data);
-    const mac = formatMacAddress(data.device);
-    console.log("MAC", mac);
-    this.switches.forEach((plug) => {
-      console.log(
-        "checking",
-        plug.device,
-        formatMacAddress(plug.device),
-        mac
-      );
-      if (formatMacAddress(plug.device) === mac) {
-        const state = plug.state ? "on" : "off";
-        console.log("plug state", state, data.action, plug.device);
-        if (data.action === "on") {
-          console.log("App::updateSwitches ON");
-          plug.on();
-        } else if (data.action === "off") {
-          console.log("App::updateSwitches OFF");
-          plug.off();
-        }
-      }
-    });
-
-    if (this.meross) {
-      this.meross.switches.forEach((plug) => {
-        if (formatMacAddress(plug.device) === mac) {
-          const state = plug.state ? "on" : "off";
-          console.log("plug state", state, data.action, plug.device);
-          if (data.action === "on") {
-            console.log("ON");
-            plug.on();
-          } else if (data.action === "off") {
-            console.log("OFF");
-            plug.off();
-          }
-        }
-      });
-    }
-  }
-
-  private async switchStatus(switcher: Switch) {
-    const msg = makeSwitchStatusMessage({
-      device: formatMacAddress(switcher.device),
-      manufacturer: switcher.manufacturer,
-      status: switcher.state,
-      timestamp: new Date().toString(),
-    });
-    console.log("SEND", msg);
-    this.send(msg);
   }
 
   private async workerStatus() {

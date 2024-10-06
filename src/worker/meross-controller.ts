@@ -27,18 +27,6 @@ export class MerossController extends EventEmitter {
         switches.push(new MerossSwitch(device));
       });
 
-      device.on("close", () => {
-        console.log("closed am i");
-      });
-
-      device.on("error", () => {
-        console.log("error am i");
-      });
-
-      device.on("reconnect", () => {
-        console.log("reconnected am i");
-      });
-
       device.on("data", (data) => {
         console.log("any data?", data);
       });
@@ -47,7 +35,6 @@ export class MerossController extends EventEmitter {
         if (data.payload && data.payload.togglex) {
           switches.forEach((plug) => {
             if (plug.plug["dev"]["uuid"] === data.header.uuid) {
-              console.log("data.payload for plug, ", data.payload);
               if (data.payload.togglex.onoff === 1) {
                 plug.state = "on";
               } else {

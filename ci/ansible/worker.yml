@@ -1,10 +1,10 @@
 - hosts: workers
 
   vars:
-    - nodejs_version: '14.x'
-    - service_description: 'Herbert in-room worker service'
-    - service_user: root
-    - service_file: dist/worker/main.js
+    nodejs_version: '18.x'
+    service_description: 'Herbert in-room worker service'
+    service_user: root
+    service_file: dist/worker/main.js
 
   tasks:
     - name: Enable I2C
@@ -75,6 +75,13 @@
       copy:
         src: '{{ srcDir }}/scripts/810900812A.licrd.conf'
         dest: /etc/lirc/lircd.conf.d/b+d.lircd.conf
+
+    - name: Create motion configuration
+      become: yes
+      copy:
+        src: '{{ srcDir }}/scripts/motion.conf'
+        dest: /etc/motion/motion.conf
+  
     - name: Create {{ appDir }}
       file:
         path: '{{ appDir }}'
@@ -128,6 +135,14 @@
       environment:
         NODE_ENV: production
 
+    - name: Enable and start motion service
+      become: yes
+      systemd:
+        name: motion
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
     - name: Install worker service
       become: yes
       template:
@@ -149,4 +164,6 @@
       copy:
         dest: /home/{{ ansible_user }}/.bash_aliases
         content: |
+          alias restart='sudo systemctl restart herbert-worker'
+          alias status='sudo systemctl status herbert-worker'
           alias tail-worker='sudo journalctl -u herbert-worker -f'

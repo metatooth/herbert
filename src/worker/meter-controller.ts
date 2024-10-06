@@ -63,7 +63,7 @@ export class MeterController extends EventEmitter {
       timestamp: new Date().toString(),
     });
 
-    console.log("send this message", msg);
+    console.log("SEND Meter ", msg);
 
     this.options.send(msg);
  
