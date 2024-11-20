@@ -1,7 +1,7 @@
 - hosts: socket_servers
 
   vars:
-    - nodejs_version: '14.x'
+    - nodejs_version: '18.x'
     - service_description: 'Main socket-server for the herbert system'
     - service_user: root
     - service_file: dist/socket-server/main.js

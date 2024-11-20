@@ -75,6 +75,7 @@ export class App {
   private closed = false;
   private channel: number;
   initialized = false;
+  config = {};  
   socket?: Socket<SocketMessageMap> = undefined;
   switches: Array<Switch> = [];
   macaddr = "";
@@ -92,7 +93,7 @@ export class App {
   }
 
     public async init(): Promise<void> {
-        console.log("INIT");
+    console.log("INIT");
     const interfaces = networkInterfaces();
 
     let net;
@@ -218,7 +219,11 @@ export class App {
   private async initDevices(config) {
     this.switches = [];
 
-    const devices = config.devices;
+    console.log("= init devices config", config);
+    this.config= JSON.parse(config);
+    console.log("= init devices parsed", this.config);
+      
+    const devices = this.config.devices;
     console.log("init devices devices", devices);
     
     devices.forEach(async (dev) => {
