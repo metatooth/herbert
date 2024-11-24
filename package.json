@@ -4,8 +4,8 @@
   "description": "automate your horticulture",
   "main": "index.js",
   "engines": {
-    "node": "v18.16.0",
-    "npm": "9.5.1"
+    "node": "18.17.1",
+    "npm": "9.6.7"
   },
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=unit_test WSS_URL=ws://localhost:5000 jest",
