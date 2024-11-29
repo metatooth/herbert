@@ -12,7 +12,7 @@
       <strong> on {{ mmmddyyyy }} </strong>
     </div>
     <div class="level-item" v-if="!abbreviated">
-      <em>Updated <readable :timestamp="local" /></em>
+      <em>Updated <readable-timestamp :timestamp="local" /></em>
     </div>
     <div class="level-item" v-if="!abbreviated">
       <button class="button" @click="reload">
@@ -26,11 +26,17 @@
 import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
+
 const FullTimestamp = Vue.extend({
   props: {
     timestamp: { default: new Date(), type: Date },
     abbreviated: { default: false, type: Boolean },
     timezone: { default: "America/New_York", type: String },
+  },
+
+  components: {
+    ReadableTimestamp
   },
 
   computed: {
