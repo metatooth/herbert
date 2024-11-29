@@ -71,3 +71,7 @@ if [ "${SERVICE}" = "worker" ]; then
   cp scripts/810900812A.licrd.conf $DEPLOYMENT_DIR/scripts/810900812A.licrd.conf
   cp scripts/motion.conf $DEPLOYMENT_DIR/scripts/motion.conf
 fi
+
+cd $DEPLOYMENT_DIR
+
+tar -czvf dist.tar.gz ./dist

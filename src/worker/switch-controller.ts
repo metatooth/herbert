@@ -8,28 +8,28 @@ import { AnySocketMessage, CommandPayload } from "../shared/types";
 import { makeSwitchStatusMessage } from "../shared/message-creators";
 
 interface SwitchControllerOptions {
-  send: (message: AnySocketMessage) => void;  
+  send: (message: AnySocketMessage) => void;
 }
 
 export class SwitchController extends EventEmitter {
   switches: Array<Switch> = [];
   options: SwitchControllerOptions;
-    
+
   public constructor(options: SwitchControllerOptions) {
     super();
     this.options = options;
   }
 
   add(switcher: Switch) {
-      this.switches.push(switcher);
+    this.switches.push(switcher);
   }
-    
+
   poll() {
     console.log(new Date(), " POLL");
 
-      this.switches.forEach((switcher) => {
-          this.switchStatus(switcher);
-      });
+    this.switches.forEach((switcher) => {
+      this.switchStatus(switcher);
+    });
   }
 
   handle(data: CommandPayload) {
@@ -44,7 +44,7 @@ export class SwitchController extends EventEmitter {
       }
     });
   }
-    
+
   switchStatus(switcher: Switch): Promise<boolean> {
     const msg = makeSwitchStatusMessage({
       device: formatMacAddress(switcher.device),
@@ -59,5 +59,4 @@ export class SwitchController extends EventEmitter {
 
     return Promise.resolve(true);
   }
-    
 }

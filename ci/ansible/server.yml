@@ -1,8 +1,8 @@
 - hosts: servers
 
   vars:
-    - nodejs_version: '14.x'
-    - service_description: 'Main server for the herbert system'
+    - nodejs_version: "14.x"
+    - service_description: "Main server for the herbert system"
     - service_user: root
     - service_file: dist/server/main.js
 
@@ -12,48 +12,48 @@
       apt:
         update_cache: yes
         state: latest
-        name: [ 'git', 'gcc', 'g++', 'make' ]
+        name: ["git", "gcc", "g++", "make"]
 
     - name: Create {{ appDir }}
       file:
-        path: '{{ appDir }}'
+        path: "{{ appDir }}"
         state: directory
 
     - name: Create {{ appDir }}/dist
       file:
-        path: '{{ appDir }}/dist'
+        path: "{{ appDir }}/dist"
         state: directory
 
     - name: Sync herbert dist
       synchronize:
-        src: '{{ distDir }}/server'
-        dest: '{{ appDir }}/dist'
+        src: "{{ distDir }}/server"
+        dest: "{{ appDir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert shared
       synchronize:
-        src: '{{ distDir }}/shared'
-        dest: '{{ appDir }}/dist'
+        src: "{{ distDir }}/shared"
+        dest: "{{ appDir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert config
       synchronize:
-        src: '{{ srcDir }}/config'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/config"
+        dest: "{{ appDir }}"
         recursive: yes
         delete: yes
 
     - name: Sync herbert package.json
       synchronize:
-        src: '{{ srcDir }}/package.json'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/package.json"
+        dest: "{{ appDir }}"
 
     - name: Sync herbert package-lock.json
       synchronize:
-        src: '{{ srcDir }}/package-lock.json'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/package-lock.json"
+        dest: "{{ appDir }}"
 
     - name: Install nodejs {{nodejs_version}}
       include_role:
@@ -64,7 +64,7 @@
     - name: Install production node_modules
       command: npm install
       args:
-        chdir: '{{ appDir }}'
+        chdir: "{{ appDir }}"
       environment:
         NODE_ENV: production
 
@@ -75,7 +75,7 @@
         dest: /etc/systemd/system/herbert-server.service
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Enable and start herbert-server service
       become: yes

@@ -4,7 +4,7 @@ import { Device } from "./device";
 
 export class DeviceManager extends EventEmitter {
   devices: Array<Device> = [];
-    
+
   constructor() {
     super();
   }
@@ -12,7 +12,7 @@ export class DeviceManager extends EventEmitter {
   poll() {
     console.log("POLL");
     this.devices.forEach((device) => {
-        console.log(`device [${device.device}]`);          
+      console.log(`device [${device.device}]`);
     });
   }
 

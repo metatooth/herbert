@@ -36,7 +36,7 @@ const FullTimestamp = Vue.extend({
   },
 
   components: {
-    ReadableTimestamp
+    ReadableTimestamp,
   },
 
   computed: {

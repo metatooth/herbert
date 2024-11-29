@@ -69,13 +69,16 @@ interface ConfigWorker {
 
 export class App {
   private static instance: App;
-  private config: ConfigWorker;
+  private config: ConfigWorker = {
+    interval: 30,
+    polling: 5,
+    devices: [],
+  };
   private wsUrl = process.env.WSS_URL || "";
   private monitorPort = process.env.MONITOR_PORT || "";
   private closed = false;
   private channel: number;
   initialized = false;
-  config = {};  
   socket?: Socket<SocketMessageMap> = undefined;
   switches: Array<Switch> = [];
   macaddr = "";
@@ -92,7 +95,7 @@ export class App {
     return App.instance;
   }
 
-    public async init(): Promise<void> {
+  public async init(): Promise<void> {
     console.log("INIT");
     const interfaces = networkInterfaces();
 
@@ -107,47 +110,47 @@ export class App {
       console.error("Undefined interface!");
     }
 
-        if (net && net.length) {
-            this.macaddr = net[0]["mac"];
-            this.inet = net[0]["address"];
-        }
-        
-        console.log("Create socket...");
-        await this.createSocket();
-        console.log("Done");
-        
-        return new Promise(async (resolve) => {
-            console.log("Ready to resolve init?");
-            try {
-                await this.run();
-            } catch (e) {
-                console.log(`ERROR: caught on run - ${e}`);
-            }
-            console.log("Done run.");
-            const i = setInterval(() => {
-                console.log("Interval has been reached.");
-                console.log(`Initialized yet? ${this.initialized}`);
-                if (this.initialized) {
-                    clearInterval(i);
-                    return resolve();
-                }
-                console.log("make worker register message");
-                const msg = makeWorkerRegisterMessage({
-                    worker: this.macaddr,
-                    inet: this.inet,
-                });
-                console.log(`Will send this - ${msg.payload.worker}`);
-                this.send(msg);
-            }, 5000);
-        });
+    if (net && net.length) {
+      this.macaddr = net[0]["mac"];
+      this.inet = net[0]["address"];
     }
-    
-    public readonly run = async (): Promise<void> => {
+
+    console.log("Create socket...");
+    await this.createSocket();
+    console.log("Done");
+
+    return new Promise(async (resolve) => {
+      console.log("Ready to resolve init?");
+      try {
+        await this.run();
+      } catch (e) {
+        console.log(`ERROR: caught on run - ${e}`);
+      }
+      console.log("Done run.");
+      const i = setInterval(() => {
+        console.log("Interval has been reached.");
+        console.log(`Initialized yet? ${this.initialized}`);
+        if (this.initialized) {
+          clearInterval(i);
+          return resolve();
+        }
+        console.log("make worker register message");
+        const msg = makeWorkerRegisterMessage({
+          worker: this.macaddr,
+          inet: this.inet,
+        });
+        console.log(`Will send this - ${msg.payload.worker}`);
+        this.send(msg);
+      }, 5000);
+    });
+  }
+
+  public readonly run = async (): Promise<void> => {
     console.log("RUN");
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
-        console.log("past initialized check");
+    console.log("past initialized check");
     if (this.monitorPort !== "") {
       const cam = new WebCamera(this.monitorPort);
       cam
@@ -164,28 +167,28 @@ export class App {
 
     console.log(new Date(), " RUN");
 
-        if (!isMockWorker() && !this.metered) {
-            const polling: number = 1000 * (this.config.polling || 5);
-            this.metered = new MeterController({
-                polling: polling, 
-                send: this.send
-            });
+    if (!isMockWorker() && !this.metered) {
+      const polling: number = 1000 * (this.config.polling || 5);
+      this.metered = new MeterController({
+        polling: polling,
+        send: this.send,
+      });
+    }
+
+    if (!this.switched) {
+      this.switched = new SwitchController({
+        send: this.send,
+      });
+    }
+
+    if (this.meross) {
+      this.meross.switches.forEach((plug) => {
+        if (plug.state === "") {
+          plug.off();
         }
-        
-        if (!this.switched) {
-            this.switched = new SwitchController({
-                send: this.send
-            });
-        }
-        
-      if (this.meross) {
-          this.meross.switches.forEach((plug) => {
-              if (plug.state === "") {
-                  plug.off();
-              }
-              this.switched.switchStatus(plug.status());
-          });
-      }
+        this.switched.switchStatus(plug.status());
+      });
+    }
 
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
@@ -220,13 +223,13 @@ export class App {
     this.switches = [];
 
     console.log("= init devices config", config);
-    this.config= JSON.parse(config);
-    console.log("= init devices parsed", this.config);
-      
-    const devices = this.config.devices;
-    console.log("init devices devices", devices);
-    
-    devices.forEach(async (dev) => {
+    //    const parsed = JSON.parse(config);
+    //    console.log("= init devices parsed", parsed);
+
+    //    const devices = parsed.devices;
+    console.log("init devices devices", config.devices);
+
+    config.devices.forEach(async (dev) => {
       const mac = formatMacAddress(dev.id);
       if (dev.manufacturer === "meross") {
         const options = {
@@ -235,15 +238,14 @@ export class App {
           logger: console.log,
           localHttpFirst: true,
         };
-        
-        console.log("init device meross", options);       
+
+        console.log("init device meross", options);
 
         this.meross = new MerossController(options);
 
         this.meross.on("update", (e) => {
           console.log(`got an update, ${e}`);
         });
-        
       } else if (dev.manufacturer === "herbert") {
         if (dev.pin) {
           this.switched.add(new Herbert(mac, parseInt(dev.pin)));
@@ -316,9 +318,9 @@ export class App {
     await this.run();
   };
 
-    private readonly handleSocketMessage = async (data: AnySocketMessage) => {
-         console.log("REC", data);
-     try {
+  private readonly handleSocketMessage = async (data: AnySocketMessage) => {
+    console.log("REC", data);
+    try {
       if (!isSocketMessage(data)) {
         console.warn("unknown message format:", data);
         return;
@@ -375,5 +377,4 @@ export class App {
     });
     this.send(msg);
   }
-
 }

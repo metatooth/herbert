@@ -11,7 +11,7 @@ test("00 initialize", async () => {
     email: MEROSS_EMAIL,
     password: MEROSS_PASSWORD,
     logger: console.log,
-    localHttpFirst: true
+    localHttpFirst: true,
   };
 
   const meross = new MerossController(options);

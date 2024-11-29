@@ -5,18 +5,33 @@ $family-sans-serif: "Roboto", sans-serif;
 $control-border-width: 2px;
 
 // Bulma Import
-@import '~bulma';
+@import "~bulma";
 
 body {
-    background-color: #2d2d2d;
+  background-color: #2d2d2d;
 }
 
-.box, .button, .card, .label, .navbar, .navbar-burger, .navbar-menu, .table, .table thead th, .tags, .tag {
-    background-color: #3d3d3d;
-    color: #fdfdfd;
+.box,
+.button,
+.card,
+.label,
+.navbar,
+.navbar-burger,
+.navbar-menu,
+.table,
+.table thead th,
+.tags,
+.tag {
+  background-color: #3d3d3d;
+  color: #fdfdfd;
 }
 
-.title, .text, .subtitle, .navbar-item, .copyright, .subtitle strong, strong {
-    color: #fdfdfd;
+.title,
+.text,
+.subtitle,
+.navbar-item,
+.copyright,
+.subtitle strong,
+strong {
+  color: #fdfdfd;
 }
-

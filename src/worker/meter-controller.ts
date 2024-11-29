@@ -11,22 +11,22 @@ import Switchbot, { WoSensorTH } from "node-switchbot";
 
 interface MeterControllerOptions {
   polling: number;
-  send: (message: AnySocketMessage) => void;  
+  send: (message: AnySocketMessage) => void;
 }
 
 export class MeterController extends EventEmitter {
   meters: Array<Meter> = [];
   options: MeterControllerOptions;
-    
+
   public constructor(options: MeterControllerOptions) {
     super();
     this.options = options;
   }
 
   add(meter: Meter) {
-      this.meters.push(meter);
+    this.meters.push(meter);
   }
-    
+
   poll() {
     console.log(new Date(), " POLL");
 
@@ -41,7 +41,7 @@ export class MeterController extends EventEmitter {
       switchbot.wait(this.options.polling);
       switchbot.stopScan();
     }
-  };
+  }
 
   switchBotHandler(ad: WoSensorTH): Promise<boolean> {
     let meter = new Meter(ad.id, "SwitchBot");
@@ -51,7 +51,7 @@ export class MeterController extends EventEmitter {
     meter.clime.timestamp = new Date();
 
     return this.meterStatus(meter);
-  };
+  }
 
   meterStatus(meter: Meter): Promise<boolean> {
     const msg = makeMeterStatusMessage({
@@ -66,7 +66,7 @@ export class MeterController extends EventEmitter {
     console.log("SEND Meter ", msg);
 
     this.options.send(msg);
- 
+
     return Promise.resolve(true);
   }
 }

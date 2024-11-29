@@ -1,8 +1,8 @@
 - hosts: workers
 
   vars:
-    nodejs_version: '18.x'
-    service_description: 'Herbert in-room worker service'
+    nodejs_version: "18.x"
+    service_description: "Herbert in-room worker service"
     service_user: root
     service_file: dist/worker/main.js
 
@@ -16,11 +16,23 @@
       apt:
         update_cache: yes
         state: latest
-        name: ['motion', 'bluetooth', 'bluez', 'git', 'gcc', 'g++', 'libbluetooth-dev', 'libudev-dev', 'lirc', 'make']
+        name:
+          [
+            "motion",
+            "bluetooth",
+            "bluez",
+            "git",
+            "gcc",
+            "g++",
+            "libbluetooth-dev",
+            "libudev-dev",
+            "lirc",
+            "make",
+          ]
 
     - name: Clone 8relind-rpi
       git:
-        repo: 'https://github.com/SequentMicrosystems/8relind-rpi.git'
+        repo: "https://github.com/SequentMicrosystems/8relind-rpi.git"
         dest: /home/{{ ansible_user }}/8relind-rpi
 
     - name: Build and install 8relind-rpi
@@ -67,60 +79,60 @@
     - name: Create the LG controller file
       become: yes
       copy:
-        src: '{{ srcDir }}/scripts/AKB73016012.licrd.conf'
+        src: "{{ srcDir }}/scripts/AKB73016012.licrd.conf"
         dest: /etc/lirc/lircd.conf.d/lg.lircd.conf
 
     - name: Create the B+D controller file
       become: yes
       copy:
-        src: '{{ srcDir }}/scripts/810900812A.licrd.conf'
+        src: "{{ srcDir }}/scripts/810900812A.licrd.conf"
         dest: /etc/lirc/lircd.conf.d/b+d.lircd.conf
 
     - name: Create motion configuration
       become: yes
       copy:
-        src: '{{ srcDir }}/scripts/motion.conf'
+        src: "{{ srcDir }}/scripts/motion.conf"
         dest: /etc/motion/motion.conf
-  
+
     - name: Create {{ appDir }}
       file:
-        path: '{{ appDir }}'
+        path: "{{ appDir }}"
         state: directory
     - name: Create {{ appDir }}/dist
       file:
-        path: '{{ appDir }}/dist'
+        path: "{{ appDir }}/dist"
         state: directory
 
     - name: Sync herbert dist
       synchronize:
-        src: '{{ distDir }}/worker'
-        dest: '{{ appDir }}/dist'
+        src: "{{ distDir }}/worker"
+        dest: "{{ appDir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert shared
       synchronize:
-        src: '{{ distDir }}/shared'
-        dest: '{{ appDir }}/dist'
+        src: "{{ distDir }}/shared"
+        dest: "{{ appDir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert config
       synchronize:
-        src: '{{ srcDir }}/config'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/config"
+        dest: "{{ appDir }}"
         recursive: yes
         delete: yes
 
     - name: Sync herbert package.json
       synchronize:
-        src: '{{ srcDir }}/package.json'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/package.json"
+        dest: "{{ appDir }}"
 
     - name: Sync herbert package-lock.json
       synchronize:
-        src: '{{ srcDir }}/package-lock.json'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/package-lock.json"
+        dest: "{{ appDir }}"
 
     - name: Install nodejs {{nodejs_version}}
       include_role:
@@ -131,7 +143,7 @@
     - name: Install production node_modules
       command: npm install
       args:
-        chdir: '{{ appDir }}'
+        chdir: "{{ appDir }}"
       environment:
         NODE_ENV: production
 
@@ -150,7 +162,7 @@
         dest: /etc/systemd/system/herbert-worker.service
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Enable and start herbert-worker service
       become: yes
