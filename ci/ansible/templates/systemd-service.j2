@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/node {{ service_file }}
-WorkingDirectory={{ appDir }}
+WorkingDirectory={{ app_dir }}
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
