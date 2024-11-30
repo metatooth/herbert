@@ -287,7 +287,9 @@ export class App {
   }
 
   private join = async () => {
-    const all = [...this.switches].map((d) => d.device);
+    const all = [...this.switched.switches.concat(this.meross.switches)].map(
+      (d) => d.device
+    );
     console.log("ALL", all);
     this.socket.emit("join", {
       room: "workers",
