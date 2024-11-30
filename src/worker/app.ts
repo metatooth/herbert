@@ -80,7 +80,6 @@ export class App {
   private channel: number;
   initialized = false;
   socket?: Socket<SocketMessageMap> = undefined;
-  switches: Array<Switch> = [];
   macaddr = "";
   inet = "";
   camera = "";
@@ -175,12 +174,6 @@ export class App {
       });
     }
 
-    if (!this.switched) {
-      this.switched = new SwitchController({
-        send: this.send,
-      });
-    }
-
     if (this.meross) {
       this.meross.switches.forEach((plug) => {
         if (plug.state === "") {
@@ -220,14 +213,16 @@ export class App {
   }
 
   private async initDevices(config) {
-    this.switches = [];
-
     console.log("= init devices config", config);
     //    const parsed = JSON.parse(config);
     //    console.log("= init devices parsed", parsed);
 
     //    const devices = parsed.devices;
     console.log("init devices devices", config.devices);
+
+    this.switched = new SwitchController({
+      send: this.send,
+    });
 
     config.devices.forEach(async (dev) => {
       const mac = formatMacAddress(dev.id);
