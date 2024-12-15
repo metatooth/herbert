@@ -144,7 +144,7 @@ export class App {
   }
 
   public readonly run = async (): Promise<void> => {
-    console.log("RUN");
+    console.log("RUN", new Date());
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
@@ -167,12 +167,15 @@ export class App {
     console.log(new Date(), " RUN");
 
     if (!isMockWorker() && !this.metered) {
+      console.log("will make meter controller");
       const polling: number = 1000 * (this.config.polling || 5);
       this.metered = new MeterController({
         polling: polling,
         send: this.send,
       });
     }
+
+    this.metered.poll();
 
     if (this.meross) {
       this.meross.switches.forEach((plug) => {
@@ -262,10 +265,10 @@ export class App {
         plug.off();
         this.switched.add(plug);
       }
-
-      this.join();
-      this.initialized = true;
     });
+
+    this.join();
+    this.initialized = true;
   }
 
   private async createSocket() {
