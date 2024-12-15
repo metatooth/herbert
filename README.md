@@ -11,13 +11,13 @@ $ sudo apt-get remove npm nodejs
 $ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 $ sudo apt-get install -y nodejs
 $ sudo apt-get install -y build-essential
-$ sudo apt-get install -y bluetooth bluez libbluetooth-dev libudev-dev # needed for worker role only 
+$ sudo apt-get install -y bluetooth bluez libbluetooth-dev libudev-dev # needed for worker role only
 $ git clone https://github.com/metatooth/herbert.git
 ```
 
 ## Build Setup
 
-``` bash
+```bash
 # install dependencies
 npm install
 
@@ -73,10 +73,10 @@ The following must be installed in order to run ansible deployments:
 
 - Python3
 - Ansible
-    - pip install ansible
+  - pip install ansible
 - Ansible Role Dependencies
-    - `ansible-galaxy install geerlingguy.postgresql`
-    - `ansible-galaxy install geerlingguy.nodejs`
+  - `ansible-galaxy install geerlingguy.postgresql`
+  - `ansible-galaxy install geerlingguy.nodejs`
 
 ## Deployment Inventory
 
@@ -87,7 +87,7 @@ create an inventory file. A sample inventory file has been provided in
 
 - Set the SSH user, password, ans herbert_version in the [all:vars] section
 - Add hosts for databases
-    - Set vars listed under [databases:vars]
+  - Set vars listed under [databases:vars]
 
 ## Deployment Version
 
@@ -119,10 +119,10 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image database using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
-    - Add database hosts under `[databases]` section
-    - Set vars under `[databases:vars]` section
+  - Add database hosts under `[databases]` section
+  - Set vars under `[databases:vars]` section
 - Run ansible databases deployment
-    - `cd ci && make deploy-databases`
+  - `cd ci && make deploy-databases`
 
 ## Server Deployment
 
@@ -130,9 +130,9 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image server using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
-    - Add server hosts under `[servers]` section
+  - Add server hosts under `[servers]` section
 - Run ansible servers deployment
-    - `cd ci && make deploy-servers HERBERT_BRANCH=<branch_or_tag>`
+  - `cd ci && make deploy-servers HERBERT_BRANCH=<branch_or_tag>`
 
 ## Worker Deployment
 
@@ -140,9 +140,9 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image worker using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
-    - Add worker hosts under `[workers]` section
+  - Add worker hosts under `[workers]` section
 - Run ansible workers deployment
-    - `cd ci && make deploy-workers HERBERT_BRANCH=<branch_or_tag>`
+  - `cd ci && make deploy-workers HERBERT_BRANCH=<branch_or_tag>`
 
 Deploying to a single worker via ansible can be accomplished via the following:
 
@@ -157,19 +157,17 @@ Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image client using `scripts/reimage.sh` script
 - Update `ci/ansible/inventory`
-    - Add client hosts under `[clients]` section
+  - Add client hosts under `[clients]` section
 - Run ansible clients deployment
-    - `cd ci && make deploy-clients HERBERT_BRANCH=<branch_or_tag>`
+  - `cd ci && make deploy-clients HERBERT_BRANCH=<branch_or_tag>`
 
 ## Deployment Logs
+
 Logs for production deployments are all managed by journald. Each service's
 logs can be accessed by running the command `journalctl -u <service_name>`
 i.e. `journalctl -u herbert-worker`
 
-Current production services:
-    - herbert-server
-    - herbert-worker
-    - herbert-client
+Current production services: - herbert-server - herbert-worker - herbert-client
 
 ## Docker / Docker Compose
 
@@ -178,8 +176,8 @@ use the included "docker compose" setup.
 
 - Install Docker for Mac: https://docs.docker.com/docker-for-mac/install/
 - Install Make
-    - Ubuntu: `sudo apt update && sudo apt install -y make`
-    - OSX: `brew install make`
+  - Ubuntu: `sudo apt update && sudo apt install -y make`
+  - OSX: `brew install make`
 
 Bring up all containers
 

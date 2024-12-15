@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: NotificationsState = {
   notifications: [] as Notification[],
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,5 +17,5 @@ export const notifications: Module<NotificationsState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

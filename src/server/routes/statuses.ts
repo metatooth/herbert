@@ -1,6 +1,6 @@
 import Router from "express-promise-router";
 
-import { createStatus, query, readAccount } from "../db";
+import { createMeterFact, createStatusFact, query, readDevice } from "../db";
 
 const router = Router();
 
@@ -28,31 +28,22 @@ router.get("/", async (req, res) => {
   const startDate = new Date(limit);
   console.log("startDate", startDate);
 
-  const start = startDate
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
+  const start = startDate.toISOString().slice(0, 19).replace("T", " ");
 
   if (one) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM statuses WHERE device = $1 ORDER BY id DESC LIMIT 1",
       [req.query.device]
     );
     res.status(200).json(rows[0]);
   } else if (req.query.device) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM statuses WHERE device = $1 AND observedat > $2 ORDER BY id DESC",
       [req.query.device, start]
     );
     res.status(200).json(rows);
   } else {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM statuses WHERE observedat > $1 ORDER BY id DESC",
       [start]
     );
@@ -61,33 +52,28 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  console.log("POST /statuses/");
   const { body } = req;
   const { device, status, ts } = body;
   const observedat = new Date(ts);
+  console.log("STATUS?", status);
+  const val = status === "on" ? 1 : 0;
 
-  const {
-    rows
-  } = await query(
-    "SELECT * FROM statuses WHERE device = $1 ORDER BY id DESC LIMIT 1",
-    [device]
-  );
+  console.log("QUERY FOR", device);
 
-  if (rows.length !== 0) {
-    const last = observedat.getTime();
-    const curr = new Date(rows[0]["observedat"]).getTime();
+  const dev = await readDevice(device);
 
-    const account = await readAccount(1);
+  console.log("this device is", dev);
 
-    if (last - curr >= account.reportingperiod) {
-      await createStatus(device, status, observedat);
-      res.status(204).send();
-    } else {
-      res.status(201).send();
-    }
+  if (dev.devicetype === "meter") {
+    await createMeterFact(device, val, "STATUS", observedat);
   } else {
-    await createStatus(device, status, observedat);
-    res.status(204).send();
+    await createStatusFact(device, status, observedat);
   }
+
+  console.log("done");
+
+  res.status(204).send();
 });
 
 export default router;

@@ -71,7 +71,7 @@
         </div>
       </div>
       <span class="field is-grouped" v-else>
-        <target
+        <zone-target
           icon="thermometer-half"
           :value="parseFloat(lampontemperature)"
           :precision="1"
@@ -80,7 +80,7 @@
           color="#ffe08a"
           simple="true"
         />
-        <target
+        <zone-target
           icon="tint"
           :value="parseFloat(lamponhumidity)"
           :precision="0"
@@ -122,7 +122,7 @@
         </div>
       </div>
       <span class="field is-grouped is-grouped-multiline" v-else>
-        <target
+        <zone-target
           icon="thermometer-half"
           :value="parseFloat(lampofftemperature)"
           :precision="1"
@@ -131,7 +131,7 @@
           color="#7a7a7a"
           simple="true"
         />
-        <target
+        <zone-target
           icon="tint"
           :value="parseFloat(lampoffhumidity)"
           :precision="0"
@@ -195,7 +195,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapActions } from "vuex";
-import Target from "@/components/Target.vue";
+import ZoneTarget from "@/components/ZoneTarget.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectControlType from "@/components/SelectControlType.vue";
 import {
@@ -203,7 +203,6 @@ import {
   celsius2kelvin,
   fahrenheit2celsius,
   kelvin2celsius,
-  vaporPressureDeficit
 } from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 
@@ -211,7 +210,7 @@ const ProfileRow = Vue.extend({
   props: {
     locked: Boolean,
     profile: Profile,
-    units: String
+    units: String,
   },
 
   data() {
@@ -252,14 +251,14 @@ const ProfileRow = Vue.extend({
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
-      editing: false
+      editing: false,
     };
   },
 
   components: {
     EditControls,
     SelectControlType,
-    Target
+    ZoneTarget,
   },
 
   computed: {
@@ -305,7 +304,7 @@ const ProfileRow = Vue.extend({
       }
 
       return max;
-    }
+    },
   },
 
   methods: {
@@ -395,7 +394,7 @@ const ProfileRow = Vue.extend({
         blowercycle: this.blowercycle * 1000,
         irrigationperday: this.irrigationperday,
         irrigationduration: this.irrigationduration * 1000,
-        controltype: this.controltype
+        controltype: this.controltype,
       };
 
       this.edit(profile);
@@ -406,8 +405,8 @@ const ProfileRow = Vue.extend({
       this.controltype = val;
     },
 
-    ...mapActions("profiles", ["edit", "remove"])
-  }
+    ...mapActions("profiles", ["edit", "remove"]),
+  },
 });
 
 export default ProfileRow;

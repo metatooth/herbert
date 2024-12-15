@@ -8,7 +8,7 @@ import { RootState } from "../types";
 export const actions: ActionTree<ZonesState, RootState> = {
   add({ commit }, payload: Zone) {
     const json = JSON.stringify(payload);
-    HTTP.post("/zones", json).then(response => {
+    HTTP.post("/zones", json).then((response) => {
       commit("ADD", Object.assign(new Zone(), response.data));
     });
   },
@@ -16,24 +16,24 @@ export const actions: ActionTree<ZonesState, RootState> = {
   addDevice({ commit }, payload: { zone: Zone; device: string }) {
     console.log("add device with payload", payload);
     const json = JSON.stringify({ device: payload.device });
-    HTTP.post(`/zones/${payload.zone.id}/devices`, json).then(response => {
+    HTTP.post(`/zones/${payload.zone.id}/devices`, json).then((response) => {
       const device = response.data.devices.find(
-        el => el.device === payload.device
+        (el) => el.device === payload.device
       );
       if (device) {
         commit("ADD_DEVICE", {
           zone: payload.zone,
-          device: Object.assign(new Device(), device)
+          device: Object.assign(new Device(), device),
         });
       }
 
       const meter = response.data.meters.find(
-        el => el.device === payload.device
+        (el) => el.device === payload.device
       );
       if (meter) {
         commit("ADD_METER", {
           zone: payload.zone,
-          meter: Object.assign(new Meter(), meter)
+          meter: Object.assign(new Meter(), meter),
         });
       }
     });
@@ -48,7 +48,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
 
   edit({ commit }, payload: Zone) {
     const json = JSON.stringify(payload);
-    HTTP.put(`/zones/${payload.id}`, json).then(response => {
+    HTTP.put(`/zones/${payload.id}`, json).then((response) => {
       const zone = Object.assign(new Zone(), response.data);
       const clone = JSON.parse(JSON.stringify(response.data));
 
@@ -74,7 +74,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
   },
 
   fetchData({ commit }) {
-    HTTP.get("/zones").then(response => {
+    HTTP.get("/zones").then((response) => {
       const payload: Zone[] = [];
       response.data.forEach((json: object) => {
         const zone = Object.assign(new Zone(), json);
@@ -146,5 +146,5 @@ export const actions: ActionTree<ZonesState, RootState> = {
     const json = JSON.stringify({ child: payload.child });
     HTTP.delete(`/zones/${payload.zone.id}/children/${payload.child}`, json);
     commit("REMOVE_CHILD", payload);
-  }
+  },
 };

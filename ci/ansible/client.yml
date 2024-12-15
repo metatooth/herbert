@@ -1,43 +1,43 @@
 - hosts: clients
 
   vars:
-    - nodejs_version: '14.x'
-    - service_description: 'Herbert client dashboard service'
+    - nodejs_version: "14.x"
+    - service_description: "Herbert client dashboard service"
     - service_user: root
     - service_file: index.js
 
   tasks:
     - name: Create {{ appDir }}
       file:
-        path: '{{ appDir }}'
+        path: "{{ appDir }}"
         state: directory
 
     - name: Create {{ appDir }}/dist
       file:
-        path: '{{ appDir }}/dist'
+        path: "{{ appDir }}/dist"
         state: directory
 
     - name: Sync herbert dist
       synchronize:
-        src: '{{ distDir }}/client'
-        dest: '{{ appDir }}/dist'
+        src: "{{ distDir }}/client"
+        dest: "{{ appDir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync index.js
       synchronize:
-        src: '{{ srcDir }}/index.js'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/index.js"
+        dest: "{{ appDir }}"
 
     - name: Sync herbert package.json
       synchronize:
-        src: '{{ srcDir }}/package.json'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/package.json"
+        dest: "{{ appDir }}"
 
     - name: Sync herbert package-lock.json
       synchronize:
-        src: '{{ srcDir }}/package-lock.json'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/package-lock.json"
+        dest: "{{ appDir }}"
 
     - name: Install nodejs {{nodejs_version}}
       include_role:
@@ -48,7 +48,7 @@
     - name: Install production node_modules
       command: npm install
       args:
-        chdir: '{{ appDir }}'
+        chdir: "{{ appDir }}"
       environment:
         NODE_ENV: production
 
@@ -59,7 +59,7 @@
         dest: /etc/systemd/system/herbert-client.service
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Enable and start herbert-client service
       become: yes

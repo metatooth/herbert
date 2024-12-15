@@ -8,5 +8,5 @@ export const actions: ActionTree<NotificationsState, RootState> = {
   },
   remove({ commit }, payload: Notification) {
     commit("REMOVE", payload);
-  }
+  },
 };

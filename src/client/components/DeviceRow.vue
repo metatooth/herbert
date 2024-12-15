@@ -2,7 +2,14 @@
   <tr>
     <td>
       <span v-if="!editing">
-        {{ device.name }}
+        <div class="is-size-3">{{ device.name }}</div>
+        <div class="is-size-5">{{ device.device }}</div>
+        <div class="is-size-7">
+          <em
+            ><readable-timestamp
+              :timestamp="new Date(Date.parse(device.updatedat))"
+          /></em>
+        </div>
       </span>
       <div class="control" v-else>
         <input
@@ -17,29 +24,18 @@
       {{ zonename }}
     </td>
     <td>
-      <button class="button" :disabled="locked" @click="toggle" v-if="!editing">
-        <font-awesome-icon :class="deviceClass" :icon="device.icon" />
-        <span>{{ device.devicetype }}</span>
-      </button>
+      <device-actual
+        v-if="!editing"
+        :device="device"
+        :locked="locked"
+        @on-toggle="toggle"
+      />
       <div class="control" v-else>
         <select-device-type
           :devicetype="device.devicetype"
           @select-devicetype="saveDeviceType"
         />
       </div>
-    </td>
-    <td class="is-italic">
-      <router-link
-        :to="{
-          name: 'statuses',
-          params: { name: device.nickname, device: device.device }
-        }"
-      >
-        <readable :timestamp="new Date(Date.parse(device.updatedat))" />
-      </router-link>
-    </td>
-    <td>
-      {{ device.device }}
     </td>
     <td>
       <edit-controls
@@ -48,6 +44,7 @@
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
+        :stacked="true"
       />
     </td>
   </tr>
@@ -59,28 +56,30 @@ import { mapActions, mapGetters, mapState } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import EditControls from "@/components/EditControls.vue";
+import DeviceActual from "@/components/DeviceActual.vue";
 
 const DeviceRow = Vue.extend({
   props: {
     device: Device,
     locked: Boolean,
-    units: String
+    units: String,
   },
 
   data() {
     return {
       nickname: this.device.nickname,
       editing: false,
-      status: this.device.status
+      status: this.device.status,
     };
   },
 
   components: {
+    DeviceActual,
     EditControls,
     SelectDeviceType,
-    Readable
+    ReadableTimestamp,
   },
 
   computed: {
@@ -135,8 +134,8 @@ const DeviceRow = Vue.extend({
     },
 
     zone() {
-      const found = this.zones.filter(zone => {
-        const devices = zone.devices.filter(device => {
+      const found = this.zones.filter((zone) => {
+        const devices = zone.devices.filter((device) => {
           return this.device.device === device.device;
         });
         return devices.length !== 0;
@@ -163,7 +162,7 @@ const DeviceRow = Vue.extend({
     },
 
     ...mapState("notifications", ["notifications"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
@@ -174,7 +173,7 @@ const DeviceRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.device,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
@@ -182,7 +181,7 @@ const DeviceRow = Vue.extend({
     saveDeviceType(devicetype: string): void {
       this.edit({
         ...this.device,
-        devicetype: devicetype
+        devicetype: devicetype,
       });
     },
 
@@ -207,8 +206,8 @@ const DeviceRow = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["edit", "remove", "on", "off"])
-  }
+    ...mapActions("devices", ["edit", "remove", "on", "off"]),
+  },
 });
 
 export default DeviceRow;

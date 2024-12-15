@@ -33,12 +33,12 @@ import Vue from "vue";
 
 const SelectZone = Vue.extend({
   props: {
-    zones: Array
+    zones: Array,
   },
 
   data() {
     return {
-      selected: ""
+      selected: "",
     };
   },
 
@@ -46,8 +46,8 @@ const SelectZone = Vue.extend({
     select() {
       this.$emit("select-zone", this.selected);
       this.selected = "";
-    }
-  }
+    },
+  },
 });
 
 export default SelectZone;

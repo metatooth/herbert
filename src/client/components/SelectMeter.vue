@@ -34,12 +34,12 @@ import Vue from "vue";
 const SelectMeter = Vue.extend({
   props: {
     label: String,
-    meters: Array
+    meters: Array,
   },
 
   data() {
     return {
-      selected: ""
+      selected: "",
     };
   },
 
@@ -47,8 +47,8 @@ const SelectMeter = Vue.extend({
     select() {
       this.$emit("select-meter", this.selected);
       this.selected = "";
-    }
-  }
+    },
+  },
 });
 
 export default SelectMeter;

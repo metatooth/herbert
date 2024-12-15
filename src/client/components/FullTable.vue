@@ -78,7 +78,7 @@ const FullTable = Vue.extend({
     headings: [],
     items: [],
     locked: Boolean,
-    type: String
+    type: String,
   },
 
   components: {
@@ -87,12 +87,12 @@ const FullTable = Vue.extend({
     MeterRow,
     ProfileRow,
     WorkerRow,
-    ZoneRow
+    ZoneRow,
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
-  }
+    ...mapGetters("settings", ["settings"]),
+  },
 });
 
 export default FullTable;

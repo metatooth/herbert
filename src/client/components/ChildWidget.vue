@@ -9,7 +9,7 @@
           :to="{
             name: 'zone',
             hash: linkto,
-            params: { id: child.id }
+            params: { id: child.id },
           }"
         >
           {{ child.nickname }}
@@ -27,17 +27,17 @@ import { mapGetters } from "vuex";
 
 const ChildWidget = Vue.extend({
   props: {
-    id: Number
+    id: Number,
   },
 
   data() {
     return {
-      child: Zone
+      child: Zone,
     };
   },
 
   mounted() {
-    this.zones.forEach(zone => {
+    this.zones.forEach((zone) => {
       if (zone.id === this.id) {
         this.child = zone;
       }
@@ -49,14 +49,14 @@ const ChildWidget = Vue.extend({
       return `#zone-details-${this.id}`;
     },
 
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
     remove(child: number) {
       this.$emit("remove-child", child);
-    }
-  }
+    },
+  },
 });
 
 export default ChildWidget;

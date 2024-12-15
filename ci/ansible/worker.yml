@@ -1,10 +1,10 @@
 - hosts: workers
 
   vars:
-    - nodejs_version: '14.x'
-    - service_description: 'Herbert in-room worker service'
-    - service_user: root
-    - service_file: dist/worker/main.js
+    nodejs_version: "18.x"
+    service_description: "Herbert in-room worker service"
+    service_user: root
+    service_file: dist/worker/main.js
 
   tasks:
     - name: Enable I2C
@@ -16,11 +16,23 @@
       apt:
         update_cache: yes
         state: latest
-        name: ['motion', 'bluetooth', 'bluez', 'git', 'gcc', 'g++', 'libbluetooth-dev', 'libudev-dev', 'lirc', 'make']
+        name:
+          [
+            "motion",
+            "bluetooth",
+            "bluez",
+            "git",
+            "gcc",
+            "g++",
+            "libbluetooth-dev",
+            "libudev-dev",
+            "lirc",
+            "make",
+          ]
 
     - name: Clone 8relind-rpi
       git:
-        repo: 'https://github.com/SequentMicrosystems/8relind-rpi.git'
+        repo: "https://github.com/SequentMicrosystems/8relind-rpi.git"
         dest: /home/{{ ansible_user }}/8relind-rpi
 
     - name: Build and install 8relind-rpi
@@ -67,53 +79,60 @@
     - name: Create the LG controller file
       become: yes
       copy:
-        src: '{{ srcDir }}/scripts/AKB73016012.licrd.conf'
+        src: "{{ src_dir }}/scripts/AKB73016012.licrd.conf"
         dest: /etc/lirc/lircd.conf.d/lg.lircd.conf
 
     - name: Create the B+D controller file
       become: yes
       copy:
-        src: '{{ srcDir }}/scripts/810900812A.licrd.conf'
+        src: "{{ src_dir }}/scripts/810900812A.licrd.conf"
         dest: /etc/lirc/lircd.conf.d/b+d.lircd.conf
-    - name: Create {{ appDir }}
+
+    - name: Create motion configuration
+      become: yes
+      copy:
+        src: "{{ src_dir }}/scripts/motion.conf"
+        dest: /etc/motion/motion.conf
+
+    - name: Create {{ app_dir }}
       file:
-        path: '{{ appDir }}'
+        path: "{{ app_dir }}"
         state: directory
-    - name: Create {{ appDir }}/dist
+    - name: Create {{ app_dir }}/dist
       file:
-        path: '{{ appDir }}/dist'
+        path: "{{ app_dir }}/dist"
         state: directory
 
     - name: Sync herbert dist
       synchronize:
-        src: '{{ distDir }}/worker'
-        dest: '{{ appDir }}/dist'
+        src: "{{ dist_dir }}/worker"
+        dest: "{{ app_dir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert shared
       synchronize:
-        src: '{{ distDir }}/shared'
-        dest: '{{ appDir }}/dist'
+        src: "{{ dist_dir }}/shared"
+        dest: "{{ app_dir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert config
       synchronize:
-        src: '{{ srcDir }}/config'
-        dest: '{{ appDir }}'
+        src: "{{ src_dir }}/config"
+        dest: "{{ app_dir }}"
         recursive: yes
         delete: yes
 
     - name: Sync herbert package.json
       synchronize:
-        src: '{{ srcDir }}/package.json'
-        dest: '{{ appDir }}'
+        src: "{{ src_dir }}/package.json"
+        dest: "{{ app_dir }}"
 
     - name: Sync herbert package-lock.json
       synchronize:
-        src: '{{ srcDir }}/package-lock.json'
-        dest: '{{ appDir }}'
+        src: "{{ src_dir }}/package-lock.json"
+        dest: "{{ app_dir }}"
 
     - name: Install nodejs {{nodejs_version}}
       include_role:
@@ -124,9 +143,17 @@
     - name: Install production node_modules
       command: npm install
       args:
-        chdir: '{{ appDir }}'
+        chdir: "{{ app_dir }}"
       environment:
         NODE_ENV: production
+
+    - name: Enable and start motion service
+      become: yes
+      systemd:
+        name: motion
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
 
     - name: Install worker service
       become: yes
@@ -135,7 +162,7 @@
         dest: /etc/systemd/system/herbert-worker.service
         owner: root
         group: root
-        mode: '0644'
+        mode: "0644"
 
     - name: Enable and start herbert-worker service
       become: yes
@@ -149,4 +176,6 @@
       copy:
         dest: /home/{{ ansible_user }}/.bash_aliases
         content: |
+          alias restart='sudo systemctl restart herbert-worker'
+          alias status='sudo systemctl status herbert-worker'
           alias tail-worker='sudo journalctl -u herbert-worker -f'

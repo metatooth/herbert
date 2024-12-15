@@ -17,8 +17,8 @@ export class Meter {
   }
 
   get zone() {
-    const found = this.zones.filter(zone => {
-      const meters = zone.meters.filter(meter => {
+    const found = this.zones.filter((zone) => {
+      const meters = zone.meters.filter((meter) => {
         return this.meter.device === meter.device;
       });
       return meters.length !== 0;

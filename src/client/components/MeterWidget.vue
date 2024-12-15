@@ -23,7 +23,7 @@
         <router-link
           :to="{
             name: 'readings',
-            params: { name: meter.nickname, device: meter.device }
+            params: { name: meter.nickname, device: meter.device },
           }"
         >
           &gt;&gt;&gt;
@@ -46,7 +46,7 @@ import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 const MeterWidget = Vue.extend({
   props: {
     meter: Meter,
-    units: String
+    units: String,
   },
 
   computed: {
@@ -85,14 +85,14 @@ const MeterWidget = Vue.extend({
       return "°" + this.units;
     },
 
-    ...mapState("notifications", ["notifications"])
+    ...mapState("notifications", ["notifications"]),
   },
 
   methods: {
     remove(meter: string) {
       this.$emit("remove-device", meter);
-    }
-  }
+    },
+  },
 });
 
 export default MeterWidget;

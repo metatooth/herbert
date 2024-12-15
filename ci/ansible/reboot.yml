@@ -26,11 +26,11 @@
       shell: nohup bash -c "/bin/sleep 5 && /sbin/shutdown -r now" &
       when: ansible_os_family == "Debian"
       become: true
- 
+
     - name: Reboot # Reboot all redhat hosts (including centos).
       shell: nohup bash -c "/usr/bin/sleep 5 && /usr/sbin/shutdown -r now" &
       when: ansible_os_family == "RedHat"
       become: true
- 
+
     - name: Wait # Wait for hosts to reboot.
       wait_for_connection: timeout=300 delay=30

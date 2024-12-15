@@ -3,7 +3,7 @@ import {
   SocketMessage,
   EnhancedMessageCreator,
   MessageCreator,
-  AnySocketMessage
+  AnySocketMessage,
 } from "./types";
 
 // type guard for message types
@@ -33,7 +33,7 @@ export const createMessageCreator = <T extends SocketMessageType>(type: T) => {
       type,
       isOfType(m: AnySocketMessage): m is SocketMessage<T, P> {
         return m.type === this.type;
-      }
+      },
     });
   };
 };

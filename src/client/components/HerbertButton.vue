@@ -15,14 +15,14 @@ const Button = Vue.extend({
     label: String,
     icon: { type: String, default: "cannabis" },
     size: { type: String, default: "small" },
-    color: { type: String, default: "primary" }
+    color: { type: String, default: "primary" },
   },
 
   computed: {
     buttonClass() {
       return `button is-${this.size} has-text-${this.color}`;
-    }
-  }
+    },
+  },
 });
 export default Button;
 </script>

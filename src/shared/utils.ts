@@ -128,7 +128,7 @@ export function color(diff, range): string {
   const c = [
     start[0] * alpha + (1 - alpha) * end[0],
     start[1] * alpha + (1 - alpha) * end[1],
-    start[2] * alpha + (1 - alpha) * end[2]
+    start[2] * alpha + (1 - alpha) * end[2],
   ];
 
   return "#" + convertToHex(c);
@@ -145,4 +145,26 @@ export function zeroes(n: number): string {
     return `0${n}`;
   }
   return n.toString();
+}
+
+/**
+ * Returns a well-formated MAC address string
+ */
+export function formatMacAddress(id: string): string {
+  if (id == undefined) {
+    return "";
+  }
+
+  if (id.length != 12 && id.length != 17) {
+    console.warn("bad format for mac address:", id);
+    return "";
+  }
+
+  // Remove all but alphanumeric characters
+  let mac = id.replace(/\W/gi, "").toLowerCase();
+  // Append a colon after every two characters
+  mac = mac.replace(/(.{2})/g, "$1:");
+
+  // remove trailing colon
+  return mac.split(":").slice(0, -1).join(":");
 }

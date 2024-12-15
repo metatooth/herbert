@@ -18,7 +18,7 @@
         />
       </div>
       <div class="content is-italic">
-        Updated <readable :timestamp="lastupdate" />
+        Updated <readable-timestamp :timestamp="lastupdate" />
       </div>
     </div>
   </div>
@@ -29,7 +29,7 @@ import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
 import DeviceTag from "@/components/DeviceTag.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import ZoneActual from "@/components/ZoneActual.vue";
 import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 import ZoneTag from "@/components/ZoneTag.vue";
@@ -39,28 +39,28 @@ import { Zone } from "@/store/zones/types";
 const ZoneTile = Vue.extend({
   props: {
     locked: Boolean,
-    zone: Zone
+    zone: Zone,
   },
 
   data() {
     return {
       readable: true,
-      editable: false
+      editable: false,
     };
   },
 
   components: {
     DeviceTag,
-    Readable,
+    ReadableTimestamp,
     ZoneActual,
     ZoneStatusButton,
-    ZoneTag
+    ZoneTag,
   },
 
   computed: {
     lastupdate() {
       let last = null;
-      this.zone.meters.forEach(meter => {
+      this.zone.meters.forEach((meter) => {
         const updatedat = new Date(meter.updatedat);
         if (last === null || updatedat > last) {
           last = updatedat;
@@ -71,7 +71,7 @@ const ZoneTile = Vue.extend({
 
     sorted(): Device[] {
       const devices = [];
-      this.zone.devices.forEach(d => {
+      this.zone.devices.forEach((d) => {
         devices.push(Object.assign(new Device(), d));
       });
       devices.sort((a, b) => {
@@ -80,21 +80,21 @@ const ZoneTile = Vue.extend({
       return devices;
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
     toggle() {
       const zone = {
         ...this.zone,
-        active: !this.zone.active
+        active: !this.zone.active,
       };
 
       this.edit(zone);
     },
 
-    ...mapActions("zones", ["edit"])
-  }
+    ...mapActions("zones", ["edit"]),
+  },
 });
 
 export default ZoneTile;

@@ -21,7 +21,7 @@ const IconAndText = Vue.extend({
     color: { type: String, default: "black" },
     size: { type: String, default: "medium" },
     backgroundColor: { type: String, default: "#ffe08a" },
-    iconColor: { type: String, default: "#ffe08a" }
+    iconColor: { type: String, default: "#ffe08a" },
   },
 
   computed: {
@@ -39,8 +39,8 @@ const IconAndText = Vue.extend({
 
     iconStyle() {
       return `color: ${this.iconColor};`;
-    }
-  }
+    },
+  },
 });
 
 export default IconAndText;

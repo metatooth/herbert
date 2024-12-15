@@ -34,12 +34,12 @@ import Vue from "vue";
 const SelectDevice = Vue.extend({
   props: {
     label: String,
-    devices: Array
+    devices: Array,
   },
 
   data() {
     return {
-      selected: ""
+      selected: "",
     };
   },
 
@@ -47,8 +47,8 @@ const SelectDevice = Vue.extend({
     select() {
       this.$emit("select-device", this.selected);
       this.selected = "";
-    }
-  }
+    },
+  },
 });
 
 export default SelectDevice;

@@ -26,17 +26,17 @@ import Target from "@/components/Target.vue";
 const MeterTarget = Vue.extend({
   props: {
     zone: Zone,
-    units: String
+    units: String,
   },
 
   data() {
     return {
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
   components: {
-    Target
+    Target,
   },
 
   computed: {
@@ -58,8 +58,8 @@ const MeterTarget = Vue.extend({
 
     unitsWithDegree(): string {
       return "°" + this.units;
-    }
-  }
+    },
+  },
 });
 
 export default MeterTarget;

@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: WorkersState = {
   workers: [] as Worker[],
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,7 +17,7 @@ export const workers: Module<WorkersState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };
 
 export default workers;

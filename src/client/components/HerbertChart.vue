@@ -19,12 +19,12 @@ const Chart = Vue.extend({
     stepSize: { type: Number },
     range: { type: Number },
     width: { type: String, default: "400px" },
-    height: { type: String, default: "400px" }
+    height: { type: String, default: "400px" },
   },
 
   data() {
     return {
-      chart: ChartJS
+      chart: ChartJS,
     };
   },
 
@@ -38,17 +38,17 @@ const Chart = Vue.extend({
           {
             data: this.data,
             borderColor: "#00bbee",
-            fill: false
-          }
-        ]
+            fill: false,
+          },
+        ],
       },
       options: {
         title: {
           display: true,
-          text: this.title
+          text: this.title,
         },
         legend: {
-          display: false
+          display: false,
         },
         borderColor: "#00bbee",
         scales: {
@@ -57,9 +57,9 @@ const Chart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
@@ -67,16 +67,16 @@ const Chart = Vue.extend({
               ticks: {
                 suggestedMin: this.suggestedMin,
                 suggestedMax: this.suggestedMax,
-                stepSize: this.stepSize
+                stepSize: this.stepSize,
               },
               scaleLabel: {
                 display: true,
-                labelString: this.label
-              }
-            }
-          ]
-        }
-      }
+                labelString: this.label,
+              },
+            },
+          ],
+        },
+      },
     });
   },
 
@@ -85,10 +85,10 @@ const Chart = Vue.extend({
       this.chart.options = {
         title: {
           display: true,
-          text: this.title
+          text: this.title,
         },
         legend: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -96,24 +96,24 @@ const Chart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
               display: true,
               ticks: {
                 suggestedMin: this.suggestedMin,
-                suggestedMax: this.suggestedMax
+                suggestedMax: this.suggestedMax,
               },
               scaleLabel: {
                 display: true,
-                labelString: val
-              }
-            }
-          ]
-        }
+                labelString: val,
+              },
+            },
+          ],
+        },
       };
 
       this.chart.update();
@@ -125,16 +125,16 @@ const Chart = Vue.extend({
       this.chart.data.datasets.push({
         data: val,
         borderColor: "#00bbee",
-        fill: false
+        fill: false,
       });
 
       this.chart.options = {
         title: {
           display: true,
-          text: this.title
+          text: this.title,
         },
         legend: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -146,30 +146,30 @@ const Chart = Vue.extend({
                 unit: "minute",
                 unitStepSize: 5,
                 displayFormats: {
-                  minute: "HH:mm"
-                }
-              }
-            }
+                  minute: "HH:mm",
+                },
+              },
+            },
           ],
           yAxes: [
             {
               display: true,
               ticks: {
                 suggestedMin: this.suggestedMin,
-                suggestedMax: this.suggestedMax
+                suggestedMax: this.suggestedMax,
               },
               scaleLabel: {
                 display: true,
-                labelString: this.label
-              }
-            }
-          ]
-        }
+                labelString: this.label,
+              },
+            },
+          ],
+        },
       };
 
       this.chart.update();
-    }
-  }
+    },
+  },
 });
 export default Chart;
 </script>

@@ -23,24 +23,24 @@ import { mapGetters } from "vuex";
 
 const SelectZoneForDevice = Vue.extend({
   props: {
-    zoneid: Number
+    zoneid: Number,
   },
 
   data() {
     return {
-      selected: this.zoneid
+      selected: this.zoneid,
     };
   },
 
   computed: {
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   watch: {
     selected(val: string) {
       this.$emit("select-zone", val);
-    }
-  }
+    },
+  },
 });
 
 export default SelectZoneForDevice;

@@ -144,14 +144,14 @@
         </div>
 
         <div class="field is-grouped is-grouped-multiline">
-          <target
+          <zone-target
             icon="thermometer-half"
             :value="parseFloat(lampontemperature)"
             units="°"
             size="small"
             color="#ffe08a"
           />
-          <target
+          <zone-target
             icon="tint"
             :value="parseFloat(lamponhumidity)"
             units="%"
@@ -161,14 +161,14 @@
         </div>
 
         <div class="field is-grouped is-grouped-multiline">
-          <target
+          <zone-target
             icon="thermometer-half"
             :value="parseFloat(lampofftemperature)"
             units="°"
             size="small"
             color="#7a7a7a"
           />
-          <target
+          <zone-target
             icon="tint"
             :value="parseFloat(lampoffhumidity)"
             units="%"
@@ -190,7 +190,7 @@
         </div>
       </div>
       <div class="content is-italic">
-        Updated <readable :timestamp="updatedat" />
+        Updated <readable-timestamp :timestamp="updatedat" />
       </div>
       <div class="content">
         <edit-controls
@@ -212,26 +212,26 @@ import {
   celsius2fahrenheit,
   celsius2kelvin,
   fahrenheit2celsius,
-  kelvin2celsius
+  kelvin2celsius,
 } from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 import EditControls from "@/components/EditControls.vue";
-import Target from "@/components/Target.vue";
-import Readable from "@/components/Readable.vue";
+import ZoneTarget from "@/components/ZoneTarget.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import SelectControlType from "@/components/SelectControlType.vue";
 
 const ProfileTile = Vue.extend({
   props: {
     locked: Boolean,
     profile: Profile,
-    units: String
+    units: String,
   },
 
   components: {
     EditControls,
-    Readable,
+    ReadableTimestamp,
     SelectControlType,
-    Target
+    ZoneTarget,
   },
 
   data() {
@@ -279,7 +279,7 @@ const ProfileTile = Vue.extend({
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
-      editing: false
+      editing: false,
     };
   },
 
@@ -326,7 +326,7 @@ const ProfileTile = Vue.extend({
       }
 
       return max;
-    }
+    },
   },
 
   methods: {
@@ -382,7 +382,7 @@ const ProfileTile = Vue.extend({
         bloweractive: this.bloweractive * 1000,
         blowercycle: this.blowercycle * 1000,
         irrigationperday: this.irrigationperday,
-        irrigationduration: this.irrigationduration * 1000
+        irrigationduration: this.irrigationduration * 1000,
       };
 
       this.edit(profile);
@@ -402,8 +402,8 @@ const ProfileTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("profiles", ["edit", "remove"])
-  }
+    ...mapActions("profiles", ["edit", "remove"]),
+  },
 });
 
 export default ProfileTile;

@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
       req.body.bloweractive,
       req.body.blowercycle,
       req.body.irrigationperday,
-      req.body.irrigationduration
+      req.body.irrigationduration,
     ]
   );
   const profile = await readProfile(rows[0].id);
@@ -58,7 +58,7 @@ router.put("/:id", async (req, res) => {
       req.body.irrigationperday,
       req.body.irrigationduration,
       req.body.controltype,
-      id
+      id,
     ]
   );
   console.log("update profiles", rows);

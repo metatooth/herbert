@@ -7,23 +7,18 @@ import Vue from "vue";
 import ChartJS from "chart.js";
 import "chartjs-adapter-date-fns";
 
-const Sparkline = Vue.extend({
+const SparklineDisplay = Vue.extend({
   props: {
     id: { type: String, default: "sparkline" },
     data: { type: Array },
-    title: { type: String },
-    label: { type: String },
-    suggestedMin: { type: Number },
-    suggestedMax: { type: Number },
-    stepSize: { type: Number },
-    range: { type: Number },
+    color: { type: String, default: "rgb(255, 119, 0)" },
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" }
+    height: { type: String, default: "50px" },
   },
 
   data() {
     return {
-      chart: ChartJS
+      chart: ChartJS,
     };
   },
 
@@ -34,10 +29,10 @@ const Sparkline = Vue.extend({
       options: {
         responsive: false,
         legend: {
-          display: false
+          display: false,
         },
         title: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -45,44 +40,39 @@ const Sparkline = Vue.extend({
               display: false,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
-              display: false
-            }
-          ]
-        }
-      }
+              display: false,
+            },
+          ],
+        },
+      },
     });
   },
 
   watch: {
     data(val) {
-      console.log("new data!", val);
-      console.log("old", this.chart.data.datasets);
-
       this.chart.data.datasets.push({
         data: val,
         fill: false,
         pointRadius: 0,
         spanGaps: true,
         tension: 0.2,
-        borderColor: "rgb(0,187,238)",
-        backgroundColor: "rgb(0,187,238)"
+        borderColor: this.color,
+        backgroundColor: this.color,
       });
-
-      console.log("new", this.chart.data.datasets);
 
       this.chart.options = {
         responsive: false,
         legend: {
-          display: false
+          display: false,
         },
         title: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -90,21 +80,21 @@ const Sparkline = Vue.extend({
               display: false,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm",
+              },
+            },
           ],
           yAxes: [
             {
-              display: false
-            }
-          ]
-        }
+              display: false,
+            },
+          ],
+        },
       };
 
       this.chart.update();
-    }
-  }
+    },
+  },
 });
-export default Sparkline;
+export default SparklineDisplay;
 </script>

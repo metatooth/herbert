@@ -27,5 +27,5 @@ export const mutations: MutationTree<WorkersState> = {
   WORKERS_ERROR(state) {
     state.error = true;
     state.workers = [];
-  }
+  },
 };

@@ -11,8 +11,8 @@ const Readable = Vue.extend({
       default: () => {
         return new Date();
       },
-      type: Date
-    }
+      type: Date,
+    },
   },
 
   computed: {
@@ -46,8 +46,8 @@ const Readable = Vue.extend({
       } else {
         return "a long time";
       }
-    }
-  }
+    },
+  },
 });
 export default Readable;
 </script>

@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: ConfigState = {
   configs: [] as Config[],
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,5 +17,5 @@ export const configs: Module<ConfigState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

@@ -37,7 +37,7 @@ import { Meter } from "@/store/meters/types";
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 const MeterNarrow = Vue.extend({
   props: {
-    meter: Meter
+    meter: Meter,
   },
 
   computed: {
@@ -55,17 +55,17 @@ const MeterNarrow = Vue.extend({
       return this.meter.humidity * 100;
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
     history() {
       this.$router.push({
         name: "readings",
-        params: { name: this.meter.nickname, device: this.meter.device }
+        params: { name: this.meter.nickname, device: this.meter.device },
       });
-    }
-  }
+    },
+  },
 });
 
 export default MeterNarrow;

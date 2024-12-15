@@ -11,5 +11,5 @@ export const getters: GetterTree<DevicesState, RootState> = {
   devicesCount(state): number {
     const { devices } = state;
     return devices.length;
-  }
+  },
 };

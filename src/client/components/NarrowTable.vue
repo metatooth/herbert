@@ -60,7 +60,7 @@ const NarrowTable = Vue.extend({
   props: {
     items: [],
     type: String,
-    locked: Boolean
+    locked: Boolean,
   },
 
   components: {
@@ -69,8 +69,8 @@ const NarrowTable = Vue.extend({
     MeterNarrow,
     ProfileNarrow,
     WorkerNarrow,
-    ZoneNarrow
-  }
+    ZoneNarrow,
+  },
 });
 
 export default NarrowTable;

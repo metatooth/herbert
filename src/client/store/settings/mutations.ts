@@ -7,5 +7,5 @@ export const mutations: MutationTree<SettingsState> = {
   },
   ERROR(state) {
     state.error = true;
-  }
+  },
 };

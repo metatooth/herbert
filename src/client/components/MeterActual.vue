@@ -31,18 +31,18 @@ const MeterActual = Vue.extend({
     meter: Meter,
     units: String,
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" }
+    height: { type: String, default: "50px" },
   },
 
   data() {
     return {
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
   components: {
     HumidityFact,
-    TemperatureFact
+    TemperatureFact,
   },
 
   computed: {
@@ -60,8 +60,8 @@ const MeterActual = Vue.extend({
       return this.meter.humidity * 100;
     },
 
-    ...mapGetters("settings", ["settings"])
-  }
+    ...mapGetters("settings", ["settings"]),
+  },
 });
 
 export default MeterActual;

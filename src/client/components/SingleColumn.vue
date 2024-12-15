@@ -82,7 +82,7 @@ const SingleColumn = Vue.extend({
   props: {
     items: [],
     locked: Boolean,
-    type: String
+    type: String,
   },
 
   components: {
@@ -92,12 +92,12 @@ const SingleColumn = Vue.extend({
     ZoneDetail,
     ZoneTile,
     WorkerTile,
-    ConfigTile
+    ConfigTile,
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
-  }
+    ...mapGetters("settings", ["settings"]),
+  },
 });
 
 export default SingleColumn;

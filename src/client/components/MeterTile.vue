@@ -34,12 +34,20 @@
         <span v-else>
           {{ zonename }}
         </span>
+        <button class="button has-text-info" @click="history">
+          <span class="icon">
+            <font-awesome-icon icon="history" />
+          </span>
+        </button>
       </p>
       <div class="content">
         <meter-actual :meter="meter" width="200px" />
       </div>
       <div class="content">
-        <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
+        <readable-timestamp
+          class="is-italic"
+          :timestamp="new Date(meter.updatedat)"
+        />
       </div>
       <div class="content">
         <edit-controls
@@ -60,28 +68,28 @@ import { mapActions, mapGetters } from "vuex";
 import { Meter } from "@/store/meters/types";
 import { Notification } from "@/store/notifications/types";
 import MeterActual from "@/components/MeterActual.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
 const MeterTile = Vue.extend({
   props: {
     locked: Boolean,
-    meter: Meter
+    meter: Meter,
   },
 
   data() {
     return {
       nickname: this.meter.nickname,
-      editing: false
+      editing: false,
     };
   },
 
   components: {
     EditControls,
     MeterActual,
-    Readable,
-    SelectZoneForDevice
+    ReadableTimestamp,
+    SelectZoneForDevice,
   },
 
   computed: {
@@ -98,8 +106,8 @@ const MeterTile = Vue.extend({
     },
 
     zone() {
-      const found = this.zones.filter(zone => {
-        const meters = zone.meters.filter(meter => {
+      const found = this.zones.filter((zone) => {
+        const meters = zone.meters.filter((meter) => {
           return this.meter.device === meter.device;
         });
         return meters.length !== 0;
@@ -125,7 +133,7 @@ const MeterTile = Vue.extend({
     },
 
     ...mapGetters("notifications", ["notifications"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
@@ -144,24 +152,31 @@ const MeterTile = Vue.extend({
       this.editing = true;
     },
 
+    history() {
+      this.$router.push({
+        name: "readings",
+        params: { name: this.meter.nickname, device: this.meter.device },
+      });
+    },
+
     save() {
       this.edit({
         ...this.meter,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
 
     selectzone(zone: number) {
-      const target = this.zones.filter(z => {
+      const target = this.zones.filter((z) => {
         return zone === z.id;
       });
 
       if (target.length !== 0) {
         const payload = { zone: target[0], device: this.meter.device };
 
-        this.zones.forEach(zone => {
-          zone.meters.forEach(meter => {
+        this.zones.forEach((zone) => {
+          zone.meters.forEach((meter) => {
             if (meter.device === this.meter.device) {
               const doomed = { zone: zone, device: this.meter.device };
               this.removeDevice(doomed);
@@ -176,8 +191,8 @@ const MeterTile = Vue.extend({
     },
 
     ...mapActions("meters", ["edit", "remove"]),
-    ...mapActions("zones", ["addDevice", "removeDevice"])
-  }
+    ...mapActions("zones", ["addDevice", "removeDevice"]),
+  },
 });
 
 export default MeterTile;

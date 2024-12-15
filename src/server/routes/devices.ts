@@ -1,7 +1,7 @@
 import Router from "express-promise-router";
 import {
   makeCommandMessage,
-  makeSendByDeviceIDMessage
+  makeSendByDeviceIDMessage,
 } from "../../shared/message-creators";
 import { Device } from "../../shared/types";
 import { query, readDevice, readDevices, registerDevice } from "../db";
@@ -19,9 +19,12 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  console.log("got post", req);
   const { body } = req;
   const { device, manufacturer } = body;
+  console.log(device, manufacturer);
   await registerDevice(device, manufacturer);
+  console.log("did register");
   res.status(204).send();
 });
 
@@ -50,7 +53,7 @@ router.put("/:id/:action", async (req, res) => {
   const cmd = makeCommandMessage({
     device: device.device,
     action: action,
-    timestamp: new Date().toString()
+    timestamp: new Date().toString(),
   });
   const payload = { device: device.device, msg: cmd };
   console.log("send by device id", payload);

@@ -51,7 +51,7 @@ import {
   faToggleOn,
   faTrash,
   faUpload,
-  faWind
+  faWind,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -108,5 +108,5 @@ Vue.config.productionTip = false;
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: (h) => h(App),
 }).$mount("#app");

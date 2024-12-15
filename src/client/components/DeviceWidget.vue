@@ -12,7 +12,7 @@
         <router-link
           :to="{
             name: 'statuses',
-            params: { name: device.nickname, device: device.device }
+            params: { name: device.nickname, device: device.device },
           }"
         >
           &gt;&gt;&gt;
@@ -38,19 +38,19 @@ import { Notification } from "@/store/notifications/types";
 
 const DeviceWidget = Vue.extend({
   props: {
-    device: Device
+    device: Device,
   },
 
   data() {
     return {
-      updating: false
+      updating: false,
     };
   },
 
   watch: {
     device() {
       this.updating = false;
-    }
+    },
   },
 
   computed: {
@@ -77,9 +77,11 @@ const DeviceWidget = Vue.extend({
     },
 
     tagClass() {
+      console.log("check for notifications");
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.device.device;
       });
+      console.log("any?", found);
       if (found) {
         return "has-text-danger";
       } else if (this.device.status === "off" || this.device.status === "0") {
@@ -91,7 +93,7 @@ const DeviceWidget = Vue.extend({
       }
     },
 
-    ...mapState("notifications", ["notifications"])
+    ...mapState("notifications", ["notifications"]),
   },
 
   methods: {
@@ -105,11 +107,13 @@ const DeviceWidget = Vue.extend({
         this.on(this.device.device);
       } else if (this.device.status === "on") {
         this.off(this.device.device);
+      } else {
+        this.on(this.device.device);
       }
     },
 
-    ...mapActions("devices", ["on", "off"])
-  }
+    ...mapActions("devices", ["on", "off"]),
+  },
 });
 
 export default DeviceWidget;

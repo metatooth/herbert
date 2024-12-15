@@ -42,7 +42,7 @@ export class Zone {
   meanTemperature(): number {
     let result = 0;
     if (this.meters.length !== 0) {
-      this.meters.forEach(meter => {
+      this.meters.forEach((meter) => {
         result = result + parseFloat(meter.temperature);
       });
       result = result / this.meters.length;
@@ -53,7 +53,7 @@ export class Zone {
   meanHumidity(): number {
     let result = 0;
     if (this.meters.length !== 0) {
-      this.meters.forEach(meter => {
+      this.meters.forEach((meter) => {
         result = result + parseFloat(meter.humidity);
       });
       result = result / this.meters.length;

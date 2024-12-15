@@ -18,17 +18,17 @@
 
 <script lang="ts">
 import Vue from "vue";
-import HerbertButton from "@/components/Button.vue";
+import HerbertButton from "@/components/HerbertButton.vue";
 
 const AddControls = Vue.extend({
   data() {
     return {
-      adding: false
+      adding: false,
     };
   },
 
   components: {
-    HerbertButton
+    HerbertButton,
   },
 
   methods: {
@@ -45,8 +45,8 @@ const AddControls = Vue.extend({
     cancel() {
       this.$emit("on-cancel");
       this.adding = false;
-    }
-  }
+    },
+  },
 });
 export default AddControls;
 </script>

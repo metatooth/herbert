@@ -7,7 +7,7 @@ import { RootState } from "../types";
 
 const state: ZonesState = {
   zones: [] as Zone[],
-  error: false
+  error: false,
 };
 
 const namespaced = true;
@@ -17,5 +17,5 @@ export const zones: Module<ZonesState, RootState> = {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

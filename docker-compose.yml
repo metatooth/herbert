@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres
+    image: postgres:13.15
     environment:
       POSTGRES_PASSWORD: bar
       POSTGRES_USER: postgres
@@ -10,7 +10,7 @@ services:
       - ./scripts/db:/docker-entrypoint-initdb.d
       - pgdata:/pgdata
     ports:
-      - '5432:5432'
+      - "5432:5432"
 
   api:
     image: herbert_server:latest
@@ -24,7 +24,7 @@ services:
       - ./src:/app/src
       - ./config:/app/config
     ports:
-      - '5000:5000'
+      - "5000:5000"
     depends_on:
       - db
 
@@ -39,7 +39,7 @@ services:
       - ./src:/app/src
       - ./config:/app/config
     ports:
-      - '2929:2929'
+      - "2929:2929"
     depends_on:
       - api
 
@@ -57,7 +57,7 @@ services:
     depends_on:
       - api
       - socket_server
-      
+
   client:
     image: herbert_client:latest
     build:
@@ -71,7 +71,7 @@ services:
       - api
       - socket_server
     ports:
-      - '8080:8080'
+      - "8080:8080"
 
   worker:
     image: herbert_worker:latest

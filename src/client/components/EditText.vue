@@ -33,17 +33,17 @@ const EditText = Vue.extend({
     text: String,
     size: String,
     label: String,
-    icon: String
+    icon: String,
   },
 
   components: {
-    HerbertButton
+    HerbertButton,
   },
 
   data() {
     return {
       edited: this.text,
-      editing: false
+      editing: false,
     };
   },
 
@@ -54,7 +54,7 @@ const EditText = Vue.extend({
         name = "text";
       }
       return name;
-    }
+    },
   },
 
   methods: {
@@ -70,8 +70,8 @@ const EditText = Vue.extend({
     cancel() {
       this.edited = this.text;
       this.editing = false;
-    }
-  }
+    },
+  },
 });
 export default EditText;
 </script>

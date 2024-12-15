@@ -11,5 +11,5 @@ export const getters: GetterTree<ConfigState, RootState> = {
   configsCount(state): number {
     const { configs } = state;
     return configs.length;
-  }
+  },
 };

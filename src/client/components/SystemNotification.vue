@@ -18,12 +18,12 @@ const Notification = Vue.extend({
     id: { type: String, default: "" },
     plug: { type: String, default: "" },
     message: { type: String, default: "" },
-    timestamp: { type: Date, default: new Date() }
+    timestamp: { type: Date, default: new Date() },
   },
 
   components: { Timestamp },
 
-  emits: ["delete-notification"]
+  emits: ["delete-notification"],
 });
 
 export default Notification;

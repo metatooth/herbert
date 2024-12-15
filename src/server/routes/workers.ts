@@ -6,7 +6,7 @@ import {
   readConfig,
   readWorker,
   readWorkers,
-  registerWorker
+  registerWorker,
 } from "../db";
 import { sendSocketMessage } from "../../shared/send-socket-message";
 

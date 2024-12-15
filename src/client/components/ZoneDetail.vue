@@ -9,19 +9,28 @@
 
     <div class="card-content">
       <nav class="level is-mobile">
-        <div class="level-item">
-          <zone-status-button :zone="zone" :locked="locked" />
-        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <zone-status-button :zone="zone" :locked="locked" />
+          </div>
 
-        <div class="level-item" v-if="zone.meters.length !== 0">
-          <p class="title" :style="temperatureStyle">
-            {{ temperature.toFixed(0) }}&#176;
-          </p>
+          <div class="level-item" v-if="zone.meters.length !== 0">
+            <p class="title" :style="temperatureStyle">
+              {{ temperature.toFixed(0) }}&#176;
+            </p>
+          </div>
+          <div class="level-item" v-if="zone.meters.length !== 0">
+            <p class="title" :style="humidityStyle">
+              {{ humidity.toFixed(0) }}%
+            </p>
+          </div>
         </div>
-        <div class="level-item" v-if="zone.meters.length !== 0">
-          <p class="title" :style="humidityStyle">{{ humidity.toFixed(0) }}%</p>
-        </div>
+        <div class="level-left" />
       </nav>
+    </div>
+
+    <div class="card-content">
+      <zone-chart :zone="zone" :units="settings.units" />
     </div>
 
     <div class="card-content">
@@ -65,18 +74,19 @@
 
     <footer class="card-footer">
       <div class="card-footer-item">
-        <readable class="is-italic" :timestamp="lastupdate" />
+        <readable-timestamp class="is-italic" :timestamp="lastupdate" />
       </div>
     </footer>
   </div>
 </template>
 
 <script lang="ts">
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import Vue from "vue";
 import { Zone } from "@/store/zones/types";
 import { mapGetters, mapActions } from "vuex";
 import NarrowTable from "@/components/NarrowTable.vue";
+import ZoneChart from "@/components/ZoneChart.vue";
 import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 
 import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
@@ -85,7 +95,7 @@ const ZoneDetail = Vue.extend({
   props: {
     zone: Zone,
     units: String,
-    locked: Boolean
+    locked: Boolean,
   },
 
   data() {
@@ -103,14 +113,15 @@ const ZoneDetail = Vue.extend({
       maxirrigators: parseInt(this.zone.maxirrigators),
       lamponleafdiff: lampon,
       lampoffleafdiff: lampoff,
-      now: new Date()
+      now: new Date(),
     };
   },
 
   components: {
     NarrowTable,
-    Readable,
-    ZoneStatusButton
+    ReadableTimestamp,
+    ZoneChart,
+    ZoneStatusButton,
   },
 
   computed: {
@@ -150,7 +161,7 @@ const ZoneDetail = Vue.extend({
 
     lastupdate() {
       let lastupdate;
-      this.zone.devices.forEach(d => {
+      this.zone.devices.forEach((d) => {
         if (d.updatedat < lastupdate) lastupdate = d.updatedat;
       });
       return lastupdate;
@@ -192,7 +203,7 @@ const ZoneDetail = Vue.extend({
     ...mapGetters("meters", ["meters"]),
     ...mapGetters("profiles", ["profiles"]),
     ...mapGetters("zones", ["zones"]),
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
@@ -203,14 +214,14 @@ const ZoneDetail = Vue.extend({
     clickDevice(device) {
       this.$router.push({
         name: "statuses",
-        params: { name: device.name, device: device.device }
+        params: { name: device.name, device: device.device },
       });
     },
 
     clickMeter(meter) {
       this.$router.push({
         name: "readings",
-        params: { name: meter.name, device: meter.device }
+        params: { name: meter.name, device: meter.device },
       });
     },
 
@@ -219,7 +230,7 @@ const ZoneDetail = Vue.extend({
     },
 
     lookupZone(id: string) {
-      const found = this.zones.filter(z => {
+      const found = this.zones.filter((z) => {
         return z.id === id;
       });
       return found[0];
@@ -231,9 +242,9 @@ const ZoneDetail = Vue.extend({
       "edit",
       "fetchData",
       "removeDevice",
-      "removeChild"
-    ])
-  }
+      "removeChild",
+    ]),
+  },
 });
 
 export default ZoneDetail;

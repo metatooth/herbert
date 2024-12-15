@@ -6,12 +6,12 @@ import { RootState } from "../types";
 export const actions: ActionTree<WorkersState, RootState> = {
   edit({ commit }, payload: Worker) {
     const json = JSON.stringify(payload);
-    HTTP.put(`/workers/${payload.worker}/config`, json).then(response => {
+    HTTP.put(`/workers/${payload.worker}/config`, json).then((response) => {
       commit("EDIT", Object.assign(new Worker(), response.data));
     });
   },
   fetchData({ commit }) {
-    HTTP.get("/workers").then(response => {
+    HTTP.get("/workers").then((response) => {
       const payload: Worker[] = [];
       response.data.forEach((json: object) => {
         if (json.camera) {
@@ -27,5 +27,5 @@ export const actions: ActionTree<WorkersState, RootState> = {
   remove({ commit }, payload: Worker) {
     HTTP.delete(`/workers/${payload.worker}`);
     commit("REMOVE", payload);
-  }
+  },
 };

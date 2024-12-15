@@ -6,20 +6,28 @@
       apt:
         update_cache: yes
         state: latest
-        name: [ 'xserver-xorg', 'xinit', 'x11-xserver-utils', 'chromium-browser', 'matchbox-window-manager', 'xautomation', 'unclutter' ]
+        name:
+          [
+            "xserver-xorg",
+            "xinit",
+            "x11-xserver-utils",
+            "chromium-browser",
+            "matchbox-window-manager",
+            "xautomation",
+            "unclutter",
+          ]
 
     - name: Create {{ appDir }}
       file:
-        path: '{{ appDir }}'
+        path: "{{ appDir }}"
         state: directory
 
     - name: Sync Herbert scripts
       synchronize:
-        src: '{{ srcDir }}/scripts'
-        dest: '{{ appDir }}'
+        src: "{{ srcDir }}/scripts"
+        dest: "{{ appDir }}"
         recursive: yes
         delete: yes
-
 
     - name: Add xinit to .bashrc
       blockinfile:

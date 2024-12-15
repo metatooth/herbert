@@ -93,5 +93,5 @@ export const mutations: MutationTree<ZonesState> = {
   ERROR(state) {
     state.error = true;
     state.zones = [];
-  }
+  },
 };

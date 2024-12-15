@@ -36,24 +36,24 @@ import { messageIsFrom } from "../../shared/type-guards";
 import { io, Socket } from "socket.io-client";
 import {
   makeErrorMessage,
-  makeSwitchStatusMessage
+  makeSwitchStatusMessage,
 } from "../../shared/message-creators";
 import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
 import Collection from "@/components/Collection.vue";
 
 const Overview = Vue.extend({
   props: {
-    filter: String
+    filter: String,
   },
 
   components: {
     Collection,
-    NotificationRow
+    NotificationRow,
   },
 
   computed: {
     activeSet() {
-      const active = this.zones.filter(el => {
+      const active = this.zones.filter((el) => {
         return el.nickname.match(this.filter);
       });
       return active.sort((a, b) => {
@@ -97,7 +97,7 @@ const Overview = Vue.extend({
 
     ...mapGetters("devices", ["devices"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   mounted() {
@@ -107,7 +107,7 @@ const Overview = Vue.extend({
     ws.emit("join", { room: "clients" });
     ws.on("message", (msg: AnySocketMessage) => {
       if (messageIsFrom(makeSwitchStatusMessage, msg)) {
-        const found = this.devices.filter(d => {
+        const found = this.devices.filter((d) => {
           return d.device === msg.payload.device;
         });
         if (found.length !== 0) {
@@ -123,7 +123,7 @@ const Overview = Vue.extend({
           action: msg.payload.action,
           code: msg.payload.code,
           message: msg.payload.message,
-          timestamp: new Date(Date.parse(msg.payload.timestamp))
+          timestamp: new Date(Date.parse(msg.payload.timestamp)),
         };
         this.add(n);
         return;
@@ -136,7 +136,7 @@ const Overview = Vue.extend({
       const check = Date.now();
       this.devices.forEach((d: Device) => {
         const local = convertToLocalTime(d.timestamp || new Date(), {
-          timeZone: "America/New_York"
+          timeZone: "America/New_York",
         });
         const diff = check - local.getTime();
         if (diff > 5 * 60 * 1000) {
@@ -148,7 +148,7 @@ const Overview = Vue.extend({
             code: "",
             plug: d.nickname || d.device,
             message: `Hasn't reported since ${formatted}`,
-            timestamp: new Date()
+            timestamp: new Date(),
           };
           this.add(n);
         }
@@ -172,8 +172,8 @@ const Overview = Vue.extend({
       return n.toString();
     },
 
-    ...mapActions("notifications", ["add", "remove"])
-  }
+    ...mapActions("notifications", ["add", "remove"]),
+  },
 });
 export default Overview;
 </script>

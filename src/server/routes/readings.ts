@@ -1,7 +1,6 @@
 import Router from "express-promise-router";
 
 import { createMeterFact, query } from "../db";
-import { Reading } from "../../shared/types";
 
 const router = Router();
 
@@ -30,31 +29,22 @@ router.get("/", async (req, res) => {
 
   const startDate = new Date(limit);
 
-  const start = startDate
-    .toISOString()
-    .slice(0, 19)
-    .replace("T", " ");
+  const start = startDate.toISOString().slice(0, 19).replace("T", " ");
 
   if (one) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
       [req.query.meter]
     );
     res.status(200).json(rows[0]);
   } else if (req.query.meter) {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM readings WHERE meter = $1 AND observedat > $2 ORDER BY id DESC",
       [req.query.meter, start]
     );
     res.status(200).json(rows);
   } else {
-    const {
-      rows
-    } = await query(
+    const { rows } = await query(
       "SELECT * FROM readings WHERE observedat > $1 ORDER BY id DESC",
       [start]
     );
@@ -64,7 +54,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   const { body } = req;
-  const { meter, temperature, humidity, pressure, ts } = body;
+  const { meter, temperature, humidity, ts } = body;
   const observedat = new Date(ts);
 
   await createMeterFact(meter, temperature, "CELSIUS", observedat);

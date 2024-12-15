@@ -210,7 +210,7 @@ const ThreeColumns = Vue.extend({
     left: [],
     middle: [],
     right: [],
-    type: String
+    type: String,
   },
 
   components: {
@@ -220,12 +220,12 @@ const ThreeColumns = Vue.extend({
     ZoneDetail,
     ZoneTile,
     WorkerTile,
-    ConfigTile
+    ConfigTile,
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
-  }
+    ...mapGetters("settings", ["settings"]),
+  },
 });
 
 export default ThreeColumns;

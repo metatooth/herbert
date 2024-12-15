@@ -1,5 +1,5 @@
 <template>
-  <sparkline :id="id" :data="humidities"> </sparkline>
+  <sparkline-display :id="id" :data="humidities" color="rgb(0,187,238)" />
 </template>
 
 <script lang="ts">
@@ -7,23 +7,23 @@ import Vue from "vue";
 
 import { Meter } from "@/store/meters/types";
 
-import Sparkline from "@/components/Sparkline.vue";
+import SparklineDisplay from "@/components/SparklineDisplay.vue";
 
 import { convertToLocalTime } from "date-fns-timezone";
 
 const HumidityFact = Vue.extend({
   props: {
-    meter: Meter
+    meter: Meter,
   },
 
   data() {
     return {
-      humidities: []
+      humidities: [],
     };
   },
 
   components: {
-    Sparkline
+    SparklineDisplay,
   },
 
   mounted() {
@@ -33,7 +33,7 @@ const HumidityFact = Vue.extend({
   computed: {
     id() {
       return `${this.meter.device}-humidity`;
-    }
+    },
   },
 
   methods: {
@@ -59,7 +59,7 @@ const HumidityFact = Vue.extend({
             }) => {
               const observedat = new Date(
                 d.year,
-                d.month,
+                d.month - 1,
                 d.date,
                 d.hour,
                 d.minute
@@ -67,7 +67,7 @@ const HumidityFact = Vue.extend({
 
               const humidity = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number
+                y: d.reading as number,
               };
 
               this.humidities.push(humidity);
@@ -77,8 +77,8 @@ const HumidityFact = Vue.extend({
       };
 
       xhr.send();
-    }
-  }
+    },
+  },
 });
 
 export default HumidityFact;

@@ -93,6 +93,14 @@ export interface MeterFact {
   units: string;
 }
 
+export interface StatusFact {
+  id: number;
+  dateid: number;
+  timeid: number;
+  device: string;
+  status: number;
+}
+
 export interface Reading {
   id: string;
   meter: string;
@@ -113,6 +121,7 @@ export interface Worker {
 
 export interface Zone {
   id: number;
+  active: boolean;
   nickname: string;
   maxirrigators: number;
   profile: Profile;
@@ -135,7 +144,7 @@ export enum SocketMessageType {
   Error = "ERROR",
   SendWorkerConfig = "SEND_WORKER_CONFIG",
   BroadcastAll = "BROADCAST_ALL",
-  SendByDeviceID = "SEND_BY_DEVICE_ID"
+  SendByDeviceID = "SEND_BY_DEVICE_ID",
 }
 
 // Represents a simple message consisting only of a type

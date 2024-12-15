@@ -16,6 +16,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   const { body } = req;
   const { macaddr, manufacturer } = body;
+  console.log("post /", macaddr, manufacturer);
   await registerMeter(macaddr, manufacturer);
   res.status(204).send();
 });

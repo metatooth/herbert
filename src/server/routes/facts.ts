@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
     req.query.units,
     limit.getFullYear(),
     limit.getMonth() + 1,
-    limit.getDate()
+    limit.getDate(),
   ]);
   const { rows } = await query<MeterFact>(
     "SELECT * FROM meter_facts \
@@ -25,11 +25,11 @@ WHERE meter = $1 AND units = $2 AND date_dim.year = $3 \
 AND date_dim.month = $4 AND date_dim.date = $5 \
 ORDER BY hour ASC, minute ASC",
     [
-      req.query.meter,
+      req.query.meter || req.query.device,
       req.query.units,
       limit.getFullYear(),
       limit.getMonth() + 1,
-      limit.getDate()
+      limit.getDate(),
     ]
   );
 

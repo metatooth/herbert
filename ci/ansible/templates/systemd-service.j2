@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/bin/node {{ service_file }}
-WorkingDirectory={{ appDir }}
+WorkingDirectory={{ app_dir }}
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
@@ -17,6 +17,7 @@ Environment=WSS_URL={{ wss_url | default("") }}
 Environment=WSS_PORT={{ wss_port | default("5000") }}
 Environment=CLIENT_URL={{ client_url | default("") }}
 Environment=CLIENT_PORT={{ client_port | default("8080") }}
+Environment=MONITOR_PORT={{ monitor_port | default("8081") }}
 
 [Install]
 WantedBy=multi-user.target

@@ -34,3 +34,7 @@ test("vapor pressure deficit", () => {
 test("relative humidity at 1718 pascals and 22 C", () => {
   expect(utils.relativeHumidity(1718, 22)).toBeCloseTo(0.65);
 });
+
+test("test vpd calc for 28.9, -1.67, and 75%", () => {
+  expect(utils.vaporPressureDeficit(28.9, -1.67, 0.75)).toBeCloseTo(1396, 0);
+});

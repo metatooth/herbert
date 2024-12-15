@@ -41,12 +41,12 @@ import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 
 const ZoneNarrow = Vue.extend({
   props: {
-    zone: Zone
+    zone: Zone,
   },
 
   data() {
     return {
-      now: new Date()
+      now: new Date(),
     };
   },
 
@@ -75,7 +75,7 @@ const ZoneNarrow = Vue.extend({
 
     lastupdate() {
       let last = null;
-      this.zone.meters.forEach(meter => {
+      this.zone.meters.forEach((meter) => {
         const updatedat = new Date(meter.updatedat);
         if (last === null || updatedat > last) {
           last = updatedat;
@@ -104,17 +104,17 @@ const ZoneNarrow = Vue.extend({
       return `color: ${this.temperatureColor};`;
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   methods: {
     clicked() {
       this.$router.push({
         name: "zone",
-        params: { id: this.zone.id }
+        params: { id: this.zone.id },
       });
-    }
-  }
+    },
+  },
 });
 
 export default ZoneNarrow;

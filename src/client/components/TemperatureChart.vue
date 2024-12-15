@@ -1,110 +1,99 @@
 <template>
-  <div>
-    <chart
-      :id="id"
-      v-bind:data="display"
-      title="Temperature"
-      v-bind:label="label"
-      v-bind:suggestedMin="suggestedMin"
-      v-bind:suggestedMax="suggestedMax"
-      v-bind:stepSize="stepSize"
-      v-bind:units="settings.units"
-    />
-  </div>
+  <canvas id="temperatures" />
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import Chart from "@/components/Chart.vue";
+import HTTP from "@/api/http";
+import { convertToLocalTime } from "date-fns-timezone";
+import ChartJS from "chart.js";
 import "chartjs-adapter-date-fns";
 
 const TemperatureChart = Vue.extend({
   props: {
-    id: { type: String },
-    data: { type: Array }
+    meters: [],
   },
 
   data() {
     return {
-      display: [],
-      stepSize: 0.5,
-      minmax: [100, 0]
+      chart: ChartJS,
     };
   },
 
-  components: {
-    Chart
-  },
-
   computed: {
-    label() {
-      if (this.settings.units === "C") {
-        return "Celsius (°C)";
-      } else if (this.settings.units === "F") {
-        return "Fahrenheit (°F)";
-      }
-
-      return "Kelvin (°K)";
-    },
-
-    suggestedMin() {
-      if (this.minmax[0] === 0) {
-        this.calcminmax();
-      }
-      return this.minmax[0];
-    },
-
-    suggestedMax() {
-      if (this.minmax[1] === 100) {
-        this.calcminmax();
-      }
-      return this.minmax[1];
-    },
-
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
-  watch: {
-    data() {
-      this.display = [];
-      let x, y;
-      this.data.forEach(d => {
-        x = d.x;
-        if (this.settings.units === "C") {
-          y = d.y;
-        } else if (this.settings.units === "F") {
-          y = (d.y * 9) / 5 + 32;
-        } else {
-          y = d.y + 273.15;
+  mounted() {
+    const ctx = document.getElementById("temperatures");
+    this.chart = new ChartJS(ctx, {
+      type: "line",
+      options: {
+        responsive: true,
+        legend: {
+          display: false,
+        },
+        elements: { point: { radius: 0 } },
+        scales: {
+          xAxes: [
+            {
+              display: true,
+              type: "time",
+              time: {
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
+          ],
+          yAxes: [
+            {
+              display: true,
+            },
+          ],
+        },
+      },
+    });
+
+    const timeZone = this.settings.timezone;
+
+    this.meters.forEach((m) => {
+      HTTP.get(`/facts?meter=${m.device}&units=CELSIUS`).then((resp) => {
+        const temperatures = [];
+
+        resp.data.forEach((d) => {
+          const observedat = new Date(
+            d.year,
+            d.month - 1,
+            d.date,
+            d.hour,
+            d.minute
+          );
+
+          const temperature = {
+            x: convertToLocalTime(observedat, { timeZone }),
+            y: d.reading as number,
+          };
+          temperatures.push(temperature);
+        });
+
+        let color = "#ff7700";
+        if (m.manufacturer === "OpenWeather") {
+          color = "#aa2200";
         }
 
-        if (y < this.minmax[0]) {
-          this.minmax[0] = y;
-        }
+        this.chart.data.datasets.push({
+          data: temperatures,
+          borderColor: color,
+          fill: false,
+        });
 
-        if (y > this.minmax[1]) {
-          this.minmax[1] = y;
-        }
-
-        this.display.push({ x: x, y: y });
+        this.chart.update();
       });
-    }
+    });
   },
-
-  methods: {
-    calcminmax() {
-      this.data.forEach(d => {
-        if (d.y < this.minmax[0]) {
-          this.minmax[0] = d.y;
-        }
-
-        if (d.y > this.minmax[1]) {
-          this.minmax[1] = d.y;
-        }
-      });
-    }
-  }
 });
+
 export default TemperatureChart;
 </script>
+
+<style scoped></style>

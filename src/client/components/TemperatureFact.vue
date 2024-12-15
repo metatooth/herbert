@@ -1,5 +1,11 @@
 <template>
-  <sparkline :id="id" :data="temperatures" :width="width" :height="height" />
+  <sparkline-display
+    :id="id"
+    :data="temperatures"
+    color="rgb(255,119,0)"
+    :width="width"
+    :height="height"
+  />
 </template>
 
 <script lang="ts">
@@ -7,7 +13,7 @@ import Vue from "vue";
 
 import { Meter } from "@/store/meters/types";
 
-import Sparkline from "@/components/Sparkline.vue";
+import SparklineDisplay from "@/components/SparklineDisplay.vue";
 
 import { convertToLocalTime } from "date-fns-timezone";
 
@@ -20,17 +26,17 @@ const TemperatureFact = Vue.extend({
   props: {
     meter: Meter,
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" }
+    height: { type: String, default: "50px" },
   },
 
   data() {
     return {
-      temperatures: [] as Fact[]
+      temperatures: [] as Fact[],
     };
   },
 
   components: {
-    Sparkline
+    SparklineDisplay,
   },
 
   mounted() {
@@ -40,7 +46,7 @@ const TemperatureFact = Vue.extend({
   computed: {
     id() {
       return `${this.meter.device}-temperature`;
-    }
+    },
   },
 
   methods: {
@@ -73,7 +79,7 @@ const TemperatureFact = Vue.extend({
               );
               const temperature = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number
+                y: d.reading as number,
               };
 
               this.temperatures.push(temperature);
@@ -83,8 +89,8 @@ const TemperatureFact = Vue.extend({
       };
 
       xhr.send();
-    }
-  }
+    },
+  },
 });
 
 export default TemperatureFact;

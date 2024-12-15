@@ -1,6 +1,18 @@
 <template>
-  <div class="container" ref="zonepage">
-    <back-to-dashboard />
+  <div class="card">
+    <div class="card-header">
+      <div class="card-header-title">
+        <p class="title"></p>
+        <p class="subtitle"></p>
+      </div>
+      <div class="card-header-icon">
+        <router-link :to="{ name: 'dashboard' }">
+          <span class="icon">
+            <font-awesome-icon icon="times-circle" />
+          </span>
+        </router-link>
+      </div>
+    </div>
     <div class="card" v-if="editing">
       <div class="card-header">
         <div class="card-header-title">
@@ -33,8 +45,9 @@
                       v-for="profile in profiles"
                       :key="profile.id"
                       :value="profile.id"
-                      >{{ profile.profile }}</option
                     >
+                      {{ profile.profile }}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -95,8 +108,9 @@
                       v-for="meter in meters"
                       :key="meter.device"
                       :value="meter.device"
-                      >{{ meter.name }}</option
                     >
+                      {{ meter.name }}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -119,8 +133,9 @@
                       v-for="device in devices"
                       :key="device.device"
                       :value="device.device"
-                      >{{ device.name }}</option
                     >
+                      {{ device.name }}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -143,8 +158,9 @@
                       v-for="zone in zones"
                       :key="zone.id"
                       :value="zone.id"
-                      >{{ zone.nickname }}</option
                     >
+                      {{ zone.nickname }}
+                    </option>
                   </select>
                 </div>
               </div>
@@ -176,15 +192,13 @@
 import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
-import BackToDashboard from "@/components/BackToDashboard.vue";
 import ZoneDetail from "@/components/ZoneDetail.vue";
 import EditControls from "@/components/EditControls.vue";
 
 const ZonePage = Vue.extend({
   components: {
-    BackToDashboard,
     EditControls,
-    ZoneDetail
+    ZoneDetail,
   },
 
   data() {
@@ -197,7 +211,7 @@ const ZonePage = Vue.extend({
       zonemeters: [],
       zonedevices: [],
       zonechildren: [],
-      editing: false
+      editing: false,
     };
   },
 
@@ -215,15 +229,15 @@ const ZonePage = Vue.extend({
 
     this.maxirrigators = this.zone.maxirrigators;
 
-    this.zone.meters.forEach(m => {
+    this.zone.meters.forEach((m) => {
       this.zonemeters.push(m.device);
     });
 
-    this.zone.devices.forEach(d => {
+    this.zone.devices.forEach((d) => {
       this.zonedevices.push(d.device);
     });
 
-    this.zone.children.forEach(c => {
+    this.zone.children.forEach((c) => {
       this.zonechildren.push(c);
     });
   },
@@ -235,7 +249,7 @@ const ZonePage = Vue.extend({
 
     zone() {
       const id = this.$route.params.id;
-      const z = this.zones.filter(z => {
+      const z = this.zones.filter((z) => {
         return z.id === id;
       });
       return z[0];
@@ -245,7 +259,7 @@ const ZonePage = Vue.extend({
     ...mapGetters("profiles", ["profiles"]),
     ...mapGetters("zones", ["zones"]),
     ...mapGetters("devices", ["devices"]),
-    ...mapGetters("meters", ["meters"])
+    ...mapGetters("meters", ["meters"]),
   },
 
   methods: {
@@ -270,7 +284,7 @@ const ZonePage = Vue.extend({
         maxirrigators: this.maxirrigators,
         meters: this.zonemeters,
         devices: this.zonedevices,
-        children: this.zonechildren
+        children: this.zonechildren,
       };
       this.edit(zone);
       this.editing = false;
@@ -287,8 +301,8 @@ const ZonePage = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("zones", ["edit", "remove"])
-  }
+    ...mapActions("zones", ["edit", "remove"]),
+  },
 });
 
 export default ZonePage;

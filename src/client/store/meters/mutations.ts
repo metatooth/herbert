@@ -30,5 +30,5 @@ export const mutations: MutationTree<MetersState> = {
   METERS_ERROR(state) {
     state.error = true;
     state.meters = [];
-  }
+  },
 };

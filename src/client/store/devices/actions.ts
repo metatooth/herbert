@@ -6,12 +6,12 @@ import { RootState } from "../types";
 export const actions: ActionTree<DevicesState, RootState> = {
   edit({ commit }, payload: Device) {
     const json = JSON.stringify(payload);
-    HTTP.put(`/devices/${payload.device}`, json).then(response => {
+    HTTP.put(`/devices/${payload.device}`, json).then((response) => {
       commit("EDIT", Object.assign(new Device(), response.data));
     });
   },
   fetchData({ commit }) {
-    HTTP.get("/devices").then(response => {
+    HTTP.get("/devices").then((response) => {
       const payload: Device[] = [];
       response.data.forEach((json: object) => {
         payload.push(Object.assign(new Device(), json));
@@ -30,5 +30,5 @@ export const actions: ActionTree<DevicesState, RootState> = {
   remove({ commit }, payload: Device) {
     HTTP.delete(`/devices/${payload.device}`);
     commit("REMOVE", payload);
-  }
+  },
 };

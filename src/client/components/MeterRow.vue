@@ -16,7 +16,7 @@
         <div class="is-size-5">{{ meter.name }}</div>
         <div class="is-size-7">{{ meter.device }}</div>
         <em
-          ><readable
+          ><readable-timestamp
             class="is-size-7"
             :timestamp="new Date(Date.parse(meter.timestamp))"
         /></em>
@@ -26,7 +26,7 @@
       {{ zonename }}
     </td>
     <td>
-      <meter-actual :meter="meter" :units="units" />
+      <meter-actual :meter="meter" :units="units" width="500px" />
     </td>
     <td>
       <edit-controls
@@ -35,6 +35,7 @@
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
+        :stacked="true"
       />
     </td>
   </tr>
@@ -46,14 +47,14 @@ import { mapActions, mapGetters } from "vuex";
 
 import EditControls from "@/components/EditControls.vue";
 import MeterActual from "@/components/MeterActual.vue";
-import Readable from "@/components/Readable.vue";
+import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 import { Meter } from "@/store/meters/types";
 
 const MeterRow = Vue.extend({
   props: {
     meter: Meter,
     locked: Boolean,
-    units: String
+    units: String,
   },
 
   data() {
@@ -61,26 +62,26 @@ const MeterRow = Vue.extend({
       nickname: this.meter.nickname,
       updatedat: new Date(Date.parse(this.meter.updatedat)),
       updating: false,
-      editing: false
+      editing: false,
     };
   },
 
   components: {
     EditControls,
     MeterActual,
-    Readable
+    ReadableTimestamp,
   },
 
   watch: {
     meter() {
       this.updating = false;
-    }
+    },
   },
 
   computed: {
     zone() {
-      const found = this.zones.filter(zone => {
-        const meters = zone.meters.filter(meter => {
+      const found = this.zones.filter((zone) => {
+        const meters = zone.meters.filter((meter) => {
           return this.meter.device === meter.device;
         });
         return meters.length !== 0;
@@ -105,7 +106,7 @@ const MeterRow = Vue.extend({
       return "";
     },
 
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
@@ -116,7 +117,7 @@ const MeterRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.meter,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
@@ -132,8 +133,8 @@ const MeterRow = Vue.extend({
       }
     },
 
-    ...mapActions("meters", ["edit", "remove"])
-  }
+    ...mapActions("meters", ["edit", "remove"]),
+  },
 });
 
 export default MeterRow;

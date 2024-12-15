@@ -11,5 +11,5 @@ export const getters: GetterTree<WorkersState, RootState> = {
   workersCount(state): number {
     const { workers } = state;
     return workers.length;
-  }
+  },
 };
