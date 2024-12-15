@@ -212,28 +212,6 @@ export class App {
     App.instance = undefined;
   }
 
-  private readonly switchBotHandler = async (
-    ad: WoSensorTH
-  ): Promise<boolean> => {
-    console.log("switchbot handler", ad.id);
-    let meter = this.meters.find(el => {
-      return el.device === ad.id;
-    });
-
-    if (!meter) {
-      meter = new Meter(ad.id, "SwitchBot");
-      this.meters.push(meter);
-    }
-
-    meter.clime.temperature = ad.serviceData.temperature.c;
-    meter.clime.humidity = ad.serviceData.humidity / 100.0;
-    meter.clime.timestamp = new Date();
-
-    this.meterStatus(meter);
-
-    return Promise.resolve(true);
-  };
-
   private async initDevices(config) {
     console.log("= init devices config", config);
     //    const parsed = JSON.parse(config);
