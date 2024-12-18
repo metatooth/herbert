@@ -1,6 +1,6 @@
 import Router from "express-promise-router";
 
-import { createMeterFact, createStatusFact, query, readDevice } from "../db";
+import { createStatus, query, readAccount } from "../db";
 
 const router = Router();
 
@@ -52,28 +52,31 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  console.log("POST /statuses/");
   const { body } = req;
   const { device, status, ts } = body;
   const observedat = new Date(ts);
-  console.log("STATUS?", status);
-  const val = status === "on" ? 1 : 0;
 
-  console.log("QUERY FOR", device);
+  const { rows } = await query(
+    "SELECT * FROM statuses WHERE device = $1 ORDER BY id DESC LIMIT 1",
+    [device]
+  );
 
-  const dev = await readDevice(device);
+  if (rows.length !== 0) {
+    const last = observedat.getTime();
+    const curr = new Date(rows[0]["observedat"]).getTime();
 
-  console.log("this device is", dev);
+    const account = await readAccount(1);
 
-  if (dev.devicetype === "meter") {
-    await createMeterFact(device, val, "STATUS", observedat);
+    if (last - curr >= account.reportingperiod) {
+      await createStatus(device, status, observedat);
+      res.status(204).send();
+    } else {
+      res.status(201).send();
+    }
   } else {
-    await createStatusFact(device, status, observedat);
+    await createStatus(device, status, observedat);
+    res.status(204).send();
   }
-
-  console.log("done");
-
-  res.status(204).send();
 });
 
 export default router;

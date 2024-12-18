@@ -22,13 +22,11 @@ export class Herbert extends Switch {
   }
 
   public status() {
-    console.log("herbert gpio", this.pin, this.state);
     if (this.output.readSync() === 1) {
       this.state = "on";
     } else {
       this.state = "off";
     }
-   console.log("herbert gpio", this.pin, this.state);
     return this;
   }
 }

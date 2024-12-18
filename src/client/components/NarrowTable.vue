@@ -12,7 +12,6 @@
         v-for="(item, index) in items"
         :key="`item-${index}`"
         :device="item"
-        :locked="locked"
       />
     </div>
     <div v-if="type === 'meter'">
@@ -60,7 +59,6 @@ const NarrowTable = Vue.extend({
   props: {
     items: [],
     type: String,
-    locked: Boolean,
   },
 
   components: {

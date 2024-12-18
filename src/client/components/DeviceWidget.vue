@@ -77,11 +77,9 @@ const DeviceWidget = Vue.extend({
     },
 
     tagClass() {
-      console.log("check for notifications");
       const found = this.notifications.find((n: Notification) => {
         return n.id === this.device.device;
       });
-      console.log("any?", found);
       if (found) {
         return "has-text-danger";
       } else if (this.device.status === "off" || this.device.status === "0") {
@@ -107,8 +105,6 @@ const DeviceWidget = Vue.extend({
         this.on(this.device.device);
       } else if (this.device.status === "on") {
         this.off(this.device.device);
-      } else {
-        this.on(this.device.device);
       }
     },
 

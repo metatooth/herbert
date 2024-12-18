@@ -29,8 +29,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
-import { io, Socket } from "socket.io-client";
-import { makeMeterStatusMessage } from "../../shared/message-creators";
 
 import Openweathermap from "../api/openweathermap";
 
@@ -42,7 +40,6 @@ const CurrentConditions = Vue.extend({
       temperature: Number,
       humidity: Number,
       main: String,
-      socket: Socket,
     };
   },
 
@@ -77,8 +74,6 @@ const CurrentConditions = Vue.extend({
   },
 
   mounted() {
-    this.socket = io(process.env.VUE_APP_WSS_URL);
-
     this.refresh();
   },
 
@@ -101,25 +96,10 @@ const CurrentConditions = Vue.extend({
           this.humidity = res.data.main.humidity;
           this.main = res.data.weather[0].main;
           this.ready = true;
-
-          let mac = this.settings.openweather.slice(-12);
-          mac = mac.replace(/(.{2})/g, "$1:");
-          mac = mac.split(":").slice(0, -1).join(":");
-
-          const msg = makeMeterStatusMessage({
-            device: mac,
-            type: "meter",
-            manufacturer: "OpenWeather",
-            temperature: this.temperature,
-            humidity: this.humidity / 100,
-            timestamp: new Date().toString(),
-          });
-
-          this.socket.emit("message", msg);
         });
       }
 
-      const refresh = this.settings.refresh ? this.settings.refresh : 60000;
+      const refresh = this.settings.refresh ? this.settings.refresh : 1000;
       setTimeout(this.refresh, refresh);
     },
   },
@@ -133,10 +113,5 @@ export default CurrentConditions;
   border-top-color: #efefef;
   border-top-width: 2px;
   border-top-style: solid;
-}
-
-.title,
-.subtitle {
-  color: #00dd77;
 }
 </style>

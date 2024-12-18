@@ -1,18 +1,8 @@
 <template>
-  <div>
-    <nav class="level">
-      <div class="level-item">
-        <temperature-fact :meter="meter" :width="width" :height="height" />
-      </div>
-      <div class="level-item">{{ temperature.toFixed(0) }}&#176;</div>
-    </nav>
-    <nav class="level">
-      <div class="level-item">
-        <humidity-fact :meter="meter" :width="width" :height="height" />
-      </div>
-      <div class="level-item">{{ humidity.toFixed(0) }}%</div>
-    </nav>
-  </div>
+  <span>
+    <span class="title"> {{ temperature.toFixed(0) }}&#176; </span>
+    <span class="title"> {{ humidity.toFixed(0) }}% </span>
+  </span>
 </template>
 
 <script lang="ts">
@@ -21,28 +11,17 @@ import { mapGetters } from "vuex";
 
 import { Meter } from "@/store/meters/types";
 
-import HumidityFact from "@/components/HumidityFact.vue";
-import TemperatureFact from "@/components/TemperatureFact.vue";
-
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
 const MeterActual = Vue.extend({
   props: {
     meter: Meter,
-    units: String,
-    width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" },
   },
 
   data() {
     return {
       ts: new Date(),
     };
-  },
-
-  components: {
-    HumidityFact,
-    TemperatureFact,
   },
 
   computed: {

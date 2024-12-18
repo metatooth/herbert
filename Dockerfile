@@ -1,16 +1,12 @@
-FROM node:18-alpine3.16 AS base
-
-RUN apk update && apk add python3 make g++
-
-RUN npm update -g npm
+FROM node:14.17.4 as base
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
 
-RUN npm install
+RUN npm install --unsafe-perms
 
-FROM base AS client
+FROM base as client
 
 COPY src/client ./src/client
 COPY src/shared src/shared
@@ -27,7 +23,7 @@ RUN npm run build:client
 
 CMD ["npm", "run", "serve:client"]
 
-FROM base AS server
+FROM base as server
 
 COPY config ./config
 COPY src/server ./src/server
@@ -38,18 +34,7 @@ RUN npm run build:server
 
 CMD ["npm", "run", "serve:server"]
 
-FROM base AS controller
-
-COPY config ./config
-COPY src/controller ./src/controller
-COPY src/shared src/shared
-COPY tsconfig.json tsconfig.base.json ./
-
-RUN npm run build:controller
-
-CMD ["npm", "run", "serve:controller"]
-
-FROM base AS socket-server
+FROM base as socket-server
 
 COPY config ./config
 COPY src/socket-server ./src/socket-server
@@ -60,9 +45,14 @@ RUN npm run build:socket-server
 
 CMD ["npm", "run", "serve:socket-server"]
 
-FROM base AS worker
+FROM base as worker
 
-RUN apk add gnome-bluetooth
+RUN apt update \
+  && apt install -y \
+  bluetooth \
+  bluez \
+  libbluetooth-dev \
+  libudev-dev
 
 COPY src/worker ./src/worker
 COPY src/shared src/shared

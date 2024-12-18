@@ -9,32 +9,23 @@
 
     <div class="card-content">
       <nav class="level is-mobile">
-        <div class="level-right">
-          <div class="level-item">
-            <zone-status-button :zone="zone" :locked="locked" />
-          </div>
-
-          <div class="level-item" v-if="zone.meters.length !== 0">
-            <p class="title" :style="temperatureStyle">
-              {{ temperature.toFixed(0) }}&#176;
-            </p>
-          </div>
-          <div class="level-item" v-if="zone.meters.length !== 0">
-            <p class="title" :style="humidityStyle">
-              {{ humidity.toFixed(0) }}%
-            </p>
-          </div>
+        <div class="level-item">
+          <zone-status-button :zone="zone" :locked="false" />
         </div>
-        <div class="level-left" />
+
+        <div class="level-item" v-if="zone.meters.length !== 0">
+          <p class="title" :style="temperatureStyle">
+            {{ temperature.toFixed(0) }}&#176;
+          </p>
+        </div>
+        <div class="level-item" v-if="zone.meters.length !== 0">
+          <p class="title" :style="humidityStyle">{{ humidity.toFixed(0) }}%</p>
+        </div>
       </nav>
     </div>
 
     <div class="card-content">
-      <zone-chart :zone="zone" :units="settings.units" />
-    </div>
-
-    <div class="card-content">
-      <narrow-table :items="zone.devices" :locked="locked" type="device" />
+      <narrow-table :items="zone.devices" type="device" />
     </div>
 
     <div class="card-content">
@@ -74,19 +65,18 @@
 
     <footer class="card-footer">
       <div class="card-footer-item">
-        <readable-timestamp class="is-italic" :timestamp="lastupdate" />
+        <readable class="is-italic" :timestamp="lastupdate" />
       </div>
     </footer>
   </div>
 </template>
 
 <script lang="ts">
-import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
+import Readable from "@/components/Readable.vue";
 import Vue from "vue";
 import { Zone } from "@/store/zones/types";
 import { mapGetters, mapActions } from "vuex";
 import NarrowTable from "@/components/NarrowTable.vue";
-import ZoneChart from "@/components/ZoneChart.vue";
 import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 
 import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
@@ -95,7 +85,6 @@ const ZoneDetail = Vue.extend({
   props: {
     zone: Zone,
     units: String,
-    locked: Boolean,
   },
 
   data() {
@@ -119,8 +108,7 @@ const ZoneDetail = Vue.extend({
 
   components: {
     NarrowTable,
-    ReadableTimestamp,
-    ZoneChart,
+    Readable,
     ZoneStatusButton,
   },
 

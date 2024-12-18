@@ -1,16 +1,35 @@
 - hosts: socket_servers
 
+  vars:
+    - nodejs_version: "14.x"
+    - service_description: "Main socket-server for the herbert system"
+    - service_user: root
+    - service_file: dist/socket-server/main.js
+
   tasks:
-    - name: Create {{ app_dir }} on host
-      file: "{{ app_dir }}"
-      state: directory
+    - name: Install System Dependencies
+      become: yes
+      apt:
+        update_cache: yes
+        state: latest
+        name: ["git", "gcc", "g++", "make"]
+
+    - name: Create {{ appDir }}
+      file:
+        path: "{{ appDir }}"
+        state: directory
+
+    - name: Create {{ appDir }}/dist
+      file:
+        path: "{{ appDir }}/dist"
+        state: directory
 
     - name: Sync herbert dist
       synchronize:
-        src: "{{ dist_dir }}/dist.tar.gz"
-        dest: "{{ app_dir }}/dist.tar.gz"
-        recursive: true
-        delete: true
+        src: "{{ distDir }}/socket-server"
+        dest: "{{ appDir }}/dist"
+        recursive: yes
+        delete: yes
 
     - name: Sync herbert shared
       synchronize:

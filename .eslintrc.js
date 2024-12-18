@@ -5,13 +5,13 @@ module.exports = {
   },
   extends: [
     "plugin:vue/essential",
-    "plugin:prettier/recommended",
     "eslint:recommended",
     "@vue/typescript/recommended",
     "@vue/prettier",
+    "@vue/prettier/@typescript-eslint",
   ],
   parserOptions: {
-    ecmaVersion: 2020,
+    ecmaVersion: 2015,
   },
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",

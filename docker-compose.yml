@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:13.15
+    image: postgres
     environment:
       POSTGRES_PASSWORD: bar
       POSTGRES_USER: postgres
@@ -42,21 +42,6 @@ services:
       - "2929:2929"
     depends_on:
       - api
-
-  controller:
-    image: herbert_controller:latest
-    build:
-      context: .
-      target: controller
-    environment:
-      API_URL: http://api:5000
-      WSS_URL: ws://socket_server:2929
-    volumes:
-      - ./src:/app/src
-      - ./config:/app/config
-    depends_on:
-      - api
-      - socket_server
 
   client:
     image: herbert_client:latest

@@ -1,10 +1,10 @@
 - hosts: workers
 
   vars:
-    nodejs_version: "18.x"
-    service_description: "Herbert in-room worker service"
-    service_user: root
-    service_file: dist/worker/main.js
+    - nodejs_version: "14.x"
+    - service_description: "Herbert in-room worker service"
+    - service_user: root
+    - service_file: dist/worker/main.js
 
   tasks:
     - name: Enable I2C
@@ -79,60 +79,53 @@
     - name: Create the LG controller file
       become: yes
       copy:
-        src: "{{ src_dir }}/scripts/AKB73016012.licrd.conf"
+        src: "{{ srcDir }}/scripts/AKB73016012.licrd.conf"
         dest: /etc/lirc/lircd.conf.d/lg.lircd.conf
 
     - name: Create the B+D controller file
       become: yes
       copy:
-        src: "{{ src_dir }}/scripts/810900812A.licrd.conf"
+        src: "{{ srcDir }}/scripts/810900812A.licrd.conf"
         dest: /etc/lirc/lircd.conf.d/b+d.lircd.conf
-
-    - name: Create motion configuration
-      become: yes
-      copy:
-        src: "{{ src_dir }}/scripts/motion.conf"
-        dest: /etc/motion/motion.conf
-
-    - name: Create {{ app_dir }}
+    - name: Create {{ appDir }}
       file:
-        path: "{{ app_dir }}"
+        path: "{{ appDir }}"
         state: directory
-    - name: Create {{ app_dir }}/dist
+    - name: Create {{ appDir }}/dist
       file:
-        path: "{{ app_dir }}/dist"
+        path: "{{ appDir }}/dist"
         state: directory
 
     - name: Sync herbert dist
       synchronize:
-        src: "{{ dist_dir }}/worker"
-        dest: "{{ app_dir }}/dist"
+        src: "{{ distDir }}/worker"
+        dest: "{{ appDir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert shared
       synchronize:
-        src: "{{ dist_dir }}/shared"
-        dest: "{{ app_dir }}/dist"
+        src: "{{ distDir }}/shared"
+        dest: "{{ appDir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert config
       synchronize:
-        src: "{{ src_dir }}/config"
-        dest: "{{ app_dir }}"
+        src: "{{ srcDir }}/config"
+        dest: "{{ appDir }}"
         recursive: yes
         delete: yes
 
     - name: Sync herbert package.json
       synchronize:
-        src: "{{ src_dir }}/package.json"
-        dest: "{{ app_dir }}"
+        src: "{{ srcDir }}/package.json"
+        dest: "{{ appDir }}"
 
     - name: Sync herbert package-lock.json
       synchronize:
-        src: "{{ src_dir }}/package-lock.json"
-        dest: "{{ app_dir }}"
+        src: "{{ srcDir }}/package-lock.json"
+        dest: "{{ appDir }}"
 
     - name: Install nodejs {{nodejs_version}}
       include_role:
@@ -143,17 +136,9 @@
     - name: Install production node_modules
       command: npm install
       args:
-        chdir: "{{ app_dir }}"
+        chdir: "{{ appDir }}"
       environment:
         NODE_ENV: production
-
-    - name: Enable and start motion service
-      become: yes
-      systemd:
-        name: motion
-        state: restarted
-        daemon_reload: yes
-        enabled: yes
 
     - name: Install worker service
       become: yes
@@ -176,6 +161,4 @@
       copy:
         dest: /home/{{ ansible_user }}/.bash_aliases
         content: |
-          alias restart='sudo systemctl restart herbert-worker'
-          alias status='sudo systemctl status herbert-worker'
           alias tail-worker='sudo journalctl -u herbert-worker -f'

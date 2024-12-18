@@ -126,7 +126,6 @@ export class HerbertSocket {
 
       if (data.payload) {
         const payload = JSON.parse(JSON.stringify(data.payload));
-        console.log("payload", payload);
         if (payload.device) {
           ws.join(`devices:${payload.device}`);
         }
@@ -241,10 +240,7 @@ export class HerbertSocket {
         data: body,
       });
 
-      console.log("DID POST /devices", body);
-
       const resp = await HTTP.get<Device>(`/devices/${payload.device}`);
-      console.log("DID GET /devices/:id", resp);
       const device = resp.data;
       const ts = new Date(device.timestamp).getTime();
       const diff = Date.parse(payload.timestamp) - ts;
@@ -255,13 +251,11 @@ export class HerbertSocket {
           status: payload.status,
           ts: payload.timestamp,
         };
-        console.log("READY TO POST /statuses", body);
         await HTTP({
           method: "post",
           url: "/statuses",
           data: body,
         });
-        console.log("DONE");
       }
     } catch (e) {
       console.error("handle switch status", e.message);
@@ -280,8 +274,6 @@ export class HerbertSocket {
         url: "/meters",
         data: body,
       });
-
-      console.log("handle meter status msg", body);
 
       const resp = await HTTP.get<Meter>(`/meters/${payload.device}`);
       const meter = resp.data;

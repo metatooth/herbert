@@ -33,7 +33,7 @@
       </div>
     </td>
     <td class="is-italic">
-      <readable-timestamp :timestamp="new Date(Date.parse(worker.updatedat))" />
+      <readable :timestamp="new Date(Date.parse(worker.updatedat))" />
     </td>
     <td>
       <edit-controls
@@ -52,7 +52,7 @@ import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
 import EditControls from "@/components/EditControls.vue";
-import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
+import Readable from "@/components/Readable.vue";
 import { Worker } from "@/store/workers/types";
 
 const WorkerRow = Vue.extend({
@@ -71,7 +71,7 @@ const WorkerRow = Vue.extend({
 
   components: {
     EditControls,
-    ReadableTimestamp,
+    Readable,
   },
 
   watch: {

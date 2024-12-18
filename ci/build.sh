@@ -69,9 +69,4 @@ if [ "${SERVICE}" = "worker" ]; then
   mkdir $DEPLOYMENT_DIR/scripts
   cp scripts/AKB73016012.licrd.conf $DEPLOYMENT_DIR/scripts/AKB73016012.licrd.conf
   cp scripts/810900812A.licrd.conf $DEPLOYMENT_DIR/scripts/810900812A.licrd.conf
-  cp scripts/motion.conf $DEPLOYMENT_DIR/scripts/motion.conf
 fi
-
-cd $DEPLOYMENT_DIR
-
-tar -czvf dist.tar.gz ./dist

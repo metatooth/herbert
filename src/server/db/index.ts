@@ -1,16 +1,12 @@
 import { Pool, QueryResult } from "pg";
 import {
   Account,
-  Config,
-  DateDim,
   Device,
   Meter,
-  MeterFact,
   Profile,
-  StatusFact,
-  TimeDim,
-  Worker,
   Zone,
+  Worker,
+  Config,
 } from "../../shared/types";
 
 const pool = new Pool({
@@ -25,131 +21,6 @@ export async function query<T>(text, params): Promise<QueryResult<T>> {
   //const duration = Date.now() - start;
   //console.log("executed query", { text, duration, rows: res.rowCount });
   return res;
-}
-
-export async function findOrCreateDateDim(date: Date): Promise<DateDim> {
-  return query<DateDim>(
-    "SELECT * FROM date_dim WHERE year = $1 AND month = $2 AND date = $3",
-    [date.getFullYear(), date.getMonth() + 1, date.getDate()]
-  ).then(async (res) => {
-    if (res.rowCount !== 0) {
-      return res.rows[0];
-    } else {
-      const { rows } = await query<DateDim>(
-        "INSERT INTO date_dim (year, month, date) VALUES ($1, $2, $3) RETURNING id",
-        [date.getFullYear(), date.getMonth() + 1, date.getDate()]
-      );
-
-      return query<DateDim>("SELECT * FROM date_dim WHERE id = $1", [
-        rows[0].id,
-      ]).then(async (res) => {
-        return res.rows[0];
-      });
-    }
-  });
-}
-
-export async function findOrCreateTimeDim(date: Date): Promise<TimeDim> {
-  return query<TimeDim>(
-    "SELECT * FROM time_dim WHERE hour = $1 AND minute = $2",
-    [date.getHours(), date.getMinutes()]
-  ).then(async (res) => {
-    if (res.rowCount !== 0) {
-      return res.rows[0];
-    } else {
-      const { rows } = await query<TimeDim>(
-        "INSERT INTO time_dim (hour, minute) VALUES ($1, $2) RETURNING id",
-        [date.getHours(), date.getMinutes()]
-      );
-
-      return query<TimeDim>("SELECT * FROM time_dim WHERE id = $1", [
-        rows[0].id,
-      ]).then(async (res) => {
-        return res.rows[0];
-      });
-    }
-  });
-}
-
-export async function createStatusFact(
-  device: string,
-  status: string,
-  observedat: Date
-): Promise<StatusFact> {
-  const datedim = await findOrCreateDateDim(observedat);
-  const timedim = await findOrCreateTimeDim(observedat);
-
-  await query(
-    "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
-    [status, device]
-  );
-
-  return query<StatusFact>(
-    "SELECT * FROM status_facts WHERE device = $1 AND dateid = $3 AND timeid = $4",
-    [device, datedim.id, timedim.id]
-  ).then(async (res) => {
-    if (res.rowCount === 0) {
-      return query<StatusFact>(
-        "INSERT INTO status_facts (device, dateid, timeid, status) VALUES ($1, $2, $3, $4) RETURNING id",
-        [device, datedim.id, timedim.id, status]
-      ).then(async (res) => {
-        return query<StatusFact>(
-          "SELECT * FROM status_facts WHERE id = $1",
-          res.rows[0].id
-        ).then(async (res) => {
-          return res.rows[0];
-        });
-      });
-    }
-  });
-}
-
-export async function createMeterFact(
-  meter: string,
-  reading: number,
-  units: string,
-  observedat: Date
-): Promise<MeterFact> {
-  const datedim = await findOrCreateDateDim(observedat);
-  const timedim = await findOrCreateTimeDim(observedat);
-
-  if (units === "CELSIUS") {
-    await query(
-      "UPDATE devices SET temperature = $1, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
-      [reading, meter]
-    );
-  } else if (units === "%RH") {
-    await query(
-      "UPDATE devices SET humidity = $1, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
-      [reading, meter]
-    );
-  }
-
-  return query<MeterFact>(
-    "SELECT * FROM meter_facts WHERE meter = $1 AND units = $2 AND dateid = $3 AND timeid = $4",
-    [meter, units, datedim.id, timedim.id]
-  ).then(async (res) => {
-    if (res.rowCount !== 0) {
-      return query<MeterFact>(
-        "UPDATE meter_facts SET reading = $1 WHERE id = $2",
-        [reading, res.rows[0].id]
-      ).then(async (res) => {
-        return res.rows[0];
-      });
-    } else {
-      return query<MeterFact>(
-        "INSERT INTO meter_facts (meter, dateid, timeid, reading, units) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-        [meter, datedim.id, timedim.id, reading, units]
-      ).then(async (res) => {
-        return query<MeterFact>(
-          "SELECT * FROM meter_facts WHERE id = $1",
-          res.rows[0].id
-        ).then(async (res) => {
-          return res.rows[0];
-        });
-      });
-    }
-  });
 }
 
 export async function readAccount(id: number): Promise<Account> {
@@ -256,7 +127,7 @@ export async function readZone(id: number) {
   });
 }
 
-export async function parentZone(id: number): Promise<Zone> {
+export async function parentZone(id: string): Promise<Zone> {
   const { rows } = await query<Zone>(
     "SELECT e.a as id FROM zones z INNER JOIN edges e ON z.id = e.b WHERE e.b = $1",
     [id]

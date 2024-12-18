@@ -30,9 +30,7 @@
       </div>
       <div class="content is-italic">
         Updated
-        <readable-timestamp
-          :timestamp="new Date(Date.parse(this.config.updatedat))"
-        />
+        <readable :timestamp="new Date(Date.parse(this.config.updatedat))" />
       </div>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
     </div>
@@ -43,7 +41,7 @@
 import Vue from "vue";
 
 import EditControls from "@/components/EditControls.vue";
-import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
+import Readable from "@/components/Readable.vue";
 import { Config } from "@/store/configs/types";
 import { mapActions } from "vuex";
 
@@ -63,7 +61,7 @@ const ConfigTile = Vue.extend({
 
   components: {
     EditControls,
-    ReadableTimestamp,
+    Readable,
   },
 
   computed: {

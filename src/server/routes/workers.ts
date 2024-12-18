@@ -8,7 +8,7 @@ import {
   readWorkers,
   registerWorker,
 } from "../db";
-import { sendSocketMessage } from "../../shared/send-socket-message";
+import { sendSocketMessage } from "../util";
 
 const router = Router();
 

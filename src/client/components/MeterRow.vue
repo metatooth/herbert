@@ -12,21 +12,28 @@
           />
         </div>
       </div>
-      <div v-else>
-        <div class="is-size-5">{{ meter.name }}</div>
-        <div class="is-size-7">{{ meter.device }}</div>
-        <em
-          ><readable-timestamp
-            class="is-size-7"
-            :timestamp="new Date(Date.parse(meter.timestamp))"
-        /></em>
-      </div>
+      <span class="is-size-5" v-else>
+        {{ meter.name }}
+      </span>
     </td>
     <td>
       {{ zonename }}
     </td>
     <td>
-      <meter-actual :meter="meter" :units="units" width="500px" />
+      <meter-actual :meter="meter" :units="units" />
+    </td>
+    <td class="is-italic">
+      <router-link
+        :to="{
+          name: 'readings',
+          params: { name: meter.nickname, device: meter.device },
+        }"
+      >
+        <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
+      </router-link>
+    </td>
+    <td class="is-size-5">
+      {{ meter.device }}
     </td>
     <td>
       <edit-controls
@@ -35,7 +42,6 @@
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
-        :stacked="true"
       />
     </td>
   </tr>
@@ -47,7 +53,7 @@ import { mapActions, mapGetters } from "vuex";
 
 import EditControls from "@/components/EditControls.vue";
 import MeterActual from "@/components/MeterActual.vue";
-import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
+import Readable from "@/components/Readable.vue";
 import { Meter } from "@/store/meters/types";
 
 const MeterRow = Vue.extend({
@@ -69,7 +75,7 @@ const MeterRow = Vue.extend({
   components: {
     EditControls,
     MeterActual,
-    ReadableTimestamp,
+    Readable,
   },
 
   watch: {

@@ -71,7 +71,7 @@
         </div>
       </div>
       <span class="field is-grouped" v-else>
-        <zone-target
+        <target
           icon="thermometer-half"
           :value="parseFloat(lampontemperature)"
           :precision="1"
@@ -80,7 +80,7 @@
           color="#ffe08a"
           simple="true"
         />
-        <zone-target
+        <target
           icon="tint"
           :value="parseFloat(lamponhumidity)"
           :precision="0"
@@ -122,7 +122,7 @@
         </div>
       </div>
       <span class="field is-grouped is-grouped-multiline" v-else>
-        <zone-target
+        <target
           icon="thermometer-half"
           :value="parseFloat(lampofftemperature)"
           :precision="1"
@@ -131,7 +131,7 @@
           color="#7a7a7a"
           simple="true"
         />
-        <zone-target
+        <target
           icon="tint"
           :value="parseFloat(lampoffhumidity)"
           :precision="0"
@@ -195,7 +195,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { mapActions } from "vuex";
-import ZoneTarget from "@/components/ZoneTarget.vue";
+import Target from "@/components/Target.vue";
 import EditControls from "@/components/EditControls.vue";
 import SelectControlType from "@/components/SelectControlType.vue";
 import {
@@ -203,6 +203,7 @@ import {
   celsius2kelvin,
   fahrenheit2celsius,
   kelvin2celsius,
+  vaporPressureDeficit,
 } from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 
@@ -258,7 +259,7 @@ const ProfileRow = Vue.extend({
   components: {
     EditControls,
     SelectControlType,
-    ZoneTarget,
+    Target,
   },
 
   computed: {

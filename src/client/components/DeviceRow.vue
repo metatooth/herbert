@@ -2,14 +2,7 @@
   <tr>
     <td>
       <span v-if="!editing">
-        <div class="is-size-3">{{ device.name }}</div>
-        <div class="is-size-5">{{ device.device }}</div>
-        <div class="is-size-7">
-          <em
-            ><readable-timestamp
-              :timestamp="new Date(Date.parse(device.updatedat))"
-          /></em>
-        </div>
+        {{ device.name }}
       </span>
       <div class="control" v-else>
         <input
@@ -24,18 +17,29 @@
       {{ zonename }}
     </td>
     <td>
-      <device-actual
-        v-if="!editing"
-        :device="device"
-        :locked="locked"
-        @on-toggle="toggle"
-      />
+      <button class="button" :disabled="locked" @click="toggle" v-if="!editing">
+        <font-awesome-icon :class="deviceClass" :icon="device.icon" />
+        <span>{{ device.devicetype }}</span>
+      </button>
       <div class="control" v-else>
         <select-device-type
           :devicetype="device.devicetype"
           @select-devicetype="saveDeviceType"
         />
       </div>
+    </td>
+    <td class="is-italic">
+      <router-link
+        :to="{
+          name: 'statuses',
+          params: { name: device.nickname, device: device.device },
+        }"
+      >
+        <readable :timestamp="new Date(Date.parse(device.updatedat))" />
+      </router-link>
+    </td>
+    <td>
+      {{ device.device }}
     </td>
     <td>
       <edit-controls
@@ -44,7 +48,6 @@
         @on-save="save"
         @on-destroy="destroy"
         @on-cancel="cancel"
-        :stacked="true"
       />
     </td>
   </tr>
@@ -56,9 +59,8 @@ import { mapActions, mapGetters, mapState } from "vuex";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
+import Readable from "@/components/Readable.vue";
 import EditControls from "@/components/EditControls.vue";
-import DeviceActual from "@/components/DeviceActual.vue";
 
 const DeviceRow = Vue.extend({
   props: {
@@ -76,10 +78,9 @@ const DeviceRow = Vue.extend({
   },
 
   components: {
-    DeviceActual,
     EditControls,
     SelectDeviceType,
-    ReadableTimestamp,
+    Readable,
   },
 
   computed: {
