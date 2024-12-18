@@ -1,6 +1,10 @@
 # Herbert
 
-An environment control system for Raspberry Pi, SwitchBot Meter, and WYZE PLUG.
+An environment control system for Raspberry Pi with support for:
+
+- Meross Plugs
+- SwitchBot TH Meters
+- ThermoPro TH Meters
 
 ## Getting Started
 
