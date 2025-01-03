@@ -1,10 +1,11 @@
 {
   "name": "herbert",
-  "version": "0.40.0",
+  "version": "0.41.0",
   "description": "automate your horticulture",
   "main": "index.js",
   "engines": {
-    "node": "14.16.1"
+    "node": "20.18.1",
+    "npm": "10.8.2"
   },
   "scripts": {
     "test": "NODE_ENV=unit_test WSS_URL=ws://localhost:5000 jest",
@@ -32,7 +33,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
-    "@fortawesome/vue-fontawesome": "^2.0.2",
+    "@fortawesome/vue-fontawesome": "^3.0.8",
     "@types/node": "^14.14.41",
     "axios": "^0.21.1",
     "body-parser": "^1.19.0",
@@ -47,20 +48,20 @@
     "date-fns-tz": "^1.1.3",
     "express": "^4.17.1",
     "express-promise-router": "^4.0.1",
-    "node-switchbot": "^1.0.0",
+    "meross-cloud": "^3.1.2",
+    "node-switchbot": "^3.4.3",
     "onoff": "^6.0.1",
     "pg": "^8.5.1",
+    "sass": "^1.83.0",
     "serve-favicon": "^2.5.0",
     "socket.io": "^4.2.0",
     "socket.io-client": "^4.2.0",
     "tslib": "^2.1.0",
-    "vue": "^2.6.11",
-    "vue-class-component": "^7.2.3",
+    "vue": "^3.5.13",
     "vue-cookies": "^1.7.4",
-    "vue-property-decorator": "^9.1.2",
     "vue-resize-directive": "^1.2.0",
     "vue-router": "^3.5.1",
-    "vuex": "^3.6.2",
+    "vuex": "^4.1.0",
     "ws": "^7.4.3"
   },
   "devDependencies": {
@@ -85,7 +86,6 @@
     "eslint-plugin-vue": "^6.2.2",
     "html-webpack-plugin": "^4.0.0",
     "jest": "^27.0.4",
-    "node-sass": "^6.0.1",
     "prettier": "^1.19.1",
     "sass-loader": "^10.1.1",
     "ts-jest": "^27.0.7",

@@ -70,6 +70,36 @@ export interface Profile {
   timestamp: Date;
 }
 
+export interface DateDim {
+  id: number;
+  year: number;
+  month: number;
+  date: number;
+}
+
+export interface TimeDim {
+  id: number;
+  hour: number;
+  minute: number;
+}
+
+export interface MeterFact {
+  id: number;
+  dateid: number;
+  timeid: number;
+  meter: string;
+  reading: number;
+  units: string;
+}
+
+export interface StatusFact {
+  id: number;
+  dateid: number;
+  timeid: number;
+  device: string;
+  status: number;
+}
+
 export interface Reading {
   id: string;
   meter: string;
@@ -110,7 +140,7 @@ export enum SocketMessageType {
   Error = "ERROR",
   SendWorkerConfig = "SEND_WORKER_CONFIG",
   BroadcastAll = "BROADCAST_ALL",
-  SendByDeviceID = "SEND_BY_DEVICE_ID",
+  SendByDeviceID = "SEND_BY_DEVICE_ID"
 }
 
 // Represents a simple message consisting only of a type

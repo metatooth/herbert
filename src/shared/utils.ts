@@ -128,7 +128,7 @@ export function color(diff, range): string {
   const c = [
     start[0] * alpha + (1 - alpha) * end[0],
     start[1] * alpha + (1 - alpha) * end[1],
-    start[2] * alpha + (1 - alpha) * end[2],
+    start[2] * alpha + (1 - alpha) * end[2]
   ];
 
   return "#" + convertToHex(c);
@@ -139,10 +139,37 @@ export function color(diff, range): string {
  * @param {number} n the number to check
  * @return {string} string representation with a leading zero (if needed)
  */
-
 export function zeroes(n: number): string {
   if (n < 10) {
     return `0${n}`;
   }
   return n.toString();
+}
+
+/**
+ * Confirms MAC address format
+ * @param {id} id the string to check
+ * @return {string} string representation of MAC address
+ */
+export function formatMacAddress(id: string) {
+  if (!id) {
+    return "";
+  }
+
+  if (id.length != 12 && id.length != 17) {
+    console.warn("bad format for mac address:", id);
+    return "";
+  }
+
+  // Remove all but alphanumeric characters
+  let mac = id.replace(/\W/gi, "").toLowerCase();
+
+  // Append a colon after every two characters
+  mac = mac.replace(/(.{2})/g, "$1:");
+
+  // remove trailing colon
+  return mac
+    .split(":")
+    .slice(0, -1)
+    .join(":");
 }

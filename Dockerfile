@@ -1,4 +1,4 @@
-FROM node:14.17.4 as base
+FROM node:20.18.1 AS base
 
 WORKDIR /app
 
@@ -6,7 +6,7 @@ COPY package.json package-lock.json ./
 
 RUN npm install --unsafe-perms
 
-FROM base as client
+FROM base AS client
 
 COPY src/client ./src/client
 COPY src/shared src/shared
@@ -23,7 +23,7 @@ RUN npm run build:client
 
 CMD ["npm", "run", "serve:client"]
 
-FROM base as server
+FROM base AS server
 
 COPY config ./config
 COPY src/server ./src/server
@@ -34,7 +34,7 @@ RUN npm run build:server
 
 CMD ["npm", "run", "serve:server"]
 
-FROM base as socket-server
+FROM base AS socket-server
 
 COPY config ./config
 COPY src/socket-server ./src/socket-server
@@ -45,7 +45,7 @@ RUN npm run build:socket-server
 
 CMD ["npm", "run", "serve:socket-server"]
 
-FROM base as worker
+FROM base AS worker
 
 RUN apt update \
   && apt install -y \

@@ -7,8 +7,8 @@
       </a>
       <div class="copyright has-text-centered is-size-7">
         <p>
-          {{ appVersion }} &#169;
-          <a href="https://metatooth.com">Metatooth</a> 2022
+          {{ appVersion }} &#169; 2024
+          <a href="https://metatooth.com">Metatooth</a>
         </p>
       </div>
     </footer>
@@ -23,8 +23,8 @@ const App = Vue.extend({
   computed: {
     appVersion() {
       return appPackage["version"];
-    },
-  },
+    }
+  }
 });
 export default App;
 </script>

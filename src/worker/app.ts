@@ -2,18 +2,15 @@ import { io, Socket } from "socket.io-client";
 import fs from "fs";
 import { networkInterfaces } from "os";
 
-import { Meter } from "./meter";
-import { MockMeter } from "./mock-meter";
-import { MockPlug } from "./mock-plug";
+import { Device } from "./device";
+import { DeviceFactory } from "./device-factory";
 import { Switch } from "./switch";
-import { Herbert } from "./herbert";
-import { SequentMicrosystems } from "./sequent-microsystems";
-import { IRSend } from "./i-r-send";
 import {
   AnySocketMessage,
   CommandPayload,
   SocketMessageMap
 } from "../shared/types";
+import { formatMacAddress } from "../shared/utils";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import {
   makeCommandMessage,
@@ -24,8 +21,6 @@ import {
   makeWorkerRegisterMessage,
   makeWorkerStatusMessage
 } from "../shared/message-creators";
-import Switchbot, { WoSensorTH } from "node-switchbot";
-import WebCamera from "./web-camera";
 
 try {
   fs.mkdirSync("./log");
@@ -35,14 +30,6 @@ try {
     process.exit(1);
   }
 }
-
-const isMockWorker = (): boolean => {
-  const envVar = process.env.NODE_ENV;
-  return (
-    envVar !== undefined &&
-    (envVar.toLowerCase() === "docker" || envVar.toLowerCase() === "unit_test")
-  );
-};
 
 interface ConfigDevice {
   id: string;
@@ -69,8 +56,7 @@ export class App {
   private closed = false;
   initialized = false;
   socket?: Socket<SocketMessageMap> = undefined;
-  meters: Array<Meter> = [];
-  switches: Array<Switch> = [];
+  devices: Array<Device> = [];
   macaddr = "";
   inet = "";
   camera = "";
@@ -123,47 +109,12 @@ export class App {
       return Promise.reject("app is not initialized");
     }
 
-    const cam = new WebCamera("8081");
-    cam.fetch().then(image => {
-      this.camera = (image as Buffer).toString("base64");
-    });
-
-    this.workerStatus();
-
-    const polling: number = 1000 * (this.config.polling || 5);
-    const interval: number = 1000 * (this.config.interval || 30);
-
-    console.log("RUN");
-
-    if (!isMockWorker()) {
-      const switchbot = new Switchbot();
-      switchbot.onadvertisement = this.switchBotHandler;
-      switchbot.startScan();
-      switchbot.wait(polling);
-      switchbot.stopScan();
-    }
-
-    this.meters.forEach(meter => {
-      if (meter.manufacturer === "mockmeter") {
-        const now = new Date().getTime();
-        meter.clime.temperature =
-          23.9 + 5 * Math.sin((2 * 3.14 * now) / 3600000);
-        meter.clime.humidity =
-          0.55 + 0.05 * Math.cos((2 * 3.14 * now) / 3600000);
-      }
-      this.meterStatus(meter);
-    });
-
-    this.switches.forEach(plug => {
-      this.switchStatus(plug.status());
-    });
-
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
       this.runTimeout = undefined;
     }
 
-    this.runTimeout = setTimeout(this.run, interval);
+    this.runTimeout = setTimeout(this.run, this.config.interval * 1000);
   };
 
   public stop() {
@@ -186,67 +137,16 @@ export class App {
     App.instance = undefined;
   }
 
-  private readonly switchBotHandler = async (
-    ad: WoSensorTH
-  ): Promise<boolean> => {
-    let meter = this.meters.find(el => {
-      return el.device === ad.id;
-    });
-
-    if (!meter) {
-      meter = new Meter(ad.id, "SwitchBot");
-      this.meters.push(meter);
-    }
-
-    meter.clime.temperature = ad.serviceData.temperature.c;
-    meter.clime.humidity = ad.serviceData.humidity / 100.0;
-    meter.clime.timestamp = new Date();
-
-    console.log("meter status", meter);
-    this.meterStatus(meter);
-
-    return Promise.resolve(true);
-  };
-
-  private async initDevices() {
-    const meters = [];
-    const switches = [];
-
-    const devices =
-      this.config && this.config.devices && Array.isArray(this.config.devices)
-        ? (this.config.devices as ConfigDevice[])
-        : ([] as ConfigDevice[]);
-
-    devices.forEach(async dev => {
-      const mac = this.formatMacAddress(dev.id);
-      if (dev.manufacturer === "herbert") {
-        if (dev.pin) {
-          switches.push(new Herbert(mac, parseInt(dev.pin)));
-        } else if (dev.board && dev.channel) {
-          switches.push(
-            new SequentMicrosystems(
-              mac,
-              parseInt(dev.board),
-              parseInt(dev.channel)
-            )
-          );
-        } else if (dev.remote && dev.mode) {
-          switches.push(new IRSend(mac, dev.remote, dev.mode));
-        }
-      } else if (dev.manufacturer === "mockmeter") {
-        const meter = new MockMeter(mac);
-        meters.push(meter);
-      } else if (dev.manufacturer === "mockplug") {
-        const plug = new MockPlug(mac);
-        plug.off();
-        switches.push(plug);
+  private async initDevices(config) {
+    const factory = new DeviceFactory();
+    config.devices.forEach(async config => {
+      const device = factory.createDevice(config);
+      if (device) {
+        this.devices.push(device);
       }
     });
 
-    this.meters = meters;
-    this.switches = switches;
-
-    const all = [...this.meters, ...this.switches].map(d => d.device);
+    const all = this.devices.map(d => d.device);
     this.socket.emit("join", {
       room: "workers",
       workerID: this.macaddr,
@@ -296,14 +196,22 @@ export class App {
 
       if (messageIsFrom(makeConfigureMessage, data)) {
         if (data.payload.worker === this.macaddr) {
-          this.config = JSON.parse(JSON.stringify(data.payload.config));
-          this.initDevices();
+          const config = JSON.parse(JSON.stringify(data.payload.config));
+          this.initDevices(config);
         }
         return;
       }
 
       if (messageIsFrom(makeCommandMessage, data)) {
-        this.updateSwitches(data.payload);
+        const mac = formatMacAddress(data.payload.device);
+        const target = this.devices.find(device => device.device === mac);
+        if (target instanceof Switch) {
+          if (data.payload.action === "on") {
+            target.on();
+          } else {
+            target.off();
+          }
+        }
         return;
       }
 
@@ -336,44 +244,6 @@ export class App {
     }
   }
 
-  private updateSwitches(data: CommandPayload) {
-    const mac = this.formatMacAddress(data.device);
-    this.switches.forEach(plug => {
-      if (this.formatMacAddress(plug.device) === mac) {
-        console.log("plug state", plug.state);
-        console.log("plug status", plug.status());
-        console.log("plug state", plug.state);
-        if (data.action === "on" && plug.state === "off") {
-          plug.on();
-        } else if (data.action === "off" && plug.state === "on") {
-          plug.off();
-        }
-      }
-    });
-  }
-
-  private async meterStatus(meter: Meter) {
-    const msg = makeMeterStatusMessage({
-      device: this.formatMacAddress(meter.device),
-      type: "meter",
-      manufacturer: meter.manufacturer,
-      temperature: meter.clime.temperature,
-      humidity: meter.clime.humidity,
-      timestamp: new Date().toString()
-    });
-    this.send(msg);
-  }
-
-  private async switchStatus(switcher: Switch) {
-    const msg = makeSwitchStatusMessage({
-      device: this.formatMacAddress(switcher.device),
-      manufacturer: switcher.manufacturer,
-      status: switcher.state,
-      timestamp: new Date().toString()
-    });
-    this.send(msg);
-  }
-
   private async workerStatus() {
     const msg = makeWorkerStatusMessage({
       worker: this.macaddr,
@@ -383,28 +253,5 @@ export class App {
       timestamp: new Date().toString()
     });
     this.send(msg);
-  }
-
-  private formatMacAddress(id: string) {
-    if (!id) {
-      return "";
-    }
-
-    if (id.length != 12 && id.length != 17) {
-      console.warn("bad format for mac address:", id);
-      return "";
-    }
-
-    // Remove all but alphanumeric characters
-    let mac = id.replace(/\W/gi, "").toLowerCase();
-
-    // Append a colon after every two characters
-    mac = mac.replace(/(.{2})/g, "$1:");
-
-    // remove trailing colon
-    return mac
-      .split(":")
-      .slice(0, -1)
-      .join(":");
   }
 }
