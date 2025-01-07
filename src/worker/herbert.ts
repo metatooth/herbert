@@ -1,5 +1,6 @@
 import { Gpio } from "onoff";
 import { Switch } from "./switch";
+import { AnySocketMessage } from "../shared/types";
 
 export class Herbert extends Switch {
   pin: number;
@@ -21,12 +22,13 @@ export class Herbert extends Switch {
     this.output.writeSync(0);
   }
 
-  public status() {
+  public status(): AnySocketMessage {
     if (this.output.readSync() === 1) {
       this.state = "on";
     } else {
       this.state = "off";
     }
-    return this;
+
+    return super.status();
   }
 }

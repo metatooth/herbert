@@ -1,3 +1,4 @@
+import { AnySocketMessage } from "../shared/types";
 import { Switch } from "./switch";
 import { exec } from "child_process";
 
@@ -54,7 +55,7 @@ export class SequentMicrosystems extends Switch {
     }
   }
 
-  public status() {
+  public status(): AnySocketMessage {
     exec(
       `8relind ${this.board} read ${this.channel}`,
       (error, stdout, stderr) => {
@@ -71,6 +72,7 @@ export class SequentMicrosystems extends Switch {
         }
       }
     );
-    return this;
+
+    return super.status();
   }
 }

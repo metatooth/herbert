@@ -7,8 +7,8 @@ import {
   RegisterWorkerPayload,
   SendByDeviceIDPayload,
   SocketMessageType,
-  SwitchStatusPaylaod,
-  WorkerStatusPayload,
+  SwitchStatusPayload,
+  WorkerStatusPayload
 } from "./types";
 import { createMessageCreator } from "./type-guards";
 
@@ -20,9 +20,9 @@ export const makeCommandMessage = createMessageCreator(
   SocketMessageType.Command
 )<CommandPayload>();
 
-export const makeErrorMessage = createMessageCreator(
-  SocketMessageType.Error
-)<ErrorPayload>();
+export const makeErrorMessage = createMessageCreator(SocketMessageType.Error)<
+  ErrorPayload
+>();
 
 export const makeConfigureMessage = createMessageCreator(
   SocketMessageType.Configure
@@ -34,7 +34,7 @@ export const makeWorkerStatusMessage = createMessageCreator(
 
 export const makeSwitchStatusMessage = createMessageCreator(
   SocketMessageType.SwitchStatus
-)<SwitchStatusPaylaod>();
+)<SwitchStatusPayload>();
 
 export const makeMeterStatusMessage = createMessageCreator(
   SocketMessageType.MeterStatus

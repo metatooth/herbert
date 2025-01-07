@@ -9,7 +9,7 @@ export class AirDirectives {
 
   constructor(controller: ClimeControl) {
     this.controller = controller;
-    this.clime = new Clime(-1, 0.6, -1);
+    this.clime = new Clime(-1, -1);
     this.temperature = "15.6";
     this.humidity = "0.40";
   }

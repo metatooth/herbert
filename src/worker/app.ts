@@ -17,7 +17,6 @@ import {
   makeConfigureMessage,
   makeErrorMessage,
   makeMeterStatusMessage,
-  makeSwitchStatusMessage,
   makeWorkerRegisterMessage,
   makeWorkerStatusMessage
 } from "../shared/message-creators";
@@ -105,16 +104,22 @@ export class App {
   }
 
   public readonly run = async (): Promise<void> => {
+    console.log("RUN", new Date());
     if (!this.initialized) {
       return Promise.reject("app is not initialized");
     }
+
+    this.devices.forEach(device => {
+      this.send(device.status());
+    });
 
     if (this.runTimeout) {
       clearTimeout(this.runTimeout);
       this.runTimeout = undefined;
     }
 
-    this.runTimeout = setTimeout(this.run, this.config.interval * 1000);
+    const interval = 1000 * (this.config.interval || 30);
+    this.runTimeout = setTimeout(this.run, interval);
   };
 
   public stop() {
@@ -137,9 +142,9 @@ export class App {
     App.instance = undefined;
   }
 
-  private async initDevices(config) {
+  private async initDevices() {
     const factory = new DeviceFactory();
-    config.devices.forEach(async config => {
+    this.config.devices.forEach(async config => {
       const device = factory.createDevice(config);
       if (device) {
         this.devices.push(device);
@@ -196,8 +201,8 @@ export class App {
 
       if (messageIsFrom(makeConfigureMessage, data)) {
         if (data.payload.worker === this.macaddr) {
-          const config = JSON.parse(JSON.stringify(data.payload.config));
-          this.initDevices(config);
+          this.config = JSON.parse(JSON.stringify(data.payload.config));
+          this.initDevices();
         }
         return;
       }

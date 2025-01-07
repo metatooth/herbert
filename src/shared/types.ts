@@ -207,7 +207,7 @@ export interface WorkerStatusPayload {
   timestamp: string;
 }
 
-export interface SwitchStatusPaylaod {
+export interface SwitchStatusPayload {
   device: string;
   manufacturer: string;
   status: string;

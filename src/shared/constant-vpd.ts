@@ -13,7 +13,7 @@ export class ConstantVpd extends ClimeControl {
 
   control(clime: Clime): [string, string] {
     const result: [string, string] = ["off", "off"];
-    const vpd: number = clime.vpd();
+    const vpd: number = 1;
     if (Math.abs(vpd - this.target) > this.tolerance) {
       if (vpd < this.target) {
         result[0] = "heat";

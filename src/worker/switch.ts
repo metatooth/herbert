@@ -1,17 +1,22 @@
 import { Device } from "./device";
+import { AnySocketMessage } from "../shared/types";
+import { makeSwitchStatusMessage } from "../shared/message-creators";
 
 export class Switch extends Device {
   public on() {
-    console.log("switch on?", this.state);
     this.state = "on";
   }
 
   public off() {
-    console.log("switch off?", this.state);
     this.state = "off";
   }
 
-  public status() {
-    return this;
+  public status(): AnySocketMessage {
+    return makeSwitchStatusMessage({
+      device: this.device,
+      manufacturer: this.manufacturer,
+      status: this.state,
+      timestamp: new Date().toString()
+    });
   }
 }
