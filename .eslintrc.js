@@ -2,19 +2,20 @@ module.exports = {
   root: true,
   env: {
     node: true,
+    es2022: true
   },
   extends: [
     "plugin:vue/essential",
     "eslint:recommended",
     "@vue/typescript/recommended",
     "@vue/prettier",
-    "@vue/prettier/@typescript-eslint",
+    "@vue/prettier/@typescript-eslint"
   ],
   parserOptions: {
-    ecmaVersion: 2015,
+    ecmaVersion: 2015
   },
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-  },
+    "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off"
+  }
 };
