@@ -1,18 +1,15 @@
-<template>
-  <canvas id="humidities" />
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-import { mapGetters } from "vuex";
-import HTTP from "@/api/http";
-import { convertToLocalTime } from "date-fns-timezone";
-import ChartJS from "chart.js";
 import "chartjs-adapter-date-fns";
+import ChartJS from "chart.js";
+import Vue from "vue";
+import { convertToLocalTime } from "date-fns-timezone";
+import { mapGetters } from "vuex";
 
-const SystemHumidityChart = Vue.extend({
+import HTTP from "@/api/http";
+
+const HumidityChart = Vue.extend({
   props: {
-    meters: [],
+    meters: { type: Array<object>, default: []},
   },
 
   data() {
@@ -93,7 +90,9 @@ const SystemHumidityChart = Vue.extend({
   },
 });
 
-export default SystemHumidityChart;
+export default HumidityChart;
 </script>
 
-<style scoped></style>
+<template>
+  <canvas id="humidities" />
+</template>

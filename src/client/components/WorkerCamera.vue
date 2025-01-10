@@ -2,7 +2,9 @@
   <div class="box">
     <div class="card">
       <div class="card-header">
-        <p class="card-header-title">{{ worker.name }}</p>
+        <p class="card-header-title">
+          {{ worker.name }}
+        </p>
       </div>
       <div class="card-image">
         <img :src="worker.camera" width="300px" height="225px" />
@@ -18,8 +20,8 @@ import { Worker } from "@/store/workers/types";
 
 const WorkerCamera = Vue.extend({
   props: {
-    worker: Worker,
-  },
+    worker: Worker
+  }
 });
 
 export default WorkerCamera;

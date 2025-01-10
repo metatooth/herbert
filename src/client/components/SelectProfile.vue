@@ -1,3 +1,49 @@
+<script lang="ts">
+import Vue from "vue";
+import HerbertButton from "@/components/Button.vue";
+import { mapGetters } from "vuex";
+import { Zone } from "@/store/zones/types";
+
+const SelectProfile = Vue.extend({
+  components: {
+    HerbertButton
+  },
+
+  props: {
+    label: string,
+    zone: Zone
+  },
+
+  emits: ["select-profile"],
+
+  data() {
+    return {
+      selected: this.zone.profileid || 0
+    };
+  },
+
+  computed: {
+    changed(): boolean {
+      if (this.zone.profileid === this.selected) {
+        return false;
+      }
+
+      return true;
+    },
+
+    ...mapGetters("profiles", ["profiles"])
+  },
+
+  methods: {
+    select() {
+      this.$emit("select-profile", this.selected);
+    }
+  }
+});
+
+export default SelectProfile;
+</script>
+
 <template>
   <div class="field is-grouped">
     <div class="field is-horizontal">
@@ -11,8 +57,8 @@
               <select v-model="selected">
                 <option
                   v-for="profile in profiles"
-                  v-bind:key="profile.id"
-                  v-bind:value="profile.id"
+                  :key="profile.id"
+                  :value="profile.id"
                 >
                   {{ profile.profile }}
                 </option>
@@ -24,55 +70,11 @@
           <herbert-button
             :show="changed"
             label=""
-            @on-click="select"
             icon="check"
+            @on-click="select"
           />
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import HerbertButton from "@/components/Button.vue";
-import { mapGetters } from "vuex";
-import { Zone } from "@/store/zones/types";
-
-const SelectProfile = Vue.extend({
-  props: {
-    label: String,
-    zone: Zone,
-  },
-
-  data() {
-    return {
-      selected: this.zone.profileid || 0,
-    };
-  },
-
-  components: {
-    HerbertButton,
-  },
-
-  computed: {
-    changed(): boolean {
-      if (this.zone.profileid === this.selected) {
-        return false;
-      }
-
-      return true;
-    },
-
-    ...mapGetters("profiles", ["profiles"]),
-  },
-
-  methods: {
-    select() {
-      this.$emit("select-profile", this.selected);
-    },
-  },
-});
-
-export default SelectProfile;
-</script>

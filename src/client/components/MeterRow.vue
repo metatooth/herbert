@@ -1,52 +1,3 @@
-<template>
-  <tr>
-    <td>
-      <div class="field is-grouped" v-if="editing">
-        <div class="control">
-          <input
-            class="input"
-            type="text"
-            v-model="nickname"
-            @keyup.esc="cancel"
-            @keyup.enter="save"
-          />
-        </div>
-      </div>
-      <span class="is-size-5" v-else>
-        {{ meter.name }}
-      </span>
-    </td>
-    <td>
-      {{ zonename }}
-    </td>
-    <td>
-      <meter-actual :meter="meter" :units="units" />
-    </td>
-    <td class="is-italic">
-      <router-link
-        :to="{
-          name: 'readings',
-          params: { name: meter.nickname, device: meter.device },
-        }"
-      >
-        <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
-      </router-link>
-    </td>
-    <td class="is-size-5">
-      {{ meter.device }}
-    </td>
-    <td>
-      <edit-controls
-        v-if="!locked"
-        @on-edit="editable"
-        @on-save="save"
-        @on-destroy="destroy"
-        @on-cancel="cancel"
-      />
-    </td>
-  </tr>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
@@ -57,10 +8,16 @@ import Readable from "@/components/Readable.vue";
 import { Meter } from "@/store/meters/types";
 
 const MeterRow = Vue.extend({
+  components: {
+    EditControls,
+    MeterActual,
+    Readable
+  },
+
   props: {
     meter: Meter,
     locked: Boolean,
-    units: String,
+    units: string
   },
 
   data() {
@@ -68,26 +25,14 @@ const MeterRow = Vue.extend({
       nickname: this.meter.nickname,
       updatedat: new Date(Date.parse(this.meter.updatedat)),
       updating: false,
-      editing: false,
+      editing: false
     };
-  },
-
-  components: {
-    EditControls,
-    MeterActual,
-    Readable,
-  },
-
-  watch: {
-    meter() {
-      this.updating = false;
-    },
   },
 
   computed: {
     zone() {
-      const found = this.zones.filter((zone) => {
-        const meters = zone.meters.filter((meter) => {
+      const found = this.zones.filter(zone => {
+        const meters = zone.meters.filter(meter => {
           return this.meter.device === meter.device;
         });
         return meters.length !== 0;
@@ -112,7 +57,13 @@ const MeterRow = Vue.extend({
       return "";
     },
 
-    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("zones", ["zones"])
+  },
+
+  watch: {
+    meter() {
+      this.updating = false;
+    }
   },
 
   methods: {
@@ -123,7 +74,7 @@ const MeterRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.meter,
-        nickname: this.nickname,
+        nickname: this.nickname
       });
       this.editing = false;
     },
@@ -139,9 +90,58 @@ const MeterRow = Vue.extend({
       }
     },
 
-    ...mapActions("meters", ["edit", "remove"]),
-  },
+    ...mapActions("meters", ["edit", "remove"])
+  }
 });
 
 export default MeterRow;
 </script>
+
+<template>
+  <tr>
+    <td>
+      <div v-if="editing" class="field is-grouped">
+        <div class="control">
+          <input
+            v-model="nickname"
+            class="input"
+            type="text"
+            @keyup.esc="cancel"
+            @keyup.enter="save"
+          />
+        </div>
+      </div>
+      <span v-else class="is-size-5">
+        {{ meter.name }}
+      </span>
+    </td>
+    <td>
+      {{ zonename }}
+    </td>
+    <td>
+      <meter-actual :meter="meter" :units="units" />
+    </td>
+    <td class="is-italic">
+      <router-link
+        :to="{
+          name: 'readings',
+          params: { name: meter.nickname, device: meter.device }
+        }"
+      >
+        <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
+      </router-link>
+    </td>
+    <td class="is-size-5">
+      {{ meter.device }}
+    </td>
+    <td>
+      <edit-controls
+        v-if="!locked"
+        @on-edit="editable"
+        @on-save="save"
+        @on-destroy="destroy"
+        @on-cancel="cancel"
+      />
+    </td>
+  </tr>
+</template>

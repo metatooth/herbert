@@ -1,14 +1,3 @@
-<template>
-  <tr>
-    <td><timestamp :timestamp="timestamp" :abbreviated="true" /></td>
-    <td>{{ name }}</td>
-    <td>{{ message }}</td>
-    <td class="has-text-centered">
-      <button class="delete" @click="$emit('delete-notification')" />
-    </td>
-  </tr>
-</template>
-
 <script>
 import Vue from "vue";
 import { mapGetters } from "vuex";
@@ -16,14 +5,16 @@ import { mapGetters } from "vuex";
 import Timestamp from "@/components/Timestamp.vue";
 
 const NotificationRow = Vue.extend({
+  components: { Timestamp },
+
   props: {
     id: { type: String, default: "" },
     plug: { type: String, default: "" },
     message: { type: String, default: "" },
-    timestamp: { type: Date, default: new Date() },
+    timestamp: { type: Date, default: new Date() }
   },
 
-  components: { Timestamp },
+  emits: ["delete-notification"],
 
   computed: {
     notificationClass() {
@@ -31,7 +22,7 @@ const NotificationRow = Vue.extend({
     },
 
     name() {
-      const found = this.devices.filter((d) => {
+      const found = this.devices.filter(d => {
         return d.device === this.plug;
       });
       if (found.length !== 0) {
@@ -41,13 +32,22 @@ const NotificationRow = Vue.extend({
       }
     },
 
-    ...mapGetters("devices", ["devices"]),
-  },
-
-  emits: ["delete-notification"],
+    ...mapGetters("devices", ["devices"])
+  }
 });
 
 export default NotificationRow;
 </script>
 
-<style></style>
+<template>
+  <tr>
+    <td>
+      <timestamp :timestamp="timestamp" :abbreviated="true" />
+    </td>
+    <td>{{ name }}</td>
+    <td>{{ message }}</td>
+    <td class="has-text-centered">
+      <button class="delete" @click="$emit('delete-notification')" />
+    </td>
+  </tr>
+</template>

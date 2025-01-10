@@ -9,26 +9,33 @@ import { formatMacAddress } from "../shared/utils";
 export class DeviceFactory {
   constructor() {}
 
-  createDevice(config): Device | null {
+  create_device(config): Promise<Device | null> {
     const mac = formatMacAddress(config.id);
-    if (config.manufacturer === "herbert") {
-      if (config.pin) {
-        return new Herbert(mac, parseInt(config.pin));
-      } else if (config.board && config.channel) {
-        return new SequentMicrosystems(
-          mac,
-          parseInt(config.board),
-          parseInt(config.channel)
-        );
-      } else if (config.remote && config.mode) {
-        return new IRSend(mac, config.remote, config.mode);
-      }
-    } else if (config.manufacturer === "mockmeter") {
-      return new MockMeter(mac);
-    } else if (config.manufacturer === "mockplug") {
-      return new MockPlug(mac);
+    let device = null;
+
+    switch (config.manufacturer) {
+      case "herbert":
+        if (config.pin) {
+          device = new Herbert(mac, parseInt(config.pin));
+        } else if (config.board && config.channel) {
+          device = new SequentMicrosystems(
+            mac,
+            parseInt(config.board),
+            parseInt(config.channel)
+          );
+        } else if (config.remote && config.mode) {
+          device = new IRSend(mac, config.remote, config.mode);
+        }
+        break;
+      case "mockmeter":
+        device = new MockMeter(mac);
+        break;
+      case "mockplug":
+        device = new MockPlug(mac);
+        break;
+      default:
     }
 
-    return null;
+    return Promise.resolve(device);
   }
 }

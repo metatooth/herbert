@@ -39,7 +39,7 @@
         <div class="column is-half">
           <device-chart
             id="statuschart"
-            v-bind:data="statuses"
+            :data="statuses"
             label="Device Status"
             title="Duty Cycle"
             type="line"
@@ -59,34 +59,33 @@ import { convertToLocalTime } from "date-fns-timezone";
 import BackToDashboard from "@/components/BackToDashboard.vue";
 
 const Statuses = Vue.extend({
-  props: {
-    name: { type: String, default: "" },
-  },
-
   components: {
     BackToDashboard,
-    DeviceChart,
+    DeviceChart
+  },
+  props: {
+    name: { type: String, default: "" }
   },
 
   data() {
     return {
       range: "hour",
-      statuses: [] as { x: Date; y: number }[],
+      statuses: [] as { x: Date; y: number }[]
     };
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"]),
-  },
-
-  mounted() {
-    this.refresh();
+    ...mapGetters("settings", ["settings"])
   },
 
   watch: {
     range() {
       this.refresh();
-    },
+    }
+  },
+
+  mounted() {
+    this.refresh();
   },
 
   methods: {
@@ -105,11 +104,11 @@ const Statuses = Vue.extend({
           this.statuses = [];
           data.forEach((d: { observedat: Date; status: string }) => {
             const ts = convertToLocalTime(d.observedat, {
-              timeZone: this.settings.timezone,
+              timeZone: this.settings.timezone
             });
             const status = {
               x: ts,
-              y: d.status === "on" ? 1 : 0,
+              y: d.status === "on" ? 1 : 0
             };
 
             this.statuses.push(status);
@@ -118,8 +117,8 @@ const Statuses = Vue.extend({
       };
 
       xhr.send();
-    },
-  },
+    }
+  }
 });
 export default Statuses;
 </script>

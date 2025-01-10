@@ -4,19 +4,15 @@ import { networkInterfaces } from "os";
 
 import { Device } from "./device";
 import { DeviceFactory } from "./device-factory";
-import { Switch } from "./switch";
-import {
-  AnySocketMessage,
-  CommandPayload,
-  SocketMessageMap
-} from "../shared/types";
+import { ConfigWorker } from "./types/config-worker";
+
+import { AnySocketMessage, SocketMessageMap } from "../shared/types";
 import { formatMacAddress } from "../shared/utils";
 import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import {
   makeCommandMessage,
   makeConfigureMessage,
   makeErrorMessage,
-  makeMeterStatusMessage,
   makeWorkerRegisterMessage,
   makeWorkerStatusMessage
 } from "../shared/message-creators";
@@ -28,24 +24,6 @@ try {
     console.error("Could not set up log directory, error was: ", e);
     process.exit(1);
   }
-}
-
-interface ConfigDevice {
-  id: string;
-  manufacturer: string;
-  username?: string;
-  password?: string;
-  board?: string;
-  remote?: string;
-  mode?: string;
-  pin?: string;
-  channel?: string;
-}
-
-interface ConfigWorker {
-  interval: number;
-  polling: number;
-  devices: ConfigDevice[];
 }
 
 export class App {
@@ -136,6 +114,12 @@ export class App {
     this.initialized = false;
   }
 
+  private restart = async () => {
+    this.stop();
+    await this.init();
+    await this.run();
+  };
+
   public close() {
     this.closed = true;
     this.stop();
@@ -143,9 +127,10 @@ export class App {
   }
 
   private async initDevices() {
+    console.log("INIT", this.config);
     const factory = new DeviceFactory();
     this.config.devices.forEach(async config => {
-      const device = factory.createDevice(config);
+      const device = await factory.createDevice(config);
       if (device) {
         this.devices.push(device);
       }
@@ -169,28 +154,21 @@ export class App {
     this.socket.on("connect", () => {
       this.socket.emit("join", { room: "workers", workerID: this.macaddr });
     });
-    this.socket.on("connect_error", this.onSocketError);
-    this.socket.on("disconnect", this.onSocketClose);
+
+    this.socket.on("connect_error", (err: Error) => {
+      console.error(err);
+    });
+
+    this.socket.on("disconnect", () => {
+      console.info("Socket is closed");
+      if (this.closed) {
+        return;
+      }
+      setTimeout(this.restart, 5000);
+    });
+
     this.socket.on("message", this.handleSocketMessage);
   }
-
-  private readonly onSocketError = (err: Error) => {
-    console.error(err);
-  };
-
-  private readonly onSocketClose = () => {
-    console.info("Socket is closed");
-    if (this.closed) {
-      return;
-    }
-    setTimeout(this.restart, 5000);
-  };
-
-  private restart = async () => {
-    this.stop();
-    await this.init();
-    await this.run();
-  };
 
   private readonly handleSocketMessage = async (data: AnySocketMessage) => {
     try {
@@ -210,12 +188,10 @@ export class App {
       if (messageIsFrom(makeCommandMessage, data)) {
         const mac = formatMacAddress(data.payload.device);
         const target = this.devices.find(device => device.device === mac);
-        if (target instanceof Switch) {
-          if (data.payload.action === "on") {
-            target.on();
-          } else {
-            target.off();
-          }
+        if (data.payload.action === "on") {
+          target.on();
+        } else {
+          target.off();
         }
         return;
       }

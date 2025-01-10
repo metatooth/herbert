@@ -2,11 +2,12 @@ export default class ThermoPro {
   noble;
 
   constructor() {
-    this.noble = require("@abandonware/noble");
+    import noble from "@abandonware/noble";
+    this.noble = noble;
   }
 
   async scan() {
-    this.noble.on("stateChange", async (state) => {
+    this.noble.on("stateChange", async state => {
       console.log("state is", state);
       if (state === "poweredOn") {
         console.log("start...");
@@ -15,7 +16,7 @@ export default class ThermoPro {
       }
     });
 
-    this.noble.on("discover", async (peripheral) => {
+    this.noble.on("discover", async peripheral => {
       console.log("discovered", peripheral);
 
       process.exit(0);

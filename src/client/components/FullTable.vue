@@ -1,3 +1,37 @@
+<script lang="ts">
+import { mapGetters } from "vuex";
+
+import ConfigRow from "@/components/ConfigRow.vue";
+import DeviceRow from "@/components/DeviceRow.vue";
+import MeterRow from "@/components/MeterRow.vue";
+import ProfileRow from "@/components/ProfileRow.vue";
+import WorkerRow from "@/components/WorkerRow.vue";
+import ZoneRow from "@/components/ZoneRow.vue";
+
+export default {
+
+  components: {
+    ConfigRow,
+    DeviceRow,
+    MeterRow,
+    ProfileRow,
+    WorkerRow,
+    ZoneRow,
+  },
+
+  props: {
+    headings: { type: Array<object>, default: [] },
+    items: { type: Array<object>, default: [] },
+    locked: boolean,
+    type: string,
+  },
+
+  computed: {
+    ...mapGetters("settings", ["settings"]),
+  },
+}
+</script>
+
 <template>
   <table class="table">
     <thead>
@@ -61,39 +95,3 @@
     </tbody>
   </table>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { mapGetters } from "vuex";
-
-import ConfigRow from "@/components/ConfigRow.vue";
-import DeviceRow from "@/components/DeviceRow.vue";
-import MeterRow from "@/components/MeterRow.vue";
-import ProfileRow from "@/components/ProfileRow.vue";
-import WorkerRow from "@/components/WorkerRow.vue";
-import ZoneRow from "@/components/ZoneRow.vue";
-
-const FullTable = Vue.extend({
-  props: {
-    headings: [],
-    items: [],
-    locked: Boolean,
-    type: String,
-  },
-
-  components: {
-    ConfigRow,
-    DeviceRow,
-    MeterRow,
-    ProfileRow,
-    WorkerRow,
-    ZoneRow,
-  },
-
-  computed: {
-    ...mapGetters("settings", ["settings"]),
-  },
-});
-
-export default FullTable;
-</script>

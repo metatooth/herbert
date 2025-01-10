@@ -4,9 +4,9 @@
       <label class="label">Title</label>
       <div class="control">
         <input
+          v-model="title"
           class="input"
           type="text"
-          v-model="title"
           placeholder="Name your grow."
         />
       </div>
@@ -18,9 +18,9 @@
         <div class="file is-boxed">
           <label class="file-label">
             <input
+              ref="file"
               class="file-input"
               type="file"
-              ref="file"
               accept="image/png"
               @change="picked"
             />
@@ -39,75 +39,75 @@
     <div class="field">
       <label class="label">Locale</label>
       <div class="control">
-        <input class="input" type="text" v-model="locale" />
+        <input v-model="locale" class="input" type="text" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">Timezone</label>
       <div class="control">
-        <input class="input" type="text" v-model="timezone" />
+        <input v-model="timezone" class="input" type="text" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">Units</label>
-      <units-selector v-bind:units="units" @change-units="select" />
+      <units-selector :units="units" @change-units="select" />
     </div>
 
     <div class="field">
       <label class="label">Refresh Rate (seconds)</label>
       <div class="control">
-        <input class="input" type="number" v-model="refresh" />
+        <input v-model="refresh" class="input" type="number" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">Timeout Period (seconds)</label>
       <div class="control">
-        <input class="input" type="number" v-model="timeout" />
+        <input v-model="timeout" class="input" type="number" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">Server Interval (seconds)</label>
       <div class="control">
-        <input class="input" type="number" v-model="interval" />
+        <input v-model="interval" class="input" type="number" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">Reporting Period (seconds)</label>
       <div class="control">
-        <input class="input" type="number" v-model="reportingperiod" />
+        <input v-model="reportingperiod" class="input" type="number" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">OpenWeather API Key</label>
       <div class="control">
-        <input class="input" type="text" v-model="openweather" />
+        <input v-model="openweather" class="input" type="text" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">City Name</label>
       <div class="control">
-        <input class="input" type="text" v-model="cityname" />
+        <input v-model="cityname" class="input" type="text" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">State Code</label>
       <div class="control">
-        <input class="input" type="text" v-model="statecode" />
+        <input v-model="statecode" class="input" type="text" />
       </div>
     </div>
 
     <div class="field">
       <label class="label">PIN</label>
       <div class="control">
-        <input class="input" type="text" size="8" v-model="pin" />
+        <input v-model="pin" class="input" type="text" size="8" />
       </div>
     </div>
 
@@ -118,7 +118,7 @@
       </div>
     </div>
 
-    <div class="field is-grouped" v-if="changed">
+    <div v-if="changed" class="field is-grouped">
       <herbert-button color="success" icon="check" @on-click="save" />
       <herbert-button color="danger" icon="times" @on-click="cancel" />
     </div>
@@ -133,8 +133,12 @@ import UnitsSelector from "@/components/UnitsSelector.vue";
 import HerbertButton from "@/components/Button.vue";
 
 const SettingsPage = Vue.extend({
+  components: {
+    HerbertButton,
+    UnitsSelector
+  },
   props: {
-    settings: Settings,
+    settings: Settings
   },
 
   data() {
@@ -153,13 +157,8 @@ const SettingsPage = Vue.extend({
       reportingperiod: this.settings.reportingperiod / 1000,
       pin: this.settings.pin,
       name: "",
-      filedata: "",
+      filedata: ""
     };
-  },
-
-  components: {
-    HerbertButton,
-    UnitsSelector,
   },
 
   computed: {
@@ -194,7 +193,7 @@ const SettingsPage = Vue.extend({
 
     url(): string {
       return process.env.VUE_APP_API_URL || "http://localhost:5000";
-    },
+    }
   },
 
   methods: {
@@ -258,7 +257,7 @@ const SettingsPage = Vue.extend({
         pin: this.pin,
         createdat: this.settings.createdat,
         updatedat: new Date(),
-        deleted: false,
+        deleted: false
       };
       this.edit(data);
     },
@@ -267,8 +266,8 @@ const SettingsPage = Vue.extend({
       this.units = units;
     },
 
-    ...mapActions("settings", ["edit"]),
-  },
+    ...mapActions("settings", ["edit"])
+  }
 });
 
 export default SettingsPage;

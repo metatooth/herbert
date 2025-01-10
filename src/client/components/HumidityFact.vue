@@ -12,28 +12,27 @@ import SparklineDisplay from "@/components/SparklineDisplay.vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
 const HumidityFact = Vue.extend({
+  components: {
+    SparklineDisplay
+  },
   props: {
-    meter: Meter,
+    meter: Meter
   },
 
   data() {
     return {
-      humidities: [],
+      humidities: []
     };
-  },
-
-  components: {
-    SparklineDisplay,
-  },
-
-  mounted() {
-    this.refresh();
   },
 
   computed: {
     id() {
       return `${this.meter.device}-humidity`;
-    },
+    }
+  },
+
+  mounted() {
+    this.refresh();
   },
 
   methods: {
@@ -67,7 +66,7 @@ const HumidityFact = Vue.extend({
 
               const humidity = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number,
+                y: d.reading as number
               };
 
               this.humidities.push(humidity);
@@ -77,8 +76,8 @@ const HumidityFact = Vue.extend({
       };
 
       xhr.send();
-    },
-  },
+    }
+  }
 });
 
 export default HumidityFact;

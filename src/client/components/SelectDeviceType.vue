@@ -3,11 +3,7 @@
     <div class="select">
       <select v-model="selected">
         <option value="">undefined</option>
-        <option
-          v-for="type in devicetypes"
-          v-bind:key="type"
-          v-bind:value="type"
-        >
+        <option v-for="type in devicetypes" :key="type" :value="type">
           {{ type }}
         </option>
       </select>
@@ -23,8 +19,10 @@ import Vue from "vue";
 
 const SelectDeviceType = Vue.extend({
   props: {
-    devicetype: String,
+    devicetype: string
   },
+
+  emits: ["select-devicetype"],
 
   data() {
     return {
@@ -35,16 +33,10 @@ const SelectDeviceType = Vue.extend({
         "heater",
         "humidifier",
         "irrigator",
-        "lamp",
+        "lamp"
       ],
-      selected: this.devicetype,
+      selected: this.devicetype
     };
-  },
-
-  watch: {
-    selected(val: string) {
-      this.$emit("select-devicetype", val);
-    },
   },
 
   computed: {
@@ -68,8 +60,14 @@ const SelectDeviceType = Vue.extend({
       }
 
       return "circle";
-    },
+    }
   },
+
+  watch: {
+    selected(val: string) {
+      this.$emit("select-devicetype", val);
+    }
+  }
 });
 
 export default SelectDeviceType;

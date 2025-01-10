@@ -1,28 +1,27 @@
-<template>
-  <button :class="buttonClass" @click="$emit('on-click')" v-if="show">
-    <font-awesome-icon :icon="icon" />
-    <span v-if="label">{{ label }}</span>
-  </button>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-
-const Button = Vue.extend({
+export default {
   props: {
     show: { type: Boolean, default: true },
-    callback: Function,
-    label: String,
+    callback: { type: Function, default: null, required: true },
+    label: { type: String, default: "Submit" },
     icon: { type: String, default: "cannabis" },
     size: { type: String, default: "small" },
-    color: { type: String, default: "primary" },
+    color: { type: String, default: "primary" }
   },
+
+  emits: ["on-click"],
 
   computed: {
     buttonClass() {
       return `button is-${this.size} has-text-${this.color}`;
-    },
-  },
-});
-export default Button;
+    }
+  }
+};
 </script>
+
+<template>
+  <button v-if="show" :class="buttonClass" @click="$emit('on-click')">
+    <font-awesome-icon :icon="icon" />
+    <span v-if="label">{{ label }}</span>
+  </button>
+</template>

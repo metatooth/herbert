@@ -11,9 +11,11 @@ test("00 initialize", async () => {
     email: MEROSS_EMAIL,
     password: MEROSS_PASSWORD,
     logger: console.log,
-    localHttpFirst: true,
+    localHttpFirst: true
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const meross = new MerossController(options);
+
   return;
 });

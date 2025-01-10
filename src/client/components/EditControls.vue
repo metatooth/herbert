@@ -32,14 +32,13 @@ import Vue from "vue";
 import HerbertButton from "@/components/Button.vue";
 
 const EditControls = Vue.extend({
+  components: {
+    HerbertButton
+  },
   data() {
     return {
-      editing: false,
+      editing: false
     };
-  },
-
-  components: {
-    HerbertButton,
   },
 
   methods: {
@@ -62,8 +61,8 @@ const EditControls = Vue.extend({
     cancel() {
       this.$emit("on-cancel");
       this.editing = false;
-    },
-  },
+    }
+  }
 });
 export default EditControls;
 </script>

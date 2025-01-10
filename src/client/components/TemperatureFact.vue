@@ -23,30 +23,29 @@ interface Fact {
 }
 
 const TemperatureFact = Vue.extend({
+  components: {
+    SparklineDisplay
+  },
   props: {
     meter: Meter,
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" },
+    height: { type: String, default: "50px" }
   },
 
   data() {
     return {
-      temperatures: [] as Fact[],
+      temperatures: [] as Fact[]
     };
-  },
-
-  components: {
-    SparklineDisplay,
-  },
-
-  mounted() {
-    this.refresh();
   },
 
   computed: {
     id() {
       return `${this.meter.device}-temperature`;
-    },
+    }
+  },
+
+  mounted() {
+    this.refresh();
   },
 
   methods: {
@@ -79,7 +78,7 @@ const TemperatureFact = Vue.extend({
               );
               const temperature = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number,
+                y: d.reading as number
               };
 
               this.temperatures.push(temperature);
@@ -89,8 +88,8 @@ const TemperatureFact = Vue.extend({
       };
 
       xhr.send();
-    },
-  },
+    }
+  }
 });
 
 export default TemperatureFact;

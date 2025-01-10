@@ -6,10 +6,10 @@
           <div class="field is-grouped is-grouped-multiline">
             <div class="control">
               <input
+                v-model="nickname"
                 class="input"
                 type="text"
                 placeHolder="Name this device"
-                v-model="nickname"
                 @keyup.esc="cancel"
               />
             </div>
@@ -24,9 +24,9 @@
 
       <p class="subtitle">
         <select-zone-for-device
+          v-if="editing"
           :zoneid="zoneid"
           @select-zone="selectzone"
-          v-if="editing"
         />
         <span v-else>{{ zonename }}</span>
       </p>
@@ -37,7 +37,7 @@
           :devicetype="device.devicetype"
           @select-devicetype="selectdevicetype"
         />
-        <button class="button" :disabled="locked" @click="toggle" v-else>
+        <button v-else class="button" :disabled="locked" @click="toggle">
           <font-awesome-icon :class="deviceClass" :icon="device.icon" />
           <span>{{ status }}</span>
         </button>
@@ -46,7 +46,7 @@
         <router-link
           :to="{
             name: 'statuses',
-            params: { name: device.nickname, device: device.device },
+            params: { name: device.nickname, device: device.device }
           }"
         >
           <readable
@@ -79,9 +79,15 @@ import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
 const DeviceTile = Vue.extend({
+  components: {
+    EditControls,
+    SelectDeviceType,
+    SelectZoneForDevice,
+    Readable
+  },
   props: {
     device: Device,
-    locked: Boolean,
+    locked: Boolean
   },
 
   data() {
@@ -90,15 +96,8 @@ const DeviceTile = Vue.extend({
       devicetype: this.device.devicetype,
       status: this.device.status,
       readable: true,
-      editing: false,
+      editing: false
     };
-  },
-
-  components: {
-    EditControls,
-    SelectDeviceType,
-    SelectZoneForDevice,
-    Readable,
   },
 
   computed: {
@@ -137,8 +136,8 @@ const DeviceTile = Vue.extend({
     },
 
     zone() {
-      const found = this.zones.filter((zone) => {
-        const devices = zone.devices.filter((device) => {
+      const found = this.zones.filter(zone => {
+        const devices = zone.devices.filter(device => {
           return this.device.device === device.device;
         });
         return devices.length !== 0;
@@ -165,7 +164,7 @@ const DeviceTile = Vue.extend({
     },
 
     ...mapGetters("settings", ["settings"]),
-    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   methods: {
@@ -188,7 +187,7 @@ const DeviceTile = Vue.extend({
       this.edit({
         ...this.device,
         nickname: this.nickname,
-        devicetype: this.devicetype,
+        devicetype: this.devicetype
       });
       this.editing = false;
     },
@@ -198,13 +197,13 @@ const DeviceTile = Vue.extend({
     },
 
     selectzone(zone: number) {
-      const target = this.zones.filter((z) => {
+      const target = this.zones.filter(z => {
         return zone === z.id;
       });
 
       const payload = { zone: target[0], device: this.device.device };
-      this.zones.forEach((zone) => {
-        zone.devices.forEach((device) => {
+      this.zones.forEach(zone => {
+        zone.devices.forEach(device => {
           if (device.device === this.device.device) {
             this.removeDevice(payload);
           }
@@ -229,8 +228,8 @@ const DeviceTile = Vue.extend({
     },
 
     ...mapActions("devices", ["on", "off", "edit", "remove"]),
-    ...mapActions("zones", ["addDevice", "removeDevice"]),
-  },
+    ...mapActions("zones", ["addDevice", "removeDevice"])
+  }
 });
 
 export default DeviceTile;

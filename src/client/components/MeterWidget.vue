@@ -1,41 +1,3 @@
-<template>
-  <div class="control has-background-dark">
-    <div class="tags has-addons" style="">
-      <span class="tag is-medium has-background-dark" :class="meterClass">
-        <font-awesome-icon icon="thermometer-half" />
-      </span>
-      <span class="tag is-medium has-text-light has-background-dark">
-        {{ temperature.toFixed(1) }} {{ unitsWithDegrees }}
-      </span>
-      <span class="tag is-medium has-text-light has-background-dark">
-        {{ name }}
-        <button class="delete" v-on:click="remove(meter.device)" />
-      </span>
-    </div>
-    <div class="tags has-addons">
-      <span class="tag is-medium has-background-dark" :class="meterClass">
-        <font-awesome-icon icon="tint" />
-      </span>
-      <span class="tag is-medium has-text-light has-background-dark">
-        {{ humidity.toFixed(0) }} %
-      </span>
-      <span class="tag is-medium has-text-light has-background-dark">
-        <router-link
-          :to="{
-            name: 'readings',
-            params: { name: meter.nickname, device: meter.device },
-          }"
-        >
-          &gt;&gt;&gt;
-        </router-link>
-      </span>
-      <span class="tag is-medium has-text-light has-background-dark">
-        &nbsp;
-      </span>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
 import { mapState } from "vuex";
@@ -46,8 +8,10 @@ import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 const MeterWidget = Vue.extend({
   props: {
     meter: Meter,
-    units: String,
+    units: string
   },
+
+  emits: ["remove-device"],
 
   computed: {
     temperature(): number {
@@ -85,15 +49,53 @@ const MeterWidget = Vue.extend({
       return "°" + this.units;
     },
 
-    ...mapState("notifications", ["notifications"]),
+    ...mapState("notifications", ["notifications"])
   },
 
   methods: {
     remove(meter: string) {
       this.$emit("remove-device", meter);
-    },
-  },
+    }
+  }
 });
 
 export default MeterWidget;
 </script>
+
+<template>
+  <div class="control has-background-dark">
+    <div class="tags has-addons" style="">
+      <span class="tag is-medium has-background-dark" :class="meterClass">
+        <font-awesome-icon icon="thermometer-half" />
+      </span>
+      <span class="tag is-medium has-text-light has-background-dark">
+        {{ temperature.toFixed(1) }} {{ unitsWithDegrees }}
+      </span>
+      <span class="tag is-medium has-text-light has-background-dark">
+        {{ name }}
+        <button class="delete" @click="remove(meter.device)" />
+      </span>
+    </div>
+    <div class="tags has-addons">
+      <span class="tag is-medium has-background-dark" :class="meterClass">
+        <font-awesome-icon icon="tint" />
+      </span>
+      <span class="tag is-medium has-text-light has-background-dark">
+        {{ humidity.toFixed(0) }} %
+      </span>
+      <span class="tag is-medium has-text-light has-background-dark">
+        <router-link
+          :to="{
+            name: 'readings',
+            params: { name: meter.nickname, device: meter.device }
+          }"
+        >
+          &gt;&gt;&gt;
+        </router-link>
+      </span>
+      <span class="tag is-medium has-text-light has-background-dark">
+        &nbsp;
+      </span>
+    </div>
+  </div>
+</template>

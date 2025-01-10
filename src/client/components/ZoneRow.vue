@@ -1,28 +1,3 @@
-<template>
-  <tr>
-    <td>
-      <zone-tag :zone="zone" :locked="locked" />
-    </td>
-    <td>
-      <zone-actual :zone="zone" :units="settings.units" />
-    </td>
-    <td>
-      <device-tag
-        v-for="device in sorted"
-        :key="device.device"
-        :device="device"
-        :locked="locked"
-      />
-    </td>
-    <td class="is-italic">
-      <readable :timestamp="lastupdate" />
-    </td>
-    <td>
-      <zone-status-button :zone="zone" :locked="locked" />
-    </td>
-  </tr>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
@@ -36,26 +11,25 @@ import { Device } from "@/store/devices/types";
 import { Zone } from "@/store/zones/types";
 
 const ZoneRow = Vue.extend({
+  components: {
+    DeviceTag,
+    Readable,
+    ZoneActual,
+    ZoneStatusButton,
+    ZoneTag
+  },
   props: {
     locked: Boolean,
     zone: Zone,
-    units: String,
+    units: string
   },
 
   data() {
     return {
       nickname: this.zone.nickname,
       profileid: this.zone.profileid,
-      editing: false,
+      editing: false
     };
-  },
-
-  components: {
-    DeviceTag,
-    Readable,
-    ZoneActual,
-    ZoneStatusButton,
-    ZoneTag,
   },
 
   computed: {
@@ -69,7 +43,7 @@ const ZoneRow = Vue.extend({
 
     sorted() {
       const devices = [];
-      this.zone.devices.forEach((d) => {
+      this.zone.devices.forEach(d => {
         devices.push(Object.assign(new Device(), d));
       });
       return devices.sort((a, b) => {
@@ -79,7 +53,7 @@ const ZoneRow = Vue.extend({
 
     lastupdate() {
       let last = null;
-      this.zone.meters.forEach((meter) => {
+      this.zone.meters.forEach(meter => {
         const updatedat = new Date(meter.updatedat);
         if (last === null || updatedat > last) {
           last = updatedat;
@@ -117,7 +91,7 @@ const ZoneRow = Vue.extend({
     },
 
     ...mapGetters("profiles", ["profiles"]),
-    ...mapGetters("settings", ["settings"]),
+    ...mapGetters("settings", ["settings"])
   },
 
   methods: {
@@ -125,7 +99,7 @@ const ZoneRow = Vue.extend({
       this.$router.push({
         name: "zone",
         hash: this.linkto,
-        params: { id: this.zone.id },
+        params: { id: this.zone.id }
       });
     },
 
@@ -137,7 +111,7 @@ const ZoneRow = Vue.extend({
       const zone = {
         id: this.zone.id,
         nickname: this.nickname,
-        profileid: this.profileid,
+        profileid: this.profileid
       };
 
       this.edit(zone);
@@ -158,14 +132,39 @@ const ZoneRow = Vue.extend({
     toggle() {
       const zone = {
         ...this.zone,
-        active: !this.zone.active,
+        active: !this.zone.active
       };
       this.edit(zone);
     },
 
-    ...mapActions("zones", ["edit", "remove"]),
-  },
+    ...mapActions("zones", ["edit", "remove"])
+  }
 });
 
 export default ZoneRow;
 </script>
+
+<template>
+  <tr>
+    <td>
+      <zone-tag :zone="zone" :locked="locked" />
+    </td>
+    <td>
+      <zone-actual :zone="zone" :units="settings.units" />
+    </td>
+    <td>
+      <device-tag
+        v-for="device in sorted"
+        :key="device.device"
+        :device="device"
+        :locked="locked"
+      />
+    </td>
+    <td class="is-italic">
+      <readable :timestamp="lastupdate" />
+    </td>
+    <td>
+      <zone-status-button :zone="zone" :locked="locked" />
+    </td>
+  </tr>
+</template>

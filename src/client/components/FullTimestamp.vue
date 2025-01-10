@@ -1,42 +1,17 @@
-<template>
-  <nav class="level">
-    <div class="level-item">
-      <span class="icon">
-        <font-awesome-icon icon="clock" />
-      </span>
-      <strong>
-        {{ hhmm }}<span class="is-size-7">{{ ss }}</span> {{ part }}
-      </strong>
-    </div>
-    <div class="level-item" v-if="!abbreviated">
-      <strong> on {{ mmmddyyyy }} </strong>
-    </div>
-    <div class="level-item" v-if="!abbreviated">
-      <em>Updated <readable-timestamp :timestamp="local" /></em>
-    </div>
-    <div class="level-item" v-if="!abbreviated">
-      <button class="button" @click="reload">
-        <font-awesome-icon icon="sync" />
-      </button>
-    </div>
-  </nav>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
 
 import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
 
-const FullTimestamp = Vue.extend({
+export default {
+  components: {
+    ReadableTimestamp
+  },
+
   props: {
     timestamp: { default: new Date(), type: Date },
     abbreviated: { default: false, type: Boolean },
-    timezone: { default: "America/New_York", type: String },
-  },
-
-  components: {
-    ReadableTimestamp,
+    timezone: { default: "America/New_York", type: String }
   },
 
   computed: {
@@ -74,7 +49,7 @@ const FullTimestamp = Vue.extend({
 
     ss(): string {
       return ":" + this.zeroes(this.local.getSeconds());
-    },
+    }
   },
 
   methods: {
@@ -87,8 +62,31 @@ const FullTimestamp = Vue.extend({
         return `0${n}`;
       }
       return n.toString();
-    },
-  },
-});
-export default FullTimestamp;
+    }
+  }
+};
 </script>
+
+<template>
+  <nav class="level">
+    <div class="level-item">
+      <span class="icon">
+        <font-awesome-icon icon="clock" />
+      </span>
+      <strong>
+        {{ hhmm }}<span class="is-size-7">{{ ss }}</span> {{ part }}
+      </strong>
+    </div>
+    <div v-if="!abbreviated" class="level-item">
+      <strong> on {{ mmmddyyyy }} </strong>
+    </div>
+    <div v-if="!abbreviated" class="level-item">
+      <em>Updated <readable-timestamp :timestamp="local"/></em>
+    </div>
+    <div v-if="!abbreviated" class="level-item">
+      <button class="button" @click="reload">
+        <font-awesome-icon icon="sync" />
+      </button>
+    </div>
+  </nav>
+</template>

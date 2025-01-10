@@ -1,17 +1,3 @@
-<template>
-  <nav class="level">
-    <div class="level-item">
-      <status-fact :device="device" :width="width" :height="height" />
-    </div>
-    <div class="level-item">
-      <button class="button" :disabled="locked" @click="toggle">
-        <font-awesome-icon :class="deviceClass" :icon="device.icon" />
-        <span>{{ device.devicetype }}</span>
-      </button>
-    </div>
-  </nav>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
 
@@ -20,21 +6,20 @@ import { Device } from "@/store/meters/types";
 import StatusFact from "@/components/StatusFact.vue";
 
 const DeviceActual = Vue.extend({
+  components: {
+    StatusFact
+  },
   props: {
     device: Device,
     locked: { type: Boolean, default: true },
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" },
+    height: { type: String, default: "50px" }
   },
 
   data() {
     return {
-      ts: new Date(),
+      ts: new Date()
     };
-  },
-
-  components: {
-    StatusFact,
   },
 
   computed: {
@@ -56,15 +41,29 @@ const DeviceActual = Vue.extend({
 
     status() {
       return this.device.status === "on";
-    },
+    }
   },
 
   methods: {
     toggle() {
       this.$emit("on-toggle");
-    },
-  },
+    }
+  }
 });
 
 export default DeviceActual;
 </script>
+
+<template>
+  <nav class="level">
+    <div class="level-item">
+      <status-fact :device="device" :width="width" :height="height" />
+    </div>
+    <div class="level-item">
+      <button class="button" :disabled="locked" @click="toggle">
+        <font-awesome-icon :class="deviceClass" :icon="device.icon" />
+        <span>{{ device.devicetype }}</span>
+      </button>
+    </div>
+  </nav>
+</template>

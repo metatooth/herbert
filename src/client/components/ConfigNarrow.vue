@@ -27,13 +27,12 @@ import { Config } from "@/store/configs/types";
 import Readable from "@/components/Readable.vue";
 
 const ConfigNarrow = Vue.extend({
-  props: {
-    config: Config,
-  },
-
   components: {
-    Readable,
+    Readable
   },
+  props: {
+    config: Config
+  }
 });
 
 export default ConfigNarrow;

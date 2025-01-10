@@ -12,7 +12,7 @@
         <router-link
           :to="{
             name: 'statuses',
-            params: { name: device.nickname, device: device.device },
+            params: { name: device.nickname, device: device.device }
           }"
         >
           &gt;&gt;&gt;
@@ -22,7 +22,7 @@
         {{ device.nickname || device.device }}
         <button
           class="delete"
-          v-on:click="remove(device.device)"
+          @click="remove(device.device)"
           @click="remove(device.device)"
         />
       </div>
@@ -38,19 +38,19 @@ import { Notification } from "@/store/notifications/types";
 
 const DeviceWidget = Vue.extend({
   props: {
-    device: Device,
+    device: Device
   },
 
   data() {
     return {
-      updating: false,
+      updating: false
     };
   },
 
   watch: {
     device() {
       this.updating = false;
-    },
+    }
   },
 
   computed: {
@@ -91,7 +91,7 @@ const DeviceWidget = Vue.extend({
       }
     },
 
-    ...mapState("notifications", ["notifications"]),
+    ...mapState("notifications", ["notifications"])
   },
 
   methods: {
@@ -108,8 +108,8 @@ const DeviceWidget = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["on", "off"]),
-  },
+    ...mapActions("devices", ["on", "off"])
+  }
 });
 
 export default DeviceWidget;

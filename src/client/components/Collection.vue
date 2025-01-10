@@ -55,16 +55,16 @@
       :locked="locked"
     />
 
-    <div class="box" v-if="allowed && !locked">
+    <div v-if="allowed && !locked" class="box">
       <p class="title">
         <add-controls @on-add="addable" @on-save="save" @on-cancel="cancel" />
       </p>
-      <div class="content" v-if="adding">
+      <div v-if="adding" class="content">
         <div class="control">
           <input
+            v-model="nickname"
             class="input"
             type="text"
-            v-model="nickname"
             placeHolder="Nickname"
             @keyup.esc="cancel"
             @keyup.enter="save"
@@ -93,10 +93,18 @@ import { Profile } from "@/store/profiles/types.ts";
 import { Zone } from "@/store/zones/types.ts";
 
 const Collection = Vue.extend({
+  components: {
+    AddControls,
+    FullTable,
+    HerbertButton,
+    NarrowTable,
+    SingleColumn,
+    ThreeColumns
+  },
   props: {
     filter: String,
     locked: Boolean,
-    type: String,
+    type: String
   },
 
   data() {
@@ -104,17 +112,8 @@ const Collection = Vue.extend({
       adding: false,
       nickname: "",
       single: false,
-      table: true,
+      table: true
     };
-  },
-
-  components: {
-    AddControls,
-    FullTable,
-    HerbertButton,
-    NarrowTable,
-    SingleColumn,
-    ThreeColumns,
   },
 
   mounted() {
@@ -154,7 +153,7 @@ const Collection = Vue.extend({
         selected = this.configs;
       }
 
-      const active = selected.filter((el) => {
+      const active = selected.filter(el => {
         if (this.filter === "") {
           return true;
         }
@@ -224,7 +223,7 @@ const Collection = Vue.extend({
           "Day",
           "Night",
           "Water",
-          "",
+          ""
         ];
       } else if (this.isZone) {
         return [
@@ -232,7 +231,7 @@ const Collection = Vue.extend({
           "Temp & RH",
           "Devices",
           "Last Ping",
-          "Active?",
+          "Active?"
         ];
       } else if (this.isWorker) {
         return ["MAC", "INET", "Name", "Configuration", "Last Ping", ""];
@@ -326,7 +325,7 @@ const Collection = Vue.extend({
         }
       }
       return items;
-    },
+    }
   },
 
   methods: {
@@ -380,8 +379,8 @@ const Collection = Vue.extend({
 
     toggle() {
       this.table = !this.table;
-    },
-  },
+    }
+  }
 });
 
 export default Collection;

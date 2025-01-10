@@ -1,217 +1,30 @@
-<template>
-  <tr>
-    <td>
-      <input
-        v-if="editing"
-        class="input"
-        type="text"
-        v-model="name"
-        placeHolder="profile name"
-      />
-      <span v-else>{{ name }}</span>
-    </td>
-    <td>
-      <input v-if="editing" class="input" type="time" v-model="lampstart" />
-      <span class="is-family-code" v-else>
-        {{ lamponHour }}:{{ lamponMinute }}
-      </span>
-    </td>
-    <td>
-      <input
-        v-if="editing"
-        class="input"
-        type="number"
-        v-model="lampduration"
-        min="0"
-        max="24"
-        size="2"
-      />
-      <span class="is-family-code" v-else>
-        {{ durationWithUnits }}
-      </span>
-    </td>
-    <td>
-      <select-control-type
-        :controltype="controltype"
-        @select-controltype="selected"
-        v-if="editing"
-      />
-      <span v-else>
-        {{ controltype }}
-      </span>
-    </td>
-    <td>
-      <div class="field is-grouped is-grouped-multiline" v-if="editing">
-        <div class="control has-icons-left">
-          <input
-            class="input"
-            type="number"
-            v-model="lampontemperature"
-            min="lampMin"
-            max="lampMax"
-            size="4"
-            step="0.1"
-          />
-          <span class="icon is-left">
-            <font-awesome-icon icon="thermometer-half" class="is-left" />
-          </span>
-        </div>
-        <div class="control has-icons-left">
-          <input
-            class="input"
-            type="number"
-            v-model="lamponhumidity"
-            min="0"
-            max="100"
-            size="2"
-          />
-          <span class="icon is-left">
-            <font-awesome-icon icon="tint" class="is-left" />
-          </span>
-        </div>
-      </div>
-      <span class="field is-grouped" v-else>
-        <target
-          icon="thermometer-half"
-          :value="parseFloat(lampontemperature)"
-          :precision="1"
-          units="°"
-          size="small"
-          color="#ffe08a"
-          simple="true"
-        />
-        <target
-          icon="tint"
-          :value="parseFloat(lamponhumidity)"
-          :precision="0"
-          units="%"
-          size="small"
-          color="#ffe08a"
-          simple="true"
-        />
-      </span>
-    </td>
-    <td>
-      <div class="field is-grouped is-grouped-multiline" v-if="editing">
-        <div class="control has-icons-left">
-          <input
-            class="input"
-            type="number"
-            v-model="lampofftemperature"
-            min="tempMin"
-            max="tempMax"
-            step="0.1"
-            size="4"
-          />
-          <span class="icon is-left">
-            <font-awesome-icon icon="thermometer-half" class="is-left" />
-          </span>
-        </div>
-        <div class="control has-icons-left">
-          <input
-            class="input"
-            type="number"
-            v-model="lampoffhumidity"
-            min="0"
-            max="100"
-            size="2"
-          />
-          <span class="icon is-left">
-            <font-awesome-icon icon="tint" class="is-left" />
-          </span>
-        </div>
-      </div>
-      <span class="field is-grouped is-grouped-multiline" v-else>
-        <target
-          icon="thermometer-half"
-          :value="parseFloat(lampofftemperature)"
-          :precision="1"
-          units="°"
-          size="small"
-          color="#7a7a7a"
-          simple="true"
-        />
-        <target
-          icon="tint"
-          :value="parseFloat(lampoffhumidity)"
-          :precision="0"
-          units="%"
-          size="small"
-          color="#7a7a7a"
-          simple="true"
-        />
-      </span>
-    </td>
-    <td>
-      <div class="field is-grouped is-grouped-multiline" v-if="editing">
-        <div class="control has-icons-left">
-          <input
-            class="input"
-            type="number"
-            v-model="irrigationduration"
-            min="0"
-            max="3600"
-            size="3"
-          />
-          <span class="icon is-left">
-            <font-awesome-icon icon="cloud-rain" class="is-left" />
-          </span>
-        </div>
-        <div class="control has-icons-left">
-          <input
-            class="input"
-            type="number"
-            v-model="irrigationperday"
-            min="0"
-            max="24"
-            size="2"
-          />
-          <span class="icon is-left">
-            <font-awesome-icon icon="cloud-rain" class="is-left" />
-          </span>
-        </div>
-      </div>
-      <div class="tags has-addons" v-else>
-        <span class="tag is-small has-text-dark is-success"
-          >{{ irrigationduration }}s</span
-        >
-        <span class="tag is-small has-text-dark is-success"
-          >{{ irrigationperday }} / day</span
-        >
-      </div>
-    </td>
-    <td>
-      <edit-controls
-        v-if="!locked"
-        @on-edit="editable"
-        @on-save="save"
-        @on-destroy="destroy"
-        @on-cancel="cancel"
-      />
-    </td>
-  </tr>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
 import { mapActions } from "vuex";
-import Target from "@/components/Target.vue";
-import EditControls from "@/components/EditControls.vue";
-import SelectControlType from "@/components/SelectControlType.vue";
+
 import {
   celsius2fahrenheit,
   celsius2kelvin,
   fahrenheit2celsius,
-  kelvin2celsius,
-  vaporPressureDeficit,
+  kelvin2celsius
 } from "../../shared/utils";
+
+import EditControls from "@/components/EditControls.vue";
+import SelectControlType from "@/components/SelectControlType.vue";
+import Target from "@/components/Target.vue";
 import { Profile } from "@/store/profiles/types";
 
 const ProfileRow = Vue.extend({
+  components: {
+    EditControls,
+    SelectControlType,
+    Target
+  },
+
   props: {
     locked: Boolean,
     profile: Profile,
-    units: String,
+    units: string
   },
 
   data() {
@@ -252,14 +65,8 @@ const ProfileRow = Vue.extend({
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
-      editing: false,
+      editing: false
     };
-  },
-
-  components: {
-    EditControls,
-    SelectControlType,
-    Target,
   },
 
   computed: {
@@ -305,7 +112,7 @@ const ProfileRow = Vue.extend({
       }
 
       return max;
-    },
+    }
   },
 
   methods: {
@@ -395,7 +202,7 @@ const ProfileRow = Vue.extend({
         blowercycle: this.blowercycle * 1000,
         irrigationperday: this.irrigationperday,
         irrigationduration: this.irrigationduration * 1000,
-        controltype: this.controltype,
+        controltype: this.controltype
       };
 
       this.edit(profile);
@@ -406,9 +213,203 @@ const ProfileRow = Vue.extend({
       this.controltype = val;
     },
 
-    ...mapActions("profiles", ["edit", "remove"]),
-  },
+    ...mapActions("profiles", ["edit", "remove"])
+  }
 });
 
 export default ProfileRow;
 </script>
+
+<template>
+  <tr>
+    <td>
+      <input
+        v-if="editing"
+        v-model="name"
+        class="input"
+        type="text"
+        placeHolder="profile name"
+      />
+      <span v-else>{{ name }}</span>
+    </td>
+    <td>
+      <input v-if="editing" v-model="lampstart" class="input" type="time" />
+      <span v-else class="is-family-code">
+        {{ lamponHour }}:{{ lamponMinute }}
+      </span>
+    </td>
+    <td>
+      <input
+        v-if="editing"
+        v-model="lampduration"
+        class="input"
+        type="number"
+        min="0"
+        max="24"
+        size="2"
+      />
+      <span v-else class="is-family-code">
+        {{ durationWithUnits }}
+      </span>
+    </td>
+    <td>
+      <select-control-type
+        v-if="editing"
+        :controltype="controltype"
+        @select-controltype="selected"
+      />
+      <span v-else>
+        {{ controltype }}
+      </span>
+    </td>
+    <td>
+      <div v-if="editing" class="field is-grouped is-grouped-multiline">
+        <div class="control has-icons-left">
+          <input
+            v-model="lampontemperature"
+            class="input"
+            type="number"
+            min="lampMin"
+            max="lampMax"
+            size="4"
+            step="0.1"
+          />
+          <span class="icon is-left">
+            <font-awesome-icon icon="thermometer-half" class="is-left" />
+          </span>
+        </div>
+        <div class="control has-icons-left">
+          <input
+            v-model="lamponhumidity"
+            class="input"
+            type="number"
+            min="0"
+            max="100"
+            size="2"
+          />
+          <span class="icon is-left">
+            <font-awesome-icon icon="tint" class="is-left" />
+          </span>
+        </div>
+      </div>
+      <span v-else class="field is-grouped">
+        <target
+          icon="thermometer-half"
+          :value="parseFloat(lampontemperature)"
+          :precision="1"
+          units="°"
+          size="small"
+          color="#ffe08a"
+          simple="true"
+        />
+        <target
+          icon="tint"
+          :value="parseFloat(lamponhumidity)"
+          :precision="0"
+          units="%"
+          size="small"
+          color="#ffe08a"
+          simple="true"
+        />
+      </span>
+    </td>
+    <td>
+      <div v-if="editing" class="field is-grouped is-grouped-multiline">
+        <div class="control has-icons-left">
+          <input
+            v-model="lampofftemperature"
+            class="input"
+            type="number"
+            min="tempMin"
+            max="tempMax"
+            step="0.1"
+            size="4"
+          />
+          <span class="icon is-left">
+            <font-awesome-icon icon="thermometer-half" class="is-left" />
+          </span>
+        </div>
+        <div class="control has-icons-left">
+          <input
+            v-model="lampoffhumidity"
+            class="input"
+            type="number"
+            min="0"
+            max="100"
+            size="2"
+          />
+          <span class="icon is-left">
+            <font-awesome-icon icon="tint" class="is-left" />
+          </span>
+        </div>
+      </div>
+      <span v-else class="field is-grouped is-grouped-multiline">
+        <target
+          icon="thermometer-half"
+          :value="parseFloat(lampofftemperature)"
+          :precision="1"
+          units="°"
+          size="small"
+          color="#7a7a7a"
+          simple="true"
+        />
+        <target
+          icon="tint"
+          :value="parseFloat(lampoffhumidity)"
+          :precision="0"
+          units="%"
+          size="small"
+          color="#7a7a7a"
+          simple="true"
+        />
+      </span>
+    </td>
+    <td>
+      <div v-if="editing" class="field is-grouped is-grouped-multiline">
+        <div class="control has-icons-left">
+          <input
+            v-model="irrigationduration"
+            class="input"
+            type="number"
+            min="0"
+            max="3600"
+            size="3"
+          />
+          <span class="icon is-left">
+            <font-awesome-icon icon="cloud-rain" class="is-left" />
+          </span>
+        </div>
+        <div class="control has-icons-left">
+          <input
+            v-model="irrigationperday"
+            class="input"
+            type="number"
+            min="0"
+            max="24"
+            size="2"
+          />
+          <span class="icon is-left">
+            <font-awesome-icon icon="cloud-rain" class="is-left" />
+          </span>
+        </div>
+      </div>
+      <div v-else class="tags has-addons">
+        <span class="tag is-small has-text-dark is-success"
+          >{{ irrigationduration }}s</span
+        >
+        <span class="tag is-small has-text-dark is-success"
+          >{{ irrigationperday }} / day</span
+        >
+      </div>
+    </td>
+    <td>
+      <edit-controls
+        v-if="!locked"
+        @on-edit="editable"
+        @on-save="save"
+        @on-destroy="destroy"
+        @on-cancel="cancel"
+      />
+    </td>
+  </tr>
+</template>

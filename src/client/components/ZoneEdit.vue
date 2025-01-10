@@ -1,3 +1,115 @@
+<script lang="ts">
+import Vue from "vue";
+import { mapActions, mapGetters } from "vuex";
+
+const ZonePage = Vue.extend({
+  data() {
+    return {
+      nickname: "",
+      profileid: 0,
+      lamponleafdiff: 0,
+      lampoffleafdiff: 0,
+      maxirrigators: 0,
+      zonemeters: [],
+      zonedevices: [],
+      zonechildren: [],
+      editing: false
+    };
+  },
+
+  computed: {
+    locked() {
+      return this.$route.params.locked;
+    },
+
+    zone() {
+      const id = this.$route.params.id;
+      const z = this.zones.filter(z => {
+        return z.id === id;
+      });
+      return z[0];
+    },
+
+    ...mapGetters("settings", ["settings"]),
+    ...mapGetters("profiles", ["profiles"]),
+    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("devices", ["devices"]),
+    ...mapGetters("meters", ["meters"])
+  },
+
+  mounted() {
+    this.nickname = this.zone.nickname;
+    this.profileid = this.zone.profile.id;
+
+    if (this.settings.units === "F") {
+      this.lamponleafdiff = (this.zone.lamponleafdiff * 9) / 5;
+      this.lampoffleafdiff = (this.zone.lampoffleafdiff * 9) / 5;
+    } else {
+      this.lamponleafdiff = this.zone.lamponleafdiff;
+      this.lampoffleafdiff = this.zone.lampoffleafdiff;
+    }
+
+    this.maxirrigators = this.zone.maxirrigators;
+
+    this.zone.meters.forEach(m => {
+      this.zonemeters.push(m.device);
+    });
+
+    this.zone.devices.forEach(d => {
+      this.zonedevices.push(d.device);
+    });
+
+    this.zone.children.forEach(c => {
+      this.zonechildren.push(c);
+    });
+  },
+
+  methods: {
+    editable() {
+      this.editing = true;
+    },
+
+    save() {
+      let lampon = this.lamponleafdiff;
+      let lampoff = this.lampoffleafdiff;
+      if (this.units === "F") {
+        lampon = (lampon * 5) / 9;
+        lampoff = (lampoff * 5) / 9;
+      }
+
+      const zone = {
+        ...this.zone,
+        nickname: this.nickname,
+        profileid: this.profileid,
+        lamponleafdiff: lampon,
+        lampoffleafdiff: lampoff,
+        maxirrigators: this.maxirrigators,
+        meters: this.zonemeters,
+        devices: this.zonedevices,
+        children: this.zonechildren
+      };
+      this.edit(zone);
+      this.editing = false;
+    },
+
+    destroy() {
+      if (confirm("OK to delete?")) {
+        this.remove(this.zone);
+        this.$router.push({ name: "dashboard" });
+      }
+    },
+
+    cancel() {
+      this.editing = false;
+    },
+
+    ...mapActions("zones", ["edit", "remove"])
+  }
+});
+
+export default ZonePage;
+</script>
+
 <template>
   <div class="card">
     <div class="card-header">
@@ -9,7 +121,7 @@
           <div class="field-body">
             <div class="field is-narrow">
               <div class="control">
-                <input class="input" v-model="nickname" />
+                <input v-model="nickname" class="input" />
               </div>
             </div>
           </div>
@@ -48,7 +160,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input class="input" type="number" v-model="lamponleafdiff" />
+              <input v-model="lamponleafdiff" class="input" type="number" />
             </div>
           </div>
         </div>
@@ -61,7 +173,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input class="input" type="number" v-model="lampoffleafdiff" />
+              <input v-model="lampoffleafdiff" class="input" type="number" />
             </div>
           </div>
         </div>
@@ -73,7 +185,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input class="input" type="number" v-model="maxirrigators" />
+              <input v-model="maxirrigators" class="input" type="number" />
             </div>
           </div>
         </div>
@@ -89,7 +201,7 @@
           <div class="field is-narrow">
             <div class="control">
               <div class="select is-multiple">
-                <select multiple v-model="zonemeters">
+                <select v-model="zonemeters" multiple>
                   <option
                     v-for="meter in meters"
                     :key="meter.device"
@@ -114,7 +226,7 @@
           <div class="field is-narrow">
             <div class="control">
               <div class="select is-multiple">
-                <select multiple v-model="zonedevices">
+                <select v-model="zonedevices" multiple>
                   <option
                     v-for="device in devices"
                     :key="device.device"
@@ -139,9 +251,13 @@
           <div class="field is-narrow">
             <div class="control">
               <div class="select is-multiple">
-                <select multiple v-model="zonechildren">
-                  <option v-for="zone in zones" :key="zone.id" :value="zone.id">
-                    {{ zone.nickname }}
+                <select v-model="zonechildren" multiple>
+                  <option
+                    v-for="target in zones"
+                    :key="target.id"
+                    :value="target.id"
+                  >
+                    {{ target.nickname }}
                   </option>
                 </select>
               </div>
@@ -152,115 +268,3 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { mapActions, mapGetters } from "vuex";
-
-const ZonePage = Vue.extend({
-  data() {
-    return {
-      nickname: "",
-      profileid: 0,
-      lamponleafdiff: 0,
-      lampoffleafdiff: 0,
-      maxirrigators: 0,
-      zonemeters: [],
-      zonedevices: [],
-      zonechildren: [],
-      editing: false,
-    };
-  },
-
-  mounted() {
-    this.nickname = this.zone.nickname;
-    this.profileid = this.zone.profile.id;
-
-    if (this.settings.units === "F") {
-      this.lamponleafdiff = (this.zone.lamponleafdiff * 9) / 5;
-      this.lampoffleafdiff = (this.zone.lampoffleafdiff * 9) / 5;
-    } else {
-      this.lamponleafdiff = this.zone.lamponleafdiff;
-      this.lampoffleafdiff = this.zone.lampoffleafdiff;
-    }
-
-    this.maxirrigators = this.zone.maxirrigators;
-
-    this.zone.meters.forEach((m) => {
-      this.zonemeters.push(m.device);
-    });
-
-    this.zone.devices.forEach((d) => {
-      this.zonedevices.push(d.device);
-    });
-
-    this.zone.children.forEach((c) => {
-      this.zonechildren.push(c);
-    });
-  },
-
-  computed: {
-    locked() {
-      return this.$route.params.locked;
-    },
-
-    zone() {
-      const id = this.$route.params.id;
-      const z = this.zones.filter((z) => {
-        return z.id === id;
-      });
-      return z[0];
-    },
-
-    ...mapGetters("settings", ["settings"]),
-    ...mapGetters("profiles", ["profiles"]),
-    ...mapGetters("zones", ["zones"]),
-    ...mapGetters("devices", ["devices"]),
-    ...mapGetters("meters", ["meters"]),
-  },
-
-  methods: {
-    editable() {
-      this.editing = true;
-    },
-
-    save() {
-      let lampon = this.lamponleafdiff;
-      let lampoff = this.lampoffleafdiff;
-      if (this.units === "F") {
-        lampon = (lampon * 5) / 9;
-        lampoff = (lampoff * 5) / 9;
-      }
-
-      const zone = {
-        ...this.zone,
-        nickname: this.nickname,
-        profileid: this.profileid,
-        lamponleafdiff: lampon,
-        lampoffleafdiff: lampoff,
-        maxirrigators: this.maxirrigators,
-        meters: this.zonemeters,
-        devices: this.zonedevices,
-        children: this.zonechildren,
-      };
-      this.edit(zone);
-      this.editing = false;
-    },
-
-    destroy() {
-      if (confirm("OK to delete?")) {
-        this.remove(this.zone);
-        this.$router.push({ name: "dashboard" });
-      }
-    },
-
-    cancel() {
-      this.editing = false;
-    },
-
-    ...mapActions("zones", ["edit", "remove"]),
-  },
-});
-
-export default ZonePage;
-</script>

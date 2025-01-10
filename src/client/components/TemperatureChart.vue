@@ -1,28 +1,19 @@
-<template>
-  <div>
-    <chart
-      :id="id"
-      v-bind:data="display"
-      title="Temperature"
-      v-bind:label="label"
-      v-bind:suggestedMin="suggestedMin"
-      v-bind:suggestedMax="suggestedMax"
-      v-bind:stepSize="stepSize"
-      v-bind:units="settings.units"
-    />
-  </div>
-</template>
-
-<script>
+<script lang="ts">
+import "chartjs-adapter-date-fns";
 import Vue from "vue";
 import { mapGetters } from "vuex";
+
 import Chart from "@/components/Chart.vue";
-import "chartjs-adapter-date-fns";
+import { Device } from "@/store/meters/types";
 
 const TemperatureChart = Vue.extend({
+
+  components: {
+    Chart,
+  },
   props: {
-    id: { type: String },
-    data: { type: Array },
+    id: string,
+    data: { type: Array<Device>, default: [] },
   },
 
   data() {
@@ -31,10 +22,6 @@ const TemperatureChart = Vue.extend({
       stepSize: 0.5,
       minmax: [100, 0],
     };
-  },
-
-  components: {
-    Chart,
   },
 
   computed: {
@@ -49,14 +36,14 @@ const TemperatureChart = Vue.extend({
     },
 
     suggestedMin() {
-      if (this.minmax[0] === 0) {
+      if (this.minmax[0] === 100) {
         this.calcminmax();
       }
       return this.minmax[0];
     },
 
     suggestedMax() {
-      if (this.minmax[1] === 100) {
+      if (this.minmax[1] === 0) {
         this.calcminmax();
       }
       return this.minmax[1];
@@ -108,3 +95,18 @@ const TemperatureChart = Vue.extend({
 });
 export default TemperatureChart;
 </script>
+
+<template>
+  <div>
+    <chart
+      :id="id"
+      :data="display"
+      title="Temperature"
+      :label="label"
+      :suggested-min="suggestedMin"
+      :suggested-max="suggestedMax"
+      :step-size="stepSize"
+      :units="settings.units"
+    />
+  </div>
+</template>

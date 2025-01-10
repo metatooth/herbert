@@ -1,3 +1,32 @@
+<script lang="ts">
+import Vue from "vue";
+
+import ConfigNarrow from "@/components/ConfigNarrow.vue";
+import DeviceNarrow from "@/components/DeviceNarrow.vue";
+import MeterNarrow from "@/components/MeterNarrow.vue";
+import ProfileNarrow from "@/components/ProfileNarrow.vue";
+import WorkerNarrow from "@/components/WorkerNarrow.vue";
+import ZoneNarrow from "@/components/ZoneNarrow.vue";
+
+const NarrowTable = Vue.extend({
+
+  components: {
+    ConfigNarrow,
+    DeviceNarrow,
+    MeterNarrow,
+    ProfileNarrow,
+    WorkerNarrow,
+    ZoneNarrow,
+  },
+  props: {
+    items: { type: Array<object>, default: [] },
+    type: string,
+  },
+});
+
+export default NarrowTable;
+</script>
+
 <template>
   <div>
     <div v-if="type === 'config'">
@@ -44,32 +73,3 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-
-import ConfigNarrow from "@/components/ConfigNarrow.vue";
-import DeviceNarrow from "@/components/DeviceNarrow.vue";
-import MeterNarrow from "@/components/MeterNarrow.vue";
-import ProfileNarrow from "@/components/ProfileNarrow.vue";
-import WorkerNarrow from "@/components/WorkerNarrow.vue";
-import ZoneNarrow from "@/components/ZoneNarrow.vue";
-
-const NarrowTable = Vue.extend({
-  props: {
-    items: [],
-    type: String,
-  },
-
-  components: {
-    ConfigNarrow,
-    DeviceNarrow,
-    MeterNarrow,
-    ProfileNarrow,
-    WorkerNarrow,
-    ZoneNarrow,
-  },
-});
-
-export default NarrowTable;
-</script>

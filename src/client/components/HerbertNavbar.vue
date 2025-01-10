@@ -1,146 +1,17 @@
-<template>
-  <nav id="navbar" class="herbert-navbar navbar">
-    <div class="navbar-brand">
-      <a class="navbar-item" @click="pick('overview')">
-        <span class="herbert-logo">
-          <font-awesome-icon icon="seedling" v-if="!logo" class="icon" />
-          <img v-else :src="logo" width="48" height="48" />
-        </span>
-        <span class="herbert-title">{{ title }}</span>
-      </a>
-      <button
-        ref="searchIcon"
-        class="navbar-item herbert-navbar-search-icon herbert-navbar-mobile-icon"
-        @click.prevent="search"
-      >
-        <span class="icon">
-          <font-awesome-icon icon="search" />
-        </span>
-      </button>
-      <a ref="navbarBurger" class="navbar-burger" @click.prevent="burger">
-        <span></span>
-        <span></span>
-        <span></span>
-      </a>
-    </div>
-    <div ref="navMenuIndex" class="navbar-menu">
-      <div class="navbar-start herbert-navbar-start">
-        <a
-          class="navbar-item herbert-navbar-item"
-          @click="pick('meters')"
-          :class="is('meters')"
-        >
-          <span class="icon has-text-success">
-            <font-awesome-icon icon="tachometer-alt" />
-          </span>
-          <span>Meters</span>
-        </a>
-        <a
-          class="navbar-item herbert-navbar-item"
-          @click="pick('devices')"
-          :class="is('devices')"
-        >
-          <span class="icon has-text-success">
-            <font-awesome-icon icon="plug" />
-          </span>
-          <span>Devices</span>
-        </a>
-        <a
-          class="navbar-item herbert-navbar-item"
-          @click="pick('profiles')"
-          :class="is('profiles')"
-        >
-          <span class="icon has-text-success">
-            <font-awesome-icon icon="cannabis" />
-          </span>
-          <span>Profiles</span>
-        </a>
-        <a
-          class="navbar-item herbert-navbar-item"
-          @click="pick('zones')"
-          :class="is('zones')"
-        >
-          <span class="icon has-text-success">
-            <font-awesome-icon icon="grip-horizontal" />
-          </span>
-          <span>Zones</span>
-        </a>
-        <a
-          class="navbar-item herbert-navbar-item"
-          @click="pick('workers')"
-          :class="is('workers')"
-        >
-          <span class="icon has-text-success">
-            <img src="../assets/images/icon.png" class="herbert-icon" />
-          </span>
-          <span>Herberts</span>
-        </a>
-        <a
-          class="navbar-item herbert-navbar-item"
-          @click="pick('configs')"
-          :class="is('configs')"
-          v-if="!locked"
-        >
-          <span class="icon has-text-success">
-            <font-awesome-icon icon="file-code" />
-          </span>
-          <span>Configs</span>
-        </a>
-        <a
-          class="navbar-item herbert-navbar-item"
-          @click="pick('settings')"
-          :class="is('settings')"
-          v-if="!locked"
-        >
-          <span class="icon has-text-success">
-            <font-awesome-icon icon="cog" />
-          </span>
-          <span>Settings</span>
-        </a>
-        <button
-          ref="lockIcon"
-          class="navbar-item herbert-navbar-lock-icon"
-          @click.prevent="toggle"
-        >
-          <span class="icon">
-            <font-awesome-icon :icon="lockIcon" />
-          </span>
-        </button>
-      </div>
-    </div>
-    <div ref="search" class="herbert-search">
-      <p class="control has-icons-left">
-        <span
-          class="herbert-autocomplete"
-          style="position: relative; display: inline-block; direction: ltr"
-        >
-          <input
-            ref="herbertSearch"
-            class="input is-rounded"
-            placeHolder="Search ..."
-            v-model="filter"
-          />
-        </span>
-        <span class="icon is-small is-left">
-          <font-awesome-icon icon="search" />
-        </span>
-      </p>
-    </div>
-  </nav>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
 import { mapGetters } from "vuex";
 
 const HerbertNavbar = Vue.extend({
   props: {
-    locked: { type: Boolean, default: true },
+    locked: { type: Boolean, default: true }
   },
+
+  emits: ["search-on", "selected", "toggle"],
 
   data() {
     return {
-      filter: "",
+      filter: ""
     };
   },
 
@@ -160,13 +31,13 @@ const HerbertNavbar = Vue.extend({
       return this.settings.title || "Grow More";
     },
 
-    ...mapGetters("settings", ["settings"]),
+    ...mapGetters("settings", ["settings"])
   },
 
   watch: {
     filter(val: string) {
       this.$emit("search-on", val);
-    },
+    }
   },
 
   methods: {
@@ -202,12 +73,143 @@ const HerbertNavbar = Vue.extend({
 
     toggle() {
       this.$emit("toggle");
-    },
-  },
+    }
+  }
 });
 
 export default HerbertNavbar;
 </script>
+
+<template>
+  <nav id="navbar" class="herbert-navbar navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" @click="pick('overview')">
+        <span class="herbert-logo">
+          <font-awesome-icon v-if="!logo" icon="seedling" class="icon" />
+          <img v-else :src="logo" width="48" height="48" />
+        </span>
+        <span class="herbert-title">{{ title }}</span>
+      </a>
+      <button
+        ref="searchIcon"
+        class="navbar-item herbert-navbar-search-icon herbert-navbar-mobile-icon"
+        @click.prevent="search"
+      >
+        <span class="icon">
+          <font-awesome-icon icon="search" />
+        </span>
+      </button>
+      <a ref="navbarBurger" class="navbar-burger" @click.prevent="burger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </a>
+    </div>
+    <div ref="navMenuIndex" class="navbar-menu">
+      <div class="navbar-start herbert-navbar-start">
+        <a
+          class="navbar-item herbert-navbar-item"
+          :class="is('meters')"
+          @click="pick('meters')"
+        >
+          <span class="icon has-text-success">
+            <font-awesome-icon icon="tachometer-alt" />
+          </span>
+          <span>Meters</span>
+        </a>
+        <a
+          class="navbar-item herbert-navbar-item"
+          :class="is('devices')"
+          @click="pick('devices')"
+        >
+          <span class="icon has-text-success">
+            <font-awesome-icon icon="plug" />
+          </span>
+          <span>Devices</span>
+        </a>
+        <a
+          class="navbar-item herbert-navbar-item"
+          :class="is('profiles')"
+          @click="pick('profiles')"
+        >
+          <span class="icon has-text-success">
+            <font-awesome-icon icon="cannabis" />
+          </span>
+          <span>Profiles</span>
+        </a>
+        <a
+          class="navbar-item herbert-navbar-item"
+          :class="is('zones')"
+          @click="pick('zones')"
+        >
+          <span class="icon has-text-success">
+            <font-awesome-icon icon="grip-horizontal" />
+          </span>
+          <span>Zones</span>
+        </a>
+        <a
+          class="navbar-item herbert-navbar-item"
+          :class="is('workers')"
+          @click="pick('workers')"
+        >
+          <span class="icon has-text-success">
+            <img src="../assets/images/icon.png" class="herbert-icon" />
+          </span>
+          <span>Herberts</span>
+        </a>
+        <a
+          v-if="!locked"
+          class="navbar-item herbert-navbar-item"
+          :class="is('configs')"
+          @click="pick('configs')"
+        >
+          <span class="icon has-text-success">
+            <font-awesome-icon icon="file-code" />
+          </span>
+          <span>Configs</span>
+        </a>
+        <a
+          v-if="!locked"
+          class="navbar-item herbert-navbar-item"
+          :class="is('settings')"
+          @click="pick('settings')"
+        >
+          <span class="icon has-text-success">
+            <font-awesome-icon icon="cog" />
+          </span>
+          <span>Settings</span>
+        </a>
+        <button
+          ref="lockIcon"
+          class="navbar-item herbert-navbar-lock-icon"
+          @click.prevent="toggle"
+        >
+          <span class="icon">
+            <font-awesome-icon :icon="lockIcon" />
+          </span>
+        </button>
+      </div>
+    </div>
+    <div ref="search" class="herbert-search">
+      <p class="control has-icons-left">
+        <span
+          class="herbert-autocomplete"
+          style="position: relative; display: inline-block; direction: ltr"
+        >
+          <input
+            ref="herbertSearch"
+            v-model="filter"
+            class="input is-rounded"
+            placeHolder="Search ..."
+          />
+        </span>
+        <span class="icon is-small is-left">
+          <font-awesome-icon icon="search" />
+        </span>
+      </p>
+    </div>
+  </nav>
+</template>
 
 <style scoped>
 .herbert-navbar .navbar-start {

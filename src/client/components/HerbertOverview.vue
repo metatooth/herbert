@@ -1,59 +1,34 @@
-<template>
-  <div id="overview">
-    <collection type="zone" :filter="filter" />
-    <h1 class="subtitle is-5">Notifications</h1>
-    <table
-      class="table is-bordered is-striped"
-      v-if="notifications.length !== 0"
-    >
-      <thead>
-        <th>At</th>
-        <th>Name</th>
-        <th>What</th>
-        <th></th>
-      </thead>
-      <tbody>
-        <notification-row
-          v-for="notification in notifications"
-          :key="notification.id"
-          v-bind="notification"
-          @delete-notification="deleteNotification(notification)"
-        />
-      </tbody>
-    </table>
-    <p class="content" v-else>All good...</p>
-  </div>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
-import { mapGetters, mapActions } from "vuex";
-import NotificationRow from "@/components/NotificationRow.vue";
 import { convertToLocalTime } from "date-fns-timezone";
-import { Device } from "@/store/devices/types";
-import { Notification } from "@/store/notifications/types";
-import { messageIsFrom } from "../../shared/type-guards";
 import { io, Socket } from "socket.io-client";
+import { mapGetters, mapActions } from "vuex";
+
+import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
 import {
   makeErrorMessage,
-  makeSwitchStatusMessage,
+  makeSwitchStatusMessage
 } from "../../shared/message-creators";
-import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
+import { messageIsFrom } from "../../shared/type-guards";
+
 import Collection from "@/components/Collection.vue";
+import NotificationRow from "@/components/NotificationRow.vue";
+import { Device } from "@/store/devices/types";
+import { Notification } from "@/store/notifications/types";
 
-const Overview = Vue.extend({
-  props: {
-    filter: String,
-  },
-
+const HerbertOverview = Vue.extend({
   components: {
     Collection,
-    NotificationRow,
+    NotificationRow
+  },
+
+  props: {
+    filter: string
   },
 
   computed: {
     activeSet() {
-      const active = this.zones.filter((el) => {
+      const active = this.zones.filter(el => {
         return el.nickname.match(this.filter);
       });
       return active.sort((a, b) => {
@@ -97,7 +72,7 @@ const Overview = Vue.extend({
 
     ...mapGetters("devices", ["devices"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
-    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   mounted() {
@@ -107,7 +82,7 @@ const Overview = Vue.extend({
     ws.emit("join", { room: "clients" });
     ws.on("message", (msg: AnySocketMessage) => {
       if (messageIsFrom(makeSwitchStatusMessage, msg)) {
-        const found = this.devices.filter((d) => {
+        const found = this.devices.filter(d => {
           return d.device === msg.payload.device;
         });
         if (found.length !== 0) {
@@ -123,7 +98,7 @@ const Overview = Vue.extend({
           action: msg.payload.action,
           code: msg.payload.code,
           message: msg.payload.message,
-          timestamp: new Date(Date.parse(msg.payload.timestamp)),
+          timestamp: new Date(Date.parse(msg.payload.timestamp))
         };
         this.add(n);
         return;
@@ -136,7 +111,7 @@ const Overview = Vue.extend({
       const check = Date.now();
       this.devices.forEach((d: Device) => {
         const local = convertToLocalTime(d.timestamp || new Date(), {
-          timeZone: "America/New_York",
+          timeZone: "America/New_York"
         });
         const diff = check - local.getTime();
         if (diff > 5 * 60 * 1000) {
@@ -148,7 +123,7 @@ const Overview = Vue.extend({
             code: "",
             plug: d.nickname || d.device,
             message: `Hasn't reported since ${formatted}`,
-            timestamp: new Date(),
+            timestamp: new Date()
           };
           this.add(n);
         }
@@ -172,8 +147,35 @@ const Overview = Vue.extend({
       return n.toString();
     },
 
-    ...mapActions("notifications", ["add", "remove"]),
-  },
+    ...mapActions("notifications", ["add", "remove"])
+  }
 });
-export default Overview;
+export default HerbertOverview;
 </script>
+
+<template>
+  <div id="overview">
+    <collection type="zone" :filter="filter" />
+    <h1 class="subtitle is-5">Notifications</h1>
+    <table
+      v-if="notifications.length !== 0"
+      class="table is-bordered is-striped"
+    >
+      <thead>
+        <th>At</th>
+        <th>Name</th>
+        <th>What</th>
+        <th></th>
+      </thead>
+      <tbody>
+        <notification-row
+          v-for="notification in notifications"
+          :key="notification.id"
+          v-bind="notification"
+          @delete-notification="deleteNotification(notification)"
+        />
+      </tbody>
+    </table>
+    <p v-else class="content">All good...</p>
+  </div>
+</template>

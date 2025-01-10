@@ -14,16 +14,16 @@ import Vue from "vue";
 import Timestamp from "@/components/Timestamp.vue";
 
 const Notification = Vue.extend({
+  components: { Timestamp },
+
   props: {
     id: { type: String, default: "" },
     plug: { type: String, default: "" },
     message: { type: String, default: "" },
-    timestamp: { type: Date, default: new Date() },
+    timestamp: { type: Date, default: new Date() }
   },
 
-  components: { Timestamp },
-
-  emits: ["delete-notification"],
+  emits: ["delete-notification"]
 });
 
 export default Notification;

@@ -1,28 +1,15 @@
-<template>
-  <div class="control">
-    <div class="tags has-addons">
-      <span :class="iconClass" :style="text" v-if="!simple">
-        <font-awesome-icon :icon="icon" />
-      </span>
-      <span :class="displayClass" :style="background">
-        {{ formatted }}{{ units }}
-      </span>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
 import Vue from "vue";
 
 const Target = Vue.extend({
   props: {
-    icon: String,
-    value: Number,
-    precision: { type: Number, default: 0 },
-    units: String,
-    color: { type: String, default: "#ffffff" },
-    size: { type: String, default: "medium" },
-    simple: { type: Boolean, default: false },
+    icon: string,
+    value: number,
+    precision: { type: number, default: 0 },
+    units: string,
+    color: { type: string, default: "#ffffff" },
+    size: { type: string, default: "medium" },
+    simple: { type: boolean, default: false }
   },
 
   computed: {
@@ -44,9 +31,22 @@ const Target = Vue.extend({
 
     formatted(): string {
       return this.value.toFixed(this.precision);
-    },
-  },
+    }
+  }
 });
 
 export default Target;
 </script>
+
+<template>
+  <div class="control">
+    <div class="tags has-addons">
+      <span v-if="!simple" :class="iconClass" :style="text">
+        <font-awesome-icon :icon="icon" />
+      </span>
+      <span :class="displayClass" :style="background">
+        {{ formatted }}{{ units }}
+      </span>
+    </div>
+  </div>
+</template>

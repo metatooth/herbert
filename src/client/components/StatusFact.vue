@@ -23,30 +23,29 @@ interface Fact {
 }
 
 const StatusFact = Vue.extend({
+  components: {
+    SparklineDisplay
+  },
   props: {
     device: Device,
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" },
+    height: { type: String, default: "50px" }
   },
 
   data() {
     return {
-      statuses: [] as Fact[],
+      statuses: [] as Fact[]
     };
-  },
-
-  components: {
-    SparklineDisplay,
-  },
-
-  mounted() {
-    this.refresh();
   },
 
   computed: {
     id() {
       return `${this.device.device}-status`;
-    },
+    }
+  },
+
+  mounted() {
+    this.refresh();
   },
 
   methods: {
@@ -79,7 +78,7 @@ const StatusFact = Vue.extend({
               );
               const temperature = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number,
+                y: d.reading as number
               };
 
               this.statuses.push(temperature);
@@ -89,8 +88,8 @@ const StatusFact = Vue.extend({
       };
 
       xhr.send();
-    },
-  },
+    }
+  }
 });
 
 export default StatusFact;

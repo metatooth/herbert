@@ -1,10 +1,36 @@
+<script lang="ts">
+import Vue from "vue";
+import { mapGetters } from "vuex";
+
+import NotificationRow from "@/components/NotificationRow.vue";
+
+const SystemNotifications = Vue.extend({
+  components: {
+    NotificationRow
+  },
+  emits: ["delete-notification"],
+
+  computed: {
+    ...mapGetters("notifications", ["notifications", "notificationsCount"])
+  },
+
+  methods: {
+    deleteNotification(notification: NotificationType): void {
+      this.$emit("delete-notification", notification);
+    }
+  }
+});
+
+export default SystemNotifications;
+</script>
+
 <template>
   <div id="notifications">
     <h1 class="subtitle is-5">
       <strong>{{ notificationsCount }}</strong>
       Notifications
     </h1>
-    <table class="table is-bordered is-striped" v-if="notificationsCount !== 0">
+    <table v-if="notificationsCount !== 0" class="table is-bordered is-striped">
       <thead>
         <th>At</th>
         <th>Name</th>
@@ -20,31 +46,6 @@
         />
       </tbody>
     </table>
-    <p class="content" v-else>All good...</p>
+    <p v-else class="content">All good...</p>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { mapGetters } from "vuex";
-
-import NotificationRow from "@/components/NotificationRow.vue";
-
-const Notifications = Vue.extend({
-  components: {
-    NotificationRow,
-  },
-
-  computed: {
-    ...mapGetters("notifications", ["notifications", "notificationsCount"]),
-  },
-
-  methods: {
-    deleteNotification(notification: NotificationType): void {
-      this.$emit("delete-notification", notification);
-    },
-  },
-});
-
-export default Notifications;
-</script>

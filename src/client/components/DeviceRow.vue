@@ -4,11 +4,11 @@
       <span v-if="!editing">
         {{ device.name }}
       </span>
-      <div class="control" v-else>
+      <div v-else class="control">
         <input
+          v-model="nickname"
           class="input"
           type="text"
-          v-model="nickname"
           @keyup.esc="cancel"
         />
       </div>
@@ -17,11 +17,11 @@
       {{ zonename }}
     </td>
     <td>
-      <button class="button" :disabled="locked" @click="toggle" v-if="!editing">
+      <button v-if="!editing" class="button" :disabled="locked" @click="toggle">
         <font-awesome-icon :class="deviceClass" :icon="device.icon" />
         <span>{{ device.devicetype }}</span>
       </button>
-      <div class="control" v-else>
+      <div v-else class="control">
         <select-device-type
           :devicetype="device.devicetype"
           @select-devicetype="saveDeviceType"
@@ -32,7 +32,7 @@
       <router-link
         :to="{
           name: 'statuses',
-          params: { name: device.nickname, device: device.device },
+          params: { name: device.nickname, device: device.device }
         }"
       >
         <readable :timestamp="new Date(Date.parse(device.updatedat))" />
@@ -63,24 +63,23 @@ import Readable from "@/components/Readable.vue";
 import EditControls from "@/components/EditControls.vue";
 
 const DeviceRow = Vue.extend({
+  components: {
+    EditControls,
+    SelectDeviceType,
+    Readable
+  },
   props: {
     device: Device,
     locked: Boolean,
-    units: String,
+    units: String
   },
 
   data() {
     return {
       nickname: this.device.nickname,
       editing: false,
-      status: this.device.status,
+      status: this.device.status
     };
-  },
-
-  components: {
-    EditControls,
-    SelectDeviceType,
-    Readable,
   },
 
   computed: {
@@ -135,8 +134,8 @@ const DeviceRow = Vue.extend({
     },
 
     zone() {
-      const found = this.zones.filter((zone) => {
-        const devices = zone.devices.filter((device) => {
+      const found = this.zones.filter(zone => {
+        const devices = zone.devices.filter(device => {
           return this.device.device === device.device;
         });
         return devices.length !== 0;
@@ -163,7 +162,7 @@ const DeviceRow = Vue.extend({
     },
 
     ...mapState("notifications", ["notifications"]),
-    ...mapGetters("zones", ["zones"]),
+    ...mapGetters("zones", ["zones"])
   },
 
   methods: {
@@ -174,7 +173,7 @@ const DeviceRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.device,
-        nickname: this.nickname,
+        nickname: this.nickname
       });
       this.editing = false;
     },
@@ -182,7 +181,7 @@ const DeviceRow = Vue.extend({
     saveDeviceType(devicetype: string): void {
       this.edit({
         ...this.device,
-        devicetype: devicetype,
+        devicetype: devicetype
       });
     },
 
@@ -207,8 +206,8 @@ const DeviceRow = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["edit", "remove", "on", "off"]),
-  },
+    ...mapActions("devices", ["edit", "remove", "on", "off"])
+  }
 });
 
 export default DeviceRow;

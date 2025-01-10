@@ -1,7 +1,3 @@
-<template>
-  <canvas :id="id" :width="width" :height="height" />
-</template>
-
 <script>
 import Vue from "vue";
 import ChartJS from "chart.js";
@@ -10,7 +6,7 @@ import "chartjs-adapter-date-fns";
 const SparklineDisplay = Vue.extend({
   props: {
     id: { type: String, default: "sparkline" },
-    data: { type: Array },
+    data: { type: Array<number>, default: [] },
     color: { type: String, default: "rgb(255, 119, 0)" },
     width: { type: String, default: "300px" },
     height: { type: String, default: "50px" },
@@ -20,38 +16,6 @@ const SparklineDisplay = Vue.extend({
     return {
       chart: ChartJS,
     };
-  },
-
-  mounted() {
-    const ctx = document.getElementById(this.id);
-    this.chart = new ChartJS(ctx, {
-      type: "line",
-      options: {
-        responsive: false,
-        legend: {
-          display: false,
-        },
-        title: {
-          display: false,
-        },
-        scales: {
-          xAxes: [
-            {
-              display: false,
-              type: "time",
-              time: {
-                parser: "yyyy-MM-dd HH:mm:ss",
-              },
-            },
-          ],
-          yAxes: [
-            {
-              display: false,
-            },
-          ],
-        },
-      },
-    });
   },
 
   watch: {
@@ -95,6 +59,42 @@ const SparklineDisplay = Vue.extend({
       this.chart.update();
     },
   },
+
+  mounted() {
+    const ctx = document.getElementById(this.id);
+    this.chart = new ChartJS(ctx, {
+      type: "line",
+      options: {
+        responsive: false,
+        legend: {
+          display: false,
+        },
+        title: {
+          display: false,
+        },
+        scales: {
+          xAxes: [
+            {
+              display: false,
+              type: "time",
+              time: {
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
+          ],
+          yAxes: [
+            {
+              display: false,
+            },
+          ],
+        },
+      },
+    });
+  },
 });
 export default SparklineDisplay;
 </script>
+
+<template>
+  <canvas :id="id" :width="width" :height="height" />
+</template>

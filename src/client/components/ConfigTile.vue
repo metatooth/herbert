@@ -4,10 +4,10 @@
       <p class="title">
         <span v-if="editing">
           <input
+            v-model="nickname"
             class="input"
             type="text"
             placeHolder="Name this config"
-            v-model="nickname"
             @keyup.esc="cancel"
             @keyup.enter="save"
           />
@@ -22,15 +22,15 @@
       </p>
       <div class="content">
         <span v-if="editing">
-          <textarea class="textarea" v-model="configStr" @keyup.esc="cancel" />
+          <textarea v-model="configStr" class="textarea" @keyup.esc="cancel" />
         </span>
-        <span class="is-family-code" v-else>
-          {{ this.config.config }}
+        <span v-else class="is-family-code">
+          {{ config.config }}
         </span>
       </div>
       <div class="content is-italic">
         Updated
-        <readable :timestamp="new Date(Date.parse(this.config.updatedat))" />
+        <readable :timestamp="new Date(Date.parse(config.updatedat))" />
       </div>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
     </div>
@@ -46,8 +46,12 @@ import { Config } from "@/store/configs/types";
 import { mapActions } from "vuex";
 
 const ConfigTile = Vue.extend({
+  components: {
+    EditControls,
+    Readable
+  },
   props: {
-    config: Config,
+    config: Config
   },
 
   data() {
@@ -55,19 +59,14 @@ const ConfigTile = Vue.extend({
       nickname: this.config.nickname,
       configStr: this.config.toString(),
       readable: true,
-      editing: false,
+      editing: false
     };
-  },
-
-  components: {
-    EditControls,
-    Readable,
   },
 
   computed: {
     lastupdate() {
       return new Date(Date.parse(this.config.updatedat));
-    },
+    }
   },
 
   methods: {
@@ -80,7 +79,7 @@ const ConfigTile = Vue.extend({
         ...this.config,
         nickname: this.nickname,
         config: this.configStr,
-        currentName: this.config.nickname,
+        currentName: this.config.nickname
       });
       this.editing = false;
     },
@@ -91,8 +90,8 @@ const ConfigTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("configs", ["edit"]),
-  },
+    ...mapActions("configs", ["edit"])
+  }
 });
 
 export default ConfigTile;

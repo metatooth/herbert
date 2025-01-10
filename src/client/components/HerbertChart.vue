@@ -1,23 +1,18 @@
-<template>
-  <canvas :id="id" :width="width" :height="height" />
-</template>
-
-<script>
-import Vue from "vue";
-import ChartJS from "chart.js";
+<script lang="ts">
 import "chartjs-adapter-date-fns";
+import ChartJS from "chart.js";
 
-const Chart = Vue.extend({
+export default {
   props: {
-    id: { type: String },
+    id: { type: String, default: "" },
     type: { type: String, default: "scatter" },
-    data: { type: Array },
-    title: { type: String },
-    label: { type: String },
-    suggestedMin: { type: Number },
-    suggestedMax: { type: Number },
-    stepSize: { type: Number },
-    range: { type: Number },
+    data: { type: Array<object>, default: [] },
+    title: { type: String, default: "Herbert Chart" },
+    label: { type: String, default: "" },
+    suggestedMin: { type: Number, default: 0 },
+    suggestedMax: { type: Number, default: 100 },
+    stepSize: { type: Number, default: 5 },
+    range: { type: Number, default: 100 },
     width: { type: String, default: "400px" },
     height: { type: String, default: "400px" },
   },
@@ -26,58 +21,6 @@ const Chart = Vue.extend({
     return {
       chart: ChartJS,
     };
-  },
-
-  mounted() {
-    const ctx = document.getElementById(this.id);
-
-    this.chart = new ChartJS(ctx, {
-      type: this.type,
-      data: {
-        datasets: [
-          {
-            data: this.data,
-            borderColor: "#00bbee",
-            fill: false,
-          },
-        ],
-      },
-      options: {
-        title: {
-          display: true,
-          text: this.title,
-        },
-        legend: {
-          display: false,
-        },
-        borderColor: "#00bbee",
-        scales: {
-          xAxes: [
-            {
-              display: true,
-              type: "time",
-              time: {
-                parser: "yyyy-MM-dd HH:mm:ss",
-              },
-            },
-          ],
-          yAxes: [
-            {
-              display: true,
-              ticks: {
-                suggestedMin: this.suggestedMin,
-                suggestedMax: this.suggestedMax,
-                stepSize: this.stepSize,
-              },
-              scaleLabel: {
-                display: true,
-                labelString: this.label,
-              },
-            },
-          ],
-        },
-      },
-    });
   },
 
   watch: {
@@ -170,6 +113,61 @@ const Chart = Vue.extend({
       this.chart.update();
     },
   },
-});
-export default Chart;
+
+  mounted() {
+    const ctx = document.getElementById(this.id);
+
+    this.chart = new ChartJS(ctx, {
+      type: this.type,
+      data: {
+        datasets: [
+          {
+            data: this.data,
+            borderColor: "#00bbee",
+            fill: false,
+          },
+        ],
+      },
+      options: {
+        title: {
+          display: true,
+          text: this.title,
+        },
+        legend: {
+          display: false,
+        },
+        borderColor: "#00bbee",
+        scales: {
+          xAxes: [
+            {
+              display: true,
+              type: "time",
+              time: {
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
+          ],
+          yAxes: [
+            {
+              display: true,
+              ticks: {
+                suggestedMin: this.suggestedMin,
+                suggestedMax: this.suggestedMax,
+                stepSize: this.stepSize,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: this.label,
+              },
+            },
+          ],
+        },
+      },
+    });
+  },
+}
 </script>
+
+<template>
+  <canvas :id="id" :width="width" :height="height" />
+</template>

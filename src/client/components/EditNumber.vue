@@ -1,62 +1,25 @@
-<template>
-  <div class="field is-horizontal">
-    <div class="field-body">
-      <div class="field">
-        <div class="tags has-addons">
-          <span class="tag has-background-black" :style="text">
-            <font-awesome-icon :icon="icon" />
-          </span>
-          <span class="tag has-text-black" :style="background">{{
-            this.label
-          }}</span>
-        </div>
-      </div>
-      <div class="field" v-if="!editing">
-        <span v-bind:class="valueClass">{{ this.edited || "undefined" }}</span>
-        <button v-bind:class="buttonClass" @click="edit">
-          <font-awesome-icon icon="edit" />
-        </button>
-      </div>
-      <div class="field is-grouped" v-else>
-        <div class="control">
-          <input
-            class="input"
-            type="number"
-            v-model="edited"
-            min="1"
-            size="2"
-            @keyup.enter="save"
-            @keyup.esc="cancel"
-          />
-        </div>
-        <herbert-button label="" :show="true" icon="check" @on-click="save" />
-        <herbert-button label="" :show="true" icon="times" @on-click="cancel" />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-import HerbertButton from "@/components/Button.vue";
+import HerbertButton from "@/components/HerbertButton.vue";
 
-const EditNumber = Vue.extend({
-  props: {
-    num: Number,
-    size: String,
-    label: String,
-    icon: String,
-    color: { type: String, default: "#ffffff" },
-  },
-
+export default {
   components: {
-    HerbertButton,
+    HerbertButton
   },
+
+  props: {
+    num: { type: Number, default: 0 },
+    size: string,
+    label: string,
+    icon: string,
+    color: { type: String, default: "#ffffff" }
+  },
+
+  emits: ["edit-number"],
 
   data() {
     return {
       edited: this.num,
-      editing: false,
+      editing: false
     };
   },
 
@@ -78,7 +41,7 @@ const EditNumber = Vue.extend({
         return "text";
       }
       return "title";
-    },
+    }
   },
 
   methods: {
@@ -94,11 +57,48 @@ const EditNumber = Vue.extend({
     cancel() {
       this.edited = this.num;
       this.editing = false;
-    },
-  },
-});
-export default EditNumber;
+    }
+  }
+};
 </script>
+
+<template>
+  <div class="field is-horizontal">
+    <div class="field-body">
+      <div class="field">
+        <div class="tags has-addons">
+          <span class="tag has-background-black" :style="text">
+            <font-awesome-icon :icon="icon" />
+          </span>
+          <span class="tag has-text-black" :style="background">{{
+            label
+          }}</span>
+        </div>
+      </div>
+      <div v-if="!editing" class="field">
+        <span :class="valueClass">{{ edited || "undefined" }}</span>
+        <button :class="buttonClass" @click="edit">
+          <font-awesome-icon icon="edit" />
+        </button>
+      </div>
+      <div v-else class="field is-grouped">
+        <div class="control">
+          <input
+            v-model="edited"
+            class="input"
+            type="number"
+            min="1"
+            size="2"
+            @keyup.enter="save"
+            @keyup.esc="cancel"
+          />
+        </div>
+        <herbert-button label="" :show="true" icon="check" @on-click="save" />
+        <herbert-button label="" :show="true" icon="times" @on-click="cancel" />
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .title {

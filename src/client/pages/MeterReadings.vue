@@ -1,9 +1,121 @@
+<script lang="ts">
+import Vue from "vue";
+import { convertToLocalTime } from "date-fns-timezone";
+import { mapGetters } from "vuex";
+
+import ZoneChart from "@/components/ZoneChart.vue";
+
+const Readings = Vue.extend({
+  components: {
+    ZoneChart
+  },
+  data() {
+    return {
+      range: "day",
+      temperatures: [],
+      humidities: [],
+      min: 100,
+      max: 0
+    };
+  },
+
+  computed: {
+    ...mapGetters("settings", ["settings"])
+  },
+
+  watch: {
+    range() {
+      this.refresh();
+    }
+  },
+
+  mounted() {
+    this.refresh();
+  },
+
+  methods: {
+    refresh() {
+      const url = process.env.VUE_APP_API_URL;
+      const timeZone = this.settings.timezone;
+
+      const temp = new XMLHttpRequest();
+
+      temp.open(
+        "GET",
+        `${url}/facts?meter=${this.$route.params.device}&units=CELSIUS&last=${this.range}`
+      );
+
+      temp.onload = () => {
+        const data = JSON.parse(temp.response);
+        if (!data.error) {
+          this.temperatures = [];
+
+          data.forEach(d => {
+            const observedat = new Date(
+              d.year,
+              d.month - 1,
+              d.date,
+              d.hour,
+              d.minute
+            );
+
+            const temperature = {
+              x: convertToLocalTime(observedat, { timeZone }),
+              y: parseFloat(d.reading)
+            };
+
+            this.temperatures.push(temperature);
+          });
+        }
+      };
+
+      const humid = new XMLHttpRequest();
+
+      humid.open(
+        "GET",
+        `${url}/facts?meter=${this.$route.params.device}&units=%RH&last=${this.range}`
+      );
+
+      humid.onload = () => {
+        const data = JSON.parse(humid.response);
+        if (!data.error) {
+          this.humidities = [];
+
+          data.forEach(d => {
+            const observedat = new Date(
+              d.year,
+              d.month - 1,
+              d.date,
+              d.hour,
+              d.minute
+            );
+
+            const humidity = {
+              x: convertToLocalTime(observedat, { timeZone }),
+              y: parseFloat(d.reading) * 100
+            };
+
+            this.humidities.push(humidity);
+          });
+        }
+      };
+
+      temp.send();
+      humid.send();
+    }
+  }
+});
+export default Readings;
+</script>
+
 <template>
   <div class="card">
     <div class="card-header">
       <div class="card-header-title">
         <p class="title">{{ $route.params.name }} Meter Reading</p>
-        <p class="subtitle">{{ $route.params.device }}</p>
+        <p class="subtitle">
+          {{ $route.params.device }}
+        </p>
       </div>
       <div class="card-header-icon">
         <router-link :to="{ name: 'dashboard' }">
@@ -46,142 +158,26 @@
         <div class="column is-half">
           <zone-chart
             id="temperaturechart"
-            v-bind:data="temperatures"
+            :data="temperatures"
             title="Temperature"
             label="Celius (C)"
-            v-bind:suggestedMin="min"
-            v-bind:suggestedMax="max"
-            v-bind:stepSize="1"
+            :suggested-min="min"
+            :suggested-max="max"
+            :step-size="1"
           />
         </div>
         <div class="column is-half">
           <zone-chart
             id="humiditychart"
-            v-bind:data="humidities"
+            :data="humidities"
             title="Relative Humidity"
             label="Percent (%)"
-            v-bind:suggestedMin="min"
-            v-bind:suggestedMax="max"
-            v-bind:stepSize="1"
+            :suggested-min="min"
+            :suggested-max="max"
+            :step-size="1"
           />
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { mapGetters } from "vuex";
-
-import ZoneChart from "@/components/ZoneChart.vue";
-import { convertToLocalTime } from "date-fns-timezone";
-
-interface MeterReading {
-  x: Date;
-  y: number;
-}
-
-const Readings = Vue.extend({
-  data() {
-    return {
-      range: "day",
-      temperatures: [] as MeterReading[],
-      humidities: [] as MeterReading[],
-      min: 100,
-      max: 0,
-    };
-  },
-
-  components: {
-    ZoneChart,
-  },
-
-  computed: {
-    ...mapGetters("settings", ["settings"]),
-  },
-
-  mounted() {
-    this.refresh();
-  },
-
-  watch: {
-    range() {
-      this.refresh();
-    },
-  },
-
-  methods: {
-    refresh() {
-      const url = process.env.VUE_APP_API_URL;
-      const timeZone = this.settings.timezone;
-
-      const temp = new XMLHttpRequest();
-
-      temp.open(
-        "GET",
-        `${url}/facts?meter=${this.$route.params.device}&units=CELSIUS&last=${this.range}`
-      );
-
-      temp.onload = () => {
-        const data = JSON.parse(temp.response);
-        if (!data.error) {
-          this.temperatures = [];
-
-          data.forEach((d) => {
-            const observedat = new Date(
-              d.year,
-              d.month - 1,
-              d.date,
-              d.hour,
-              d.minute
-            );
-
-            const temperature = {
-              x: convertToLocalTime(observedat, { timeZone }),
-              y: d.reading as number,
-            };
-
-            this.temperatures.push(temperature);
-          });
-        }
-      };
-
-      const humid = new XMLHttpRequest();
-
-      humid.open(
-        "GET",
-        `${url}/facts?meter=${this.$route.params.device}&units=%RH&last=${this.range}`
-      );
-
-      humid.onload = () => {
-        const data = JSON.parse(humid.response);
-        if (!data.error) {
-          this.humidities = [];
-
-          data.forEach((d) => {
-            const observedat = new Date(
-              d.year,
-              d.month - 1,
-              d.date,
-              d.hour,
-              d.minute
-            );
-
-            const humidity = {
-              x: convertToLocalTime(observedat, { timeZone }),
-              y: (d.reading as number) * 100,
-            };
-
-            this.humidities.push(humidity);
-          });
-        }
-      };
-
-      temp.send();
-      humid.send();
-    },
-  },
-});
-export default Readings;
-</script>
