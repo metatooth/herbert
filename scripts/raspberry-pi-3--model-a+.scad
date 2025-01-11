@@ -9,7 +9,7 @@ minimum = 1;
 module blank() {
     difference() {
         cube(board);
-    
+
         translate([20, board[1] / 2 + 15, board[2] - minimum])
             linear_extrude(minimum)
                 text("© Metatooth LLC 2021", 2, "Ubuntu");
@@ -27,7 +27,7 @@ module camera() {
     x = 4.21;
     y = 22.87;
     z = 5.5;
-    
+
     translate([45 - x / 2, 11.5 - y / 2, board[2]])
         cube([x, y, z]);
 }
@@ -36,7 +36,7 @@ module cpu() {
     x = 14;
     y = 14;
     z = minimum;
-    
+
     translate([27.1 - x / 2, 31.2 - y / 2, board[2]])
             cube([x, y, z]);
 }
@@ -52,14 +52,14 @@ module display() {
     x = 4.21;
     y = 22.87;
     z = 5.5;
-    
+
     translate([1.2, 28 - y / 2, board[2]])
         cube([x, y, z]);
 }
 
 module fillet(quad, x, y) {
     rot = quad * 90 - 90;
-         
+
     translate([x, y, 0])
         rotate([0, 0, rot])
                 difference() {
@@ -67,7 +67,7 @@ module fillet(quad, x, y) {
                     translate([offset, offset, 0])
                         cylinder(board[2], offset, offset, $fa = 5, $fs = 0.1);
                 }
-                
+
 }
 
 module fillets() {
@@ -82,13 +82,13 @@ module fourpole() {
     y = 12.4;
     z = 6;
 
-    
+
     r = z / 2;
-    
+
     translate([board[0] - 11.5, y, board[2] + z / 2])
     rotate([90, 0, 0])
         cylinder(15.4, r, r, $fa = 5, $fs = 0.1);
-    
+
     translate([board[0] - x / 2 - 11.5, 0, board[2]])
         cube([x, y, z]);
 }
@@ -99,7 +99,7 @@ module gpio() {
     z = 8.5;
 
     translate([offset + 29 - x / 2, board[1] - offset - y / 2, board[2]])
-        cube([x, y, z]);    
+        cube([x, y, z]);
 }
 
 module hdmi() {
@@ -115,7 +115,7 @@ module led(offx, offy) {
     x = 1.8;
     y = 1.8;
     z = minimum;
-    
+
     translate([offx, offy, board[2]])
         cube([x, y, z]);
 }
@@ -129,7 +129,7 @@ module memory() {
     x = 10;
     y = 12;
     z = minimum;
-    
+
     translate([11.5 - x / 2, 41.5 - y / 2, board[2]])
             cube([x, y, z]);
 }
@@ -138,13 +138,13 @@ module microusb() {
     x = 8.4;
     y = 6.0;
     z = 3.6;
-    
+
     translate([10.5 - x / 2, -1.2, board[2]])
         cube([x, y, z]);
 }
 
 module mipis() {
-    display();    
+    display();
     camera();
 }
 
@@ -152,7 +152,7 @@ module penrun() {
     x = 5;
     y = 2;
     z = minimum;
-    
+
     translate([board[0] - x - 1.2, board[1] - 10.91 - y /2, board[2]])
         cube([x, y, z]);
 }
@@ -162,7 +162,7 @@ module sdcard() {
     y = 12;
     z = minimum;
 
-    
+
     translate([-2.5, 22, -z])
         cube([x, y, z]);
 }
@@ -183,7 +183,7 @@ module usb() {
     x = 14.2;
     y = 14.2;
     z = 7.1;
-    
+
     translate([board[0] - x + 3.0, 31.45 - y / 2, board[2]])
         cube([x, y, z]);
 }
@@ -206,7 +206,7 @@ color("#ffffff") {
 }
 
 color("#ff5733") {
-    mipis();    
+    mipis();
 }
 
 color("#363636") {

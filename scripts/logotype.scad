@@ -27,16 +27,16 @@ translate([-radius, 1.05*radius, ratio*radius+d/2]) {
                difference() {
                     translate([0,0,ratio*radius]) {
                          sphere(ratio*radius, $fn=100);
-          
+
                     }
-   
+
                     linear_extrude(radius) {
                          circle(radius, $fn=3);
                     }
-   
-   
+
+
                }
-   
+
                for (i = [0:2]) {
                     intersection() {
                          linear_extrude(radius) {

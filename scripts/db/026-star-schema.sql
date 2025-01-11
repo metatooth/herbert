@@ -33,4 +33,3 @@ create table meter_facts (
 );
 
 commit;
-

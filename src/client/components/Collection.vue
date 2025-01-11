@@ -1,110 +1,31 @@
-<template>
-  <div ref="collection">
-    <nav class="level is-mobile">
-      <div class="level-left">
-        <div class="level-item">
-          <p class="subtitle is-5">
-            <strong>{{ activeCount }}</strong> {{ name }}
-          </p>
-        </div>
-      </div>
-      <div class="level-right">
-        <div class="level-item">
-          <p class="control">
-            <herbert-button
-              style="margin: 20px"
-              :show="true"
-              :icon="icon"
-              color="grey-lighter"
-              size="small"
-              @on-click="toggle"
-            />
-          </p>
-        </div>
-      </div>
-    </nav>
-
-    <narrow-table
-      v-if="single && table"
-      :items="activeSet"
-      :type="type"
-      :locked="locked"
-    />
-
-    <single-column
-      v-if="single && !table"
-      :items="activeSet"
-      :type="type"
-      :locked="locked"
-    />
-
-    <three-columns
-      v-if="!single && !table"
-      :left="left"
-      :middle="middle"
-      :right="right"
-      :type="type"
-      :locked="locked"
-    />
-
-    <full-table
-      v-if="!single && table"
-      :headings="headings"
-      :items="activeSet"
-      :type="type"
-      :locked="locked"
-    />
-
-    <div v-if="allowed && !locked" class="box">
-      <p class="title">
-        <add-controls @on-add="addable" @on-save="save" @on-cancel="cancel" />
-      </p>
-      <div v-if="adding" class="content">
-        <div class="control">
-          <input
-            v-model="nickname"
-            class="input"
-            type="text"
-            placeHolder="Nickname"
-            @keyup.esc="cancel"
-            @keyup.enter="save"
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
 import AddControls from "@/components/AddControls.vue";
-
-import HerbertButton from "@/components/Button.vue";
-
+import FullTable from "@/components/FullTable.vue";
+import HerbertButton from "@/components/HerbertButton.vue";
 import NarrowTable from "@/components/NarrowTable.vue";
 import SingleColumn from "@/components/SingleColumn.vue";
 import ThreeColumns from "@/components/ThreeColumns.vue";
-import FullTable from "@/components/FullTable.vue";
 
 import { Config } from "@/store/configs/types.ts";
 import { Profile } from "@/store/profiles/types.ts";
 import { Zone } from "@/store/zones/types.ts";
 
-const Collection = Vue.extend({
+export default {
   components: {
     AddControls,
     FullTable,
     HerbertButton,
     NarrowTable,
     SingleColumn,
-    ThreeColumns
+    ThreeColumns,
   },
+
   props: {
-    filter: String,
+    filter: { type: String, default: "" },
     locked: Boolean,
-    type: String
+    type: { type: String, default: "" },
   },
 
   data() {
@@ -112,29 +33,17 @@ const Collection = Vue.extend({
       adding: false,
       nickname: "",
       single: false,
-      table: true
+      table: true,
     };
-  },
-
-  mounted() {
-    if (this.$refs.collection.clientWidth < 700) {
-      this.single = true;
-    }
   },
 
   computed: {
     ...mapGetters("meters", ["meters"]),
-
     ...mapGetters("devices", ["devices"]),
-
     ...mapGetters("profiles", ["profiles"]),
-
     ...mapGetters("zones", ["zones"]),
-
     ...mapGetters("workers", ["workers"]),
-
     ...mapGetters("configs", ["configs"]),
-
     ...mapGetters("settings", ["settings"]),
 
     activeSet() {
@@ -153,7 +62,7 @@ const Collection = Vue.extend({
         selected = this.configs;
       }
 
-      const active = selected.filter(el => {
+      const active = selected.filter((el) => {
         if (this.filter === "") {
           return true;
         }
@@ -223,7 +132,7 @@ const Collection = Vue.extend({
           "Day",
           "Night",
           "Water",
-          ""
+          "",
         ];
       } else if (this.isZone) {
         return [
@@ -231,7 +140,7 @@ const Collection = Vue.extend({
           "Temp & RH",
           "Devices",
           "Last Ping",
-          "Active?"
+          "Active?",
         ];
       } else if (this.isWorker) {
         return ["MAC", "INET", "Name", "Configuration", "Last Ping", ""];
@@ -325,6 +234,12 @@ const Collection = Vue.extend({
         }
       }
       return items;
+    },
+  },
+
+  mounted() {
+    if (this.$refs.collection.clientWidth < 700) {
+      this.single = true;
     }
   },
 
@@ -379,9 +294,84 @@ const Collection = Vue.extend({
 
     toggle() {
       this.table = !this.table;
-    }
-  }
-});
-
-export default Collection;
+    },
+  },
+};
 </script>
+
+<template>
+  <div ref="collection">
+    <nav class="level is-mobile">
+      <div class="level-left">
+        <div class="level-item">
+          <p class="subtitle is-5">
+            <strong>{{ activeCount }}</strong> {{ name }}
+          </p>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <p class="control">
+            <herbert-button
+              style="margin: 20px"
+              :show="true"
+              :icon="icon"
+              color="grey-lighter"
+              size="small"
+              @on-click="toggle"
+            />
+          </p>
+        </div>
+      </div>
+    </nav>
+
+    <narrow-table
+      v-if="single && table"
+      :items="activeSet"
+      :type="type"
+      :locked="locked"
+    />
+
+    <single-column
+      v-if="single && !table"
+      :items="activeSet"
+      :type="type"
+      :locked="locked"
+    />
+
+    <three-columns
+      v-if="!single && !table"
+      :left="left"
+      :middle="middle"
+      :right="right"
+      :type="type"
+      :locked="locked"
+    />
+
+    <full-table
+      v-if="!single && table"
+      :headings="headings"
+      :items="activeSet"
+      :type="type"
+      :locked="locked"
+    />
+
+    <div v-if="allowed && !locked" class="box">
+      <p class="title">
+        <add-controls @on-add="addable" @on-save="save" @on-cancel="cancel" />
+      </p>
+      <div v-if="adding" class="content">
+        <div class="control">
+          <input
+            v-model="nickname"
+            class="input"
+            type="text"
+            placeHolder="Nickname"
+            @keyup.esc="cancel"
+            @keyup.enter="save"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

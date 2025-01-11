@@ -1,56 +1,20 @@
-<template>
-  <div class="control">
-    <div class="tags has-addons">
-      <div
-        class="tag is-medium has-background-dark"
-        :class="tagClass"
-        @click="toggle"
-      >
-        <font-awesome-icon :icon="iconClass" />
-      </div>
-      <span class="tag is-medium has-text-light has-background-dark">
-        <router-link
-          :to="{
-            name: 'statuses',
-            params: { name: device.nickname, device: device.device }
-          }"
-        >
-          &gt;&gt;&gt;
-        </router-link>
-      </span>
-      <div class="tag is-medium has-text-light has-background-dark">
-        {{ device.nickname || device.device }}
-        <button
-          class="delete"
-          @click="remove(device.device)"
-          @click="remove(device.device)"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapState, mapActions } from "vuex";
+
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
 
-const DeviceWidget = Vue.extend({
+export default {
   props: {
-    device: Device
+    device: Device,
   },
+
+  emits: ["remove-device"],
 
   data() {
     return {
-      updating: false
+      updating: false,
     };
-  },
-
-  watch: {
-    device() {
-      this.updating = false;
-    }
   },
 
   computed: {
@@ -91,7 +55,13 @@ const DeviceWidget = Vue.extend({
       }
     },
 
-    ...mapState("notifications", ["notifications"])
+    ...mapState("notifications", ["notifications"]),
+  },
+
+  watch: {
+    device() {
+      this.updating = false;
+    },
   },
 
   methods: {
@@ -108,9 +78,35 @@ const DeviceWidget = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["on", "off"])
-  }
-});
-
-export default DeviceWidget;
+    ...mapActions("devices", ["on", "off"]),
+  },
+};
 </script>
+
+<template>
+  <div class="control">
+    <div class="tags has-addons">
+      <div
+        class="tag is-medium has-background-dark"
+        :class="tagClass"
+        @click="toggle"
+      >
+        <font-awesome-icon :icon="iconClass" />
+      </div>
+      <span class="tag is-medium has-text-light has-background-dark">
+        <router-link
+          :to="{
+            name: 'statuses',
+            params: { name: device.nickname, device: device.device },
+          }"
+        >
+          &gt;&gt;&gt;
+        </router-link>
+      </span>
+      <div class="tag is-medium has-text-light has-background-dark">
+        {{ device.nickname || device.device }}
+        <button class="delete" @click="remove(device.device)" />
+      </div>
+    </div>
+  </div>
+</template>

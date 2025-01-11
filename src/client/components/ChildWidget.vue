@@ -1,3 +1,45 @@
+<script lang="ts">
+import { mapGetters } from "vuex";
+
+import { Zone } from "@/store/zones/types";
+
+export default {
+  props: {
+    id: number,
+  },
+
+  emits: ["remove-child"],
+
+  data() {
+    return {
+      child: Zone,
+    };
+  },
+
+  computed: {
+    linkto(): string {
+      return `#zone-details-${this.id}`;
+    },
+
+    ...mapGetters("zones", ["zones"]),
+  },
+
+  mounted() {
+    this.zones.forEach((zone) => {
+      if (zone.id === this.id) {
+        this.child = zone;
+      }
+    });
+  },
+
+  methods: {
+    remove(child: number) {
+      this.$emit("remove-child", child);
+    },
+  },
+};
+</script>
+
 <template>
   <div class="control">
     <div class="tags has-addons">
@@ -9,7 +51,7 @@
           :to="{
             name: 'zone',
             hash: linkto,
-            params: { id: child.id }
+            params: { id: child.id },
           }"
         >
           {{ child.nickname }}
@@ -19,45 +61,3 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { Zone } from "@/store/zones/types";
-import { mapGetters } from "vuex";
-
-const ChildWidget = Vue.extend({
-  props: {
-    id: Number
-  },
-
-  data() {
-    return {
-      child: Zone
-    };
-  },
-
-  mounted() {
-    this.zones.forEach(zone => {
-      if (zone.id === this.id) {
-        this.child = zone;
-      }
-    });
-  },
-
-  computed: {
-    linkto(): string {
-      return `#zone-details-${this.id}`;
-    },
-
-    ...mapGetters("zones", ["zones"])
-  },
-
-  methods: {
-    remove(child: number) {
-      this.$emit("remove-child", child);
-    }
-  }
-});
-
-export default ChildWidget;
-</script>

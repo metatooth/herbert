@@ -1,84 +1,30 @@
-<template>
-  <tr>
-    <td>
-      <span v-if="!editing">
-        {{ device.name }}
-      </span>
-      <div v-else class="control">
-        <input
-          v-model="nickname"
-          class="input"
-          type="text"
-          @keyup.esc="cancel"
-        />
-      </div>
-    </td>
-    <td>
-      {{ zonename }}
-    </td>
-    <td>
-      <button v-if="!editing" class="button" :disabled="locked" @click="toggle">
-        <font-awesome-icon :class="deviceClass" :icon="device.icon" />
-        <span>{{ device.devicetype }}</span>
-      </button>
-      <div v-else class="control">
-        <select-device-type
-          :devicetype="device.devicetype"
-          @select-devicetype="saveDeviceType"
-        />
-      </div>
-    </td>
-    <td class="is-italic">
-      <router-link
-        :to="{
-          name: 'statuses',
-          params: { name: device.nickname, device: device.device }
-        }"
-      >
-        <readable :timestamp="new Date(Date.parse(device.updatedat))" />
-      </router-link>
-    </td>
-    <td>
-      {{ device.device }}
-    </td>
-    <td>
-      <edit-controls
-        v-if="!locked"
-        @on-edit="editable"
-        @on-save="save"
-        @on-destroy="destroy"
-        @on-cancel="cancel"
-      />
-    </td>
-  </tr>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapActions, mapGetters, mapState } from "vuex";
+
+import EditControls from "@/components/EditControls.vue";
+import Readable from "@/components/Readable.vue";
+import SelectDeviceType from "@/components/SelectDeviceType.vue";
 import { Device } from "@/store/devices/types";
 import { Notification } from "@/store/notifications/types";
-import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import Readable from "@/components/Readable.vue";
-import EditControls from "@/components/EditControls.vue";
 
-const DeviceRow = Vue.extend({
+export default {
   components: {
     EditControls,
     SelectDeviceType,
-    Readable
+    Readable,
   },
+
   props: {
     device: Device,
     locked: Boolean,
-    units: String
+    units: string,
   },
 
   data() {
     return {
       nickname: this.device.nickname,
       editing: false,
-      status: this.device.status
+      status: this.device.status,
     };
   },
 
@@ -134,8 +80,8 @@ const DeviceRow = Vue.extend({
     },
 
     zone() {
-      const found = this.zones.filter(zone => {
-        const devices = zone.devices.filter(device => {
+      const found = this.zones.filter((zone) => {
+        const devices = zone.devices.filter((device) => {
           return this.device.device === device.device;
         });
         return devices.length !== 0;
@@ -162,7 +108,7 @@ const DeviceRow = Vue.extend({
     },
 
     ...mapState("notifications", ["notifications"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
@@ -173,7 +119,7 @@ const DeviceRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.device,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
@@ -181,7 +127,7 @@ const DeviceRow = Vue.extend({
     saveDeviceType(devicetype: string): void {
       this.edit({
         ...this.device,
-        devicetype: devicetype
+        devicetype: devicetype,
       });
     },
 
@@ -206,9 +152,62 @@ const DeviceRow = Vue.extend({
       }
     },
 
-    ...mapActions("devices", ["edit", "remove", "on", "off"])
-  }
-});
-
-export default DeviceRow;
+    ...mapActions("devices", ["edit", "remove", "on", "off"]),
+  },
+};
 </script>
+
+<template>
+  <tr>
+    <td>
+      <span v-if="!editing">
+        {{ device.name }}
+      </span>
+      <div v-else class="control">
+        <input
+          v-model="nickname"
+          class="input"
+          type="text"
+          @keyup.esc="cancel"
+        />
+      </div>
+    </td>
+    <td>
+      {{ zonename }}
+    </td>
+    <td>
+      <button v-if="!editing" class="button" :disabled="locked" @click="toggle">
+        <font-awesome-icon :class="deviceClass" :icon="device.icon" />
+        <span>{{ device.devicetype }}</span>
+      </button>
+      <div v-else class="control">
+        <select-device-type
+          :devicetype="device.devicetype"
+          @select-devicetype="saveDeviceType"
+        />
+      </div>
+    </td>
+    <td class="is-italic">
+      <router-link
+        :to="{
+          name: 'statuses',
+          params: { name: device.nickname, device: device.device },
+        }"
+      >
+        <readable :timestamp="new Date(Date.parse(device.updatedat))" />
+      </router-link>
+    </td>
+    <td>
+      {{ device.device }}
+    </td>
+    <td>
+      <edit-controls
+        v-if="!locked"
+        @on-edit="editable"
+        @on-save="save"
+        @on-destroy="destroy"
+        @on-cancel="cancel"
+      />
+    </td>
+  </tr>
+</template>

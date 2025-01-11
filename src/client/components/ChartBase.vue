@@ -1,28 +1,23 @@
-<template>
-  <canvas :id="id" width="400px" height="400px" />
-</template>
-
-<script>
-import Vue from "vue";
-import ChartJS from "chart.js";
+<script lang="ts">
 import "chartjs-adapter-date-fns";
+import ChartJS from "chart.js";
 
-const Chart = Vue.extend({
+export default {
   props: {
-    id: { type: String },
+    id: { type: String, default: "" },
     type: { type: String, default: "scatter" },
-    data: { type: Array },
-    title: { type: String },
-    label: { type: String },
-    suggestedMin: { type: Number },
-    suggestedMax: { type: Number },
-    stepSize: { type: Number },
-    range: { type: Number }
+    data: { type: Array<object>, default: "" },
+    title: { type: String, default: "Chart Base" },
+    label: { type: String, default: "Detail" },
+    suggestedMin: { type: Number, default: 0 },
+    suggestedMax: { type: Number, default: 100 },
+    stepSize: { type: Number, default: 5 },
+    range: { type: Number, default: 100 },
   },
 
   data() {
     return {
-      chart: ChartJS
+      chart: ChartJS,
     };
   },
 
@@ -31,10 +26,10 @@ const Chart = Vue.extend({
       this.chart.options = {
         title: {
           display: true,
-          text: this.title
+          text: this.title,
         },
         legend: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -42,24 +37,24 @@ const Chart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
               display: true,
               ticks: {
                 suggestedMin: this.suggestedMin,
-                suggestedMax: this.suggestedMax
+                suggestedMax: this.suggestedMax,
               },
               scaleLabel: {
                 display: true,
-                labelString: val
-              }
-            }
-          ]
-        }
+                labelString: val,
+              },
+            },
+          ],
+        },
       };
 
       this.chart.update();
@@ -71,16 +66,16 @@ const Chart = Vue.extend({
       this.chart.data.datasets.push({
         data: val,
         borderColor: "#00bbee",
-        fill: false
+        fill: false,
       });
 
       this.chart.options = {
         title: {
           display: true,
-          text: this.title
+          text: this.title,
         },
         legend: {
-          display: false
+          display: false,
         },
         scales: {
           xAxes: [
@@ -92,29 +87,29 @@ const Chart = Vue.extend({
                 unit: "minute",
                 unitStepSize: 5,
                 displayFormats: {
-                  minute: "HH:mm"
-                }
-              }
-            }
+                  minute: "HH:mm",
+                },
+              },
+            },
           ],
           yAxes: [
             {
               display: true,
               ticks: {
                 suggestedMin: this.suggestedMin,
-                suggestedMax: this.suggestedMax
+                suggestedMax: this.suggestedMax,
               },
               scaleLabel: {
                 display: true,
-                labelString: this.label
-              }
-            }
-          ]
-        }
+                labelString: this.label,
+              },
+            },
+          ],
+        },
       };
 
       this.chart.update();
-    }
+    },
   },
 
   mounted() {
@@ -127,17 +122,17 @@ const Chart = Vue.extend({
           {
             data: this.data,
             borderColor: "#00bbee",
-            fill: false
-          }
-        ]
+            fill: false,
+          },
+        ],
       },
       options: {
         title: {
           display: true,
-          text: this.title
+          text: this.title,
         },
         legend: {
-          display: false
+          display: false,
         },
         borderColor: "#00bbee",
         scales: {
@@ -146,9 +141,9 @@ const Chart = Vue.extend({
               display: true,
               type: "time",
               time: {
-                parser: "yyyy-MM-dd HH:mm:ss"
-              }
-            }
+                parser: "yyyy-MM-dd HH:mm:ss",
+              },
+            },
           ],
           yAxes: [
             {
@@ -156,18 +151,21 @@ const Chart = Vue.extend({
               ticks: {
                 suggestedMin: this.suggestedMin,
                 suggestedMax: this.suggestedMax,
-                stepSize: this.stepSize
+                stepSize: this.stepSize,
               },
               scaleLabel: {
                 display: true,
-                labelString: this.label
-              }
-            }
-          ]
-        }
-      }
+                labelString: this.label,
+              },
+            },
+          ],
+        },
+      },
     });
-  }
-});
-export default Chart;
+  },
+};
 </script>
+
+<template>
+  <canvas :id="id" width="400px" height="400px" />
+</template>

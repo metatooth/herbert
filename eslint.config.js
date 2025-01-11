@@ -9,19 +9,19 @@ export default typescriptEslint.config(
     extends: [
       eslint.configs.recommended,
       ...typescriptEslint.configs.recommended,
-      ...pluginVue.configs["flat/recommended"]
+      ...pluginVue.configs["flat/recommended"],
     ],
     files: ["src/**/*.{ts,vue}"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
       parserOptions: {
-        parser: typescriptEslint.parser
-      }
+        parser: typescriptEslint.parser,
+      },
     },
     rules: {
-      "vue/multi-word-component-names": 0
-    }
+      "vue/multi-word-component-names": 0,
+    },
   },
-  configPrettier
+  configPrettier,
 );

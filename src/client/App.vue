@@ -1,3 +1,17 @@
+<script lang="ts">
+import Vue from "vue";
+import appPackage from "../../package.json";
+
+const App = Vue.extend({
+  computed: {
+    appVersion() {
+      return appPackage["version"];
+    },
+  },
+});
+export default App;
+</script>
+
 <template>
   <div>
     <router-view />
@@ -14,20 +28,6 @@
     </footer>
   </div>
 </template>
-
-<script>
-import Vue from "vue";
-import appPackage from "../../package.json";
-
-const App = Vue.extend({
-  computed: {
-    appVersion() {
-      return appPackage["version"];
-    }
-  }
-});
-export default App;
-</script>
 
 <style scoped>
 .container {

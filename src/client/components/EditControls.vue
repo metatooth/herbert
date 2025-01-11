@@ -1,3 +1,44 @@
+<script lang="ts">
+import HerbertButton from "@/components/HerbertButton.vue";
+
+export default {
+  components: {
+    HerbertButton,
+  },
+
+  emits: ["on-edit", "on-save", "on-destroy", "on-cancel"],
+
+  data() {
+    return {
+      editing: false,
+    };
+  },
+
+  methods: {
+    edit() {
+      this.$emit("on-edit");
+      this.editing = true;
+    },
+
+    save() {
+      this.$emit("on-save");
+      this.editing = false;
+    },
+
+    destroy() {
+      if (confirm("OK to trash?")) {
+        this.$emit("on-destroy");
+      }
+    },
+
+    cancel() {
+      this.$emit("on-cancel");
+      this.editing = false;
+    },
+  },
+};
+</script>
+
 <template>
   <span class="field is-grouped is-grouped-right">
     <herbert-button
@@ -26,43 +67,3 @@
     />
   </span>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import HerbertButton from "@/components/Button.vue";
-
-const EditControls = Vue.extend({
-  components: {
-    HerbertButton
-  },
-  data() {
-    return {
-      editing: false
-    };
-  },
-
-  methods: {
-    edit() {
-      this.$emit("on-edit");
-      this.editing = true;
-    },
-
-    save() {
-      this.$emit("on-save");
-      this.editing = false;
-    },
-
-    destroy() {
-      if (confirm("OK to trash?")) {
-        this.$emit("on-destroy");
-      }
-    },
-
-    cancel() {
-      this.$emit("on-cancel");
-      this.editing = false;
-    }
-  }
-});
-export default EditControls;
-</script>

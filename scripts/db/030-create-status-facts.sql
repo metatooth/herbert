@@ -10,4 +10,3 @@ create table status_facts (
 );
 
 commit;
-

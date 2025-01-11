@@ -1,23 +1,22 @@
 <script lang="ts">
-import Vue from "vue";
-
-const ButtonBase = Vue.extend({
+export default {
   props: {
     show: { type: Boolean, default: true },
-    callback: Function,
-    label: String,
+    callback: { type: Function, default: null, required: true },
+    label: { type: String, default: "Submit" },
     icon: { type: String, default: "cannabis" },
     size: { type: String, default: "small" },
-    color: { type: String, default: "primary" }
+    color: { type: String, default: "primary" },
   },
+
+  emits: ["on-click"],
 
   computed: {
     buttonClass() {
       return `button is-${this.size} has-text-${this.color}`;
-    }
-  }
-});
-export default ButtonBase;
+    },
+  },
+};
 </script>
 
 <template>

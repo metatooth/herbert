@@ -124,7 +124,7 @@ create table zone_meters (
 
 insert into accounts (units, locale, timezone)
        values ('F', 'us_EN', 'America/New_York');
- 
+
 insert into manufacturers (manufacturer)
        values ('herbert'), ('SwitchBot'), ('WYZE'), ('mockbot'), ('sm-8relay');
 
@@ -136,5 +136,5 @@ insert into profiles (profile, timezone, lampstart, lampduration, lampontemperat
        lamponhumidity, lampofftemperature, lampoffhumidity)
        values
        ('Officespace', 'America/New_York', '08:00', '10 hours', 18.3, 21, 12.8, 21);
-       
+
 commit;

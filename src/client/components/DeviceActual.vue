@@ -1,24 +1,24 @@
 <script lang="ts">
-import Vue from "vue";
-
 import { Device } from "@/store/meters/types";
-
 import StatusFact from "@/components/StatusFact.vue";
 
-const DeviceActual = Vue.extend({
+export default {
   components: {
-    StatusFact
+    StatusFact,
   },
+
   props: {
     device: Device,
     locked: { type: Boolean, default: true },
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" }
+    height: { type: String, default: "50px" },
   },
+
+  emits: ["on-toggle"],
 
   data() {
     return {
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
@@ -41,17 +41,15 @@ const DeviceActual = Vue.extend({
 
     status() {
       return this.device.status === "on";
-    }
+    },
   },
 
   methods: {
     toggle() {
       this.$emit("on-toggle");
-    }
-  }
-});
-
-export default DeviceActual;
+    },
+  },
+};
 </script>
 
 <template>

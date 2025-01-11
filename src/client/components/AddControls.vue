@@ -1,14 +1,16 @@
 <script lang="ts">
-import Vue from "vue";
 import HerbertButton from "@/components/HerbertButton.vue";
 
-const AddControls = Vue.extend({
+export default {
   components: {
-    HerbertButton
+    HerbertButton,
   },
+
+  emits: ["on-add", "on-save", "on-cancel"],
+
   data() {
     return {
-      adding: false
+      adding: false,
     };
   },
 
@@ -26,10 +28,9 @@ const AddControls = Vue.extend({
     cancel() {
       this.$emit("on-cancel");
       this.adding = false;
-    }
-  }
-});
-export default AddControls;
+    },
+  },
+};
 </script>
 
 <template>
