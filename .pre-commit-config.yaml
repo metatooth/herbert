@@ -25,10 +25,8 @@ repos:
         name: Run eslint
         files: \.(vue|js|ts|tsx)?$
         additional_dependencies:
-          [
-            "globals@13.21.0",
-            "eslint@9.17.0",
-            "@eslint/js",
-            "eslint-config-prettier@9.1.0",
-            "eslint-plugin-vue@9.32.0",
-          ]
+          - globals@13.21.0
+          - eslint@9.17.0
+          - eslint/js
+          - eslint-config-prettier@9.1.0
+          - eslint-plugin-vue@9.32.0

@@ -2,8 +2,6 @@
   "name": "herbert",
   "version": "0.41.0",
   "description": "automate your horticulture",
-  "type": "module",
-  "main": "index.js",
   "engines": {
     "node": "20.18.1",
     "npm": "10.8.2"
@@ -19,10 +17,10 @@
     "serve:worker": "tsc-watch --noClear -b ./src/worker/tsconfig.json --onSuccess \"node --enable-source-maps dist/worker/main.js\"",
     "start": "node index.js",
     "copy:favicon": "cp src/server/favicon.ico dist/server/",
-    "build:client": "vue-cli-service build src/client/main.ts",
+    "build:client": "vue-tsc build src/client && vite build src/worker",
     "build:server": "tsc -b src/server && npm run copy:favicon",
     "build:socket-server": "tsc -b src/socket-server",
-    "build:worker": "vue-tsc -b src/worker && vite build src/worker",
+    "build:worker": "tsc -b src/worker",
     "serve": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,SOCKET,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgCyan.bold,bgRed.bold\"  \"npm run serve:client\" \"npm run serve:server\" \"npm run serve:socket-server\" \"npm run serve:worker\"",
     "build": "concurrently --prefix \"[{name}]\" --names \"CLIENT,SERVER,SOCKET,WORKER\" -c \"bgBlue.bold,bgGreen.bold,bgCyan.bold,bgRed.bold\"  \"npm run build:client\" \"npm run build:server\" \"npm run build:socket-server\" \"npm run build:worker\""
   },
@@ -51,6 +49,7 @@
     "express-promise-router": "^4.0.1",
     "globals": "^15.14.0",
     "meross-cloud": "^3.1.2",
+    "noble": "^1.9.1",
     "node-switchbot": "^3.4.3",
     "onoff": "^6.0.1",
     "pg": "^8.5.1",

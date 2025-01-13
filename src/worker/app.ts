@@ -4,7 +4,7 @@ import { networkInterfaces } from "os";
 
 import { Device } from "./device";
 import { DeviceFactory } from "./device-factory";
-import { ConfigWorker } from "./types/config-worker";
+import ConfigWorker from "./types/config-worker";
 
 import { AnySocketMessage, SocketMessageMap } from "../shared/types";
 import { formatMacAddress } from "../shared/utils";
@@ -14,7 +14,7 @@ import {
   makeConfigureMessage,
   makeErrorMessage,
   makeWorkerRegisterMessage,
-  makeWorkerStatusMessage
+  makeWorkerStatusMessage,
 } from "../shared/message-creators";
 
 try {
@@ -66,7 +66,7 @@ export class App {
 
     await this.createSocket();
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const i = setInterval(() => {
         if (this.initialized) {
           clearInterval(i);
@@ -74,7 +74,7 @@ export class App {
         }
         const msg = makeWorkerRegisterMessage({
           worker: this.macaddr,
-          inet: this.inet
+          inet: this.inet,
         });
         this.send(msg);
       }, 2000);
@@ -87,7 +87,7 @@ export class App {
       return Promise.reject("app is not initialized");
     }
 
-    this.devices.forEach(device => {
+    this.devices.forEach((device) => {
       this.send(device.status());
     });
 
@@ -126,21 +126,21 @@ export class App {
     App.instance = undefined;
   }
 
-  private async initDevices() {
+  private async init_devices() {
     console.log("INIT", this.config);
     const factory = new DeviceFactory();
-    this.config.devices.forEach(async config => {
-      const device = await factory.createDevice(config);
+    this.config.devices.forEach(async (config) => {
+      const device = await factory.create_device(config);
       if (device) {
         this.devices.push(device);
       }
     });
 
-    const all = this.devices.map(d => d.device);
+    const all = this.devices.map((d) => d.device);
     this.socket.emit("join", {
       room: "workers",
       workerID: this.macaddr,
-      devices: all
+      devices: all,
     });
     this.initialized = true;
   }
@@ -180,14 +180,14 @@ export class App {
       if (messageIsFrom(makeConfigureMessage, data)) {
         if (data.payload.worker === this.macaddr) {
           this.config = JSON.parse(JSON.stringify(data.payload.config));
-          this.initDevices();
+          this.init_devices();
         }
         return;
       }
 
       if (messageIsFrom(makeCommandMessage, data)) {
         const mac = formatMacAddress(data.payload.device);
-        const target = this.devices.find(device => device.device === mac);
+        const target = this.devices.find((device) => device.device === mac);
         if (data.payload.action === "on") {
           target.on();
         } else {
@@ -231,7 +231,7 @@ export class App {
       inet: this.inet,
       config: JSON.stringify(this.config),
       camera: this.camera,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
     this.send(msg);
   }

@@ -1,4 +1,4 @@
-import ConfigDevice from "./ConfigDevice";
+import ConfigDevice from "./config-device";
 
 export default interface ConfigWorker {
   interval: number;
