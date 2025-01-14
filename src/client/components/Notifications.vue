@@ -6,20 +6,20 @@ import NotificationRow from "@/components/NotificationRow.vue";
 
 const Notifications = Vue.extend({
   components: {
-    NotificationRow
+    NotificationRow,
   },
 
   emits: ["delete-notification"],
 
   computed: {
-    ...mapGetters("notifications", ["notifications", "notificationsCount"])
+    ...mapGetters("notifications", ["notifications", "notificationsCount"]),
   },
 
   methods: {
     deleteNotification(notification: NotificationType): void {
       this.$emit("delete-notification", notification);
-    }
-  }
+    },
+  },
 });
 
 export default Notifications;

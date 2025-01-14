@@ -6,19 +6,19 @@ import { Zone } from "@/store/zones/types";
 
 const SelectProfile = Vue.extend({
   components: {
-    HerbertButton
+    HerbertButton,
   },
 
   props: {
     label: string,
-    zone: Zone
+    zone: Zone,
   },
 
   emits: ["select-profile"],
 
   data() {
     return {
-      selected: this.zone.profileid || 0
+      selected: this.zone.profileid || 0,
     };
   },
 
@@ -31,14 +31,14 @@ const SelectProfile = Vue.extend({
       return true;
     },
 
-    ...mapGetters("profiles", ["profiles"])
+    ...mapGetters("profiles", ["profiles"]),
   },
 
   methods: {
     select() {
       this.$emit("select-profile", this.selected);
-    }
-  }
+    },
+  },
 });
 
 export default SelectProfile;

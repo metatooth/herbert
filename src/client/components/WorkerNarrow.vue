@@ -33,11 +33,11 @@ import Readable from "@/components/Readable.vue";
 
 const WorkerNarrow = Vue.extend({
   components: {
-    Readable
+    Readable,
   },
   props: {
-    worker: Worker
-  }
+    worker: Worker,
+  },
 });
 
 export default WorkerNarrow;

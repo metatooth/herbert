@@ -8,46 +8,46 @@ import {
   SendByDeviceIDPayload,
   SocketMessageType,
   SwitchStatusPayload,
-  WorkerStatusPayload
+  WorkerStatusPayload,
 } from "./types";
 import { createMessageCreator } from "./type-guards";
 
 export const makeWorkerRegisterMessage = createMessageCreator(
-  SocketMessageType.Register
+  SocketMessageType.Register,
 )<RegisterWorkerPayload>();
 
 export const makeCommandMessage = createMessageCreator(
-  SocketMessageType.Command
+  SocketMessageType.Command,
 )<CommandPayload>();
 
-export const makeErrorMessage = createMessageCreator(SocketMessageType.Error)<
-  ErrorPayload
->();
+export const makeErrorMessage = createMessageCreator(
+  SocketMessageType.Error,
+)<ErrorPayload>();
 
 export const makeConfigureMessage = createMessageCreator(
-  SocketMessageType.Configure
+  SocketMessageType.Configure,
 )<ConfigurePayload>();
 
 export const makeWorkerStatusMessage = createMessageCreator(
-  SocketMessageType.WorkerStatus
+  SocketMessageType.WorkerStatus,
 )<WorkerStatusPayload>();
 
 export const makeSwitchStatusMessage = createMessageCreator(
-  SocketMessageType.SwitchStatus
+  SocketMessageType.SwitchStatus,
 )<SwitchStatusPayload>();
 
 export const makeMeterStatusMessage = createMessageCreator(
-  SocketMessageType.MeterStatus
+  SocketMessageType.MeterStatus,
 )<MeterStatusPayload>();
 
 export const makeSendWorkerConfigMessage = createMessageCreator(
-  SocketMessageType.SendWorkerConfig
+  SocketMessageType.SendWorkerConfig,
 )<string>();
 
 export const makeBroadcastAllMessage = createMessageCreator(
-  SocketMessageType.BroadcastAll
+  SocketMessageType.BroadcastAll,
 )<AnySocketMessage>();
 
 export const makeSendByDeviceIDMessage = createMessageCreator(
-  SocketMessageType.SendByDeviceID
+  SocketMessageType.SendByDeviceID,
 )<SendByDeviceIDPayload>();

@@ -1,7 +1,8 @@
-import { Device } from "@/store/devices/types";
-import { Meter } from "@/store/meters/types";
-import { Profile } from "@/store/profiles/types";
 import { LampTimer } from "../../../shared/lamp-timer";
+
+import { Device } from "@client/store/devices/types";
+import { Meter } from "@client/store/meters/types";
+import { Profile } from "@client/store/profiles/types";
 
 export class Zone {
   id: number;
@@ -43,7 +44,7 @@ export class Zone {
     let result = 0;
     if (this.meters.length !== 0) {
       this.meters.forEach((meter) => {
-        result = result + parseFloat(meter.temperature);
+        result = result + meter.temperature;
       });
       result = result / this.meters.length;
     }
@@ -54,7 +55,7 @@ export class Zone {
     let result = 0;
     if (this.meters.length !== 0) {
       this.meters.forEach((meter) => {
-        result = result + parseFloat(meter.humidity);
+        result = result + meter.humidity;
       });
       result = result / this.meters.length;
     }
@@ -67,7 +68,7 @@ export class Zone {
     let shortname = tokens[0].slice(0, 5);
 
     if (tokens.length === 2) {
-      if (!isNaN(tokens[1])) {
+      if (!isNaN(parseFloat(tokens[1]))) {
         let index = tokens[1];
         if (index.length < 2) {
           index = `0${index}`;

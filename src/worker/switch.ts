@@ -16,7 +16,7 @@ export class Switch extends Device {
       device: this.device,
       manufacturer: this.manufacturer,
       status: this.state,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
   }
 }

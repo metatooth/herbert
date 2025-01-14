@@ -11,7 +11,7 @@ const NotificationRow = Vue.extend({
     id: { type: String, default: "" },
     plug: { type: String, default: "" },
     message: { type: String, default: "" },
-    timestamp: { type: Date, default: new Date() }
+    timestamp: { type: Date, default: new Date() },
   },
 
   emits: ["delete-notification"],
@@ -22,7 +22,7 @@ const NotificationRow = Vue.extend({
     },
 
     name() {
-      const found = this.devices.filter(d => {
+      const found = this.devices.filter((d) => {
         return d.device === this.plug;
       });
       if (found.length !== 0) {
@@ -32,8 +32,8 @@ const NotificationRow = Vue.extend({
       }
     },
 
-    ...mapGetters("devices", ["devices"])
-  }
+    ...mapGetters("devices", ["devices"]),
+  },
 });
 
 export default NotificationRow;

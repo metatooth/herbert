@@ -42,7 +42,7 @@
         <router-link
           :to="{
             name: 'readings',
-            params: { name: meter.nickname, device: meter.device }
+            params: { name: meter.nickname, device: meter.device },
           }"
         >
           <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
@@ -76,17 +76,17 @@ const MeterTile = Vue.extend({
     EditControls,
     MeterActual,
     Readable,
-    SelectZoneForDevice
+    SelectZoneForDevice,
   },
   props: {
     locked: Boolean,
-    meter: Meter
+    meter: Meter,
   },
 
   data() {
     return {
       nickname: this.meter.nickname,
-      editing: false
+      editing: false,
     };
   },
 
@@ -104,8 +104,8 @@ const MeterTile = Vue.extend({
     },
 
     zone() {
-      const found = this.zones.filter(zone => {
-        const meters = zone.meters.filter(meter => {
+      const found = this.zones.filter((zone) => {
+        const meters = zone.meters.filter((meter) => {
           return this.meter.device === meter.device;
         });
         return meters.length !== 0;
@@ -131,7 +131,7 @@ const MeterTile = Vue.extend({
     },
 
     ...mapGetters("notifications", ["notifications"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   methods: {
@@ -153,21 +153,21 @@ const MeterTile = Vue.extend({
     save() {
       this.edit({
         ...this.meter,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
 
     selectzone(zone: number) {
-      const target = this.zones.filter(z => {
+      const target = this.zones.filter((z) => {
         return zone === z.id;
       });
 
       if (target.length !== 0) {
         const payload = { zone: target[0], device: this.meter.device };
 
-        this.zones.forEach(zone => {
-          zone.meters.forEach(meter => {
+        this.zones.forEach((zone) => {
+          zone.meters.forEach((meter) => {
             if (meter.device === this.meter.device) {
               const doomed = { zone: zone, device: this.meter.device };
               this.removeDevice(doomed);
@@ -182,8 +182,8 @@ const MeterTile = Vue.extend({
     },
 
     ...mapActions("meters", ["edit", "remove"]),
-    ...mapActions("zones", ["addDevice", "removeDevice"])
-  }
+    ...mapActions("zones", ["addDevice", "removeDevice"]),
+  },
 });
 
 export default MeterTile;

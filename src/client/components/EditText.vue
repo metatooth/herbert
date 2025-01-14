@@ -3,14 +3,14 @@ import HerbertButton from "@/components/HerbertButton.vue";
 
 export default {
   components: {
-    HerbertButton
+    HerbertButton,
   },
 
   props: {
     text: string,
     size: string,
     label: string,
-    icon: string
+    icon: string,
   },
 
   emits: ["edit-text"],
@@ -18,7 +18,7 @@ export default {
   data() {
     return {
       edited: this.text,
-      editing: false
+      editing: false,
     };
   },
 
@@ -29,7 +29,7 @@ export default {
         name = "text";
       }
       return name;
-    }
+    },
   },
 
   methods: {
@@ -45,8 +45,8 @@ export default {
     cancel() {
       this.edited = this.text;
       this.editing = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

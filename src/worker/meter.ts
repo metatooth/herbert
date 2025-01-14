@@ -19,7 +19,7 @@ export class Meter extends Device {
       type: "",
       temperature: this.clime.temperature,
       humidity: this.clime.humidity,
-      timestamp: new Date().toString()
+      timestamp: new Date().toString(),
     });
   }
 }

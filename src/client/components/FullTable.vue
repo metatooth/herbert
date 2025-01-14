@@ -9,7 +9,6 @@ import WorkerRow from "@/components/WorkerRow.vue";
 import ZoneRow from "@/components/ZoneRow.vue";
 
 export default {
-
   components: {
     ConfigRow,
     DeviceRow,
@@ -29,7 +28,7 @@ export default {
   computed: {
     ...mapGetters("settings", ["settings"]),
   },
-}
+};
 </script>
 
 <template>

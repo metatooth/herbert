@@ -20,7 +20,7 @@ export class Environment {
     delta: number,
     humidity: number,
     tolerance: number,
-    mintemp: number
+    mintemp: number,
   ) {
     this.temp = temp;
     this.humidity = humidity;
@@ -32,7 +32,7 @@ export class Environment {
   check(
     temperature: number,
     delta: number,
-    humidity: number
+    humidity: number,
   ): Map<string, boolean> {
     const deficit = vaporPressureDeficit(temperature, delta, humidity);
 

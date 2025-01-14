@@ -31,12 +31,12 @@ router.put("/:id", async (req, res) => {
   if (req.body.devicetype) {
     await query<Device>(
       "UPDATE devices SET nickname = $1, devicetype = $2, updatedat = CURRENT_TIMESTAMP WHERE device = $3 RETURNING device",
-      [req.body.nickname, req.body.devicetype, id]
+      [req.body.nickname, req.body.devicetype, id],
     );
   } else {
     await query<Device>(
       "UPDATE devices SET nickname = $1, devicetype = null, updatedat = CURRENT_TIMESTAMP WHERE device = $2 RETURNING device",
-      [req.body.nickname, id]
+      [req.body.nickname, id],
     );
   }
   const device = await readDevice(id);
@@ -62,7 +62,7 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   await query(
     "UPDATE devices SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE device = $1",
-    [id]
+    [id],
   );
   res.status(204).json({});
 });

@@ -80,7 +80,7 @@ async function run() {
             (count * temperature + 1 * meter.temperature) / (count + 1);
           humidity = (count * humidity + 100 * meter.humidity) / (count + 1);
           count++;
-        })
+        }),
       );
 
       const now = new Date();
@@ -102,7 +102,7 @@ async function run() {
 
       const blower = new BlowerTimer(
         zone.profile.bloweractive / 1000,
-        zone.profile.blowercycle / 1000
+        zone.profile.blowercycle / 1000,
       );
 
       const delta = lamp.isOn(hour)
@@ -126,7 +126,7 @@ async function run() {
         const vpd = vaporPressureDeficit(
           zone.profile.lampontemperature,
           delta,
-          zone.profile.lamponhumidity
+          zone.profile.lamponhumidity,
         );
         target = new ConstantVpd([vpd, 100]);
       } else {
@@ -144,7 +144,7 @@ async function run() {
       }
 
       const directives = new AirDirectives(target);
-      directives.clime = new Clime(temperature, delta, humidity);
+      directives.clime = new Clime(temperature, humidity);
       directives.monitor();
 
       console.log(directives);
@@ -206,7 +206,7 @@ async function run() {
         parseInt(zone.profile.irrigationduration),
         num,
         parseInt(zone.maxirrigators),
-        utc.getHours()
+        utc.getHours(),
       );
 
       console.log("irr", irrigator);

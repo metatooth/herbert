@@ -3,7 +3,7 @@ import Vue from "vue";
 
 const SelectControlType = Vue.extend({
   props: {
-    controltype: string
+    controltype: string,
   },
 
   emits: ["select-controltype"],
@@ -11,15 +11,15 @@ const SelectControlType = Vue.extend({
   data() {
     return {
       controltypes: ["HI_LO", "TARGETS", "VPD"],
-      selected: this.controltype
+      selected: this.controltype,
     };
   },
 
   watch: {
     selected(val: string) {
       this.$emit("select-controltype", val);
-    }
-  }
+    },
+  },
 });
 
 export default SelectControlType;

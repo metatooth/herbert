@@ -34,19 +34,19 @@ router.get("/", async (req, res) => {
   if (one) {
     const { rows } = await query(
       "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
-      [req.query.meter]
+      [req.query.meter],
     );
     res.status(200).json(rows[0]);
   } else if (req.query.meter) {
     const { rows } = await query(
       "SELECT * FROM readings WHERE meter = $1 AND observedat > $2 ORDER BY id DESC",
-      [req.query.meter, start]
+      [req.query.meter, start],
     );
     res.status(200).json(rows);
   } else {
     const { rows } = await query(
       "SELECT * FROM readings WHERE observedat > $1 ORDER BY id DESC",
-      [start]
+      [start],
     );
     res.status(200).json(rows);
   }
@@ -59,7 +59,7 @@ router.post("/", async (req, res) => {
 
   const { rows } = await query<Reading>(
     "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
-    [meter]
+    [meter],
   );
 
   if (rows.length !== 0) {

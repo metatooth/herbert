@@ -20,8 +20,8 @@ import { Worker } from "@/store/workers/types";
 
 const WorkerCamera = Vue.extend({
   props: {
-    worker: Worker
-  }
+    worker: Worker,
+  },
 });
 
 export default WorkerCamera;

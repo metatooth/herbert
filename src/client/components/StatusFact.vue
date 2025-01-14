@@ -24,24 +24,24 @@ interface Fact {
 
 const StatusFact = Vue.extend({
   components: {
-    SparklineDisplay
+    SparklineDisplay,
   },
   props: {
     device: Device,
     width: { type: String, default: "300px" },
-    height: { type: String, default: "50px" }
+    height: { type: String, default: "50px" },
   },
 
   data() {
     return {
-      statuses: [] as Fact[]
+      statuses: [] as Fact[],
     };
   },
 
   computed: {
     id() {
       return `${this.device.device}-status`;
-    }
+    },
   },
 
   mounted() {
@@ -74,22 +74,22 @@ const StatusFact = Vue.extend({
                 d.month - 1,
                 d.date,
                 d.hour,
-                d.minute
+                d.minute,
               );
               const temperature = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number
+                y: d.reading as number,
               };
 
               this.statuses.push(temperature);
-            }
+            },
           );
         }
       };
 
       xhr.send();
-    }
-  }
+    },
+  },
 });
 
 export default StatusFact;

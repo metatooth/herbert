@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@client/*": ["./*"]
+    },
+    "outDir": "../../dist/client",
+    "composite": true
+  },
+  "include": ["**/*.ts", "**/*.vue"],
+  "exclude": ["**/*.test.ts"],
+  "references": [{ "path": "../shared" }]
+}

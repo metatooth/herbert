@@ -9,7 +9,7 @@ import HTTP from "@/api/http";
 
 const HumidityChart = Vue.extend({
   props: {
-    meters: { type: Array<object>, default: []},
+    meters: { type: Array<object>, default: [] },
   },
 
   data() {
@@ -63,7 +63,7 @@ const HumidityChart = Vue.extend({
             d.month - 1,
             d.date,
             d.hour,
-            d.minute
+            d.minute,
           );
 
           const humidity = {

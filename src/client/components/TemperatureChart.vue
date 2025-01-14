@@ -7,7 +7,6 @@ import Chart from "@/components/Chart.vue";
 import { Device } from "@/store/meters/types";
 
 const TemperatureChart = Vue.extend({
-
   components: {
     Chart,
   },

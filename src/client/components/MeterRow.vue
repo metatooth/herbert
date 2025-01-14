@@ -11,13 +11,13 @@ const MeterRow = Vue.extend({
   components: {
     EditControls,
     MeterActual,
-    Readable
+    Readable,
   },
 
   props: {
     meter: Meter,
     locked: Boolean,
-    units: string
+    units: string,
   },
 
   data() {
@@ -25,14 +25,14 @@ const MeterRow = Vue.extend({
       nickname: this.meter.nickname,
       updatedat: new Date(Date.parse(this.meter.updatedat)),
       updating: false,
-      editing: false
+      editing: false,
     };
   },
 
   computed: {
     zone() {
-      const found = this.zones.filter(zone => {
-        const meters = zone.meters.filter(meter => {
+      const found = this.zones.filter((zone) => {
+        const meters = zone.meters.filter((meter) => {
           return this.meter.device === meter.device;
         });
         return meters.length !== 0;
@@ -57,13 +57,13 @@ const MeterRow = Vue.extend({
       return "";
     },
 
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   watch: {
     meter() {
       this.updating = false;
-    }
+    },
   },
 
   methods: {
@@ -74,7 +74,7 @@ const MeterRow = Vue.extend({
     save(): void {
       this.edit({
         ...this.meter,
-        nickname: this.nickname
+        nickname: this.nickname,
       });
       this.editing = false;
     },
@@ -90,8 +90,8 @@ const MeterRow = Vue.extend({
       }
     },
 
-    ...mapActions("meters", ["edit", "remove"])
-  }
+    ...mapActions("meters", ["edit", "remove"]),
+  },
 });
 
 export default MeterRow;
@@ -125,7 +125,7 @@ export default MeterRow;
       <router-link
         :to="{
           name: 'readings',
-          params: { name: meter.nickname, device: meter.device }
+          params: { name: meter.nickname, device: meter.device },
         }"
       >
         <readable :timestamp="new Date(Date.parse(meter.timestamp))" />

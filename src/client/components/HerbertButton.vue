@@ -6,7 +6,7 @@ export default {
     label: { type: String, default: "Submit" },
     icon: { type: String, default: "cannabis" },
     size: { type: String, default: "small" },
-    color: { type: String, default: "primary" }
+    color: { type: String, default: "primary" },
   },
 
   emits: ["on-click"],
@@ -14,8 +14,8 @@ export default {
   computed: {
     buttonClass() {
       return `button is-${this.size} has-text-${this.color}`;
-    }
-  }
+    },
+  },
 };
 </script>
 

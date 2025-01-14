@@ -8,7 +8,7 @@ const router = Router();
 router.get("/", async (req, res) => {
   const { rows } = await query(
     "SELECT * FROM profiles WHERE deleted <> true",
-    []
+    [],
   );
   res.status(200).json(rows);
 });
@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
       req.body.blowercycle,
       req.body.irrigationperday,
       req.body.irrigationduration,
-    ]
+    ],
   );
   const profile = await readProfile(rows[0].id);
   res.status(201).json(profile);
@@ -59,7 +59,7 @@ router.put("/:id", async (req, res) => {
       req.body.irrigationduration,
       req.body.controltype,
       id,
-    ]
+    ],
   );
   console.log("update profiles", rows);
   const profile = await readProfile(rows[0].id);
@@ -70,7 +70,7 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   await query(
     "UPDATE profiles SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE id = $1",
-    [id]
+    [id],
   );
   res.status(204).json({});
 });

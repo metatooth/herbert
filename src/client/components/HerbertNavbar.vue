@@ -4,14 +4,14 @@ import { mapGetters } from "vuex";
 
 const HerbertNavbar = Vue.extend({
   props: {
-    locked: { type: Boolean, default: true }
+    locked: { type: Boolean, default: true },
   },
 
   emits: ["search-on", "selected", "toggle"],
 
   data() {
     return {
-      filter: ""
+      filter: "",
     };
   },
 
@@ -31,13 +31,13 @@ const HerbertNavbar = Vue.extend({
       return this.settings.title || "Grow More";
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   watch: {
     filter(val: string) {
       this.$emit("search-on", val);
-    }
+    },
   },
 
   methods: {
@@ -73,8 +73,8 @@ const HerbertNavbar = Vue.extend({
 
     toggle() {
       this.$emit("toggle");
-    }
-  }
+    },
+  },
 });
 
 export default HerbertNavbar;

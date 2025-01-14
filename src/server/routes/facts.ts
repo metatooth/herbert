@@ -30,7 +30,7 @@ ORDER BY hour ASC, minute ASC",
       limit.getFullYear(),
       limit.getMonth() + 1,
       limit.getDate(),
-    ]
+    ],
   );
 
   res.status(200).json(rows);

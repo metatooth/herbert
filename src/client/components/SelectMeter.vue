@@ -4,7 +4,7 @@ import Vue from "vue";
 const SelectMeter = Vue.extend({
   props: {
     label: string,
-    meters: { type: Array<object>, default: [] }
+    meters: { type: Array<object>, default: [] },
   },
 
   emits: ["select-meter"],

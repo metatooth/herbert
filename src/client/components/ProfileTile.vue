@@ -5,7 +5,7 @@ import {
   celsius2fahrenheit,
   celsius2kelvin,
   fahrenheit2celsius,
-  kelvin2celsius
+  kelvin2celsius,
 } from "../../shared/utils";
 import { Profile } from "@/store/profiles/types";
 import EditControls from "@/components/EditControls.vue";
@@ -18,12 +18,12 @@ const ProfileTile = Vue.extend({
     EditControls,
     Readable,
     SelectControlType,
-    Target
+    Target,
   },
   props: {
     locked: Boolean,
     profile: Profile,
-    units: string
+    units: string,
   },
 
   data() {
@@ -53,7 +53,7 @@ const ProfileTile = Vue.extend({
     console.log(
       "lampon profile",
       this.profile.lampontemperature,
-      typeof this.lampontemperature
+      typeof this.lampontemperature,
     );
     console.log("lampon", lampon, typeof lampon);
 
@@ -71,7 +71,7 @@ const ProfileTile = Vue.extend({
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
-      editing: false
+      editing: false,
     };
   },
 
@@ -118,7 +118,7 @@ const ProfileTile = Vue.extend({
       }
 
       return max;
-    }
+    },
   },
 
   methods: {
@@ -146,7 +146,7 @@ const ProfileTile = Vue.extend({
       console.log(
         "lamp on",
         this.lampontemperature,
-        typeof this.lampontemperature
+        typeof this.lampontemperature,
       );
       console.log("lamp on", ontemp, typeof ontemp);
       console.log("this units", this.units);
@@ -174,7 +174,7 @@ const ProfileTile = Vue.extend({
         bloweractive: this.bloweractive * 1000,
         blowercycle: this.blowercycle * 1000,
         irrigationperday: this.irrigationperday,
-        irrigationduration: this.irrigationduration * 1000
+        irrigationduration: this.irrigationduration * 1000,
       };
 
       this.edit(profile);
@@ -194,8 +194,8 @@ const ProfileTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("profiles", ["edit", "remove"])
-  }
+    ...mapActions("profiles", ["edit", "remove"]),
+  },
 });
 
 export default ProfileTile;

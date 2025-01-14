@@ -7,7 +7,7 @@ import ZoneChart from "@/components/ZoneChart.vue";
 
 const Readings = Vue.extend({
   components: {
-    ZoneChart
+    ZoneChart,
   },
   data() {
     return {
@@ -15,18 +15,18 @@ const Readings = Vue.extend({
       temperatures: [],
       humidities: [],
       min: 100,
-      max: 0
+      max: 0,
     };
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   watch: {
     range() {
       this.refresh();
-    }
+    },
   },
 
   mounted() {
@@ -42,7 +42,7 @@ const Readings = Vue.extend({
 
       temp.open(
         "GET",
-        `${url}/facts?meter=${this.$route.params.device}&units=CELSIUS&last=${this.range}`
+        `${url}/facts?meter=${this.$route.params.device}&units=CELSIUS&last=${this.range}`,
       );
 
       temp.onload = () => {
@@ -50,18 +50,18 @@ const Readings = Vue.extend({
         if (!data.error) {
           this.temperatures = [];
 
-          data.forEach(d => {
+          data.forEach((d) => {
             const observedat = new Date(
               d.year,
               d.month - 1,
               d.date,
               d.hour,
-              d.minute
+              d.minute,
             );
 
             const temperature = {
               x: convertToLocalTime(observedat, { timeZone }),
-              y: parseFloat(d.reading)
+              y: parseFloat(d.reading),
             };
 
             this.temperatures.push(temperature);
@@ -73,7 +73,7 @@ const Readings = Vue.extend({
 
       humid.open(
         "GET",
-        `${url}/facts?meter=${this.$route.params.device}&units=%RH&last=${this.range}`
+        `${url}/facts?meter=${this.$route.params.device}&units=%RH&last=${this.range}`,
       );
 
       humid.onload = () => {
@@ -81,18 +81,18 @@ const Readings = Vue.extend({
         if (!data.error) {
           this.humidities = [];
 
-          data.forEach(d => {
+          data.forEach((d) => {
             const observedat = new Date(
               d.year,
               d.month - 1,
               d.date,
               d.hour,
-              d.minute
+              d.minute,
             );
 
             const humidity = {
               x: convertToLocalTime(observedat, { timeZone }),
-              y: parseFloat(d.reading) * 100
+              y: parseFloat(d.reading) * 100,
             };
 
             this.humidities.push(humidity);
@@ -102,8 +102,8 @@ const Readings = Vue.extend({
 
       temp.send();
       humid.send();
-    }
-  }
+    },
+  },
 });
 export default Readings;
 </script>

@@ -32,7 +32,7 @@ router.put("/", async (req, res) => {
         req.body.statecode,
         req.body.reportingperiod,
         req.body.pin,
-      ]
+      ],
     );
   } else {
     await query(
@@ -50,7 +50,7 @@ router.put("/", async (req, res) => {
         req.body.statecode,
         req.body.reportingperiod,
         req.body.pin,
-      ]
+      ],
     );
   }
 

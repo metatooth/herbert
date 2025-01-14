@@ -18,7 +18,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
     const json = JSON.stringify({ device: payload.device });
     HTTP.post(`/zones/${payload.zone.id}/devices`, json).then((response) => {
       const device = response.data.devices.find(
-        (el) => el.device === payload.device
+        (el) => el.device === payload.device,
       );
       if (device) {
         commit("ADD_DEVICE", {
@@ -28,7 +28,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
       }
 
       const meter = response.data.meters.find(
-        (el) => el.device === payload.device
+        (el) => el.device === payload.device,
       );
       if (meter) {
         commit("ADD_METER", {
@@ -56,16 +56,16 @@ export const actions: ActionTree<ZonesState, RootState> = {
 
       if (zone.profile) {
         zone.profile.lampontemperature = parseFloat(
-          clone.profile.lampontemperature
+          clone.profile.lampontemperature,
         );
 
         zone.profile.lamponhumidity = parseFloat(clone.profile.lamponhumidity);
         zone.profile.lampofftemperature = parseFloat(
-          clone.profile.lampofftemperature
+          clone.profile.lampofftemperature,
         );
 
         zone.profile.lampoffhumidity = parseFloat(
-          clone.profile.lampoffhumidity
+          clone.profile.lampoffhumidity,
         );
       }
 
@@ -84,18 +84,18 @@ export const actions: ActionTree<ZonesState, RootState> = {
 
         if (zone.profile) {
           zone.profile.lampontemperature = parseFloat(
-            clone.profile.lampontemperature
+            clone.profile.lampontemperature,
           );
 
           zone.profile.lamponhumidity = parseFloat(
-            clone.profile.lamponhumidity
+            clone.profile.lamponhumidity,
           );
           zone.profile.lampofftemperature = parseFloat(
-            clone.profile.lampofftemperature
+            clone.profile.lampofftemperature,
           );
 
           zone.profile.lampoffhumidity = parseFloat(
-            clone.profile.lampoffhumidity
+            clone.profile.lampoffhumidity,
           );
         }
 

@@ -24,7 +24,7 @@ router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const { rows } = await query<Meter>(
     "UPDATE devices SET nickname = $1, updatedat = CURRENT_TIMESTAMP WHERE device = $2 RETURNING device",
-    [req.body.nickname, id]
+    [req.body.nickname, id],
   );
   const meter = await readMeter(rows[0].device);
   res.status(201).json(meter);
@@ -34,7 +34,7 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   await query(
     "UPDATE devices SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE device = $1",
-    [id]
+    [id],
   );
   res.status(204).json({});
 });

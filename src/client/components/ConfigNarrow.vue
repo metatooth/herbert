@@ -28,11 +28,11 @@ import Readable from "@/components/Readable.vue";
 
 const ConfigNarrow = Vue.extend({
   components: {
-    Readable
+    Readable,
   },
   props: {
-    config: Config
-  }
+    config: Config,
+  },
 });
 
 export default ConfigNarrow;

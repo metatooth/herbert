@@ -7,7 +7,7 @@ import { mapGetters, mapActions } from "vuex";
 import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
 import {
   makeErrorMessage,
-  makeSwitchStatusMessage
+  makeSwitchStatusMessage,
 } from "../../shared/message-creators";
 import { messageIsFrom } from "../../shared/type-guards";
 
@@ -19,16 +19,16 @@ import { Notification } from "@/store/notifications/types";
 const HerbertOverview = Vue.extend({
   components: {
     Collection,
-    NotificationRow
+    NotificationRow,
   },
 
   props: {
-    filter: string
+    filter: string,
   },
 
   computed: {
     activeSet() {
-      const active = this.zones.filter(el => {
+      const active = this.zones.filter((el) => {
         return el.nickname.match(this.filter);
       });
       return active.sort((a, b) => {
@@ -72,17 +72,17 @@ const HerbertOverview = Vue.extend({
 
     ...mapGetters("devices", ["devices"]),
     ...mapGetters("notifications", ["notifications", "notificationsCount"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   mounted() {
     const ws: Socket<SocketMessageMap> = io(
-      process.env.VUE_APP_WS_URL || "ws://localhost:5000"
+      process.env.VUE_APP_WS_URL || "ws://localhost:5000",
     );
     ws.emit("join", { room: "clients" });
     ws.on("message", (msg: AnySocketMessage) => {
       if (messageIsFrom(makeSwitchStatusMessage, msg)) {
-        const found = this.devices.filter(d => {
+        const found = this.devices.filter((d) => {
           return d.device === msg.payload.device;
         });
         if (found.length !== 0) {
@@ -98,7 +98,7 @@ const HerbertOverview = Vue.extend({
           action: msg.payload.action,
           code: msg.payload.code,
           message: msg.payload.message,
-          timestamp: new Date(Date.parse(msg.payload.timestamp))
+          timestamp: new Date(Date.parse(msg.payload.timestamp)),
         };
         this.add(n);
         return;
@@ -111,7 +111,7 @@ const HerbertOverview = Vue.extend({
       const check = Date.now();
       this.devices.forEach((d: Device) => {
         const local = convertToLocalTime(d.timestamp || new Date(), {
-          timeZone: "America/New_York"
+          timeZone: "America/New_York",
         });
         const diff = check - local.getTime();
         if (diff > 5 * 60 * 1000) {
@@ -123,7 +123,7 @@ const HerbertOverview = Vue.extend({
             code: "",
             plug: d.nickname || d.device,
             message: `Hasn't reported since ${formatted}`,
-            timestamp: new Date()
+            timestamp: new Date(),
           };
           this.add(n);
         }
@@ -147,8 +147,8 @@ const HerbertOverview = Vue.extend({
       return n.toString();
     },
 
-    ...mapActions("notifications", ["add", "remove"])
-  }
+    ...mapActions("notifications", ["add", "remove"]),
+  },
 });
 export default HerbertOverview;
 </script>

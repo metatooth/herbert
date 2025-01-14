@@ -9,7 +9,7 @@ const Readings = Vue.extend({
   components: {
     BackToDashboard,
     Chart,
-    TemperatureChart
+    TemperatureChart,
   },
   data() {
     return {
@@ -18,14 +18,14 @@ const Readings = Vue.extend({
       humidities: [],
       pressures: [],
       min: 100,
-      max: 0
+      max: 0,
     };
   },
 
   watch: {
     range() {
       this.refresh();
-    }
+    },
   },
 
   mounted() {
@@ -39,7 +39,7 @@ const Readings = Vue.extend({
 
       xhr.open(
         "GET",
-        `${url}/readings/?meter=${this.$route.params.device}&last=${this.range}`
+        `${url}/readings/?meter=${this.$route.params.device}&last=${this.range}`,
       );
 
       xhr.onload = () => {
@@ -48,15 +48,15 @@ const Readings = Vue.extend({
           this.temperatures = [];
           this.humidities = [];
           const timeZone = "America/New_York";
-          data.forEach(d => {
+          data.forEach((d) => {
             const ts = convertToLocalTime(d.observedat, { timeZone });
             const temperature = {
               x: ts,
-              y: parseFloat(d.temperature)
+              y: parseFloat(d.temperature),
             };
             const humidity = {
               x: ts,
-              y: 100 * d.humidity
+              y: 100 * d.humidity,
             };
 
             if (humidity.y < this.min) {
@@ -69,7 +69,7 @@ const Readings = Vue.extend({
 
             const pressure = {
               x: ts,
-              y: d.pressure / 1000
+              y: d.pressure / 1000,
             };
 
             this.temperatures.push(temperature);
@@ -80,8 +80,8 @@ const Readings = Vue.extend({
       };
 
       xhr.send();
-    }
-  }
+    },
+  },
 });
 export default Readings;
 </script>

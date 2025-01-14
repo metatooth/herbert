@@ -58,7 +58,7 @@ export class MerossController extends EventEmitter {
     this.switches.forEach((device) => {
       device.plug.controlToggleX(1, true, (err, res) => {
         console.log(
-          "Toggle Response - err: " + err + " & res: " + JSON.stringify(res)
+          "Toggle Response - err: " + err + " & res: " + JSON.stringify(res),
         );
       });
     });

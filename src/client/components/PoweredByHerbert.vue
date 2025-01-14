@@ -2,9 +2,7 @@
   <div class="box">
     <div class="card">
       <div class="card-content">
-        <p class="content">
-          Powered by
-        </p>
+        <p class="content">Powered by</p>
         <img class="logo" src="../assets/images/logo.png" />
       </div>
       <footer class="card-footer">

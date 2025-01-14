@@ -9,11 +9,11 @@ import { mapActions, mapGetters } from "vuex";
 const WorkerTile = Vue.extend({
   components: {
     EditControls,
-    Readable
+    Readable,
   },
   props: {
     locked: Boolean,
-    worker: Worker
+    worker: Worker,
   },
 
   data() {
@@ -22,7 +22,7 @@ const WorkerTile = Vue.extend({
       configname: this.worker.configname,
       config: JSON.stringify(this.worker.config),
       readable: true,
-      editing: false
+      editing: false,
     };
   },
 
@@ -34,17 +34,17 @@ const WorkerTile = Vue.extend({
       return null;
     },
 
-    ...mapGetters("configs", ["configs"])
+    ...mapGetters("configs", ["configs"]),
   },
 
   watch: {
     configname() {
-      this.configs.forEach(config => {
+      this.configs.forEach((config) => {
         if (this.configname === config.nickname) {
           this.config = config.config;
         }
       });
-    }
+    },
   },
 
   methods: {
@@ -56,7 +56,7 @@ const WorkerTile = Vue.extend({
       this.edit({
         ...this.worker,
         nickname: this.nickname,
-        configname: this.configname
+        configname: this.configname,
       });
       this.editing = false;
     },
@@ -73,8 +73,8 @@ const WorkerTile = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("workers", ["edit", "remove"])
-  }
+    ...mapActions("workers", ["edit", "remove"]),
+  },
 });
 
 export default WorkerTile;
@@ -104,9 +104,7 @@ export default WorkerTile;
       </p>
       <div class="content">
         <select v-if="editing" v-model="configname">
-          <option disabled value="">
-            Select a config for this worker
-          </option>
+          <option disabled value="">Select a config for this worker</option>
           <option v-for="item in configs" :key="item.nickname">
             {{ item.nickname }}
           </option>

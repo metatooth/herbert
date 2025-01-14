@@ -7,7 +7,7 @@ const router = Router();
 router.get("/", async (req, res) => {
   const { rows } = await query<Config>(
     "SELECT * FROM worker_config ORDER BY nickname",
-    []
+    [],
   );
   res.status(200).json(rows);
 });
@@ -21,7 +21,7 @@ router.post("/", async (req, res) => {
   const { nickname, config } = req.body;
   await query<Config>(
     "INSERT INTO worker_config (nickname, config) VALUES ($1, $2)",
-    [nickname, JSON.stringify(config)]
+    [nickname, JSON.stringify(config)],
   );
   const updatedConfig = await readConfig(nickname);
   return res.status(200).json(updatedConfig);
@@ -37,7 +37,7 @@ router.put("/:name", async (req, res) => {
     config = $2,
     updatedat = CURRENT_TIMESTAMP
     WHERE nickname = $3`,
-    [nickname, config, name]
+    [nickname, config, name],
   );
   res.status(200).json(rows[0]);
 });

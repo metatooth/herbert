@@ -3,7 +3,7 @@ import HerbertButton from "@/components/HerbertButton.vue";
 
 export default {
   components: {
-    HerbertButton
+    HerbertButton,
   },
 
   props: {
@@ -11,7 +11,7 @@ export default {
     size: string,
     label: string,
     icon: string,
-    color: { type: String, default: "#ffffff" }
+    color: { type: String, default: "#ffffff" },
   },
 
   emits: ["edit-number"],
@@ -19,7 +19,7 @@ export default {
   data() {
     return {
       edited: this.num,
-      editing: false
+      editing: false,
     };
   },
 
@@ -41,7 +41,7 @@ export default {
         return "text";
       }
       return "title";
-    }
+    },
   },
 
   methods: {
@@ -57,8 +57,8 @@ export default {
     cancel() {
       this.edited = this.num;
       this.editing = false;
-    }
-  }
+    },
+  },
 };
 </script>
 

@@ -140,7 +140,7 @@ export enum SocketMessageType {
   Error = "ERROR",
   SendWorkerConfig = "SEND_WORKER_CONFIG",
   BroadcastAll = "BROADCAST_ALL",
-  SendByDeviceID = "SEND_BY_DEVICE_ID"
+  SendByDeviceID = "SEND_BY_DEVICE_ID",
 }
 
 // Represents a simple message consisting only of a type
@@ -159,7 +159,7 @@ export type AnySocketMessage = SocketMessage<SocketMessageType, unknown>;
 
 // Represents a function that creates a socket message object
 export type MessageCreator<T extends SocketMessageType, P> = (
-  payload: P
+  payload: P,
 ) => SocketMessage<T, P>;
 
 // Represents an enhancement on the creator function that allows it to

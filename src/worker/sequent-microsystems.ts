@@ -28,7 +28,7 @@ export class SequentMicrosystems extends Switch {
           if (stdout) {
             console.log(`stdout: ${stdout}`);
           }
-        }
+        },
       );
       this.state = "on";
     }
@@ -49,7 +49,7 @@ export class SequentMicrosystems extends Switch {
           if (stdout) {
             console.log(`stdout: ${stdout}`);
           }
-        }
+        },
       );
       this.state = "off";
     }
@@ -70,7 +70,7 @@ export class SequentMicrosystems extends Switch {
         } else {
           this.state = "off";
         }
-      }
+      },
     );
 
     return super.status();

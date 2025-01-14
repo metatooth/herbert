@@ -6,7 +6,7 @@ import "chartjs-adapter-date-fns";
 const SparklineDisplay = Vue.extend({
   props: {
     id: { type: String, default: "sparkline" },
-    data: { type: Array<number>, default: [] },
+    data: { type: Array, default: () => [] },
     color: { type: String, default: "rgb(255, 119, 0)" },
     width: { type: String, default: "300px" },
     height: { type: String, default: "50px" },

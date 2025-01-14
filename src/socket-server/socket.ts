@@ -19,7 +19,7 @@ import {
   MeterStatusPayload,
   RegisterWorkerPayload,
   SocketMessageMap,
-  SwitchStatusPaylaod,
+  SwitchStatusPayload,
   Worker,
   WorkerStatusPayload,
 } from "../shared/types";
@@ -66,7 +66,7 @@ export class HerbertSocket {
 
   public broadcastToOthers(
     ws: IO.Socket<SocketMessageMap>,
-    msg: AnySocketMessage
+    msg: AnySocketMessage,
   ) {
     ws.broadcast.emit("message", msg);
   }
@@ -227,7 +227,7 @@ export class HerbertSocket {
     }
   }
 
-  private async handleSwitchStatusMsg(payload: SwitchStatusPaylaod) {
+  private async handleSwitchStatusMsg(payload: SwitchStatusPayload) {
     try {
       const body = {
         device: payload.device,
@@ -292,7 +292,7 @@ export class HerbertSocket {
           pressure: vaporPressureDeficit(
             payload.temperature,
             0,
-            payload.humidity
+            payload.humidity,
           ),
           ts: payload.timestamp,
         };

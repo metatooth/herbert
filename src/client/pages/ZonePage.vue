@@ -10,7 +10,7 @@ const ZonePage = Vue.extend({
   components: {
     BackToDashboard,
     EditControls,
-    ZoneDetail
+    ZoneDetail,
   },
 
   data() {
@@ -23,7 +23,7 @@ const ZonePage = Vue.extend({
       zonemeters: [],
       zonedevices: [],
       zonechildren: [],
-      editing: false
+      editing: false,
     };
   },
 
@@ -34,7 +34,7 @@ const ZonePage = Vue.extend({
 
     zone() {
       const id = this.$route.params.id;
-      const z = this.zones.filter(z => {
+      const z = this.zones.filter((z) => {
         return z.id === id;
       });
       return z[0];
@@ -44,7 +44,7 @@ const ZonePage = Vue.extend({
     ...mapGetters("profiles", ["profiles"]),
     ...mapGetters("zones", ["zones"]),
     ...mapGetters("devices", ["devices"]),
-    ...mapGetters("meters", ["meters"])
+    ...mapGetters("meters", ["meters"]),
   },
 
   mounted() {
@@ -61,15 +61,15 @@ const ZonePage = Vue.extend({
 
     this.maxirrigators = this.zone.maxirrigators;
 
-    this.zone.meters.forEach(m => {
+    this.zone.meters.forEach((m) => {
       this.zonemeters.push(m.device);
     });
 
-    this.zone.devices.forEach(d => {
+    this.zone.devices.forEach((d) => {
       this.zonedevices.push(d.device);
     });
 
-    this.zone.children.forEach(c => {
+    this.zone.children.forEach((c) => {
       this.zonechildren.push(c);
     });
   },
@@ -96,7 +96,7 @@ const ZonePage = Vue.extend({
         maxirrigators: this.maxirrigators,
         meters: this.zonemeters,
         devices: this.zonedevices,
-        children: this.zonechildren
+        children: this.zonechildren,
       };
       this.edit(zone);
       this.editing = false;
@@ -113,8 +113,8 @@ const ZonePage = Vue.extend({
       this.editing = false;
     },
 
-    ...mapActions("zones", ["edit", "remove"])
-  }
+    ...mapActions("zones", ["edit", "remove"]),
+  },
 });
 
 export default ZonePage;

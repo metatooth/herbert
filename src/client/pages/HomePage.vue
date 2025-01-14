@@ -16,20 +16,20 @@ const Dashboard = Vue.extend({
     HerbertCollection,
     HerbertNavbar,
     ReadableTimestamp,
-    SettingsPage
+    SettingsPage,
   },
   data() {
     return {
       filter: "",
       picked: "overview",
       locked: true,
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
   computed: {
     cameras() {
-      return this.workers.filter(worker => {
+      return this.workers.filter((worker) => {
         return worker.camera !== null;
       });
     },
@@ -43,7 +43,7 @@ const Dashboard = Vue.extend({
 
     ...mapGetters("settings", ["settings"]),
     ...mapGetters("workers", ["workers"]),
-    ...mapGetters("zones", ["zones"])
+    ...mapGetters("zones", ["zones"]),
   },
 
   mounted() {
@@ -113,9 +113,9 @@ const Dashboard = Vue.extend({
       "configs/fetchData",
       "zones/fetchData",
       "settings/fetchData",
-      "settings/edit"
-    ])
-  }
+      "settings/edit",
+    ]),
+  },
 });
 
 export default Dashboard;

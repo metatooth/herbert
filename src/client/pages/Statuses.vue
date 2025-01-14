@@ -8,27 +8,27 @@ import BackToDashboard from "@/components/BackToDashboard.vue";
 const Statuses = Vue.extend({
   components: {
     BackToDashboard,
-    ChartBase
+    ChartBase,
   },
   props: {
-    name: { type: String, default: "" }
+    name: { type: String, default: "" },
   },
 
   data() {
     return {
       range: "hour",
-      statuses: []
+      statuses: [],
     };
   },
 
   computed: {
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   watch: {
     range() {
       this.refresh();
-    }
+    },
   },
 
   mounted() {
@@ -42,20 +42,20 @@ const Statuses = Vue.extend({
 
       xhr.open(
         "GET",
-        `${url}/statuses/?device=${this.$route.params.device}&last=${this.range}`
+        `${url}/statuses/?device=${this.$route.params.device}&last=${this.range}`,
       );
 
       xhr.onload = () => {
         const data = JSON.parse(xhr.response);
         if (!data.error) {
           this.statuses = [];
-          data.forEach(d => {
+          data.forEach((d) => {
             const ts = convertToLocalTime(d.observedat, {
-              timeZone: this.settings.timezone
+              timeZone: this.settings.timezone,
             });
             const status = {
               x: ts,
-              y: d.status === "on" ? 1 : 0
+              y: d.status === "on" ? 1 : 0,
             };
 
             this.statuses.push(status);
@@ -64,8 +64,8 @@ const Statuses = Vue.extend({
       };
 
       xhr.send();
-    }
-  }
+    },
+  },
 });
 export default Statuses;
 </script>

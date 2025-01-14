@@ -13,7 +13,7 @@ export class IrrigationTimer {
     active: number,
     total: number,
     max: number,
-    offset: number
+    offset: number,
   ) {
     this.runs = runs;
     this.active = active;

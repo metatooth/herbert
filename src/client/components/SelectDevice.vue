@@ -4,7 +4,7 @@ import Vue from "vue";
 const SelectDevice = Vue.extend({
   props: {
     label: string,
-    devices: { type: Array<object>, default: [] }
+    devices: { type: Array<object>, default: [] },
   },
 
   emits: ["select-device"],

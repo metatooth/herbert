@@ -12,7 +12,6 @@ import ConfigTile from "@/components/ConfigTile.vue";
 import { Device } from "@/store/meters/types";
 
 const ThreeColumns = Vue.extend({
-
   components: {
     DeviceTile,
     MeterTile,

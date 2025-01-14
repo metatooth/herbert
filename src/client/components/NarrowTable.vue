@@ -1,6 +1,4 @@
 <script lang="ts">
-import Vue from "vue";
-
 import ConfigNarrow from "@/components/ConfigNarrow.vue";
 import DeviceNarrow from "@/components/DeviceNarrow.vue";
 import MeterNarrow from "@/components/MeterNarrow.vue";
@@ -8,8 +6,7 @@ import ProfileNarrow from "@/components/ProfileNarrow.vue";
 import WorkerNarrow from "@/components/WorkerNarrow.vue";
 import ZoneNarrow from "@/components/ZoneNarrow.vue";
 
-const NarrowTable = Vue.extend({
-
+export default {
   components: {
     ConfigNarrow,
     DeviceNarrow,
@@ -22,9 +19,7 @@ const NarrowTable = Vue.extend({
     items: { type: Array<object>, default: [] },
     type: string,
   },
-});
-
-export default NarrowTable;
+};
 </script>
 
 <template>

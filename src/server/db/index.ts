@@ -26,7 +26,7 @@ export async function query<T>(text, params): Promise<QueryResult<T>> {
 export async function readAccount(id: number): Promise<Account> {
   const { rows } = await query<Account>(
     "SELECT title, logo, locale, timezone, units, refresh, timeout, interval, openweather, cityname, statecode, reportingperiod, pin, updatedat FROM accounts WHERE id = $1",
-    [id]
+    [id],
   );
   return rows[0];
 }
@@ -34,7 +34,7 @@ export async function readAccount(id: number): Promise<Account> {
 export async function readProfile(id: string): Promise<Profile> {
   const { rows } = await query<Profile>(
     "SELECT id, profile, lampstart, lampduration, lampontemperature, lamponhumidity, lampofftemperature, lampoffhumidity, bloweractive, blowercycle, irrigationperday, irrigationduration, controltype, updatedat FROM profiles WHERE id = $1",
-    [id]
+    [id],
   );
   return rows[0];
 }
@@ -42,7 +42,7 @@ export async function readProfile(id: string): Promise<Profile> {
 export async function readDevice(id: string): Promise<Device> {
   const { rows } = await query<Device>(
     "SELECT device, devicetype, manufacturer, nickname, status, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
-    [id]
+    [id],
   );
   return rows[0];
 }
@@ -50,7 +50,7 @@ export async function readDevice(id: string): Promise<Device> {
 export async function readMeter(id: string): Promise<Meter> {
   const { rows } = await query<Meter>(
     "SELECT device, devicetype, manufacturer, nickname, temperature, humidity, pressure, updatedat as timestamp, createdat, updatedat, deleted, deletedat FROM devices WHERE device = $1",
-    [id]
+    [id],
   );
   return rows[0];
 }
@@ -60,7 +60,7 @@ export async function readZone(id: number) {
 
   const res = await query<Zone & Profile>(
     "SELECT z.id, z.nickname, p.id as profileid, z.maxirrigators, z.lamponleafdiff, z.lampoffleafdiff, z.updatedat, z.active FROM zones z LEFT JOIN profiles p ON z.profileid = p.id WHERE z.id = $1",
-    [id]
+    [id],
   );
 
   promises.push(res.rows[0]);
@@ -75,7 +75,7 @@ export async function readZone(id: number) {
 
   const devices = await query<Device>(
     "SELECT d.device FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.devicetype != 'meter' AND zd.zoneid = $1",
-    [id]
+    [id],
   );
 
   if (devices.rowCount > 0) {
@@ -86,7 +86,7 @@ export async function readZone(id: number) {
 
   const meters = await query<Meter>(
     "SELECT d.device FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.devicetype = 'meter' AND zd.zoneid = $1",
-    [id]
+    [id],
   );
 
   if (meters.rowCount > 0) {
@@ -97,7 +97,7 @@ export async function readZone(id: number) {
 
   const children = await query<number>(
     "SELECT e.b FROM zones z INNER JOIN edges e ON z.id = e.a WHERE z.id = $1",
-    [id]
+    [id],
   );
 
   if (children.rowCount > 0) {
@@ -130,7 +130,7 @@ export async function readZone(id: number) {
 export async function parentZone(id: string): Promise<Zone> {
   const { rows } = await query<Zone>(
     "SELECT e.a as id FROM zones z INNER JOIN edges e ON z.id = e.b WHERE e.b = $1",
-    [id]
+    [id],
   );
   if (rows.length > 0) {
     return await readZone(rows[0].id);
@@ -144,7 +144,7 @@ export async function readZones() {
 
   const { rows } = await query<Zone>(
     "SELECT id FROM zones WHERE deleted <> true",
-    []
+    [],
   );
 
   rows.forEach((row) => {
@@ -160,7 +160,7 @@ export async function readActiveZones() {
 
   const { rows } = await query<Zone>(
     "SELECT id FROM zones WHERE deleted <> true AND active <> false",
-    []
+    [],
   );
 
   rows.forEach((row) => {
@@ -176,7 +176,7 @@ export async function readZoneDevices(device: string) {
 
   const { rows } = await query<Device & Zone>(
     "SELECT d.id FROM devices d INNER JOIN zone_devices zd ON d.device = zd.device WHERE d.device = $1 ORDER BY d.devicetype",
-    [device]
+    [device],
   );
 
   rows.forEach((row) => {
@@ -192,7 +192,7 @@ export async function readDevices() {
 
   const { rows } = await query<Device>(
     "SELECT device FROM devices WHERE (devicetype is null OR devicetype != 'meter') AND deleted <> true",
-    []
+    [],
   );
 
   rows.forEach((row) => {
@@ -208,7 +208,7 @@ export async function readMeters() {
 
   const { rows } = await query<Device>(
     "SELECT device FROM devices WHERE devicetype = 'meter' AND deleted <> true",
-    []
+    [],
   );
 
   rows.forEach((row) => {
@@ -222,7 +222,7 @@ export async function readMeters() {
 export async function readConfig(name: string) {
   const { rows } = await query<Config>(
     "SELECT * FROM worker_config WHERE nickname = $1",
-    [name]
+    [name],
   );
   return rows[0];
 }
@@ -237,7 +237,7 @@ export async function readWorker(macaddr: string) {
 export async function reading(device: string) {
   const { rows } = await query(
     "SELECT * FROM readings WHERE meter = $1 ORDER BY id DESC LIMIT 1",
-    [device]
+    [device],
   );
   return rows[0];
 }
@@ -247,7 +247,7 @@ export async function readWorkers() {
 
   const { rows } = await query<Worker>(
     "SELECT worker FROM workers WHERE deleted <> true",
-    []
+    [],
   );
 
   rows.forEach((row) => {
@@ -264,10 +264,10 @@ export async function registerDevice(macaddr: string, manufacturer: string) {
       if (res.rowCount === 0) {
         return query(
           "INSERT INTO devices (device, manufacturer) VALUES ($1, $2)",
-          [macaddr, manufacturer]
+          [macaddr, manufacturer],
         );
       }
-    }
+    },
   );
 }
 
@@ -277,10 +277,10 @@ export async function registerMeter(macaddr: string, manufacturer: string) {
       if (res.rowCount === 0) {
         return query(
           "INSERT INTO devices (device, devicetype, manufacturer) VALUES ($1, 'meter', $2)",
-          [macaddr, manufacturer]
+          [macaddr, manufacturer],
         );
       }
-    }
+    },
   );
 }
 
@@ -293,15 +293,15 @@ export async function registerWorker(macaddr: string, inet: string) {
         const jsonStr = JSON.stringify(config.config);
         return query(
           "INSERT INTO workers (worker, inet, configname, config) VALUES ($1, $2, $3, $4)",
-          [macaddr, inet, defaultConfig, jsonStr]
+          [macaddr, inet, defaultConfig, jsonStr],
         );
       } else {
         return query(
           "UPDATE workers SET inet = $1, deleted = false, deletedat = NULL, updatedat = CURRENT_TIMESTAMP WHERE worker = $2",
-          [inet, macaddr]
+          [inet, macaddr],
         );
       }
-    }
+    },
   );
 }
 
@@ -310,21 +310,21 @@ export async function createReading(
   temperature: number,
   humidity: number,
   pressure: number,
-  ts: Date
+  ts: Date,
 ) {
   return query("SELECT * FROM devices WHERE device = $1", [meter]).then(
     async (res) => {
       if (res.rowCount !== 0) {
         await query(
           "UPDATE devices SET temperature = $1, humidity = $2, pressure = $3, devicetype = 'meter', deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $4",
-          [temperature, humidity, pressure, meter]
+          [temperature, humidity, pressure, meter],
         );
         return query(
           "INSERT INTO readings (meter, temperature, humidity, pressure, observedat) VALUES ($1, $2, $3, $4, $5)",
-          [meter, temperature, humidity, pressure, ts]
+          [meter, temperature, humidity, pressure, ts],
         );
       }
-    }
+    },
   );
 }
 
@@ -334,13 +334,13 @@ export async function createStatus(device: string, status: string, ts: Date) {
       if (res.rowCount !== 0) {
         await query(
           "UPDATE devices SET status = $1, deleted = false, updatedat = CURRENT_TIMESTAMP WHERE device = $2",
-          [status, device]
+          [status, device],
         );
         return query(
           "INSERT INTO statuses (device, status, observedat) VALUES ($1, $2, $3)",
-          [device, status, ts]
+          [device, status, ts],
         );
       }
-    }
+    },
   );
 }

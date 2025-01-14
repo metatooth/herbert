@@ -11,7 +11,6 @@ import WorkerTile from "@/components/WorkerTile.vue";
 import ConfigTile from "@/components/ConfigTile.vue";
 
 const SingleColumn = Vue.extend({
-
   components: {
     DeviceTile,
     MeterTile,

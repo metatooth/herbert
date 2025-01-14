@@ -135,10 +135,10 @@ import HerbertButton from "@/components/Button.vue";
 const SettingsPage = Vue.extend({
   components: {
     HerbertButton,
-    UnitsSelector
+    UnitsSelector,
   },
   props: {
-    settings: Settings
+    settings: Settings,
   },
 
   data() {
@@ -157,7 +157,7 @@ const SettingsPage = Vue.extend({
       reportingperiod: this.settings.reportingperiod / 1000,
       pin: this.settings.pin,
       name: "",
-      filedata: ""
+      filedata: "",
     };
   },
 
@@ -193,7 +193,7 @@ const SettingsPage = Vue.extend({
 
     url(): string {
       return process.env.VUE_APP_API_URL || "http://localhost:5000";
-    }
+    },
   },
 
   methods: {
@@ -257,7 +257,7 @@ const SettingsPage = Vue.extend({
         pin: this.pin,
         createdat: this.settings.createdat,
         updatedat: new Date(),
-        deleted: false
+        deleted: false,
       };
       this.edit(data);
     },
@@ -266,8 +266,8 @@ const SettingsPage = Vue.extend({
       this.units = units;
     },
 
-    ...mapActions("settings", ["edit"])
-  }
+    ...mapActions("settings", ["edit"]),
+  },
 });
 
 export default SettingsPage;

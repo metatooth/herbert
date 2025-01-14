@@ -20,7 +20,7 @@
           </div>
           <div class="level-item">
             <p class="text">
-              <em><readable :timestamp="new Date(worker.updatedat)"/></em>
+              <em><readable :timestamp="new Date(worker.updatedat)" /></em>
             </p>
           </div>
         </div>
@@ -99,20 +99,20 @@ const Dashboard = Vue.extend({
     Notifications,
     Readable,
     SettingsPage,
-    Timestamp
+    Timestamp,
   },
   data() {
     return {
       filter: "",
       picked: "overview",
       locked: true,
-      ts: new Date()
+      ts: new Date(),
     };
   },
 
   computed: {
     ...mapGetters("settings", ["settings"]),
-    ...mapGetters("workers", ["workers"])
+    ...mapGetters("workers", ["workers"]),
   },
 
   mounted() {
@@ -182,9 +182,9 @@ const Dashboard = Vue.extend({
       "configs/fetchData",
       "zones/fetchData",
       "settings/fetchData",
-      "settings/edit"
-    ])
-  }
+      "settings/edit",
+    ]),
+  },
 });
 
 export default Dashboard;

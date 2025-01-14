@@ -128,7 +128,7 @@ export function color(diff, range): string {
   const c = [
     start[0] * alpha + (1 - alpha) * end[0],
     start[1] * alpha + (1 - alpha) * end[1],
-    start[2] * alpha + (1 - alpha) * end[2]
+    start[2] * alpha + (1 - alpha) * end[2],
   ];
 
   return "#" + convertToHex(c);
@@ -168,8 +168,5 @@ export function formatMacAddress(id: string) {
   mac = mac.replace(/(.{2})/g, "$1:");
 
   // remove trailing colon
-  return mac
-    .split(":")
-    .slice(0, -1)
-    .join(":");
+  return mac.split(":").slice(0, -1).join(":");
 }

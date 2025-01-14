@@ -9,12 +9,12 @@ const ZoneChart = Vue.extend({
   components: {
     DeviceChart,
     HumidityChart,
-    TemperatureChart
+    TemperatureChart,
   },
   props: {
     zone: Zone,
-    units: string
-  }
+    units: string,
+  },
 });
 
 export default ZoneChart;

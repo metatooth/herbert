@@ -6,7 +6,7 @@ import {
   celsius2fahrenheit,
   celsius2kelvin,
   fahrenheit2celsius,
-  kelvin2celsius
+  kelvin2celsius,
 } from "../../shared/utils";
 
 import EditControls from "@/components/EditControls.vue";
@@ -18,13 +18,13 @@ const ProfileRow = Vue.extend({
   components: {
     EditControls,
     SelectControlType,
-    Target
+    Target,
   },
 
   props: {
     locked: Boolean,
     profile: Profile,
-    units: string
+    units: string,
   },
 
   data() {
@@ -65,7 +65,7 @@ const ProfileRow = Vue.extend({
       irrigationperday: parseInt(this.profile.irrigationperday),
       irrigationduration: this.profile.irrigationduration / 1000,
       updatedat: new Date(Date.parse(this.profile.updatedat)),
-      editing: false
+      editing: false,
     };
   },
 
@@ -112,7 +112,7 @@ const ProfileRow = Vue.extend({
       }
 
       return max;
-    }
+    },
   },
 
   methods: {
@@ -202,7 +202,7 @@ const ProfileRow = Vue.extend({
         blowercycle: this.blowercycle * 1000,
         irrigationperday: this.irrigationperday,
         irrigationduration: this.irrigationduration * 1000,
-        controltype: this.controltype
+        controltype: this.controltype,
       };
 
       this.edit(profile);
@@ -213,8 +213,8 @@ const ProfileRow = Vue.extend({
       this.controltype = val;
     },
 
-    ...mapActions("profiles", ["edit", "remove"])
-  }
+    ...mapActions("profiles", ["edit", "remove"]),
+  },
 });
 
 export default ProfileRow;

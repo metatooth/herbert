@@ -3,7 +3,7 @@ import Vue from "vue";
 
 const SelectZone = Vue.extend({
   props: {
-    zones: { type: Array<object>, default: [] }
+    zones: { type: Array<object>, default: [] },
   },
 
   emits: ["select-zone"],

@@ -20,9 +20,7 @@
     </div>
     <div v-else>
       <div class="level-item">
-        <p class="subtitle">
-          Loading...
-        </p>
+        <p class="subtitle">Loading...</p>
       </div>
     </div>
   </div>
@@ -41,7 +39,7 @@ const CurrentConditions = Vue.extend({
       timestamp: Date,
       temperature: Number,
       humidity: Number,
-      main: String
+      main: String,
     };
   },
 
@@ -72,7 +70,7 @@ const CurrentConditions = Vue.extend({
       );
     },
 
-    ...mapGetters("settings", ["settings"])
+    ...mapGetters("settings", ["settings"]),
   },
 
   mounted() {
@@ -91,8 +89,8 @@ const CurrentConditions = Vue.extend({
         }
 
         Openweathermap.get("/data/2.5/weather", {
-          params: { q: q, units: units, appid: this.settings.openweather }
-        }).then(res => {
+          params: { q: q, units: units, appid: this.settings.openweather },
+        }).then((res) => {
           this.timestamp = new Date();
           this.temperature = res.data.main.temp;
           this.humidity = res.data.main.humidity;
@@ -103,8 +101,8 @@ const CurrentConditions = Vue.extend({
 
       const refresh = this.settings.refresh ? this.settings.refresh : 1000;
       setTimeout(this.refresh, refresh);
-    }
-  }
+    },
+  },
 });
 
 export default CurrentConditions;

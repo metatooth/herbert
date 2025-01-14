@@ -13,7 +13,7 @@ export const isMessageType = (t: unknown): t is SocketMessageType => {
 
 // type guard for socket messages
 export const isSocketMessage = (
-  m: unknown
+  m: unknown,
 ): m is SocketMessage<SocketMessageType, unknown> => {
   return (
     typeof m === "object" &&
@@ -40,10 +40,10 @@ export const createMessageCreator = <T extends SocketMessageType>(type: T) => {
 
 // helper to type guard messages by checking if they came from a given creator
 export const messageIsFrom = <
-  E extends EnhancedMessageCreator<SocketMessageType, unknown>
+  E extends EnhancedMessageCreator<SocketMessageType, unknown>,
 >(
   c: E,
-  msg: AnySocketMessage
+  msg: AnySocketMessage,
 ): msg is ReturnType<E> => {
   return c.isOfType(msg);
 };

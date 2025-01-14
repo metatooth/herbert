@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const { rows } = await query<Zone>(
     "INSERT INTO zones (nickname, profileid, maxirrigators, lamponleafdiff, lampoffleafdiff) VALUES ($1, $2, 3, 0, 0) RETURNING id",
-    [req.body.nickname, req.body.profileid]
+    [req.body.nickname, req.body.profileid],
   );
   const zone = await readZone(rows[0].id);
   res.status(201).json(zone);
@@ -37,7 +37,7 @@ router.put("/:id", async (req, res) => {
       req.body.lamponleafdiff,
       req.body.lampoffleafdiff,
       id,
-    ]
+    ],
   );
 
   const devices = [];
@@ -60,13 +60,13 @@ router.put("/:id", async (req, res) => {
 
   await query<Record<string, number>>(
     "DELETE FROM zone_devices WHERE zoneid = $1",
-    [id]
+    [id],
   );
 
   devices.forEach(async (dev) => {
     query<Record<string, number>>(
       "INSERT INTO zone_devices (zoneid, device) VALUES ($1, $2)",
-      [id, dev]
+      [id, dev],
     );
   });
 
@@ -78,7 +78,7 @@ router.delete("/:id", async (req, res) => {
   const { id } = req.params;
   await query(
     "UPDATE zones SET deleted = true, deletedat = CURRENT_TIMESTAMP WHERE id = $1",
-    [id]
+    [id],
   );
   res.status(204).json({});
 });

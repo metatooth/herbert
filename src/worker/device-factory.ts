@@ -21,7 +21,7 @@ export class DeviceFactory {
           device = new SequentMicrosystems(
             mac,
             parseInt(config.board),
-            parseInt(config.channel)
+            parseInt(config.channel),
           );
         } else if (config.remote && config.mode) {
           device = new IRSend(mac, config.remote, config.mode);

@@ -5,13 +5,13 @@ import Readable from "@/components/Readable.vue";
 
 const Timestamp = Vue.extend({
   components: {
-    Readable
+    Readable,
   },
 
   props: {
     timestamp: { default: new Date(), type: Date },
     abbreviated: { default: false, type: Boolean },
-    timezone: { default: "America/New_York", type: String }
+    timezone: { default: "America/New_York", type: String },
   },
 
   computed: {
@@ -49,7 +49,7 @@ const Timestamp = Vue.extend({
 
     ss(): string {
       return ":" + this.zeroes(this.local.getSeconds());
-    }
+    },
   },
 
   methods: {
@@ -62,8 +62,8 @@ const Timestamp = Vue.extend({
         return `0${n}`;
       }
       return n.toString();
-    }
-  }
+    },
+  },
 });
 export default Timestamp;
 </script>
@@ -82,7 +82,7 @@ export default Timestamp;
       <strong> on {{ mmmddyyyy }} </strong>
     </div>
     <div v-if="!abbreviated" class="level-item">
-      <em>Updated <readable :timestamp="local"/></em>
+      <em>Updated <readable :timestamp="local" /></em>
     </div>
     <div v-if="!abbreviated" class="level-item">
       <button class="button" @click="reload">
