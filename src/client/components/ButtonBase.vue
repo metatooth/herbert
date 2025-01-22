@@ -2,8 +2,7 @@
 export default {
   props: {
     show: { type: Boolean, default: true },
-    callback: { type: Function, default: null, required: true },
-    label: { type: String, default: "Submit" },
+    label: { type: String, default: "" },
     icon: { type: String, default: "cannabis" },
     size: { type: String, default: "small" },
     color: { type: String, default: "primary" },

@@ -1,9 +1,9 @@
 <script lang="ts">
-import HerbertButton from "@client/components/HerbertButton.vue";
+import ButtonBase from "@client/components/ButtonBase.vue";
 
 export default {
   components: {
-    HerbertButton,
+    ButtonBase,
   },
 
   props: {
@@ -69,8 +69,8 @@ export default {
             @keyup.esc="cancel"
           />
         </div>
-        <herbert-button label="" :show="true" icon="check" @on-click="save" />
-        <herbert-button label="" :show="true" icon="times" @on-click="cancel" />
+        <button-base label="" :show="true" icon="check" @on-click="save" />
+        <button-base label="" :show="true" icon="times" @on-click="cancel" />
       </div>
     </div>
   </div>

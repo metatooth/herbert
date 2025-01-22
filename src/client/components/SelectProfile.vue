@@ -1,12 +1,12 @@
 <script lang="ts">
 import { mapGetters } from "vuex";
 
-import HerbertButton from "@client/components/HerbertButton.vue";
+import ButtonBase from "@client/components/ButtonBase.vue";
 import { Zone } from "@client/store/zones/types";
 
 export default {
   components: {
-    HerbertButton,
+    ButtonBase,
   },
 
   props: {
@@ -65,7 +65,7 @@ export default {
           </div>
         </div>
         <div class="field">
-          <herbert-button
+          <button-base
             :show="changed"
             label=""
             icon="check"

@@ -18,10 +18,8 @@ export default {
         <p>Powered by <img src="./assets/images/logo.png" /><br /></p>
       </a>
       <div class="copyright has-text-centered is-size-7">
-        <p>
-          {{ appVersion }} &#169; 2024
-          <a href="https://metatooth.com">Metatooth</a>
-        </p>
+        <p>{{ appVersion }}</p>
+        <p>&#169; 2025 <a href="https://metatooth.com">Metatooth</a></p>
       </div>
     </footer>
   </div>

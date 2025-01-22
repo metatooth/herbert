@@ -3,7 +3,7 @@ import { mapGetters } from "vuex";
 
 import AddControls from "@client/components/AddControls.vue";
 import FullTable from "@client/components/FullTable.vue";
-import HerbertButton from "@client/components/HerbertButton.vue";
+import ButtonBase from "@client/components/ButtonBase.vue";
 import NarrowTable from "@client/components/NarrowTable.vue";
 import SingleColumn from "@client/components/SingleColumn.vue";
 import ThreeColumns from "@client/components/ThreeColumns.vue";
@@ -16,7 +16,7 @@ export default {
   components: {
     AddControls,
     FullTable,
-    HerbertButton,
+    ButtonBase,
     NarrowTable,
     SingleColumn,
     ThreeColumns,
@@ -312,7 +312,7 @@ export default {
       <div class="level-right">
         <div class="level-item">
           <p class="control">
-            <herbert-button
+            <button-base
               style="margin: 20px"
               :show="true"
               :icon="icon"
