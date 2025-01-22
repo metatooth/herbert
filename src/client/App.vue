@@ -1,15 +1,13 @@
 <script lang="ts">
-import Vue from "vue";
 import appPackage from "../../package.json";
 
-const App = Vue.extend({
+export default {
   computed: {
     appVersion() {
       return appPackage["version"];
     },
   },
-});
-export default App;
+};
 </script>
 
 <template>

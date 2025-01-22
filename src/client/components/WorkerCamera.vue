@@ -1,3 +1,13 @@
+<script lang="ts">
+import { Worker } from "@client/store/workers/types";
+
+export default {
+  props: {
+    worker: Worker,
+  },
+};
+</script>
+
 <template>
   <div class="box">
     <div class="card">
@@ -7,24 +17,8 @@
         </p>
       </div>
       <div class="card-image">
-        <img :src="worker.camera" width="300px" height="225px" />
+        <img :src="worker.camera.toString()" width="300px" height="225px" />
       </div>
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-
-import { Worker } from "@/store/workers/types";
-
-const WorkerCamera = Vue.extend({
-  props: {
-    worker: Worker,
-  },
-});
-
-export default WorkerCamera;
-</script>
-
-<style></style>

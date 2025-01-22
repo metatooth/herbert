@@ -1,20 +1,5 @@
-<template>
-  <div class="control">
-    <div class="tags has-addons">
-      <span :class="iconClass" :style="iconStyle">
-        <font-awesome-icon :icon="icon" />
-      </span>
-      <span :class="textClass" :style="textStyle">
-        {{ text }}
-      </span>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-
-const IconAndText = Vue.extend({
+export default {
   props: {
     icon: { type: String, default: "lightbulb" },
     text: { type: String, default: "Lightbulb" },
@@ -41,7 +26,18 @@ const IconAndText = Vue.extend({
       return `color: ${this.iconColor};`;
     },
   },
-});
-
-export default IconAndText;
+};
 </script>
+
+<template>
+  <div class="control">
+    <div class="tags has-addons">
+      <span :class="iconClass" :style="iconStyle">
+        <font-awesome-icon :icon="icon" />
+      </span>
+      <span :class="textClass" :style="textStyle">
+        {{ text }}
+      </span>
+    </div>
+  </div>
+</template>

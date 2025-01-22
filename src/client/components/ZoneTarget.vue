@@ -1,20 +1,10 @@
-<template>
-  <span>
-    <span class="title" :style="style">
-      {{ temperature.toFixed(0) }}&#176;
-    </span>
-    <span class="title" :style="style"> {{ humidity.toFixed(0) }}% </span>
-  </span>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import { Zone } from "@/store/zones/types";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
+import { Zone } from "@client/store/zones/types";
+import { celsius2fahrenheit, celsius2kelvin } from "@shared/utils";
 
-const ZoneTarget = Vue.extend({
+export default {
   props: {
     zone: Zone,
   },
@@ -50,7 +40,14 @@ const ZoneTarget = Vue.extend({
 
     ...mapGetters("settings", ["settings"]),
   },
-});
-
-export default ZoneTarget;
+};
 </script>
+
+<template>
+  <span>
+    <span class="title" :style="style">
+      {{ temperature.toFixed(0) }}&#176;
+    </span>
+    <span class="title" :style="style"> {{ humidity.toFixed(0) }}% </span>
+  </span>
+</template>

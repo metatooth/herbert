@@ -1,5 +1,5 @@
-import Vue from "vue";
-import Vuex, { StoreOptions } from "vuex";
+import { createStore } from "vuex";
+
 import { RootState } from "./types";
 import { zones } from "./zones";
 import { notifications } from "./notifications";
@@ -10,9 +10,7 @@ import { workers } from "./workers";
 import { settings } from "./settings";
 import { configs } from "./configs";
 
-Vue.use(Vuex);
-
-const store: StoreOptions<RootState> = {
+const store = createStore({
   strict: true,
   state: {
     version: "1.0.0",
@@ -27,6 +25,6 @@ const store: StoreOptions<RootState> = {
     settings,
     configs,
   },
-};
+});
 
-export default new Vuex.Store<RootState>(store);
+export default store;

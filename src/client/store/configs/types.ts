@@ -1,6 +1,7 @@
 export class Config {
-  nickname = "";
-  config = "";
+  nickname: string;
+  config: object;
+  updatedat: Date;
 
   toString() {
     return JSON.stringify(this.config);

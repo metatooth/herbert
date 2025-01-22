@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      "@client": fileURLToPath(new URL("./src/client", import.meta.url)),
+      "@shared": fileURLToPath(new URL("../shared/", import.meta.url)),
+      "@client": fileURLToPath(new URL("./", import.meta.url)),
     },
   },
 });

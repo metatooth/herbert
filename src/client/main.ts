@@ -1,11 +1,10 @@
-import "@/assets/main.scss";
-
-import Vue from "vue";
+import { createApp } from "vue";
 import VueCookies from "vue-cookies";
 
-import router from "@/router";
-import store from "@/store";
-import App from "@/App.vue";
+import "@client/assets/main.scss";
+import router from "@client/router";
+import store from "@client/store";
+import App from "@client/App.vue";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -99,14 +98,12 @@ library.add(faTrash);
 library.add(faUpload);
 library.add(faWind);
 
-Vue.component("FontAwesomeIcon", FontAwesomeIcon);
+export const app = createApp(App);
 
-Vue.use(VueCookies);
+app.component("FontAwesomeIcon", FontAwesomeIcon);
 
-Vue.config.productionTip = false;
+app.use(VueCookies);
+app.use(router);
+app.use(store);
 
-new Vue({
-  router,
-  store,
-  render: (h) => h(App),
-}).$mount("#app");
+app.mount("#app");

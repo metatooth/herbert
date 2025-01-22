@@ -1,17 +1,22 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import DeviceTile from "@/components/DeviceTile.vue";
-import MeterTile from "@/components/MeterTile.vue";
-import ProfileTile from "@/components/ProfileTile.vue";
-import ZoneDetail from "@/components/ZoneDetail.vue";
-import ZoneTile from "@/components/ZoneTile.vue";
-import WorkerTile from "@/components/WorkerTile.vue";
-import ConfigTile from "@/components/ConfigTile.vue";
-import { Device } from "@/store/meters/types";
+import ConfigTile from "@client/components/ConfigTile.vue";
+import DeviceTile from "@client/components/DeviceTile.vue";
+import MeterTile from "@client/components/MeterTile.vue";
+import ProfileTile from "@client/components/ProfileTile.vue";
+import WorkerTile from "@client/components/WorkerTile.vue";
+import ZoneDetail from "@client/components/ZoneDetail.vue";
+import ZoneTile from "@client/components/ZoneTile.vue";
 
-const ThreeColumns = Vue.extend({
+import { Config } from "@client/store/configs/types";
+import { Device } from "@client/store/devices/types";
+import { Meter } from "@client/store/meters/types";
+import { Profile } from "@client/store/profiles/types";
+import { Worker } from "@client/store/workers/types";
+import { Zone } from "@client/store/zones/types";
+
+export default {
   components: {
     DeviceTile,
     MeterTile,
@@ -21,20 +26,19 @@ const ThreeColumns = Vue.extend({
     WorkerTile,
     ConfigTile,
   },
+
   props: {
     locked: Boolean,
-    left: { type: Array<Device>, default: [] },
-    middle: { type: Array<Device>, default: [] },
-    right: { type: Array<Device>, default: [] },
-    type: string,
+    left: { type: Array<object>, default: [] },
+    middle: { type: Array<object>, default: [] },
+    right: { type: Array<object>, default: [] },
+    type: String,
   },
 
   computed: {
     ...mapGetters("settings", ["settings"]),
   },
-});
-
-export default ThreeColumns;
+};
 </script>
 
 <template>
@@ -43,7 +47,7 @@ export default ThreeColumns;
       <meter-tile
         v-for="(item, index) in left"
         :key="`item-${index}`"
-        :meter="item"
+        :meter="item as Meter"
         :units="settings.units"
         :locked="locked"
       />
@@ -52,7 +56,7 @@ export default ThreeColumns;
       <meter-tile
         v-for="(item, index) in middle"
         :key="`item-${index}`"
-        :meter="item"
+        :meter="item as Meter"
         :units="settings.units"
         :locked="locked"
       />
@@ -61,7 +65,7 @@ export default ThreeColumns;
       <meter-tile
         v-for="(item, index) in right"
         :key="`item-${index}`"
-        :meter="item"
+        :meter="item as Meter"
         :units="settings.units"
         :locked="locked"
       />
@@ -70,7 +74,7 @@ export default ThreeColumns;
       <device-tile
         v-for="(item, index) in left"
         :key="`item-${index}`"
-        :device="item"
+        :device="item as Device"
         :units="settings.units"
         :locked="locked"
       />
@@ -79,7 +83,7 @@ export default ThreeColumns;
       <device-tile
         v-for="(item, index) in middle"
         :key="`item-${index}`"
-        :device="item"
+        :device="item as Device"
         :units="settings.units"
         :locked="locked"
       />
@@ -88,7 +92,7 @@ export default ThreeColumns;
       <device-tile
         v-for="(item, index) in right"
         :key="`item-${index}`"
-        :device="item"
+        :device="item as Device"
         :units="settings.units"
         :locked="locked"
       />
@@ -97,7 +101,7 @@ export default ThreeColumns;
       <profile-tile
         v-for="(item, index) in left"
         :key="`item-${index}`"
-        :profile="item"
+        :profile="item as Profile"
         :units="settings.units"
         :locked="locked"
       />
@@ -106,7 +110,7 @@ export default ThreeColumns;
       <profile-tile
         v-for="(item, index) in middle"
         :key="`item-${index}`"
-        :profile="item"
+        :profile="item as Profile"
         :units="settings.units"
         :locked="locked"
       />
@@ -115,7 +119,7 @@ export default ThreeColumns;
       <profile-tile
         v-for="(item, index) in right"
         :key="`item-${index}`"
-        :profile="item"
+        :profile="item as Profile"
         :units="settings.units"
         :locked="locked"
       />
@@ -124,7 +128,7 @@ export default ThreeColumns;
       <zone-tile
         v-for="(item, index) in left"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -133,7 +137,7 @@ export default ThreeColumns;
       <zone-tile
         v-for="(item, index) in middle"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -142,7 +146,7 @@ export default ThreeColumns;
       <zone-tile
         v-for="(item, index) in right"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -151,7 +155,7 @@ export default ThreeColumns;
       <zone-detail
         v-for="(item, index) in left"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -160,7 +164,7 @@ export default ThreeColumns;
       <zone-detail
         v-for="(item, index) in middle"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -169,7 +173,7 @@ export default ThreeColumns;
       <zone-detail
         v-for="(item, index) in right"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -178,7 +182,7 @@ export default ThreeColumns;
       <worker-tile
         v-for="(item, index) in left"
         :key="`item-${index}`"
-        :worker="item"
+        :worker="item as Worker"
         :units="settings.units"
         :locked="locked"
       />
@@ -187,7 +191,7 @@ export default ThreeColumns;
       <worker-tile
         v-for="(item, index) in middle"
         :key="`item-${index}`"
-        :worker="item"
+        :worker="item as Worker"
         :units="settings.units"
         :locked="locked"
       />
@@ -196,7 +200,7 @@ export default ThreeColumns;
       <worker-tile
         v-for="(item, index) in right"
         :key="`item-${index}`"
-        :worker="item"
+        :worker="item as Worker"
         :units="settings.units"
         :locked="locked"
       />
@@ -205,7 +209,7 @@ export default ThreeColumns;
       <config-tile
         v-for="(item, index) in left"
         :key="`item-${index}`"
-        :config="item"
+        :config="item as Config"
         :units="settings.units"
         :locked="locked"
       />
@@ -214,7 +218,7 @@ export default ThreeColumns;
       <config-tile
         v-for="(item, index) in middle"
         :key="`item-${index}`"
-        :config="item"
+        :config="item as Config"
         :units="settings.units"
         :locked="locked"
       />
@@ -223,7 +227,7 @@ export default ThreeColumns;
       <config-tile
         v-for="(item, index) in right"
         :key="`item-${index}`"
-        :config="item"
+        :config="item as Config"
         :units="settings.units"
         :locked="locked"
       />

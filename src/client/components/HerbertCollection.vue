@@ -1,21 +1,18 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import AddControls from "@/components/AddControls.vue";
+import AddControls from "@client/components/AddControls.vue";
+import FullTable from "@client/components/FullTable.vue";
+import HerbertButton from "@client/components/HerbertButton.vue";
+import NarrowTable from "@client/components/NarrowTable.vue";
+import SingleColumn from "@client/components/SingleColumn.vue";
+import ThreeColumns from "@client/components/ThreeColumns.vue";
 
-import HerbertButton from "@/components/HerbertButton.vue";
+import { Config } from "@client/store/configs/types";
+import { Profile } from "@client/store/profiles/types";
+import { Zone } from "@client/store/zones/types";
 
-import NarrowTable from "@/components/NarrowTable.vue";
-import SingleColumn from "@/components/SingleColumn.vue";
-import ThreeColumns from "@/components/ThreeColumns.vue";
-import FullTable from "@/components/FullTable.vue";
-
-import { Config } from "@/store/configs/types.ts";
-import { Profile } from "@/store/profiles/types.ts";
-import { Zone } from "@/store/zones/types.ts";
-
-const HerbertCollection = Vue.extend({
+export default {
   components: {
     AddControls,
     FullTable,
@@ -24,10 +21,11 @@ const HerbertCollection = Vue.extend({
     SingleColumn,
     ThreeColumns,
   },
+
   props: {
-    filter: string,
+    filter: String,
     locked: Boolean,
-    type: string,
+    type: String,
   },
 
   data() {
@@ -281,7 +279,7 @@ const HerbertCollection = Vue.extend({
       } else if (this.isConfig) {
         const config = new Config();
         config.nickname = this.nickname;
-        config.config = '{ "changeme": "true" }';
+        config.config = { changeme: "true" };
         this.$store.dispatch("configs/add", config);
       }
 
@@ -298,9 +296,7 @@ const HerbertCollection = Vue.extend({
       this.table = !this.table;
     },
   },
-});
-
-export default HerbertCollection;
+};
 </script>
 
 <template>

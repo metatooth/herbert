@@ -1,5 +1,5 @@
 <script lang="ts">
-import HerbertButton from "@/components/HerbertButton.vue";
+import HerbertButton from "@client/components/HerbertButton.vue";
 
 export default {
   components: {
@@ -7,10 +7,10 @@ export default {
   },
 
   props: {
-    num: { type: Number, default: 0 },
-    size: string,
-    label: string,
-    icon: string,
+    num: Number,
+    size: String,
+    label: String,
+    icon: String,
     color: { type: String, default: "#ffffff" },
   },
 

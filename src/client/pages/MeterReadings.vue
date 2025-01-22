@@ -1,11 +1,10 @@
 <script lang="ts">
-import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
 import { mapGetters } from "vuex";
 
-import ZoneChart from "@/components/ZoneChart.vue";
+import ZoneChart from "@client/components/ZoneChart.vue";
 
-const Readings = Vue.extend({
+export default {
   components: {
     ZoneChart,
   },
@@ -104,8 +103,7 @@ const Readings = Vue.extend({
       humid.send();
     },
   },
-});
-export default Readings;
+};
 </script>
 
 <template>

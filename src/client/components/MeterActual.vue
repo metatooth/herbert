@@ -1,19 +1,11 @@
-<template>
-  <span>
-    <span class="title"> {{ temperature.toFixed(0) }}&#176; </span>
-    <span class="title"> {{ humidity.toFixed(0) }}% </span>
-  </span>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import { Meter } from "@/store/meters/types";
+import { Meter } from "@client/store/meters/types";
 
 import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
-const MeterActual = Vue.extend({
+export default {
   props: {
     meter: Meter,
   },
@@ -41,7 +33,12 @@ const MeterActual = Vue.extend({
 
     ...mapGetters("settings", ["settings"]),
   },
-});
-
-export default MeterActual;
+};
 </script>
+
+<template>
+  <span>
+    <span class="title"> {{ temperature.toFixed(0) }}&#176; </span>
+    <span class="title"> {{ humidity.toFixed(0) }}% </span>
+  </span>
+</template>

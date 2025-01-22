@@ -1,19 +1,11 @@
-<template>
-  <span class="tag" :class="stateClass">
-    {{ name }}
-  </span>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-
 enum SystemStatus {
   OFF = 0,
   ON = 1,
   ERROR = 2,
 }
 
-const SystemDisplay = Vue.extend({
+export default {
   name: "SystemDisplay",
   props: {
     name: { type: String, default: "" },
@@ -30,6 +22,11 @@ const SystemDisplay = Vue.extend({
       }
     },
   },
-});
-export default SystemDisplay;
+};
 </script>
+
+<template>
+  <span class="tag" :class="stateClass">
+    {{ name }}
+  </span>
+</template>

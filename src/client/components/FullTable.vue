@@ -1,12 +1,19 @@
 <script lang="ts">
 import { mapGetters } from "vuex";
 
-import ConfigRow from "@/components/ConfigRow.vue";
-import DeviceRow from "@/components/DeviceRow.vue";
-import MeterRow from "@/components/MeterRow.vue";
-import ProfileRow from "@/components/ProfileRow.vue";
-import WorkerRow from "@/components/WorkerRow.vue";
-import ZoneRow from "@/components/ZoneRow.vue";
+import ConfigRow from "@client/components/ConfigRow.vue";
+import DeviceRow from "@client/components/DeviceRow.vue";
+import MeterRow from "@client/components/MeterRow.vue";
+import ProfileRow from "@client/components/ProfileRow.vue";
+import WorkerRow from "@client/components/WorkerRow.vue";
+import ZoneRow from "@client/components/ZoneRow.vue";
+
+import { Config } from "@client/store/configs/types";
+import { Device } from "@client/store/devices/types";
+import { Meter } from "@client/store/meters/types";
+import { Profile } from "@client/store/profiles/types";
+import { Worker } from "@client/store/workers/types";
+import { Zone } from "@client/store/zones/types";
 
 export default {
   components: {
@@ -19,10 +26,10 @@ export default {
   },
 
   props: {
-    headings: { type: Array<object>, default: [] },
+    headings: { type: Array<string>, default: [] },
     items: { type: Array<object>, default: [] },
-    locked: boolean,
-    type: string,
+    locked: Boolean,
+    type: String,
   },
 
   computed: {
@@ -42,7 +49,7 @@ export default {
       <meter-row
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :meter="item"
+        :meter="item as Meter"
         :units="settings.units"
         :locked="locked"
       />
@@ -51,7 +58,7 @@ export default {
       <device-row
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :device="item"
+        :device="item as Device"
         :units="settings.units"
         :locked="locked"
       />
@@ -60,7 +67,7 @@ export default {
       <profile-row
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :profile="item"
+        :profile="item as Profile"
         :units="settings.units"
         :locked="locked"
       />
@@ -69,7 +76,7 @@ export default {
       <zone-row
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -78,7 +85,7 @@ export default {
       <worker-row
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :worker="item"
+        :worker="item as Worker"
         :units="settings.units"
         :locked="locked"
       />
@@ -87,7 +94,7 @@ export default {
       <config-row
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :config="item"
+        :config="item as Config"
         :units="settings.units"
         :locked="locked"
       />

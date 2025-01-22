@@ -1,5 +1,5 @@
 <script lang="ts">
-import Timestamp from "@/components/Timestamp.vue";
+import Timestamp from "@client/components/Timestamp.vue";
 
 export default {
   components: { Timestamp },

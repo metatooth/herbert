@@ -1,45 +1,16 @@
-<template>
-  <div>
-    <div v-if="ready">
-      <div class="level-item">
-        <p class="subtitle">
-          {{ settings.cityname }}, {{ settings.statecode }}
-        </p>
-      </div>
-      <div class="level-item">
-        <p class="title">
-          {{ main }}
-        </p>
-      </div>
-      <div class="level-item">
-        <p class="title">{{ temperature.toFixed(0) }}&#176;</p>
-      </div>
-      <div class="level-item">
-        <p class="title">{{ humidity.toFixed(0) }}%</p>
-      </div>
-    </div>
-    <div v-else>
-      <div class="level-item">
-        <p class="subtitle">Loading...</p>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
 import Openweathermap from "../api/openweathermap";
 
-const CurrentConditions = Vue.extend({
+export default {
   data() {
     return {
       ready: false,
-      timestamp: Date,
-      temperature: Number,
-      humidity: Number,
-      main: String,
+      timestamp: new Date(),
+      temperature: 0,
+      humidity: 0,
+      main: "",
     };
   },
 
@@ -92,8 +63,8 @@ const CurrentConditions = Vue.extend({
           params: { q: q, units: units, appid: this.settings.openweather },
         }).then((res) => {
           this.timestamp = new Date();
-          this.temperature = res.data.main.temp;
-          this.humidity = res.data.main.humidity;
+          this.temperature = parseFloat(res.data.main.temp);
+          this.humidity = parseFloat(res.data.main.humidity);
           this.main = res.data.weather[0].main;
           this.ready = true;
         });
@@ -103,10 +74,36 @@ const CurrentConditions = Vue.extend({
       setTimeout(this.refresh, refresh);
     },
   },
-});
-
-export default CurrentConditions;
+};
 </script>
+
+<template>
+  <div>
+    <div v-if="ready">
+      <div class="level-item">
+        <p class="subtitle">
+          {{ settings.cityname }}, {{ settings.statecode }}
+        </p>
+      </div>
+      <div class="level-item">
+        <p class="title">
+          {{ main }}
+        </p>
+      </div>
+      <div class="level-item">
+        <p class="title">{{ temperature.toFixed(0) }}&#176;</p>
+      </div>
+      <div class="level-item">
+        <p class="title">{{ humidity.toFixed(0) }}%</p>
+      </div>
+    </div>
+    <div v-else>
+      <div class="level-item">
+        <p class="subtitle">Loading...</p>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .level {

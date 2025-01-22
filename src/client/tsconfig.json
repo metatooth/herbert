@@ -1,7 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "module": "es2022",
+    "lib": ["dom"],
     "paths": {
+      "@shared/*": ["../shared/*"],
       "@client/*": ["./*"]
     },
     "outDir": "../../dist/client",

@@ -1,13 +1,12 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
-import EditControls from "@/components/EditControls.vue";
-import MeterActual from "@/components/MeterActual.vue";
-import Readable from "@/components/Readable.vue";
-import { Meter } from "@/store/meters/types";
+import EditControls from "@client/components/EditControls.vue";
+import MeterActual from "@client/components/MeterActual.vue";
+import Readable from "@client/components/Readable.vue";
+import { Meter } from "@client/store/meters/types";
 
-const MeterRow = Vue.extend({
+export default {
   components: {
     EditControls,
     MeterActual,
@@ -15,15 +14,15 @@ const MeterRow = Vue.extend({
   },
 
   props: {
-    meter: Meter,
+    meter: { type: Meter, required: true },
     locked: Boolean,
-    units: string,
+    units: String,
   },
 
   data() {
     return {
       nickname: this.meter.nickname,
-      updatedat: new Date(Date.parse(this.meter.updatedat)),
+      updatedat: this.meter.updatedat,
       updating: false,
       editing: false,
     };
@@ -92,9 +91,7 @@ const MeterRow = Vue.extend({
 
     ...mapActions("meters", ["edit", "remove"]),
   },
-});
-
-export default MeterRow;
+};
 </script>
 
 <template>
@@ -128,7 +125,7 @@ export default MeterRow;
           params: { name: meter.nickname, device: meter.device },
         }"
       >
-        <readable :timestamp="new Date(Date.parse(meter.timestamp))" />
+        <readable :timestamp="meter.timestamp" />
       </router-link>
     </td>
     <td class="is-size-5">

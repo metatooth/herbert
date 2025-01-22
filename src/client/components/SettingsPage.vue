@@ -1,142 +1,16 @@
-<template>
-  <section class="section">
-    <div class="field">
-      <label class="label">Title</label>
-      <div class="control">
-        <input
-          v-model="title"
-          class="input"
-          type="text"
-          placeholder="Name your grow."
-        />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Logo</label>
-      <div class="control">
-        <div class="file is-boxed">
-          <label class="file-label">
-            <input
-              ref="file"
-              class="file-input"
-              type="file"
-              accept="image/png"
-              @change="picked"
-            />
-            <span class="file-cta" @click="pick">
-              <font-awesome-icon icon="upload" />
-              <span class="file-label"> Choose a file… </span>
-              <span class="file-name">
-                {{ filename }}
-              </span>
-            </span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Locale</label>
-      <div class="control">
-        <input v-model="locale" class="input" type="text" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Timezone</label>
-      <div class="control">
-        <input v-model="timezone" class="input" type="text" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Units</label>
-      <units-selector :units="units" @change-units="select" />
-    </div>
-
-    <div class="field">
-      <label class="label">Refresh Rate (seconds)</label>
-      <div class="control">
-        <input v-model="refresh" class="input" type="number" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Timeout Period (seconds)</label>
-      <div class="control">
-        <input v-model="timeout" class="input" type="number" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Server Interval (seconds)</label>
-      <div class="control">
-        <input v-model="interval" class="input" type="number" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Reporting Period (seconds)</label>
-      <div class="control">
-        <input v-model="reportingperiod" class="input" type="number" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">OpenWeather API Key</label>
-      <div class="control">
-        <input v-model="openweather" class="input" type="text" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">City Name</label>
-      <div class="control">
-        <input v-model="cityname" class="input" type="text" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">State Code</label>
-      <div class="control">
-        <input v-model="statecode" class="input" type="text" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">PIN</label>
-      <div class="control">
-        <input v-model="pin" class="input" type="text" size="8" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">API Base URL</label>
-      <div class="control">
-        <a target="_blank" :href="url">{{ url }}</a>
-      </div>
-    </div>
-
-    <div v-if="changed" class="field is-grouped">
-      <herbert-button color="success" icon="check" @on-click="save" />
-      <herbert-button color="danger" icon="times" @on-click="cancel" />
-    </div>
-  </section>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapActions } from "vuex";
-import { Settings } from "@/store/settings/types";
-import UnitsSelector from "@/components/UnitsSelector.vue";
-import HerbertButton from "@/components/Button.vue";
 
-const SettingsPage = Vue.extend({
+import ButtonBase from "@client/components/ButtonBase.vue";
+import UnitsSelector from "@client/components/UnitsSelector.vue";
+import { Settings } from "@client/store/settings/types";
+
+export default {
   components: {
-    HerbertButton,
+    ButtonBase,
     UnitsSelector,
   },
+
   props: {
     settings: Settings,
   },
@@ -268,7 +142,132 @@ const SettingsPage = Vue.extend({
 
     ...mapActions("settings", ["edit"]),
   },
-});
-
-export default SettingsPage;
+};
 </script>
+
+<template>
+  <section class="section">
+    <div class="field">
+      <label class="label">Title</label>
+      <div class="control">
+        <input
+          v-model="title"
+          class="input"
+          type="text"
+          placeholder="Name your grow."
+        />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Logo</label>
+      <div class="control">
+        <div class="file is-boxed">
+          <label class="file-label">
+            <input
+              ref="file"
+              class="file-input"
+              type="file"
+              accept="image/png"
+              @change="picked"
+            />
+            <span class="file-cta" @click="pick">
+              <font-awesome-icon icon="upload" />
+              <span class="file-label"> Choose a file… </span>
+              <span class="file-name">
+                {{ filename }}
+              </span>
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Locale</label>
+      <div class="control">
+        <input v-model="locale" class="input" type="text" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Timezone</label>
+      <div class="control">
+        <input v-model="timezone" class="input" type="text" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Units</label>
+      <units-selector :units="units" @change-units="select" />
+    </div>
+
+    <div class="field">
+      <label class="label">Refresh Rate (seconds)</label>
+      <div class="control">
+        <input v-model="refresh" class="input" type="number" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Timeout Period (seconds)</label>
+      <div class="control">
+        <input v-model="timeout" class="input" type="number" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Server Interval (seconds)</label>
+      <div class="control">
+        <input v-model="interval" class="input" type="number" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Reporting Period (seconds)</label>
+      <div class="control">
+        <input v-model="reportingperiod" class="input" type="number" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">OpenWeather API Key</label>
+      <div class="control">
+        <input v-model="openweather" class="input" type="text" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">City Name</label>
+      <div class="control">
+        <input v-model="cityname" class="input" type="text" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">State Code</label>
+      <div class="control">
+        <input v-model="statecode" class="input" type="text" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">PIN</label>
+      <div class="control">
+        <input v-model="pin" class="input" type="text" size="8" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">API Base URL</label>
+      <div class="control">
+        <a target="_blank" :href="url">{{ url }}</a>
+      </div>
+    </div>
+
+    <div v-if="changed" class="field is-grouped">
+      <button-base color="success" icon="check" @on-click="save" />
+      <button-base color="danger" icon="times" @on-click="cancel" />
+    </div>
+  </section>
+</template>

@@ -1,14 +1,14 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapState } from "vuex";
-import { Meter } from "@/store/meters/types";
-import { Notification } from "@/store/notifications/types";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
 
-const MeterWidget = Vue.extend({
+import { Meter } from "@client/store/meters/types";
+import { Notification } from "@client/store/notifications/types";
+import { celsius2fahrenheit, celsius2kelvin } from "@shared/utils";
+
+export default {
   props: {
     meter: Meter,
-    units: string,
+    units: String,
   },
 
   emits: ["remove-device"],
@@ -16,7 +16,7 @@ const MeterWidget = Vue.extend({
   computed: {
     temperature(): number {
       if (this.units === "C") {
-        return this.meter.temperature / 1;
+        return this.meter.temperature;
       } else if (this.units === "F") {
         return celsius2fahrenheit(this.meter.temperature);
       } else {
@@ -57,9 +57,7 @@ const MeterWidget = Vue.extend({
       this.$emit("remove-device", meter);
     },
   },
-});
-
-export default MeterWidget;
+};
 </script>
 
 <template>

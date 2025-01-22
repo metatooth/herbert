@@ -1,16 +1,15 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
-import DeviceTag from "@/components/DeviceTag.vue";
-import Readable from "@/components/Readable.vue";
-import ZoneActual from "@/components/ZoneActual.vue";
-import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
-import ZoneTag from "@/components/ZoneTag.vue";
-import { Device } from "@/store/devices/types";
-import { Zone } from "@/store/zones/types";
+import DeviceTag from "@client/components/DeviceTag.vue";
+import Readable from "@client/components/Readable.vue";
+import ZoneActual from "@client/components/ZoneActual.vue";
+import ZoneStatusButton from "@client/components/ZoneStatusButton.vue";
+import ZoneTag from "@client/components/ZoneTag.vue";
+import { Device } from "@client/store/devices/types";
+import { Zone } from "@client/store/zones/types";
 
-const ZoneRow = Vue.extend({
+export default {
   components: {
     DeviceTag,
     Readable,
@@ -21,7 +20,7 @@ const ZoneRow = Vue.extend({
   props: {
     locked: Boolean,
     zone: Zone,
-    units: string,
+    units: { type: String, default: "" },
   },
 
   data() {
@@ -47,7 +46,7 @@ const ZoneRow = Vue.extend({
         devices.push(Object.assign(new Device(), d));
       });
       return devices.sort((a, b) => {
-        return a.devicetype > b.devicetype;
+        return a.devicetype.localeCompare(b.devicetype);
       });
     },
 
@@ -139,9 +138,7 @@ const ZoneRow = Vue.extend({
 
     ...mapActions("zones", ["edit", "remove"]),
   },
-});
-
-export default ZoneRow;
+};
 </script>
 
 <template>

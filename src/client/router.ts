@@ -1,11 +1,9 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
-import Dashboard from "@/pages/Dashboard.vue";
-import Readings from "@/pages/Readings.vue";
-import Statuses from "@/pages/Statuses.vue";
-import ZonePage from "@/pages/ZonePage.vue";
+import { createWebHistory, createRouter } from "vue-router";
 
-Vue.use(VueRouter);
+import Dashboard from "@client/pages/Dashboard.vue";
+import Readings from "@client/pages/Readings.vue";
+import Statuses from "@client/pages/Statuses.vue";
+import ZonePage from "@client/pages/ZonePage.vue";
 
 const routes = [
   { path: "/dashboard", name: "dashboard", component: Dashboard },
@@ -14,8 +12,9 @@ const routes = [
   { path: "/zones/:id", name: "zone", component: ZonePage },
 ];
 
-const router = new VueRouter({
-  routes: routes,
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
 });
 
 router.replace("/dashboard");

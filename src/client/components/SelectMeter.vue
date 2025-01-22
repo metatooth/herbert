@@ -1,10 +1,10 @@
 <script lang="ts">
-import Vue from "vue";
+import { Meter } from "@client/store/meters/types";
 
-const SelectMeter = Vue.extend({
+export default {
   props: {
-    label: string,
-    meters: { type: Array<object>, default: [] },
+    label: String,
+    meters: { type: Array<Meter>, default: [] },
   },
 
   emits: ["select-meter"],
@@ -21,9 +21,7 @@ const SelectMeter = Vue.extend({
       this.selected = "";
     },
   },
-});
-
-export default SelectMeter;
+};
 </script>
 
 <template>

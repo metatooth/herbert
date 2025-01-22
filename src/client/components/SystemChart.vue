@@ -1,3 +1,17 @@
+<script lang="ts">
+import SystemDeviceChart from "@client/components/SystemDeviceChart.vue";
+import SystemHumidityChart from "@client/components/SystemHumidityChart.vue";
+import SystemTemperatureChart from "@client/components/SystemTemperatureChart.vue";
+
+export default {
+  components: {
+    SystemDeviceChart,
+    SystemHumidityChart,
+    SystemTemperatureChart,
+  },
+};
+</script>
+
 <template>
   <nav class="level">
     <div class="level-left" />
@@ -14,23 +28,6 @@
     </div>
   </nav>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import SystemDeviceChart from "@/components/SystemDeviceChart.vue";
-import SystemHumidityChart from "@/components/SystemHumidityChart.vue";
-import SystemTemperatureChart from "@/components/SystemTemperatureChart.vue";
-
-const SystemChart = Vue.extend({
-  components: {
-    SystemDeviceChart,
-    SystemHumidityChart,
-    SystemTemperatureChart,
-  },
-});
-
-export default SystemChart;
-</script>
 
 <style scoped>
 .level-item {

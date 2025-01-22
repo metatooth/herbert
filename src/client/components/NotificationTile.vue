@@ -1,8 +1,7 @@
 <script>
-import Vue from "vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Timestamp from "@client/components/Timestamp.vue";
 
-const NotificationTile = Vue.extend({
+export default {
   components: { Timestamp },
 
   props: {
@@ -13,9 +12,7 @@ const NotificationTile = Vue.extend({
   },
 
   emits: ["delete-notification"],
-});
-
-export default NotificationTile;
+};
 </script>
 
 <template>

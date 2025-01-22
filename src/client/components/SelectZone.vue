@@ -1,9 +1,9 @@
 <script lang="ts">
-import Vue from "vue";
+import { Zone } from "@client/store/zones/types";
 
-const SelectZone = Vue.extend({
+export default {
   props: {
-    zones: { type: Array<object>, default: [] },
+    zones: { type: Array<Zone>, default: [] },
   },
 
   emits: ["select-zone"],
@@ -20,9 +20,7 @@ const SelectZone = Vue.extend({
       this.selected = "";
     },
   },
-});
-
-export default SelectZone;
+};
 </script>
 
 <template>

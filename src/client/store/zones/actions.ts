@@ -1,9 +1,11 @@
 import { ActionTree } from "vuex";
-import HTTP from "@/api/http";
-import { ZonesState, Zone } from "./types";
+
+import HTTP from "@client/api/http";
+
 import { Device } from "../devices/types";
 import { Meter } from "../meters/types";
 import { RootState } from "../types";
+import { ZonesState, Zone } from "./types";
 
 export const actions: ActionTree<ZonesState, RootState> = {
   add({ commit }, payload: Zone) {
@@ -143,8 +145,7 @@ export const actions: ActionTree<ZonesState, RootState> = {
   },
 
   removeChild({ commit }, payload: { zone: Zone; child: string }) {
-    const json = JSON.stringify({ child: payload.child });
-    HTTP.delete(`/zones/${payload.zone.id}/children/${payload.child}`, json);
+    HTTP.delete(`/zones/${payload.zone.id}/children/${payload.child}`);
     commit("REMOVE_CHILD", payload);
   },
 };

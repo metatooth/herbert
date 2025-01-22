@@ -1,8 +1,10 @@
-import { LampTimer } from "../../../shared/lamp-timer";
+import { LampTimer } from "@shared/lamp-timer";
 
 export class Profile {
   id: number;
   profile: string;
+  controltype: string;
+  timezone: string;
   lampstart: string;
   lampduration: { hours: number };
   lampontemperature: number;

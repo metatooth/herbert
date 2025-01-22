@@ -1,16 +1,22 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import DeviceTile from "@/components/DeviceTile.vue";
-import MeterTile from "@/components/MeterTile.vue";
-import ProfileTile from "@/components/ProfileTile.vue";
-import ZoneDetail from "@/components/ZoneDetail.vue";
-import ZoneTile from "@/components/ZoneTile.vue";
-import WorkerTile from "@/components/WorkerTile.vue";
-import ConfigTile from "@/components/ConfigTile.vue";
+import ConfigTile from "@client/components/ConfigTile.vue";
+import DeviceTile from "@client/components/DeviceTile.vue";
+import MeterTile from "@client/components/MeterTile.vue";
+import ProfileTile from "@client/components/ProfileTile.vue";
+import WorkerTile from "@client/components/WorkerTile.vue";
+import ZoneDetail from "@client/components/ZoneDetail.vue";
+import ZoneTile from "@client/components/ZoneTile.vue";
 
-const SingleColumn = Vue.extend({
+import { Config } from "@client/store/configs/types";
+import { Device } from "@client/store/devices/types";
+import { Meter } from "@client/store/meters/types";
+import { Profile } from "@client/store/profiles/types";
+import { Worker } from "@client/store/workers/types";
+import { Zone } from "@client/store/zones/types";
+
+export default {
   components: {
     DeviceTile,
     MeterTile,
@@ -20,18 +26,17 @@ const SingleColumn = Vue.extend({
     WorkerTile,
     ConfigTile,
   },
+
   props: {
     items: { type: Array<object>, default: [] },
     locked: Boolean,
-    type: string,
+    type: String,
   },
 
   computed: {
     ...mapGetters("settings", ["settings"]),
   },
-});
-
-export default SingleColumn;
+};
 </script>
 
 <template>
@@ -40,7 +45,7 @@ export default SingleColumn;
       <device-tile
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :device="item"
+        :device="item as Device"
         :units="settings.units"
         :locked="locked"
       />
@@ -49,7 +54,7 @@ export default SingleColumn;
       <meter-tile
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :meter="item"
+        :meter="item as Meter"
         :units="settings.units"
         :locked="locked"
       />
@@ -58,7 +63,7 @@ export default SingleColumn;
       <profile-tile
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :profile="item"
+        :profile="item as Profile"
         :units="settings.units"
         :locked="locked"
       />
@@ -67,7 +72,7 @@ export default SingleColumn;
       <zone-tile
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -76,7 +81,7 @@ export default SingleColumn;
       <zone-detail
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :zone="item"
+        :zone="item as Zone"
         :units="settings.units"
         :locked="locked"
       />
@@ -85,7 +90,7 @@ export default SingleColumn;
       <worker-tile
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :worker="item"
+        :worker="item as Worker"
         :units="settings.units"
         :locked="locked"
       />
@@ -94,7 +99,7 @@ export default SingleColumn;
       <config-tile
         v-for="(item, index) in items"
         :key="`item-${index}`"
-        :config="item"
+        :config="item as Config"
         :units="settings.units"
         :locked="locked"
       />

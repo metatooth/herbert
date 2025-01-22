@@ -1,6 +1,8 @@
 export class Worker {
   worker: string;
   nickname: string;
+  configname: string;
+  config: object;
   inet?: string;
   camera?: Uint8Array;
   createdat: Date;
@@ -11,6 +13,8 @@ export class Worker {
   constructor() {
     this.worker = "";
     this.nickname = "";
+    this.configname = "";
+    this.config = {};
     this.createdat = new Date();
     this.updatedat = new Date();
     this.deleted = false;

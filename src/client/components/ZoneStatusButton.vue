@@ -1,23 +1,9 @@
-<template>
-  <button
-    class="button"
-    :disabled="locked"
-    :class="statusClass"
-    @click="toggle"
-  >
-    <span class="icon">
-      <font-awesome-icon :icon="statusIcon" />
-    </span>
-  </button>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapActions } from "vuex";
 
-import { Zone } from "@/store/zones/types";
+import { Zone } from "@client/store/zones/types";
 
-const ZoneStatusButton = Vue.extend({
+export default {
   props: {
     locked: Boolean,
     zone: Zone,
@@ -59,7 +45,18 @@ const ZoneStatusButton = Vue.extend({
 
     ...mapActions("zones", ["edit"]),
   },
-});
-
-export default ZoneStatusButton;
+};
 </script>
+
+<template>
+  <button
+    class="button"
+    :disabled="locked"
+    :class="statusClass"
+    @click="toggle"
+  >
+    <span class="icon">
+      <font-awesome-icon :icon="statusIcon" />
+    </span>
+  </button>
+</template>

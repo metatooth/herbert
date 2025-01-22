@@ -1,11 +1,10 @@
 <script lang="ts">
-import Vue from "vue";
-import { Zone } from "@/store/zones/types";
-import DeviceChart from "@/components/DeviceChart.vue";
-import HumidityChart from "@/components/HumidityChart.vue";
-import TemperatureChart from "@/components/TemperatureChart.vue";
+import { Zone } from "@client/store/zones/types";
+import DeviceChart from "@client/components/DeviceChart.vue";
+import HumidityChart from "@client/components/HumidityChart.vue";
+import TemperatureChart from "@client/components/TemperatureChart.vue";
 
-const ZoneChart = Vue.extend({
+export default {
   components: {
     DeviceChart,
     HumidityChart,
@@ -13,11 +12,8 @@ const ZoneChart = Vue.extend({
   },
   props: {
     zone: Zone,
-    units: string,
   },
-});
-
-export default ZoneChart;
+};
 </script>
 
 <template>

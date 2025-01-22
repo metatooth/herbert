@@ -1,5 +1,5 @@
 <script lang="ts">
-import HerbertButton from "@/components/HerbertButton.vue";
+import HerbertButton from "@client/components/HerbertButton.vue";
 
 export default {
   components: {
@@ -7,10 +7,10 @@ export default {
   },
 
   props: {
-    text: string,
-    size: string,
-    label: string,
-    icon: string,
+    text: String,
+    size: String,
+    label: String,
+    icon: String,
   },
 
   emits: ["edit-text"],

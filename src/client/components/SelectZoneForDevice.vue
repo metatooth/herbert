@@ -1,10 +1,9 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-const SelectZoneForDevice = Vue.extend({
+export default {
   props: {
-    zoneid: number,
+    zoneid: Number,
   },
 
   emits: ["select-zone"],
@@ -24,9 +23,7 @@ const SelectZoneForDevice = Vue.extend({
       this.$emit("select-zone", val);
     },
   },
-});
-
-export default SelectZoneForDevice;
+};
 </script>
 
 <template>

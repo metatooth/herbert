@@ -1,10 +1,9 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import NotificationRow from "@/components/NotificationRow.vue";
+import NotificationRow from "@client/components/NotificationRow.vue";
 
-const Notifications = Vue.extend({
+export default {
   components: {
     NotificationRow,
   },
@@ -16,13 +15,11 @@ const Notifications = Vue.extend({
   },
 
   methods: {
-    deleteNotification(notification: NotificationType): void {
+    deleteNotification(notification): void {
       this.$emit("delete-notification", notification);
     },
   },
-});
-
-export default Notifications;
+};
 </script>
 
 <template>
@@ -33,10 +30,12 @@ export default Notifications;
     </h1>
     <table v-if="notificationsCount !== 0" class="table is-bordered is-striped">
       <thead>
-        <th>At</th>
-        <th>Name</th>
-        <th>What</th>
-        <th></th>
+        <tr>
+          <th>At</th>
+          <th>Name</th>
+          <th>What</th>
+          <th></th>
+        </tr>
       </thead>
       <tbody>
         <notification-row

@@ -1,10 +1,10 @@
 <script lang="ts">
-import Vue from "vue";
+import { Device } from "@client/store/devices/types";
 
-const SelectDevice = Vue.extend({
+export default {
   props: {
-    label: string,
-    devices: { type: Array<object>, default: [] },
+    label: String,
+    devices: { type: Array<Device>, default: [] },
   },
 
   emits: ["select-device"],
@@ -21,9 +21,7 @@ const SelectDevice = Vue.extend({
       this.selected = "";
     },
   },
-});
-
-export default SelectDevice;
+};
 </script>
 
 <template>

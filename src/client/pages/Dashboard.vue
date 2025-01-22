@@ -1,97 +1,15 @@
-<template>
-  <div id="dashboard" class="container">
-    <herbert-navbar
-      :active="picked"
-      :locked="locked"
-      @search-on="setFilter"
-      @selected="selected"
-      @toggle="toggle"
-    />
-
-    <nav class="level">
-      <div class="level-left" />
-      <div class="level-right">
-        <div v-for="worker in workers" :key="worker.worker">
-          <div class="level-item">
-            <p class="subtitle">{{ worker.name }}</p>
-          </div>
-          <div v-if="worker.camera" class="level-item">
-            <img :src="worker.camera" width="200" />
-          </div>
-          <div class="level-item">
-            <p class="text">
-              <em><readable :timestamp="new Date(worker.updatedat)" /></em>
-            </p>
-          </div>
-        </div>
-        <current-conditions />
-      </div>
-    </nav>
-
-    <div class="box">
-      <collection
-        v-if="is('devices')"
-        type="device"
-        :filter="filter"
-        :locked="locked"
-      />
-      <collection
-        v-if="is('meters')"
-        type="meter"
-        :filter="filter"
-        :locked="locked"
-      />
-      <collection
-        v-if="is('profiles')"
-        type="profile"
-        :filter="filter"
-        :locked="locked"
-      />
-      <collection
-        v-if="is('workers')"
-        type="worker"
-        :filter="filter"
-        :locked="locked"
-      />
-      <collection
-        v-if="is('configs')"
-        type="config"
-        :filter="filter"
-        :locked="locked"
-      />
-      <collection
-        v-if="is('zones') || is('overview')"
-        type="zone"
-        :filter="filter"
-        :locked="locked"
-      />
-      <settings-page
-        v-if="is('settings')"
-        :settings="settings"
-        :locked="locked"
-        @save-settings="saveSettings"
-      />
-    </div>
-
-    <notifications v-if="is('overview')" class="box" />
-
-    <timestamp class="box" :timestamp="ts" />
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
-import Collection from "@/components/Collection.vue";
-import CurrentConditions from "@/components/CurrentConditions.vue";
-import HerbertNavbar from "@/components/HerbertNavbar.vue";
-import Notifications from "@/components/Notifications.vue";
-import Readable from "@/components/Readable.vue";
-import SettingsPage from "@/components/SettingsPage.vue";
-import Timestamp from "@/components/Timestamp.vue";
+import Collection from "@client/components/Collection.vue";
+import CurrentConditions from "@client/components/CurrentConditions.vue";
+import HerbertNavbar from "@client/components/HerbertNavbar.vue";
+import Notifications from "@client/components/Notifications.vue";
+import Readable from "@client/components/Readable.vue";
+import SettingsPage from "@client/components/SettingsPage.vue";
+import Timestamp from "@client/components/Timestamp.vue";
 
-const Dashboard = Vue.extend({
+export default {
   components: {
     Collection,
     CurrentConditions,
@@ -185,7 +103,86 @@ const Dashboard = Vue.extend({
       "settings/edit",
     ]),
   },
-});
-
-export default Dashboard;
+};
 </script>
+
+<template>
+  <div id="dashboard" class="container">
+    <herbert-navbar
+      :active="picked"
+      :locked="locked"
+      @search-on="setFilter"
+      @selected="selected"
+      @toggle="toggle"
+    />
+
+    <nav class="level">
+      <div class="level-left" />
+      <div class="level-right">
+        <div v-for="worker in workers" :key="worker.worker">
+          <div class="level-item">
+            <p class="subtitle">{{ worker.name }}</p>
+          </div>
+          <div v-if="worker.camera" class="level-item">
+            <img :src="worker.camera" width="200" />
+          </div>
+          <div class="level-item">
+            <p class="text">
+              <em><readable :timestamp="new Date(worker.updatedat)" /></em>
+            </p>
+          </div>
+        </div>
+        <current-conditions />
+      </div>
+    </nav>
+
+    <div class="box">
+      <collection
+        v-if="is('devices')"
+        type="device"
+        :filter="filter"
+        :locked="locked"
+      />
+      <collection
+        v-if="is('meters')"
+        type="meter"
+        :filter="filter"
+        :locked="locked"
+      />
+      <collection
+        v-if="is('profiles')"
+        type="profile"
+        :filter="filter"
+        :locked="locked"
+      />
+      <collection
+        v-if="is('workers')"
+        type="worker"
+        :filter="filter"
+        :locked="locked"
+      />
+      <collection
+        v-if="is('configs')"
+        type="config"
+        :filter="filter"
+        :locked="locked"
+      />
+      <collection
+        v-if="is('zones') || is('overview')"
+        type="zone"
+        :filter="filter"
+        :locked="locked"
+      />
+      <settings-page
+        v-if="is('settings')"
+        :settings="settings"
+        :locked="locked"
+        @save-settings="saveSettings"
+      />
+    </div>
+
+    <notifications v-if="is('overview')" class="box" />
+
+    <timestamp class="box" :timestamp="ts" />
+  </div>
+</template>

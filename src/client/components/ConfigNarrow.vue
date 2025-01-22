@@ -1,3 +1,17 @@
+<script lang="ts">
+import Readable from "@client/components/Readable.vue";
+import { Config } from "@client/store/configs/types";
+
+export default {
+  components: {
+    Readable,
+  },
+  props: {
+    config: Config,
+  },
+};
+</script>
+
 <template>
   <nav class="level is-mobile">
     <div class="level-left">
@@ -12,28 +26,8 @@
     </div>
     <div class="level-right">
       <div class="level-item">
-        <readable
-          class="is-italic"
-          :timestamp="new Date(Date.parse(config.updatedat))"
-        />
+        <readable class="is-italic" :timestamp="config.updatedat" />
       </div>
     </div>
   </nav>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { Config } from "@/store/configs/types";
-import Readable from "@/components/Readable.vue";
-
-const ConfigNarrow = Vue.extend({
-  components: {
-    Readable,
-  },
-  props: {
-    config: Config,
-  },
-});
-
-export default ConfigNarrow;
-</script>

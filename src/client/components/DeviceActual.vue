@@ -1,6 +1,6 @@
 <script lang="ts">
-import { Device } from "@/store/meters/types";
-import StatusFact from "@/components/StatusFact.vue";
+import StatusFact from "@client/components/StatusFact.vue";
+import { Device } from "@client/store/devices/types";
 
 export default {
   components: {

@@ -1,15 +1,14 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 
-import HerbertCollection from "@/components/HerbertCollection.vue";
-import CurrentConditions from "@/components/CurrentConditions.vue";
-import HerbertNavbar from "@/components/HerbertNavbar.vue";
-import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
-import SettingsPage from "@/components/SettingsPage.vue";
-import FullTimestamp from "@/components/FullTimestamp.vue";
+import HerbertCollection from "@client/components/HerbertCollection.vue";
+import CurrentConditions from "@client/components/CurrentConditions.vue";
+import HerbertNavbar from "@client/components/HerbertNavbar.vue";
+import ReadableTimestamp from "@client/components/ReadableTimestamp.vue";
+import SettingsPage from "@client/components/SettingsPage.vue";
+import FullTimestamp from "@client/components/FullTimestamp.vue";
 
-const Dashboard = Vue.extend({
+export default {
   components: {
     CurrentConditions,
     FullTimestamp,
@@ -116,9 +115,7 @@ const Dashboard = Vue.extend({
       "settings/edit",
     ]),
   },
-});
-
-export default Dashboard;
+};
 </script>
 
 <template>

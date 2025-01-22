@@ -1,16 +1,15 @@
 <script lang="ts">
-import Vue from "vue";
-import { Zone } from "@/store/zones/types";
-import Target from "@/components/Target.vue";
+import Target from "@client/components/Target.vue";
+import { Zone } from "@client/store/zones/types";
 
-const MeterTarget = Vue.extend({
+export default {
   components: {
     Target,
   },
 
   props: {
     zone: Zone,
-    units: string,
+    units: String,
   },
 
   data() {
@@ -40,9 +39,7 @@ const MeterTarget = Vue.extend({
       return "°" + this.units;
     },
   },
-});
-
-export default MeterTarget;
+};
 </script>
 
 <template>

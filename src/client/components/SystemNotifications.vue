@@ -1,13 +1,13 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import NotificationRow from "@/components/NotificationRow.vue";
+import NotificationRow from "@client/components/NotificationRow.vue";
 
-const SystemNotifications = Vue.extend({
+export default {
   components: {
     NotificationRow,
   },
+
   emits: ["delete-notification"],
 
   computed: {
@@ -15,13 +15,11 @@ const SystemNotifications = Vue.extend({
   },
 
   methods: {
-    deleteNotification(notification: NotificationType): void {
+    deleteNotification(notification): void {
       this.$emit("delete-notification", notification);
     },
   },
-});
-
-export default SystemNotifications;
+};
 </script>
 
 <template>

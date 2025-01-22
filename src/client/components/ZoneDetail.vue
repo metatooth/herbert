@@ -1,39 +1,30 @@
 <script lang="ts">
-import Readable from "@/components/Readable.vue";
-import Vue from "vue";
-import { Zone } from "@/store/zones/types";
 import { mapGetters, mapActions } from "vuex";
-import NarrowTable from "@/components/NarrowTable.vue";
-import ZoneStatusButton from "@/components/ZoneStatusButton.vue";
 
-import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
+import { celsius2fahrenheit, celsius2kelvin, color } from "@shared/utils";
 
-const ZoneDetail = Vue.extend({
+import NarrowTable from "@client/components/NarrowTable.vue";
+import Readable from "@client/components/Readable.vue";
+import ZoneStatusButton from "@client/components/ZoneStatusButton.vue";
+import { Zone } from "@client/store/zones/types";
+
+export default {
   components: {
     NarrowTable,
     Readable,
     ZoneStatusButton,
   },
+
   props: {
     zone: Zone,
-    units: string,
+    units: { type: String, default: "" },
   },
 
   data() {
-    let lampon = parseFloat(this.zone.lamponleafdiff);
-    let lampoff = parseFloat(this.zone.lampoffleafdiff);
-
-    if (this.units === "F") {
-      lampon = (lampon * 9) / 5;
-      lampoff = (lampoff * 9) / 5;
-    }
-
     return {
       nickname: this.zone.nickname,
-      profileid: parseInt(this.zone.profileid),
-      maxirrigators: parseInt(this.zone.maxirrigators),
-      lamponleafdiff: lampon,
-      lampoffleafdiff: lampoff,
+      profileid: this.zone.profileid,
+      maxirrigators: this.zone.maxirrigators,
       now: new Date(),
     };
   },
@@ -159,9 +150,7 @@ const ZoneDetail = Vue.extend({
       "removeChild",
     ]),
   },
-});
-
-export default ZoneDetail;
+};
 </script>
 
 <template>
@@ -200,20 +189,6 @@ export default ZoneDetail;
 
     <div class="card-content">
       <div class="field is-grouped is-grouped-multiline">
-        <div class="control">
-          <div class="tags has-addons">
-            <span
-              class="tag has-background-grey-darker is-medium"
-              :style="leafdiffStyle"
-            >
-              <font-awesome-icon icon="cannabis" />
-            </span>
-            <span class="tag has-text-black is-medium"
-              >{{ lamponleafdiff.toFixed(1) }}&#176;</span
-            >
-          </div>
-        </div>
-
         <div v-if="zone.children.length > 0" class="control">
           <div class="tags has-addons">
             <span

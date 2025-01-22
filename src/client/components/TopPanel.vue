@@ -1,3 +1,35 @@
+<script lang="ts">
+import { mapGetters } from "vuex";
+
+import CurrentConditions from "@client/components/CurrentConditions.vue";
+import PoweredByHerbert from "@client/components/PoweredByHerbert.vue";
+import SystemDeviceChart from "@client/components/SystemDeviceChart.vue";
+import SystemHumidityChart from "@client/components/SystemHumidityChart.vue";
+import SystemTemperatureChart from "@client/components/SystemTemperatureChart.vue";
+import WorkerCamera from "@client/components/WorkerCamera.vue";
+
+export default {
+  components: {
+    CurrentConditions,
+    PoweredByHerbert,
+    SystemDeviceChart,
+    SystemHumidityChart,
+    SystemTemperatureChart,
+    WorkerCamera,
+  },
+
+  computed: {
+    cameras() {
+      return this.workers.filter((worker) => {
+        return worker.camera !== null;
+      });
+    },
+
+    ...mapGetters("workers", ["workers"]),
+  },
+};
+</script>
+
 <template>
   <div class="columns">
     <div class="column">
@@ -22,40 +54,3 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { mapGetters } from "vuex";
-
-import CurrentConditions from "@/components/CurrentConditions.vue";
-import PoweredByHerbert from "@/components/PoweredByHerbert.vue";
-import SystemDeviceChart from "@/components/SystemDeviceChart.vue";
-import SystemHumidityChart from "@/components/SystemHumidityChart.vue";
-import SystemTemperatureChart from "@/components/SystemTemperatureChart.vue";
-import WorkerCamera from "@/components/WorkerCamera.vue";
-
-const TopPanel = Vue.extend({
-  components: {
-    CurrentConditions,
-    PoweredByHerbert,
-    SystemDeviceChart,
-    SystemHumidityChart,
-    SystemTemperatureChart,
-    WorkerCamera,
-  },
-
-  computed: {
-    cameras() {
-      return this.workers.filter((worker) => {
-        return worker.camera !== null;
-      });
-    },
-
-    ...mapGetters("workers", ["workers"]),
-  },
-});
-
-export default TopPanel;
-</script>
-
-<style></style>

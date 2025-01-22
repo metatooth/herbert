@@ -1,9 +1,9 @@
 <script lang="ts">
-import HerbertButton from "@/components/HerbertButton.vue";
+import ButtonBase from "@client/components/ButtonBase.vue";
 
 export default {
   components: {
-    HerbertButton,
+    ButtonBase,
   },
 
   emits: ["on-add", "on-save", "on-cancel"],
@@ -35,14 +35,9 @@ export default {
 
 <template>
   <div class="field is-grouped is-grouped-center">
-    <herbert-button color="info" icon="plus" :show="!adding" @on-click="on" />
-    <herbert-button
-      color="success"
-      icon="check"
-      :show="adding"
-      @on-click="save"
-    />
-    <herbert-button
+    <button-base color="info" icon="plus" :show="!adding" @on-click="on" />
+    <button-base color="success" icon="check" :show="adding" @on-click="save" />
+    <button-base
       color="danger"
       icon="times"
       :show="adding"

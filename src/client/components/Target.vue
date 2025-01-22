@@ -1,15 +1,13 @@
 <script lang="ts">
-import Vue from "vue";
-
-const Target = Vue.extend({
+export default {
   props: {
-    icon: string,
-    value: number,
-    precision: { type: number, default: 0 },
-    units: string,
-    color: { type: string, default: "#ffffff" },
-    size: { type: string, default: "medium" },
-    simple: { type: boolean, default: false },
+    icon: String,
+    value: Number,
+    precision: { type: Number, default: 0 },
+    units: String,
+    color: { type: String, default: "#ffffff" },
+    size: { type: String, default: "medium" },
+    simple: { type: Boolean, default: false },
   },
 
   computed: {
@@ -33,9 +31,7 @@ const Target = Vue.extend({
       return this.value.toFixed(this.precision);
     },
   },
-});
-
-export default Target;
+};
 </script>
 
 <template>

@@ -1,13 +1,9 @@
-<template>
-  <device-chart :devices="devices" />
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
-import DeviceChart from "@/components/DeviceChart.vue";
 
-const SystemDeviceChart = Vue.extend({
+import DeviceChart from "@client/components/DeviceChart.vue";
+
+export default {
   components: {
     DeviceChart,
   },
@@ -15,9 +11,9 @@ const SystemDeviceChart = Vue.extend({
   computed: {
     ...mapGetters("devices", ["devices"]),
   },
-});
-
-export default SystemDeviceChart;
+};
 </script>
 
-<style scoped></style>
+<template>
+  <device-chart :devices="devices" />
+</template>

@@ -1,5 +1,4 @@
 <script lang="ts">
-import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
 import { io, Socket } from "socket.io-client";
 import { mapGetters, mapActions } from "vuex";
@@ -11,19 +10,19 @@ import {
 } from "../../shared/message-creators";
 import { messageIsFrom } from "../../shared/type-guards";
 
-import Collection from "@/components/Collection.vue";
-import NotificationRow from "@/components/NotificationRow.vue";
-import { Device } from "@/store/devices/types";
-import { Notification } from "@/store/notifications/types";
+import Collection from "@client/components/Collection.vue";
+import NotificationRow from "@client/components/NotificationRow.vue";
+import { Device } from "@client/store/devices/types";
+import { Notification } from "@client/store/notifications/types";
 
-const HerbertOverview = Vue.extend({
+export default {
   components: {
     Collection,
     NotificationRow,
   },
 
   props: {
-    filter: string,
+    filter: String,
   },
 
   computed: {
@@ -110,7 +109,7 @@ const HerbertOverview = Vue.extend({
     checkDeviceHealth(): void {
       const check = Date.now();
       this.devices.forEach((d: Device) => {
-        const local = convertToLocalTime(d.timestamp || new Date(), {
+        const local = convertToLocalTime(d.updatedat || new Date(), {
           timeZone: "America/New_York",
         });
         const diff = check - local.getTime();
@@ -120,7 +119,7 @@ const HerbertOverview = Vue.extend({
           const n: Notification = {
             id: d.device,
             action: "",
-            code: "",
+            code: 0,
             plug: d.nickname || d.device,
             message: `Hasn't reported since ${formatted}`,
             timestamp: new Date(),
@@ -149,8 +148,7 @@ const HerbertOverview = Vue.extend({
 
     ...mapActions("notifications", ["add", "remove"]),
   },
-});
-export default HerbertOverview;
+};
 </script>
 
 <template>

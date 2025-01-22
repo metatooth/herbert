@@ -4,7 +4,7 @@ import ChartJS from "chart.js";
 import { convertToLocalTime } from "date-fns-timezone";
 import { mapGetters } from "vuex";
 
-import HTTP from "@/api/http";
+import HTTP from "@client/api/http";
 
 export default {
   props: {

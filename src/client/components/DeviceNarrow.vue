@@ -1,39 +1,9 @@
-<template>
-  <nav class="level is-mobile">
-    <div class="level-left">
-      <div class="level-item">
-        <p class="subtitle is-7">
-          <strong>{{ device.name.slice(0, 12) }}</strong
-          ><br />
-          {{ device.device }}
-        </p>
-      </div>
-    </div>
-    <div class="level-right">
-      <div class="level-item">
-        <button class="button" @click="toggle">
-          <font-awesome-icon :class="deviceClass" :icon="device.icon" />
-          <span>{{ status.slice(0, 3) }}</span>
-        </button>
-      </div>
-      <div class="level-item">
-        <button class="button has-text-info" @click="history">
-          <span class="icon">
-            <font-awesome-icon icon="history" />
-          </span>
-        </button>
-      </div>
-    </div>
-  </nav>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapActions } from "vuex";
 
-import { Device } from "@/store/meters/types";
+import { Device } from "@client/store/devices/types";
 
-const DeviceNarrow = Vue.extend({
+export default {
   props: {
     device: Device,
   },
@@ -83,7 +53,34 @@ const DeviceNarrow = Vue.extend({
 
     ...mapActions("devices", ["on", "off"]),
   },
-});
-
-export default DeviceNarrow;
+};
 </script>
+
+<template>
+  <nav class="level is-mobile">
+    <div class="level-left">
+      <div class="level-item">
+        <p class="subtitle is-7">
+          <strong>{{ device.name.slice(0, 12) }}</strong
+          ><br />
+          {{ device.device }}
+        </p>
+      </div>
+    </div>
+    <div class="level-right">
+      <div class="level-item">
+        <button class="button" @click="toggle">
+          <font-awesome-icon :class="deviceClass" :icon="device.icon" />
+          <span>{{ status.slice(0, 3) }}</span>
+        </button>
+      </div>
+      <div class="level-item">
+        <button class="button has-text-info" @click="history">
+          <span class="icon">
+            <font-awesome-icon icon="history" />
+          </span>
+        </button>
+      </div>
+    </div>
+  </nav>
+</template>

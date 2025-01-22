@@ -1,12 +1,11 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
-import BackToDashboard from "@/components/BackToDashboard.vue";
-import ZoneDetail from "@/components/ZoneDetail.vue";
-import EditControls from "@/components/EditControls.vue";
+import BackToDashboard from "@client/components/BackToDashboard.vue";
+import ZoneDetail from "@client/components/ZoneDetail.vue";
+import EditControls from "@client/components/EditControls.vue";
 
-const ZonePage = Vue.extend({
+export default {
   components: {
     BackToDashboard,
     EditControls,
@@ -115,9 +114,7 @@ const ZonePage = Vue.extend({
 
     ...mapActions("zones", ["edit", "remove"]),
   },
-});
-
-export default ZonePage;
+};
 </script>
 
 <template>

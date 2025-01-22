@@ -1,7 +1,9 @@
 import { ActionTree } from "vuex";
-import HTTP from "@/api/http";
-import { WorkersState, Worker } from "./types";
+
+import HTTP from "@client/api/http";
+
 import { RootState } from "../types";
+import { WorkersState, Worker } from "./types";
 
 export const actions: ActionTree<WorkersState, RootState> = {
   edit({ commit }, payload: Worker) {
@@ -14,10 +16,10 @@ export const actions: ActionTree<WorkersState, RootState> = {
     HTTP.get("/workers").then((response) => {
       const payload: Worker[] = [];
       response.data.forEach((json: object) => {
-        if (json.camera) {
+        if (json["camera"]) {
           let camera = "data:image/jpeg;base64,";
-          camera += btoa(String.fromCharCode(...json.camera.data));
-          json.camera = camera;
+          camera += btoa(String.fromCharCode(...json["camera"].data));
+          json["camera"] = camera;
         }
         payload.push(Object.assign(new Worker(), json));
       });

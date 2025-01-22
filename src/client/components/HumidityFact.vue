@@ -1,20 +1,14 @@
-<template>
-  <sparkline-display :id="id" :data="humidities" color="rgb(0,187,238)" />
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-
-import { Meter } from "@/store/meters/types";
-
-import SparklineDisplay from "@/components/SparklineDisplay.vue";
-
 import { convertToLocalTime } from "date-fns-timezone";
 
-const HumidityFact = Vue.extend({
+import SparklineDisplay from "@client/components/SparklineDisplay.vue";
+import { Meter } from "@client/store/meters/types";
+
+export default {
   components: {
     SparklineDisplay,
   },
+
   props: {
     meter: Meter,
   },
@@ -57,16 +51,16 @@ const HumidityFact = Vue.extend({
               reading: string;
             }) => {
               const observedat = new Date(
-                d.year,
-                d.month - 1,
-                d.date,
-                d.hour,
-                d.minute,
+                parseInt(d.year),
+                parseInt(d.month) - 1,
+                parseInt(d.date),
+                parseInt(d.hour),
+                parseInt(d.minute),
               );
 
               const humidity = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number,
+                y: parseFloat(d.reading),
               };
 
               this.humidities.push(humidity);
@@ -78,9 +72,9 @@ const HumidityFact = Vue.extend({
       xhr.send();
     },
   },
-});
-
-export default HumidityFact;
+};
 </script>
 
-<style></style>
+<template>
+  <sparkline-display :id="id" :data="humidities" color="rgb(0,187,238)" />
+</template>

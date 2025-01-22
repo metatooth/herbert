@@ -1,3 +1,17 @@
+<script lang="ts">
+import Readable from "@client/components/Readable.vue";
+import { Worker } from "@client/store/workers/types";
+
+export default {
+  components: {
+    Readable,
+  },
+  props: {
+    worker: Worker,
+  },
+};
+</script>
+
 <template>
   <nav class="level is-mobile">
     <div class="level-left">
@@ -17,28 +31,8 @@
     </div>
     <div class="level-right">
       <div class="level-item">
-        <readable
-          class="is-italic"
-          :timestamp="new Date(Date.parse(worker.updatedat))"
-        />
+        <readable class="is-italic" :timestamp="worker.updatedat" />
       </div>
     </div>
   </nav>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { Worker } from "@/store/profiles/types";
-import Readable from "@/components/Readable.vue";
-
-const WorkerNarrow = Vue.extend({
-  components: {
-    Readable,
-  },
-  props: {
-    worker: Worker,
-  },
-});
-
-export default WorkerNarrow;
-</script>

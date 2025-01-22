@@ -1,45 +1,11 @@
-<template>
-  <nav class="level is-mobile">
-    <div class="level-left">
-      <div class="level-item">
-        <div class="tag has-background-black-bis is-medium" :style="iconStyle">
-          <span class="icon">
-            <font-awesome-icon icon="lightbulb" />
-          </span>
-        </div>
-      </div>
-      <div class="level-item" @click="clicked">
-        <div class="content">
-          <p class="title is-5">
-            {{ zone.shortname }}
-          </p>
-          <p class="subtitle is-7">
-            {{ zone.profile.profile }}
-          </p>
-        </div>
-      </div>
-    </div>
-    <div v-if="zone.meters.length !== 0" class="level-right">
-      <div class="level-item">
-        <p class="title" :style="temperatureStyle">
-          {{ temperature.toFixed(0) }}&#176;
-        </p>
-      </div>
-      <div class="level-item">
-        <p class="title" :style="humidityStyle">{{ humidity.toFixed(0) }}%</p>
-      </div>
-    </div>
-  </nav>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import { Zone } from "@/store/zones/types";
+import { Zone } from "@client/store/zones/types";
+
 import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 
-const ZoneNarrow = Vue.extend({
+export default {
   props: {
     zone: Zone,
   },
@@ -115,7 +81,39 @@ const ZoneNarrow = Vue.extend({
       });
     },
   },
-});
-
-export default ZoneNarrow;
+};
 </script>
+
+<template>
+  <nav class="level is-mobile">
+    <div class="level-left">
+      <div class="level-item">
+        <div class="tag has-background-black-bis is-medium" :style="iconStyle">
+          <span class="icon">
+            <font-awesome-icon icon="lightbulb" />
+          </span>
+        </div>
+      </div>
+      <div class="level-item" @click="clicked">
+        <div class="content">
+          <p class="title is-5">
+            {{ zone.shortname }}
+          </p>
+          <p class="subtitle is-7">
+            {{ zone.profile.profile }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div v-if="zone.meters.length !== 0" class="level-right">
+      <div class="level-item">
+        <p class="title" :style="temperatureStyle">
+          {{ temperature.toFixed(0) }}&#176;
+        </p>
+      </div>
+      <div class="level-item">
+        <p class="title" :style="humidityStyle">{{ humidity.toFixed(0) }}%</p>
+      </div>
+    </div>
+  </nav>
+</template>

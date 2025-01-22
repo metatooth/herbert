@@ -1,13 +1,12 @@
 <script lang="ts">
 import "chartjs-adapter-date-fns";
 import ChartJS from "chart.js";
-import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
 import { mapGetters } from "vuex";
 
-import HTTP from "@/api/http";
+import HTTP from "@client/api/http";
 
-const HumidityChart = Vue.extend({
+export default {
   props: {
     meters: { type: Array<object>, default: [] },
   },
@@ -88,9 +87,7 @@ const HumidityChart = Vue.extend({
       });
     });
   },
-});
-
-export default HumidityChart;
+};
 </script>
 
 <template>

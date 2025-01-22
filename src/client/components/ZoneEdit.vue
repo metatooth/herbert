@@ -1,8 +1,7 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
-const ZonePage = Vue.extend({
+export default {
   data() {
     return {
       nickname: "",
@@ -105,9 +104,7 @@ const ZonePage = Vue.extend({
 
     ...mapActions("zones", ["edit", "remove"]),
   },
-});
-
-export default ZonePage;
+};
 </script>
 
 <template>

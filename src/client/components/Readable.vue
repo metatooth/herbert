@@ -1,11 +1,5 @@
-<template>
-  <span> {{ lapsed }} ago </span>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-
-const Readable = Vue.extend({
+export default {
   props: {
     timestamp: {
       default: () => {
@@ -17,7 +11,7 @@ const Readable = Vue.extend({
 
   computed: {
     lapsed(): string {
-      const diff = new Date() - this.timestamp;
+      const diff = new Date().getTime() - this.timestamp.getTime();
       if (diff < 30000) {
         return "seconds";
       } else if (diff < 60000) {
@@ -48,6 +42,9 @@ const Readable = Vue.extend({
       }
     },
   },
-});
-export default Readable;
+};
 </script>
+
+<template>
+  <span> {{ lapsed }} ago </span>
+</template>

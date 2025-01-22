@@ -1,8 +1,8 @@
 <script lang="ts">
 import { mapState, mapActions } from "vuex";
 
-import { Device } from "@/store/devices/types";
-import { Notification } from "@/store/notifications/types";
+import { Device } from "@client/store/devices/types";
+import { Notification } from "@client/store/notifications/types";
 
 export default {
   props: {

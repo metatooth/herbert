@@ -1,5 +1,7 @@
 import { ActionTree } from "vuex";
-import HTTP from "@/api/http";
+
+import HTTP from "@client/api/http";
+
 import { DevicesState, Device } from "./types";
 import { RootState } from "../types";
 

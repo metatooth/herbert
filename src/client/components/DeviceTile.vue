@@ -1,84 +1,13 @@
-<template>
-  <div class="tile is-parent">
-    <div class="tile is-child box">
-      <div class="title">
-        <div v-if="editing">
-          <div class="field is-grouped is-grouped-multiline">
-            <div class="control">
-              <input
-                v-model="nickname"
-                class="input"
-                type="text"
-                placeHolder="Name this device"
-                @keyup.esc="cancel"
-              />
-            </div>
-          </div>
-        </div>
-        <span v-else>{{ device.name }}</span>
-      </div>
-
-      <p class="subtitle">
-        {{ device.device }}
-      </p>
-
-      <p class="subtitle">
-        <select-zone-for-device
-          v-if="editing"
-          :zoneid="zoneid"
-          @select-zone="selectzone"
-        />
-        <span v-else>{{ zonename }}</span>
-      </p>
-
-      <div class="content">
-        <select-device-type
-          v-if="editing"
-          :devicetype="device.devicetype"
-          @select-devicetype="selectdevicetype"
-        />
-        <button v-else class="button" :disabled="locked" @click="toggle">
-          <font-awesome-icon :class="deviceClass" :icon="device.icon" />
-          <span>{{ status }}</span>
-        </button>
-      </div>
-      <div class="content">
-        <router-link
-          :to="{
-            name: 'statuses',
-            params: { name: device.nickname, device: device.device },
-          }"
-        >
-          <readable
-            class="is-italic"
-            :timestamp="new Date(Date.parse(device.updatedat))"
-          />
-        </router-link>
-      </div>
-      <div class="content">
-        <edit-controls
-          v-if="!locked"
-          class="edit-controls"
-          @on-edit="editable"
-          @on-save="save"
-          @on-destroy="destroy"
-          @on-cancel="cancel"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
-import { Device } from "@/store/devices/types";
-import Readable from "@/components/Readable.vue";
-import EditControls from "@/components/EditControls.vue";
-import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
-const DeviceTile = Vue.extend({
+import { Device } from "@client/store/devices/types";
+import Readable from "@client/components/Readable.vue";
+import EditControls from "@client/components/EditControls.vue";
+import SelectDeviceType from "@client/components/SelectDeviceType.vue";
+import SelectZoneForDevice from "@client/components/SelectZoneForDevice.vue";
+
+export default {
   components: {
     EditControls,
     SelectDeviceType,
@@ -230,7 +159,73 @@ const DeviceTile = Vue.extend({
     ...mapActions("devices", ["on", "off", "edit", "remove"]),
     ...mapActions("zones", ["addDevice", "removeDevice"]),
   },
-});
-
-export default DeviceTile;
+};
 </script>
+
+<template>
+  <div class="tile is-parent">
+    <div class="tile is-child box">
+      <div class="title">
+        <div v-if="editing">
+          <div class="field is-grouped is-grouped-multiline">
+            <div class="control">
+              <input
+                v-model="nickname"
+                class="input"
+                type="text"
+                placeHolder="Name this device"
+                @keyup.esc="cancel"
+              />
+            </div>
+          </div>
+        </div>
+        <span v-else>{{ device.name }}</span>
+      </div>
+
+      <p class="subtitle">
+        {{ device.device }}
+      </p>
+
+      <p class="subtitle">
+        <select-zone-for-device
+          v-if="editing"
+          :zoneid="zoneid"
+          @select-zone="selectzone"
+        />
+        <span v-else>{{ zonename }}</span>
+      </p>
+
+      <div class="content">
+        <select-device-type
+          v-if="editing"
+          :devicetype="device.devicetype"
+          @select-devicetype="selectdevicetype"
+        />
+        <button v-else class="button" :disabled="locked" @click="toggle">
+          <font-awesome-icon :class="deviceClass" :icon="device.icon" />
+          <span>{{ status }}</span>
+        </button>
+      </div>
+      <div class="content">
+        <router-link
+          :to="{
+            name: 'statuses',
+            params: { name: device.nickname, device: device.device },
+          }"
+        >
+          <readable class="is-italic" :timestamp="device.updatedat" />
+        </router-link>
+      </div>
+      <div class="content">
+        <edit-controls
+          v-if="!locked"
+          class="edit-controls"
+          @on-edit="editable"
+          @on-save="save"
+          @on-destroy="destroy"
+          @on-cancel="cancel"
+        />
+      </div>
+    </div>
+  </div>
+</template>

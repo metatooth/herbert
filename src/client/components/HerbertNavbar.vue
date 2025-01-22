@@ -1,8 +1,7 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-const HerbertNavbar = Vue.extend({
+export default {
   props: {
     locked: { type: Boolean, default: true },
   },
@@ -75,9 +74,7 @@ const HerbertNavbar = Vue.extend({
       this.$emit("toggle");
     },
   },
-});
-
-export default HerbertNavbar;
+};
 </script>
 
 <template>

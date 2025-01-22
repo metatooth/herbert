@@ -1,4 +1,4 @@
-import { LampTimer } from "../../../shared/lamp-timer";
+import { LampTimer } from "@shared/lamp-timer";
 
 import { Device } from "@client/store/devices/types";
 import { Meter } from "@client/store/meters/types";

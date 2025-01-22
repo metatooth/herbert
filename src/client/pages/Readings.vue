@@ -1,14 +1,14 @@
 <script lang="ts">
-import Vue from "vue";
-import Chart from "@/components/Chart.vue";
-import TemperatureChart from "@/components/TemperatureChart.vue";
 import { convertToLocalTime } from "date-fns-timezone";
-import BackToDashboard from "@/components/BackToDashboard.vue";
 
-const Readings = Vue.extend({
+import ChartBase from "@client/components/ChartBase.vue";
+import TemperatureChart from "@client/components/TemperatureChart.vue";
+import BackToDashboard from "@client/components/BackToDashboard.vue";
+
+export default {
   components: {
     BackToDashboard,
-    Chart,
+    ChartBase,
     TemperatureChart,
   },
   data() {
@@ -82,8 +82,7 @@ const Readings = Vue.extend({
       xhr.send();
     },
   },
-});
-export default Readings;
+};
 </script>
 
 <template>
@@ -130,7 +129,7 @@ export default Readings;
           <temperature-chart id="tempchart" :data="temperatures" />
         </div>
         <div class="column is-half">
-          <chart
+          <chart-base
             id="humiditychart"
             :data="humidities"
             title="Relative Humidity"

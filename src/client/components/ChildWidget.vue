@@ -1,18 +1,18 @@
 <script lang="ts">
 import { mapGetters } from "vuex";
 
-import { Zone } from "@/store/zones/types";
+import { Zone } from "@client/store/zones/types";
 
 export default {
   props: {
-    id: number,
+    id: Number,
   },
 
   emits: ["remove-child"],
 
   data() {
     return {
-      child: Zone,
+      child: new Zone(),
     };
   },
 

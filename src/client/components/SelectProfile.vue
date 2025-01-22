@@ -1,17 +1,17 @@
 <script lang="ts">
-import Vue from "vue";
-import HerbertButton from "@/components/Button.vue";
 import { mapGetters } from "vuex";
-import { Zone } from "@/store/zones/types";
 
-const SelectProfile = Vue.extend({
+import HerbertButton from "@client/components/HerbertButton.vue";
+import { Zone } from "@client/store/zones/types";
+
+export default {
   components: {
     HerbertButton,
   },
 
   props: {
-    label: string,
-    zone: Zone,
+    label: String,
+    zone: { type: Zone, required: true },
   },
 
   emits: ["select-profile"],
@@ -39,9 +39,7 @@ const SelectProfile = Vue.extend({
       this.$emit("select-profile", this.selected);
     },
   },
-});
-
-export default SelectProfile;
+};
 </script>
 
 <template>

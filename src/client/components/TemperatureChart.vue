@@ -1,17 +1,17 @@
 <script lang="ts">
 import "chartjs-adapter-date-fns";
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import Chart from "@/components/Chart.vue";
-import { Device } from "@/store/meters/types";
+import ChartBase from "@client/components/ChartBase.vue";
+import { Device } from "@client/store/devices/types";
 
-const TemperatureChart = Vue.extend({
+export default {
   components: {
-    Chart,
+    ChartBase,
   },
+
   props: {
-    id: string,
+    id: String,
     data: { type: Array<Device>, default: [] },
   },
 
@@ -91,13 +91,12 @@ const TemperatureChart = Vue.extend({
       });
     },
   },
-});
-export default TemperatureChart;
+};
 </script>
 
 <template>
   <div>
-    <chart
+    <chart-base
       :id="id"
       :data="display"
       title="Temperature"

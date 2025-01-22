@@ -1,29 +1,28 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapGetters, mapActions } from "vuex";
 import { convertToLocalTime } from "date-fns-timezone";
 import { io, Socket } from "socket.io-client";
 
-import { messageIsFrom } from "../../shared/type-guards";
-import { AnySocketMessage, SocketMessageMap } from "../../shared/types";
+import { messageIsFrom } from "@shared/type-guards";
+import { AnySocketMessage, SocketMessageMap } from "@shared/types";
 import {
   makeErrorMessage,
   makeSwitchStatusMessage,
-} from "../../shared/message-creators";
+} from "@shared/message-creators";
 
-import NotificationRow from "@/components/NotificationRow.vue";
-import { Device } from "@/store/devices/types";
-import { Notification } from "@/store/notifications/types";
-import Collection from "@/components/Collection.vue";
+import Collection from "@client/components/Collection.vue";
+import NotificationRow from "@client/components/NotificationRow.vue";
+import { Device } from "@client/store/devices/types";
+import { Notification } from "@client/store/notifications/types";
 
-const Overview = Vue.extend({
+export default {
   components: {
     Collection,
     NotificationRow,
   },
 
   props: {
-    filter: string,
+    filter: String,
   },
 
   computed: {
@@ -108,19 +107,19 @@ const Overview = Vue.extend({
 
   methods: {
     checkDeviceHealth(): void {
-      const check = Date.now();
+      const check = new Date();
       this.devices.forEach((d: Device) => {
-        const local = convertToLocalTime(d.timestamp || new Date(), {
+        const local = convertToLocalTime(d.updatedat || new Date(), {
           timeZone: "America/New_York",
         });
-        const diff = check - local.getTime();
+        const diff = check.getTime() - local.getTime();
         if (diff > 5 * 60 * 1000) {
           const formatted = this.pretty(local);
 
           const n: Notification = {
             id: d.device,
             action: "",
-            code: "",
+            code: 0,
             plug: d.nickname || d.device,
             message: `Hasn't reported since ${formatted}`,
             timestamp: new Date(),
@@ -149,8 +148,7 @@ const Overview = Vue.extend({
 
     ...mapActions("notifications", ["add", "remove"]),
   },
-});
-export default Overview;
+};
 </script>
 
 <template>

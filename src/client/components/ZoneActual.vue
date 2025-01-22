@@ -1,21 +1,11 @@
-<template>
-  <span v-if="zone.meters.length > 0">
-    <span class="title" :style="temperatureStyle">
-      {{ temperature.toFixed(0) }}&#176;
-    </span>
-    <span class="title" :style="humidityStyle">
-      {{ humidity.toFixed(0) }}%
-    </span>
-  </span>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-import { Zone } from "@/store/zones/types";
 import { mapGetters } from "vuex";
+
+import { Zone } from "@client/store/zones/types";
+
 import { celsius2fahrenheit, celsius2kelvin, color } from "../../shared/utils";
 
-const ZoneActual = Vue.extend({
+export default {
   props: {
     zone: Zone,
     size: { type: String, default: "medium" },
@@ -64,7 +54,16 @@ const ZoneActual = Vue.extend({
 
     ...mapGetters("settings", ["settings"]),
   },
-});
-
-export default ZoneActual;
+};
 </script>
+
+<template>
+  <span v-if="zone.meters.length > 0">
+    <span class="title" :style="temperatureStyle">
+      {{ temperature.toFixed(0) }}&#176;
+    </span>
+    <span class="title" :style="humidityStyle">
+      {{ humidity.toFixed(0) }}%
+    </span>
+  </span>
+</template>

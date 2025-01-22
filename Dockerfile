@@ -13,10 +13,10 @@ COPY src/shared src/shared
 COPY tsconfig.json \
   tsconfig.base.json \
   babel.config.js \
-  .eslintrc.js \
-  .eslintignore \
+  eslint.config.js \
   jest.config.js \
   vue.config.js \
+  vite.config.mjs \
   ./
 
 RUN npm run build:client

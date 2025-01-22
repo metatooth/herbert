@@ -1,20 +1,19 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapActions } from "vuex";
+
+import EditControls from "@client/components/EditControls.vue";
+import SelectControlType from "@client/components/SelectControlType.vue";
+import Target from "@client/components/Target.vue";
+import { Profile } from "@client/store/profiles/types";
 
 import {
   celsius2fahrenheit,
   celsius2kelvin,
   fahrenheit2celsius,
   kelvin2celsius,
-} from "../../shared/utils";
+} from "@shared/utils";
 
-import EditControls from "@/components/EditControls.vue";
-import SelectControlType from "@/components/SelectControlType.vue";
-import Target from "@/components/Target.vue";
-import { Profile } from "@/store/profiles/types";
-
-const ProfileRow = Vue.extend({
+export default {
   components: {
     EditControls,
     SelectControlType,
@@ -23,8 +22,8 @@ const ProfileRow = Vue.extend({
 
   props: {
     locked: Boolean,
-    profile: Profile,
-    units: string,
+    profile: { type: Profile, required: true },
+    units: String,
   },
 
   data() {
@@ -40,8 +39,8 @@ const ProfileRow = Vue.extend({
       hourString = hourInt.toString();
     }
 
-    let lampon = parseFloat(this.profile.lampontemperature);
-    let lampoff = parseFloat(this.profile.lampofftemperature);
+    let lampon = this.profile.lampontemperature;
+    let lampoff = this.profile.lampofftemperature;
 
     if (this.units === "F") {
       lampon = celsius2fahrenheit(lampon);
@@ -62,9 +61,9 @@ const ProfileRow = Vue.extend({
       lampoffhumidity: this.profile.lampoffhumidity,
       bloweractive: this.profile.bloweractive / 1000,
       blowercycle: this.profile.blowercycle / 1000,
-      irrigationperday: parseInt(this.profile.irrigationperday),
+      irrigationperday: this.profile.irrigationperday,
       irrigationduration: this.profile.irrigationduration / 1000,
-      updatedat: new Date(Date.parse(this.profile.updatedat)),
+      updatedat: this.profile.updatedat,
       editing: false,
     };
   },
@@ -150,7 +149,7 @@ const ProfileRow = Vue.extend({
       this.lampoffhumidity = this.profile.lampoffhumidity;
       this.bloweractive = this.profile.bloweractive / 1000;
       this.blowercycle = this.profile.blowercycle / 1000;
-      this.irrigationperday = parseInt(this.profile.irrigationperday);
+      this.irrigationperday = this.profile.irrigationperday;
       this.irrigationduration = this.profile.irrigationduration / 1000;
 
       this.editing = false;
@@ -215,9 +214,7 @@ const ProfileRow = Vue.extend({
 
     ...mapActions("profiles", ["edit", "remove"]),
   },
-});
-
-export default ProfileRow;
+};
 </script>
 
 <template>
@@ -295,21 +292,21 @@ export default ProfileRow;
       <span v-else class="field is-grouped">
         <target
           icon="thermometer-half"
-          :value="parseFloat(lampontemperature)"
+          :value="lampontemperature"
           :precision="1"
           units="°"
           size="small"
           color="#ffe08a"
-          simple="true"
+          :simple="true"
         />
         <target
           icon="tint"
-          :value="parseFloat(lamponhumidity)"
+          :value="lamponhumidity"
           :precision="0"
           units="%"
           size="small"
           color="#ffe08a"
-          simple="true"
+          :simple="true"
         />
       </span>
     </td>
@@ -346,21 +343,21 @@ export default ProfileRow;
       <span v-else class="field is-grouped is-grouped-multiline">
         <target
           icon="thermometer-half"
-          :value="parseFloat(lampofftemperature)"
+          :value="lampofftemperature"
           :precision="1"
           units="°"
           size="small"
           color="#7a7a7a"
-          simple="true"
+          :simple="true"
         />
         <target
           icon="tint"
-          :value="parseFloat(lampoffhumidity)"
+          :value="lampoffhumidity"
           :precision="0"
           units="%"
           size="small"
           color="#7a7a7a"
-          simple="true"
+          :simple="true"
         />
       </span>
     </td>

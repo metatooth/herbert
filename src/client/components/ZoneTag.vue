@@ -1,22 +1,9 @@
-<template>
-  <div class="tags has-addons" @click="clicked">
-    <span class="tag has-background-black-bis is-medium">
-      <strong
-        ><span :style="text">{{ name }}</span></strong
-      >
-    </span>
-    <span class="tag has-text-black-bis is-medium" :style="background">
-      {{ zone.profile.profile.slice(0, 12) }}
-    </span>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-import { Zone } from "@/store/zones/types";
+import { Zone } from "@client/store/zones/types";
+
 import { zeroes } from "../../shared/utils";
 
-const ZoneTag = Vue.extend({
+export default {
   props: {
     locked: Boolean,
     zone: Zone,
@@ -66,10 +53,21 @@ const ZoneTag = Vue.extend({
       });
     },
   },
-});
-
-export default ZoneTag;
+};
 </script>
+
+<template>
+  <div class="tags has-addons" @click="clicked">
+    <span class="tag has-background-black-bis is-medium">
+      <strong
+        ><span :style="text">{{ name }}</span></strong
+      >
+    </span>
+    <span class="tag has-text-black-bis is-medium" :style="background">
+      {{ zone.profile.profile.slice(0, 12) }}
+    </span>
+  </div>
+</template>
 
 <style scoped>
 .tags:hover {

@@ -1,28 +1,10 @@
-<template>
-  <sparkline-display
-    :id="id"
-    :data="temperatures"
-    color="rgb(255,119,0)"
-    :width="width"
-    :height="height"
-  />
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-
-import { Meter } from "@/store/meters/types";
-
-import SparklineDisplay from "@/components/SparklineDisplay.vue";
-
 import { convertToLocalTime } from "date-fns-timezone";
 
-interface Fact {
-  x: Date;
-  y: number;
-}
+import { Meter, MeterFact } from "@client/store/meters/types";
+import SparklineDisplay from "@client/components/SparklineDisplay.vue";
 
-const TemperatureFact = Vue.extend({
+export default {
   components: {
     SparklineDisplay,
   },
@@ -34,7 +16,7 @@ const TemperatureFact = Vue.extend({
 
   data() {
     return {
-      temperatures: [] as Fact[],
+      temperatures: new Array<MeterFact>(),
     };
   },
 
@@ -70,15 +52,15 @@ const TemperatureFact = Vue.extend({
               reading: string;
             }) => {
               const observedat = new Date(
-                d.year,
-                d.month - 1,
-                d.date,
-                d.hour,
-                d.minute,
+                parseInt(d.year),
+                parseInt(d.month) - 1,
+                parseInt(d.date),
+                parseInt(d.hour),
+                parseInt(d.minute),
               );
               const temperature = {
                 x: convertToLocalTime(observedat, { timeZone }),
-                y: d.reading as number,
+                y: parseFloat(d.reading),
               };
 
               this.temperatures.push(temperature);
@@ -90,9 +72,15 @@ const TemperatureFact = Vue.extend({
       xhr.send();
     },
   },
-});
-
-export default TemperatureFact;
+};
 </script>
 
-<style></style>
+<template>
+  <sparkline-display
+    :id="id"
+    :data="temperatures"
+    color="rgb(255,119,0)"
+    :width="width"
+    :height="height"
+  />
+</template>

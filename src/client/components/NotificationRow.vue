@@ -1,10 +1,9 @@
 <script>
-import Vue from "vue";
 import { mapGetters } from "vuex";
 
-import Timestamp from "@/components/Timestamp.vue";
+import Timestamp from "@client/components/Timestamp.vue";
 
-const NotificationRow = Vue.extend({
+export default {
   components: { Timestamp },
 
   props: {
@@ -34,9 +33,7 @@ const NotificationRow = Vue.extend({
 
     ...mapGetters("devices", ["devices"]),
   },
-});
-
-export default NotificationRow;
+};
 </script>
 
 <template>

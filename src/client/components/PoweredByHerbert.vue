@@ -17,11 +17,3 @@
     </div>
   </div>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-const PoweredByHerbert = Vue.extend({});
-export default PoweredByHerbert;
-</script>
-
-<style></style>

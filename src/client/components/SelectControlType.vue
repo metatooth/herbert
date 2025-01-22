@@ -1,9 +1,7 @@
 <script lang="ts">
-import Vue from "vue";
-
-const SelectControlType = Vue.extend({
+export default {
   props: {
-    controltype: string,
+    controltype: String,
   },
 
   emits: ["select-controltype"],
@@ -20,9 +18,7 @@ const SelectControlType = Vue.extend({
       this.$emit("select-controltype", val);
     },
   },
-});
-
-export default SelectControlType;
+};
 </script>
 
 <template>

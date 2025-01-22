@@ -123,7 +123,7 @@ export interface Zone {
   nickname: string;
   maxirrigators: number;
   profile: Profile;
-  children: Zone[];
+  children: number[];
   meters: Meter[];
   devices: Device[];
   timestamp: Date;

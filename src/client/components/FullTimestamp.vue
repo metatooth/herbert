@@ -1,7 +1,7 @@
 <script lang="ts">
 import { convertToLocalTime } from "date-fns-timezone";
 
-import ReadableTimestamp from "@/components/ReadableTimestamp.vue";
+import ReadableTimestamp from "@client/components/ReadableTimestamp.vue";
 
 export default {
   components: {
@@ -54,7 +54,7 @@ export default {
 
   methods: {
     reload() {
-      window.location.reload(true);
+      window.location.reload();
     },
 
     zeroes(n: number): string {

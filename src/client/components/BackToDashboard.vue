@@ -1,3 +1,7 @@
+<script lang="ts">
+export default {};
+</script>
+
 <template>
   <span class="tags has-addons">
     <span class="tag is-medium">
@@ -8,11 +12,3 @@
     </span>
   </span>
 </template>
-
-<script>
-import Vue from "vue";
-
-const BackToDashboard = Vue.extend({});
-
-export default BackToDashboard;
-</script>

@@ -1,77 +1,14 @@
-<template>
-  <div class="tile is-parent">
-    <div class="tile is-child box">
-      <p class="title">
-        <span v-if="editing">
-          <div class="field">
-            <div class="control">
-              <input
-                v-model="nickname"
-                class="input"
-                type="text"
-                placeHolder="Name this meter"
-                @keyup.esc="cancel"
-              />
-            </div>
-          </div>
-        </span>
-        <span v-else>
-          {{ meter.name }}
-        </span>
-      </p>
-      <p class="subtitle">
-        {{ meter.device }}
-      </p>
-      <p class="subtitle">
-        <span v-if="editing">
-          <div class="control">
-            <select-zone-for-device
-              :zoneid="zoneid"
-              @select-zone="selectzone"
-            />
-          </div>
-        </span>
-        <span v-else>
-          {{ zonename }}
-        </span>
-      </p>
-      <div class="content">
-        <meter-actual :meter="meter" />
-      </div>
-      <div class="content">
-        <router-link
-          :to="{
-            name: 'readings',
-            params: { name: meter.nickname, device: meter.device },
-          }"
-        >
-          <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
-        </router-link>
-      </div>
-      <div class="content">
-        <edit-controls
-          v-if="!locked"
-          @on-edit="editable"
-          @on-save="save"
-          @on-destroy="destroy"
-          @on-cancel="cancel"
-        />
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
-import { Meter } from "@/store/meters/types";
-import { Notification } from "@/store/notifications/types";
-import MeterActual from "@/components/MeterActual.vue";
-import Readable from "@/components/Readable.vue";
-import EditControls from "@/components/EditControls.vue";
-import SelectZoneForDevice from "@/components/SelectZoneForDevice.vue";
 
-const MeterTile = Vue.extend({
+import EditControls from "@client/components/EditControls.vue";
+import MeterActual from "@client/components/MeterActual.vue";
+import Readable from "@client/components/Readable.vue";
+import SelectZoneForDevice from "@client/components/SelectZoneForDevice.vue";
+import { Meter } from "@client/store/meters/types";
+import { Notification } from "@client/store/notifications/types";
+
+export default {
   components: {
     EditControls,
     MeterActual,
@@ -184,12 +121,73 @@ const MeterTile = Vue.extend({
     ...mapActions("meters", ["edit", "remove"]),
     ...mapActions("zones", ["addDevice", "removeDevice"]),
   },
-});
-
-export default MeterTile;
+};
 </script>
 
-<style>
+<template>
+  <div class="tile is-parent">
+    <div class="tile is-child box">
+      <p class="title">
+        <span v-if="editing">
+          <div class="field">
+            <div class="control">
+              <input
+                v-model="nickname"
+                class="input"
+                type="text"
+                placeHolder="Name this meter"
+                @keyup.esc="cancel"
+              />
+            </div>
+          </div>
+        </span>
+        <span v-else>
+          {{ meter.name }}
+        </span>
+      </p>
+      <p class="subtitle">
+        {{ meter.device }}
+      </p>
+      <p class="subtitle">
+        <span v-if="editing">
+          <div class="control">
+            <select-zone-for-device
+              :zoneid="zoneid"
+              @select-zone="selectzone"
+            />
+          </div>
+        </span>
+        <span v-else>
+          {{ zonename }}
+        </span>
+      </p>
+      <div class="content">
+        <meter-actual :meter="meter" />
+      </div>
+      <div class="content">
+        <router-link
+          :to="{
+            name: 'readings',
+            params: { name: meter.nickname, device: meter.device },
+          }"
+        >
+          <readable class="is-italic" :timestamp="new Date(meter.updatedat)" />
+        </router-link>
+      </div>
+      <div class="content">
+        <edit-controls
+          v-if="!locked"
+          @on-edit="editable"
+          @on-save="save"
+          @on-destroy="destroy"
+          @on-cancel="cancel"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
 .subtitle .icon {
   margin: 5px 5px;
 }

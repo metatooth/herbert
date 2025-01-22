@@ -1,3 +1,44 @@
+<script lang="ts">
+import { mapGetters } from "vuex";
+
+import { Meter } from "@client/store/meters/types";
+
+import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
+
+export default {
+  props: {
+    meter: Meter,
+  },
+
+  computed: {
+    temperature(): number {
+      const temp = this.meter.temperature * 1;
+      if (this.settings.units === "F") {
+        return celsius2fahrenheit(temp);
+      } else if (this.settings.units === "K") {
+        return celsius2kelvin(temp);
+      }
+      return temp;
+    },
+
+    humidity(): number {
+      return this.meter.humidity * 100;
+    },
+
+    ...mapGetters("settings", ["settings"]),
+  },
+
+  methods: {
+    history() {
+      this.$router.push({
+        name: "readings",
+        params: { name: this.meter.nickname, device: this.meter.device },
+      });
+    },
+  },
+};
+</script>
+
 <template>
   <nav class="level is-mobile">
     <div class="level-left">
@@ -29,47 +70,6 @@
     </div>
   </nav>
 </template>
-
-<script lang="ts">
-import Vue from "vue";
-import { mapGetters } from "vuex";
-import { Meter } from "@/store/meters/types";
-import { celsius2fahrenheit, celsius2kelvin } from "../../shared/utils";
-const MeterNarrow = Vue.extend({
-  props: {
-    meter: Meter,
-  },
-
-  computed: {
-    temperature(): number {
-      const temp = this.meter.temperature * 1;
-      if (this.settings.units === "F") {
-        return celsius2fahrenheit(temp);
-      } else if (this.settings.units === "K") {
-        return celsius2kelvin(temp);
-      }
-      return temp;
-    },
-
-    humidity(): number {
-      return this.meter.humidity * 100;
-    },
-
-    ...mapGetters("settings", ["settings"]),
-  },
-
-  methods: {
-    history() {
-      this.$router.push({
-        name: "readings",
-        params: { name: this.meter.nickname, device: this.meter.device },
-      });
-    },
-  },
-});
-
-export default MeterNarrow;
-</script>
 
 <style scoped>
 .clickable:hover {

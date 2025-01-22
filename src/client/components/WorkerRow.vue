@@ -1,16 +1,16 @@
 <script lang="ts">
-import Vue from "vue";
 import { mapActions, mapGetters } from "vuex";
 
-import EditControls from "@/components/EditControls.vue";
-import Readable from "@/components/Readable.vue";
-import { Worker } from "@/store/workers/types";
+import EditControls from "@client/components/EditControls.vue";
+import Readable from "@client/components/Readable.vue";
+import { Worker } from "@client/store/workers/types";
 
-const WorkerRow = Vue.extend({
+export default {
   components: {
     EditControls,
     Readable,
   },
+
   props: {
     locked: Boolean,
     worker: Worker,
@@ -20,6 +20,7 @@ const WorkerRow = Vue.extend({
     return {
       nickname: this.worker.nickname,
       configname: this.worker.configname,
+      config: this.worker.config,
       editing: false,
     };
   },
@@ -64,9 +65,7 @@ const WorkerRow = Vue.extend({
 
     ...mapActions("workers", ["edit", "remove"]),
   },
-});
-
-export default WorkerRow;
+};
 </script>
 
 <template>
@@ -104,7 +103,7 @@ export default WorkerRow;
       </div>
     </td>
     <td class="is-italic">
-      <readable :timestamp="new Date(Date.parse(worker.updatedat))" />
+      <readable :timestamp="worker.updatedat" />
     </td>
     <td>
       <edit-controls

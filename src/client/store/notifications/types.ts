@@ -2,7 +2,7 @@ export class Notification {
   id: string;
   plug: string;
   action: string;
-  code: string;
+  code: number;
   message: string;
   timestamp: Date;
 
@@ -10,7 +10,7 @@ export class Notification {
     this.id = "";
     this.plug = "";
     this.action = "";
-    this.code = "";
+    this.code = 0;
     this.message = "";
     this.timestamp = new Date();
   }

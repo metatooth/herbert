@@ -1,16 +1,16 @@
 <script lang="ts">
-import Vue from "vue";
-
-import EditControls from "@/components/EditControls.vue";
-import Readable from "@/components/Readable.vue";
-import { Worker } from "@/store/workers/types";
 import { mapActions, mapGetters } from "vuex";
 
-const WorkerTile = Vue.extend({
+import EditControls from "@client/components/EditControls.vue";
+import Readable from "@client/components/Readable.vue";
+import { Worker } from "@client/store/workers/types";
+
+export default {
   components: {
     EditControls,
     Readable,
   },
+
   props: {
     locked: Boolean,
     worker: Worker,
@@ -20,7 +20,7 @@ const WorkerTile = Vue.extend({
     return {
       nickname: this.worker.nickname || this.worker.worker,
       configname: this.worker.configname,
-      config: JSON.stringify(this.worker.config),
+      config: this.worker.config,
       readable: true,
       editing: false,
     };
@@ -75,9 +75,7 @@ const WorkerTile = Vue.extend({
 
     ...mapActions("workers", ["edit", "remove"]),
   },
-});
-
-export default WorkerTile;
+};
 </script>
 
 <template>

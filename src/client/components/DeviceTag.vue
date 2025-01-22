@@ -1,22 +1,9 @@
-<template>
-  <button
-    class="button"
-    :disabled="locked"
-    :class="deviceClass"
-    @click="toggle"
-  >
-    <span class="icon">
-      <font-awesome-icon :icon="deviceIcon" />
-    </span>
-  </button>
-</template>
-
 <script>
-import Vue from "vue";
 import { mapActions } from "vuex";
-import { Device } from "@/store/devices/types";
 
-const DeviceTag = Vue.extend({
+import { Device } from "@client/store/devices/types";
+
+export default {
   props: {
     device: Device,
     locked: Boolean,
@@ -75,9 +62,18 @@ const DeviceTag = Vue.extend({
 
     ...mapActions("devices", ["on", "off"]),
   },
-});
-
-export default DeviceTag;
+};
 </script>
 
-<style></style>
+<template>
+  <button
+    class="button"
+    :disabled="locked"
+    :class="deviceClass"
+    @click="toggle"
+  >
+    <span class="icon">
+      <font-awesome-icon :icon="deviceIcon" />
+    </span>
+  </button>
+</template>

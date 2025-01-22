@@ -1,9 +1,9 @@
 <script lang="ts">
-import Vue from "vue";
 import { convertToLocalTime } from "date-fns-timezone";
-import Readable from "@/components/Readable.vue";
 
-const Timestamp = Vue.extend({
+import Readable from "@client/components/Readable.vue";
+
+export default {
   components: {
     Readable,
   },
@@ -54,7 +54,7 @@ const Timestamp = Vue.extend({
 
   methods: {
     reload() {
-      window.location.reload(true);
+      window.location.reload();
     },
 
     zeroes(n: number): string {
@@ -64,8 +64,7 @@ const Timestamp = Vue.extend({
       return n.toString();
     },
   },
-});
-export default Timestamp;
+};
 </script>
 
 <template>

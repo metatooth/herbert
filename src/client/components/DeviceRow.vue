@@ -1,11 +1,11 @@
 <script lang="ts">
 import { mapActions, mapGetters, mapState } from "vuex";
 
-import EditControls from "@/components/EditControls.vue";
-import Readable from "@/components/Readable.vue";
-import SelectDeviceType from "@/components/SelectDeviceType.vue";
-import { Device } from "@/store/devices/types";
-import { Notification } from "@/store/notifications/types";
+import EditControls from "@client/components/EditControls.vue";
+import Readable from "@client/components/Readable.vue";
+import SelectDeviceType from "@client/components/SelectDeviceType.vue";
+import { Device } from "@client/store/devices/types";
+import { Notification } from "@client/store/notifications/types";
 
 export default {
   components: {
@@ -17,7 +17,7 @@ export default {
   props: {
     device: Device,
     locked: Boolean,
-    units: string,
+    units: String,
   },
 
   data() {
@@ -194,7 +194,7 @@ export default {
           params: { name: device.nickname, device: device.device },
         }"
       >
-        <readable :timestamp="new Date(Date.parse(device.updatedat))" />
+        <readable :timestamp="device.updatedat" />
       </router-link>
     </td>
     <td>

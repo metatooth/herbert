@@ -1,25 +1,7 @@
-<template>
-  <div class="control has-icons-left">
-    <div class="select">
-      <select v-model="selected">
-        <option value="">undefined</option>
-        <option v-for="type in devicetypes" :key="type" :value="type">
-          {{ type }}
-        </option>
-      </select>
-    </div>
-    <span class="icon is-small is-left">
-      <font-awesome-icon :icon="selectedIcon" />
-    </span>
-  </div>
-</template>
-
 <script lang="ts">
-import Vue from "vue";
-
-const SelectDeviceType = Vue.extend({
+export default {
   props: {
-    devicetype: string,
+    devicetype: String,
   },
 
   emits: ["select-devicetype"],
@@ -68,7 +50,21 @@ const SelectDeviceType = Vue.extend({
       this.$emit("select-devicetype", val);
     },
   },
-});
-
-export default SelectDeviceType;
+};
 </script>
+
+<template>
+  <div class="control has-icons-left">
+    <div class="select">
+      <select v-model="selected">
+        <option value="">undefined</option>
+        <option v-for="type in devicetypes" :key="type" :value="type">
+          {{ type }}
+        </option>
+      </select>
+    </div>
+    <span class="icon is-small is-left">
+      <font-awesome-icon :icon="selectedIcon" />
+    </span>
+  </div>
+</template>

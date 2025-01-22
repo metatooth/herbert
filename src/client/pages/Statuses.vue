@@ -1,11 +1,11 @@
 <script lang="ts">
-import Vue from "vue";
-import { mapGetters } from "vuex";
-import ChartBase from "@/components/ChartBase.vue";
 import { convertToLocalTime } from "date-fns-timezone";
-import BackToDashboard from "@/components/BackToDashboard.vue";
+import { mapGetters } from "vuex";
 
-const Statuses = Vue.extend({
+import BackToDashboard from "@client/components/BackToDashboard.vue";
+import ChartBase from "@client/components/ChartBase.vue";
+
+export default {
   components: {
     BackToDashboard,
     ChartBase,
@@ -66,8 +66,7 @@ const Statuses = Vue.extend({
       xhr.send();
     },
   },
-});
-export default Statuses;
+};
 </script>
 
 <template>

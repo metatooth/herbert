@@ -1,3 +1,8 @@
+export interface DeviceFact {
+  x: Date;
+  y: number;
+}
+
 export class Device {
   device: string;
   devicetype: string;
@@ -43,33 +48,6 @@ export class Device {
     }
 
     return "has-text-danger";
-  }
-
-  get zone() {
-    const found = this.zones.filter((zone) => {
-      const devices = zone.devices.filter((device) => {
-        return this.device.device === device.device;
-      });
-      return devices.length !== 0;
-    });
-
-    return found.length !== 0 ? found[0] : null;
-  }
-
-  get zoneid() {
-    const zone = this.zone;
-    if (zone) {
-      return zone.id;
-    }
-    return 0;
-  }
-
-  get zonename() {
-    const zone = this.zone;
-    if (zone) {
-      return zone.nickname;
-    }
-    return "";
   }
 }
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-import HerbertButton from "@/components/HerbertButton.vue";
+import HerbertButton from "@client/components/HerbertButton.vue";
 
 export default {
   components: {
