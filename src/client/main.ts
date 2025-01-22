@@ -2,6 +2,7 @@ import { createApp } from "vue";
 import VueCookies from "vue-cookies";
 
 import "@client/assets/main.scss";
+
 import router from "@client/router";
 import store from "@client/store";
 import App from "@client/App.vue";

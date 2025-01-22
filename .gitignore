@@ -27,3 +27,4 @@ pnpm-debug.log*
 inventory
 config/development.json
 _venv
+src/client/dist/

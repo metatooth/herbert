@@ -47,7 +47,7 @@ services:
     image: herbert_client:latest
     build:
       context: .
-      target: client
+      target: runner
     env_file: .env
     volumes:
       - ./src:/app/src

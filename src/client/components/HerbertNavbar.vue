@@ -4,6 +4,7 @@ import { mapGetters } from "vuex";
 export default {
   props: {
     locked: { type: Boolean, default: true },
+    picked: { type: String, default: "overview" },
   },
 
   emits: ["search-on", "selected", "toggle"],
