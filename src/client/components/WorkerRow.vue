@@ -103,7 +103,7 @@ export default {
       </div>
     </td>
     <td class="is-italic">
-      <readable :timestamp="worker.updatedat" />
+      <readable :timestamp="new Date(worker.updatedat)" />
     </td>
     <td>
       <edit-controls

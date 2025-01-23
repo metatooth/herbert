@@ -88,7 +88,7 @@ export default {
       </div>
       <div class="content is-italic">
         Updated
-        <readable :timestamp="config.updatedat" />
+        <readable :timestamp="new Date(config.updatedat)" />
       </div>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />
     </div>

@@ -4,7 +4,6 @@ import { mapGetters } from "vuex";
 export default {
   props: {
     locked: { type: Boolean, default: true },
-    picked: { type: String, default: "overview" },
   },
 
   emits: ["search-on", "selected", "toggle"],
@@ -12,6 +11,7 @@ export default {
   data() {
     return {
       filter: "",
+      picked: "overview",
     };
   },
 
@@ -98,6 +98,7 @@ export default {
         </span>
       </button>
       <a ref="navbarBurger" class="navbar-burger" @click.prevent="burger">
+        <span></span>
         <span></span>
         <span></span>
         <span></span>

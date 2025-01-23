@@ -80,7 +80,7 @@ export default {
       </span>
     </td>
     <td class="is-italic">
-      <readable :timestamp="config.updatedat" />
+      <readable :timestamp="new Date(config.updatedat)" />
     </td>
     <td>
       <edit-controls @on-edit="editable" @on-save="save" @on-cancel="cancel" />

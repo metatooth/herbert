@@ -37,8 +37,6 @@ export default {
 
   computed: {
     changed(): boolean {
-      console.log(this.settings.pin, this.pin, this.settings.pin !== this.pin);
-
       if (
         this.settings.title !== this.title ||
         this.name !== "" ||
@@ -57,7 +55,6 @@ export default {
       ) {
         return true;
       }
-      console.log("false?");
       return false;
     },
 
@@ -66,7 +63,7 @@ export default {
     },
 
     url(): string {
-      return process.env.VUE_APP_API_URL || "http://localhost:5000";
+      return "http://localhost:5000";
     },
   },
 

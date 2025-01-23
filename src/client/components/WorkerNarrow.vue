@@ -31,7 +31,7 @@ export default {
     </div>
     <div class="level-right">
       <div class="level-item">
-        <readable class="is-italic" :timestamp="worker.updatedat" />
+        <readable class="is-italic" :timestamp="new Date(worker.updatedat)" />
       </div>
     </div>
   </nav>

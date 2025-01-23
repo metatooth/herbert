@@ -24,7 +24,7 @@ export default {
       filter: "",
       picked: "overview",
       locked: true,
-      ts: new Date(),
+      timestamp: new Date(),
     };
   },
 
@@ -58,7 +58,7 @@ export default {
       this["zones/fetchData"]();
       this["settings/fetchData"]();
 
-      this.ts = new Date();
+      this.timestamp = new Date();
 
       setTimeout(this.refresh, this.settings.refresh);
     },
@@ -183,6 +183,6 @@ export default {
 
     <notifications v-if="is('overview')" class="box" />
 
-    <timestamp class="box" :timestamp="ts" />
+    <timestamp class="box" :timestamp="timestamp" />
   </div>
 </template>

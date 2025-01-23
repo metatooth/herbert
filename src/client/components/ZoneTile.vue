@@ -32,7 +32,7 @@ export default {
 
   computed: {
     lastupdate() {
-      let last = null;
+      let last = new Date();
       this.zone.meters.forEach((meter) => {
         const updatedat = new Date(meter.updatedat);
         if (last === null || updatedat > last) {

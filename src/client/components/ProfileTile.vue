@@ -387,7 +387,7 @@ export default {
         </div>
       </div>
       <div class="content is-italic">
-        Updated <readable :timestamp="updatedat" />
+        Updated <readable :timestamp="new Date(updatedat)" />
       </div>
       <div class="content">
         <edit-controls

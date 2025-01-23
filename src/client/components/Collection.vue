@@ -115,7 +115,7 @@ export default {
     },
 
     allowed() {
-      return !this.table && (this.isProfile || this.isZone || this.isConfig);
+      return !this.table && (this.isConfig || this.isProfile || this.isZone);
     },
 
     headings() {
@@ -185,18 +185,26 @@ export default {
 
     name() {
       let name;
-      if (this.isMeter) {
-        name = "Meter";
-      } else if (this.isDevice) {
-        name = "Device";
-      } else if (this.isProfile) {
-        name = "Profile";
-      } else if (this.isZone) {
-        name = "Zone";
-      } else if (this.isWorker) {
-        name = "Herbert";
-      } else if (this.isConfig) {
-        name = "Config";
+      switch (this.type) {
+        case "meter":
+          name = "Meter";
+          break;
+        case "device":
+          name = "Device";
+          break;
+        case "profile":
+          name = "Profile";
+          break;
+        case "zone":
+          name = "Zone";
+          break;
+        case "worker":
+          name = "Herbert";
+          break;
+        case "config":
+          name = "Config";
+          break;
+        default:
       }
 
       if (this.activeCount !== 1) {

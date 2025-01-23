@@ -26,7 +26,7 @@ export default {
     </div>
     <div class="level-right">
       <div class="level-item">
-        <readable class="is-italic" :timestamp="config.updatedat" />
+        <readable class="is-italic" :timestamp="new Date(config.updatedat)" />
       </div>
     </div>
   </nav>
