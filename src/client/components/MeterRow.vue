@@ -22,7 +22,7 @@ export default {
   data() {
     return {
       nickname: this.meter.nickname,
-      updatedat: this.meter.updatedat,
+      updatedat: new Date(this.meter.updatedat),
       updating: false,
       editing: false,
     };
@@ -125,7 +125,7 @@ export default {
           params: { name: meter.nickname, device: meter.device },
         }"
       >
-        <readable :timestamp="meter.timestamp" />
+        <readable :timestamp="new Date(meter.timestamp)" />
       </router-link>
     </td>
     <td class="is-size-5">
