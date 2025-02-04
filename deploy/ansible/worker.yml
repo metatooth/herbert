@@ -1,10 +1,10 @@
 - hosts: workers
 
   vars:
-    - nodejs_version: "14.x"
-    - service_description: "Herbert in-room worker service"
-    - service_user: root
-    - service_file: dist/worker/main.js
+    nodejs_version: "20.x"
+    service_description: "Herbert in-room worker service"
+    service_user: root
+    service_file: dist/worker/main.js
 
   tasks:
     - name: Enable I2C
