@@ -1,15 +1,41 @@
+import { formatMacAddress } from "../shared/utils";
+
 import { Device } from "./device";
 import { Herbert } from "./herbert";
 import { IRSend } from "./i-r-send";
 import { MockMeter } from "./mock-meter";
 import { MockPlug } from "./mock-plug";
 import { SequentMicrosystems } from "./sequent-microsystems";
-import { formatMacAddress } from "../shared/utils";
+import { ThermoPro } from "./thermo-pro";
 
 export class DeviceFactory {
   constructor() {}
 
-  create_device(config): Promise<Device | null> {
+  parseDevices(config): Promise<Array<Device>> {
+    const devices = [];
+
+    config.devices.forEach(async (item) => {
+      const device = this.createDevice(item);
+      if (device) {
+        devices.push(device);
+      } else {
+        switch (item.manufacturer) {
+          case "thermopro":
+            console.log("start thermopro");
+            const pro = new ThermoPro();
+            await pro.scan();
+            console.log("done thermopro");
+
+            break;
+          default:
+        }
+      }
+    });
+
+    return Promise.resolve(devices);
+  }
+
+  private createDevice(config): Device | null {
     const mac = formatMacAddress(config.id);
     let device = null;
 
@@ -36,6 +62,6 @@ export class DeviceFactory {
       default:
     }
 
-    return Promise.resolve(device);
+    return device;
   }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { mapGetters, mapActions } from "vuex";
-import { convertToLocalTime } from "date-fns-timezone";
+import { convertToLocalTime } from "@shared/utils";
 import { io, Socket } from "socket.io-client";
 
 import { messageIsFrom } from "@shared/type-guards";

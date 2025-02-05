@@ -1,5 +1,5 @@
 <script lang="ts">
-import { convertToLocalTime } from "date-fns-timezone";
+import { convertToLocalTime } from "@shared/utils";
 
 import ReadableTimestamp from "@client/components/ReadableTimestamp.vue";
 

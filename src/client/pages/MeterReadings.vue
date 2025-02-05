@@ -1,5 +1,5 @@
 <script lang="ts">
-import { convertToLocalTime } from "date-fns-timezone";
+import { convertToLocalTime } from "@shared/utils";
 import { mapGetters } from "vuex";
 
 import ZoneChart from "@client/components/ZoneChart.vue";
@@ -19,6 +19,14 @@ export default {
   },
 
   computed: {
+    device() {
+      return this.$route.params.device;
+    },
+
+    name() {
+      return this.$route.params.name;
+    },
+
     ...mapGetters("settings", ["settings"]),
   },
 
@@ -110,9 +118,9 @@ export default {
   <div class="card">
     <div class="card-header">
       <div class="card-header-title">
-        <p class="title">{{ $route.params.name }} Meter Reading</p>
+        <p class="title">{{ name }} Meter Reading</p>
         <p class="subtitle">
-          {{ $route.params.device }}
+          {{ device }}
         </p>
       </div>
       <div class="card-header-icon">

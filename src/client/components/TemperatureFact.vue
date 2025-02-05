@@ -1,5 +1,5 @@
 <script lang="ts">
-import { convertToLocalTime } from "date-fns-timezone";
+import { convertToLocalTime } from "@shared/utils";
 
 import { Meter, MeterFact } from "@client/store/meters/types";
 import SparklineDisplay from "@client/components/SparklineDisplay.vue";

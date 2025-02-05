@@ -26,6 +26,15 @@ try {
   }
 }
 
+try {
+  fs.mkdirSync("./store");
+} catch (e) {
+  if (e.code != "EEXIST") {
+    console.error("Could not set up storage directory, error was: ", e);
+    process.exit(1);
+  }
+}
+
 export class App {
   private static instance: App;
   private config: ConfigWorker;
@@ -129,12 +138,7 @@ export class App {
   private async init_devices() {
     console.log("INIT", this.config);
     const factory = new DeviceFactory();
-    this.config.devices.forEach(async (config) => {
-      const device = await factory.create_device(config);
-      if (device) {
-        this.devices.push(device);
-      }
-    });
+    this.devices = await factory.parseDevices(this.config);
 
     const all = this.devices.map((d) => d.device);
     this.socket.emit("join", {

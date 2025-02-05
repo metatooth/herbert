@@ -1,5 +1,5 @@
 <script lang="ts">
-import { convertToLocalTime } from "date-fns-timezone";
+import { convertToLocalTime } from "@shared/utils";
 import { io, Socket } from "socket.io-client";
 import { mapGetters, mapActions } from "vuex";
 

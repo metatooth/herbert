@@ -170,3 +170,15 @@ export function formatMacAddress(id: string) {
   // remove trailing colon
   return mac.split(":").slice(0, -1).join(":");
 }
+
+interface TimeZoneOptions {
+  timeZone: string;
+}
+
+/**
+ * Given a date input, convert to local time for given time zone.
+ */
+export function convertToLocalTime(input: Date, options: TimeZoneOptions) {
+  console.log(input);
+  return input;
+}

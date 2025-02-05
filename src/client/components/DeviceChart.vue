@@ -1,7 +1,7 @@
 <script lang="ts">
 import "chartjs-adapter-date-fns";
 import ChartJS from "chart.js";
-import { convertToLocalTime } from "date-fns-timezone";
+import { convertToLocalTime } from "@shared/utils";
 import { mapGetters } from "vuex";
 
 import HTTP from "@client/api/http";

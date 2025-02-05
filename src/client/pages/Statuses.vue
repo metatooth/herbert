@@ -1,5 +1,6 @@
 <script lang="ts">
-import { convertToLocalTime } from "date-fns-timezone";
+import { convertToLocalTime } from "@shared/utils";
+
 import { mapGetters } from "vuex";
 
 import BackToDashboard from "@client/components/BackToDashboard.vue";
@@ -22,6 +23,14 @@ export default {
   },
 
   computed: {
+    device() {
+      return this.$route.params.device;
+    },
+
+    name() {
+      return this.$route.params.name;
+    },
+
     ...mapGetters("settings", ["settings"]),
   },
 
@@ -75,9 +84,9 @@ export default {
       <back-to-dashboard />
     </section>
     <section class="section">
-      <h2 class="title">{{ $route.params.name }} Switch Status</h2>
+      <h2 class="title">{{ name }} Switch Status</h2>
       <h2 class="subtitle">
-        {{ $route.params.device }}
+        {{ device }}
       </h2>
 
       <form class="control">

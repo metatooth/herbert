@@ -1,6 +1,4 @@
 <script lang="ts">
-import { convertToLocalTime } from "date-fns-timezone";
-
 import ChartBase from "@client/components/ChartBase.vue";
 import TemperatureChart from "@client/components/TemperatureChart.vue";
 import BackToDashboard from "@client/components/BackToDashboard.vue";
@@ -11,9 +9,11 @@ export default {
     ChartBase,
     TemperatureChart,
   },
+
   data() {
     return {
       range: "hour",
+      xhr: new XMLHttpRequest(),
       temperatures: [],
       humidities: [],
       pressures: [],
@@ -22,64 +22,67 @@ export default {
     };
   },
 
-  watch: {
-    range() {
-      this.refresh();
+  computed: {
+    device() {
+      return this.$route.params.device;
+    },
+
+    name() {
+      return this.$route.params.name;
     },
   },
 
   mounted() {
-    this.refresh();
+    this.xhr.onload = () => {
+      const data = JSON.parse(this.xhr.response);
+
+      if (data.error) {
+        return;
+      }
+
+      this.temperatures = [];
+      this.humidities = [];
+      data.forEach((d) => {
+        const temperature = {
+          x: d.observedat,
+          y: parseFloat(d.temperature),
+        };
+
+        const humidity = {
+          x: d.observedat,
+          y: 100 * d.humidity,
+        };
+
+        if (humidity.y < this.min) {
+          this.min = humidity.y;
+        }
+
+        if (humidity.y > this.max) {
+          this.max = humidity.y;
+        }
+
+        const pressure = {
+          x: d.observedat,
+          y: d.pressure / 1000,
+        };
+
+        this.temperatures.push(temperature);
+        this.humidities.push(humidity);
+        this.pressures.push(pressure);
+      });
+    };
   },
 
-  methods: {
-    refresh() {
-      const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL;
+  watch: {
+    range() {
+      const url = "http://localhost:5000";
 
-      xhr.open(
+      this.xhr.open(
         "GET",
         `${url}/readings/?meter=${this.$route.params.device}&last=${this.range}`,
       );
 
-      xhr.onload = () => {
-        const data = JSON.parse(xhr.response);
-        if (!data.error) {
-          this.temperatures = [];
-          this.humidities = [];
-          const timeZone = "America/New_York";
-          data.forEach((d) => {
-            const ts = convertToLocalTime(d.observedat, { timeZone });
-            const temperature = {
-              x: ts,
-              y: parseFloat(d.temperature),
-            };
-            const humidity = {
-              x: ts,
-              y: 100 * d.humidity,
-            };
-
-            if (humidity.y < this.min) {
-              this.min = humidity.y;
-            }
-
-            if (humidity.y > this.max) {
-              this.max = humidity.y;
-            }
-
-            const pressure = {
-              x: ts,
-              y: d.pressure / 1000,
-            };
-
-            this.temperatures.push(temperature);
-            this.humidities.push(humidity);
-            this.pressures.push(pressure);
-          });
-        }
-      };
-
-      xhr.send();
+      this.xhr.send();
     },
   },
 };
@@ -91,9 +94,9 @@ export default {
       <back-to-dashboard />
     </section>
     <section class="section">
-      <h2 class="title">{{ $route.params.name }} Meter Reading</h2>
+      <h2 class="title">{{ name }} Meter Reading</h2>
       <h2 class="subtitle">
-        {{ $route.params.device }}
+        {{ device }}
       </h2>
 
       <form class="control">
@@ -143,7 +146,7 @@ export default {
 
       <div class="columns">
         <div class="column is-half">
-          <chart
+          <chart-base
             id="pressurechart"
             :data="pressures"
             title="Vapor Pressure Deficit"
