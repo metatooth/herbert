@@ -24,6 +24,12 @@ router.get("/:id", async (req, res) => {
   res.status(200).json(await readZone(parseInt(id)));
 });
 
+router.get("/:id/parent", async (req, res) => {
+  const { id } = req.params;
+  const zone = await readZone(parseInt(id));
+  res.status(200).json(zone.parent);
+});
+
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
 

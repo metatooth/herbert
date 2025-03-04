@@ -120,9 +120,11 @@ export interface Worker {
 
 export interface Zone {
   id: number;
+  active: boolean;
   nickname: string;
   maxirrigators: number;
   profile: Profile;
+  parent: number;
   children: number[];
   meters: Meter[];
   devices: Device[];

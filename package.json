@@ -10,7 +10,7 @@
     "test": "NODE_ENV=unit_test WSS_URL=ws://localhost:5000 jest",
     "clean": "rm -rf dist",
     "dev": "vite src/client",
-    "build": "run-p build:client build:server build:socket-server build:worker",
+    "build": "run-p build:client build:controller build:server build:socket-server build:worker",
     "preview": "vite preview src/client",
     "lint": "eslint src/ --fix",
     "format": "prettier --write src/",

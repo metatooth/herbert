@@ -17,7 +17,7 @@ import {
 } from "../shared/message-creators";
 import { sendSocketMessage } from "../shared/send-socket-message";
 
-process.env.TZ = "ETC/Utc";
+process.env.TZ = "America/New_York";
 
 const apiUrl = process.env.API_URL || "";
 const HTTP = axios.create({ baseURL: apiUrl });
@@ -95,7 +95,7 @@ async function run() {
         delta / 1,
         zone.profile.lamponhumidity / 1000,
       );
-      target = new ConstantVpd(vpd);
+      target = new ConstantVpd([vpd, 0.1]);
     } else {
       console.log("it is targets?", zone.profile.controltype);
       console.log(zone.profile);
@@ -120,7 +120,7 @@ async function run() {
     console.log("humidity", humidity);
 
     const directives = new AirDirectives(target);
-    directives.clime = new Clime(temperature, delta / 1, humidity);
+    directives.clime = new Clime(temperature, humidity);
     directives.monitor();
 
     console.log(directives);

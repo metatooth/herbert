@@ -27,6 +27,7 @@ import { isSocketMessage, messageIsFrom } from "../shared/type-guards";
 import { vaporPressureDeficit } from "../shared/utils";
 
 const apiUrl = process.env.API_URL || "";
+console.log("Attaching to API Server on %s", apiUrl);
 const HTTP = axios.create({ baseURL: apiUrl });
 
 export class HerbertSocket {

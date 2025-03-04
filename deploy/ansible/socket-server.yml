@@ -20,8 +20,8 @@
         cmd: >
           docker run -d
           -p {{ wss_port }}:{{ wss_port }}
-          -e "API_URL=http://api-1:{{ api_port }}"
-          -e "WSS_PORT={{ wss_port }}"
+          -e API_URL=http://api-1:{{ api_port }}
+          -e WSS_PORT={{ wss_port }}
           --network=herbert-net
           --name=socket-1
           herbert_socket:latest

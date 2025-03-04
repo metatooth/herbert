@@ -26,7 +26,6 @@ endif
 
 .PHONY: deploy-all
 deploy-all: deploy-controllers \
-deploy-databases \
 deploy-servers \
 deploy-socket-servers \
 deploy-workers \

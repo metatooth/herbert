@@ -19,8 +19,8 @@
       ansible.builtin.shell:
         cmd: >
           docker run -d
-          -e "API_URL=http://api-1:{{ api_port }}"
-          -e "WSS_URL=ws://socket-1:{{ wss_port }}"
+          -e API_URL=http://api-1:{{ api_port }}
+          -e WSS_URL=ws://socket-1:{{ wss_port }}
           --network=herbert-net
           --name=controller-1
           herbert_controller:latest

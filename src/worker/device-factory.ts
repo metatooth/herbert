@@ -18,17 +18,6 @@ export class DeviceFactory {
       const device = this.createDevice(item);
       if (device) {
         devices.push(device);
-      } else {
-        switch (item.manufacturer) {
-          case "thermopro":
-            console.log("start thermopro");
-            const pro = new ThermoPro();
-            await pro.scan();
-            console.log("done thermopro");
-
-            break;
-          default:
-        }
       }
     });
 
@@ -58,6 +47,9 @@ export class DeviceFactory {
         break;
       case "mockplug":
         device = new MockPlug(mac);
+        break;
+      case "thermopro":
+        device = new ThermoPro();
         break;
       default:
     }

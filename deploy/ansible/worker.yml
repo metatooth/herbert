@@ -161,4 +161,7 @@
       copy:
         dest: /home/{{ ansible_user }}/.bash_aliases
         content: |
+          alias reload='sudo systemctl daemon-reload'
+          alias restart='sudo systemctl restart herbert-worker'
+          alias status='sudo systemctl status herbert-worker'
           alias tail-worker='sudo journalctl -u herbert-worker -f'
