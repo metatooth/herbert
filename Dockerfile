@@ -1,4 +1,4 @@
-FROM node:20.18.1 AS base
+FROM node:20.18.2-bullseye AS base
 
 WORKDIR /app
 
@@ -49,12 +49,24 @@ RUN npm run build:socket-server
 
 CMD ["npm", "run", "serve:socket-server"]
 
+FROM base AS controller
+
+COPY config ./config
+COPY src/controller ./src/controller
+COPY src/shared src/shared
+COPY tsconfig.json tsconfig.base.json ./
+
+RUN npm run build:controller
+
+CMD ["npm", "run", "serve:controller"]
+
 FROM base AS worker
 
 RUN apt update \
   && apt install -y \
   bluetooth \
   bluez \
+  dbus \
   libbluetooth-dev \
   libudev-dev
 
@@ -64,4 +76,6 @@ COPY tsconfig.json tsconfig.base.json ./
 
 RUN npm run build:worker
 
-CMD ["npm", "run", "serve:worker"]
+COPY worker-entrypoint.sh entrypoint.sh
+
+CMD ./entrypoint.sh

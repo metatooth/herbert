@@ -1,70 +1,27 @@
 - hosts: clients
 
-  vars:
-    - nodejs_version: "14.x"
-    - service_description: "Herbert client dashboard service"
-    - service_user: root
-    - service_file: index.js
-
   tasks:
-    - name: Create {{ appDir }}
-      file:
-        path: "{{ appDir }}"
-        state: directory
-
-    - name: Create {{ appDir }}/dist
-      file:
-        path: "{{ appDir }}/dist"
-        state: directory
-
-    - name: Sync herbert dist
+    - name: Sync docker image
       synchronize:
-        src: "{{ distDir }}/client"
-        dest: "{{ appDir }}/dist"
-        recursive: yes
-        delete: yes
+        src: "{{ src_dir }}/herbert_client_latest.tar.gz"
+        dest: "{{ deploy_dir }}"
 
-    - name: Sync index.js
-      synchronize:
-        src: "{{ srcDir }}/index.js"
-        dest: "{{ appDir }}"
+    - name: Load docker image
+      ansible.builtin.shell:
+        cmd: docker load < herbert_client_latest.tar.gz
+        chdir: "{{ deploy_dir }}"
 
-    - name: Sync herbert package.json
-      synchronize:
-        src: "{{ srcDir }}/package.json"
-        dest: "{{ appDir }}"
+    - name: Stop running conatiner
+      ansible.builtin.shell:
+        cmd: docker container remove --force client-1
 
-    - name: Sync herbert package-lock.json
-      synchronize:
-        src: "{{ srcDir }}/package-lock.json"
-        dest: "{{ appDir }}"
-
-    - name: Install nodejs {{nodejs_version}}
-      include_role:
-        name: geerlingguy.nodejs
-        apply:
-          become: yes
-
-    - name: Install production node_modules
-      command: npm install
-      args:
-        chdir: "{{ appDir }}"
-      environment:
-        NODE_ENV: production
-
-    - name: Install client service
-      become: yes
-      template:
-        src: ./templates/systemd-service.j2
-        dest: /etc/systemd/system/herbert-client.service
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Enable and start herbert-client service
-      become: yes
-      systemd:
-        name: herbert-client
-        state: restarted
-        daemon_reload: yes
-        enabled: yes
+    - name: Run docker image as container
+      ansible.builtin.shell:
+        cmd: >
+          docker run -d
+          -p {{ client_port }}:{{ client_port }}
+          -e "API_URL=http://api-1:{{ api_port }}"
+          -e "WSS_PORT={{ wss_port }}"
+          --network=herbert-net
+          --name=client-1
+          herbert_client:latest

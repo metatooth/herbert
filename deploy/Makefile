@@ -25,7 +25,8 @@ ifeq ($(ANSIBLE_INVENTORY),)
 endif
 
 .PHONY: deploy-all
-deploy-all: deploy-databases \
+deploy-all: deploy-controllers \
+deploy-databases \
 deploy-servers \
 deploy-socket-servers \
 deploy-workers \
@@ -40,9 +41,10 @@ build: check_branch check_inventory
 deploy:
 	ansible-playbook -i ${ANSIBLE_INVENTORY} ansible/$(SERVICE).yml
 
-.PHONY: deploy-databases
-deploy-databases:
-	$(MAKE) deploy SERVICE=database
+.PHONY: deploy-controllers
+deploy-controllers:
+	$(MAKE) build SERVICE=controller
+	$(MAKE) deploy SERVICE=controller
 
 .PHONY: deploy-servers
 deploy-servers:

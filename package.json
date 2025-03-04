@@ -16,6 +16,7 @@
     "format": "prettier --write src/",
     "serve": "run-p serve:client serve:server serve:socket-server serve:worker",
     "serve:client": "npm run dev",
+    "serve:controller": "tsc-watch --noClear -b ./src/controller/tsconfig.json --onSuccess \"node --enable-source-maps dist/controller/main.js\"",
     "serve:server": "tsc-watch --noClear -b ./src/server/tsconfig.json --onSuccess \"node --enable-source-maps dist/server/main.js\"",
     "serve:socket-server": "tsc-watch --noClear -b ./src/socket-server/tsconfig.json --onSuccess \"node --enable-source-maps dist/socket-server/main.js\"",
     "serve:worker": "tsc-watch --noClear -b ./src/worker/tsconfig.json --onSuccess \"node --enable-source-maps dist/worker/main.js\"",
@@ -23,6 +24,7 @@
     "build:client": "run-p type-check:client \"build-only:client {@}\" --",
     "build-only:client": "vite build src/client",
     "type-check:client": "vue-tsc --build src/client",
+    "build:controller": "tsc -b src/controller",
     "build:server": "tsc -b src/server && npm run copy:favicon",
     "build:socket-server": "tsc -b src/socket-server",
     "build:worker": "tsc -b src/worker"

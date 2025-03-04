@@ -42,30 +42,30 @@ fi
 
 cd $BUILD_DIR
 
-npm install
-
-VUE_APP_API_URL=$VUE_APP_API_URL \
-  VUE_APP_WS_URL=$VUE_APP_WS_URL\
-  npm run build:${SERVICE}
-
 rm -rf $DEPLOYMENT_DIR
 mkdir -p $DEPLOYMENT_DIR
 
-cp -R dist $DEPLOYMENT_DIR
-cp package.json package-lock.json $DEPLOYMENT_DIR
+if [ "${SERVICE}" = "server" ]; then
+  docker compose build api
+  docker save herbert_server:latest | gzip > $DEPLOYMENT_DIR/herbert_server_latest.tar.gz
+elif [ "${SERVICE}" = "socket-server" ]; then
+  docker compose build socket_server
+  docker save herbert_socket:latest | gzip > $DEPLOYMENT_DIR/herbert_socket_latest.tar.gz
+elif [ "${SERVICE}" = "controller" ]; then
+  docker compose build controller
+  docker save herbert_controller:latest | gzip > $DEPLOYMENT_DIR/herbert_controller_latest.tar.gz
+elif [ "${SERVICE}" = "client" ]; then
+  docker compose build client
+  docker save herbert_client:latest | gzip > $DEPLOYMENT_DIR/herbert_client_latest.tar.gz
+elif [ "${SERVICE}" = "worker" ]; then
+  npm install
+  VUE_APP_API_URL=$VUE_APP_API_URL \
+    VUE_APP_WS_URL=$VUE_APP_WS_URL \
+    npm run build:worker
 
-if [ "${SERVICE}" = "client" ]; then
-  cp index.js $DEPLOYMENT_DIR
-else
-  cp -R config $DEPLOYMENT_DIR
-fi
+  cp -R dist $DEPLOYMENT_DIR
+  cp package.json package-lock.json $DEPLOYMENT_DIR
 
-if [ "${SERVICE}" = "kiosk" ]; then
-  mkdir $DEPLOYMENT_DIR/scripts
-  cp scripts/kiosk.sh $DEPLOYMENT_DIR/scripts/kiosk.sh
-fi
-
-if [ "${SERVICE}" = "worker" ]; then
   mkdir $DEPLOYMENT_DIR/scripts
   cp scripts/AKB73016012.licrd.conf $DEPLOYMENT_DIR/scripts/AKB73016012.licrd.conf
   cp scripts/810900812A.licrd.conf $DEPLOYMENT_DIR/scripts/810900812A.licrd.conf

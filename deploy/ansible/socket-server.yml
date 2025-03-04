@@ -1,92 +1,27 @@
 - hosts: socket_servers
 
-  vars:
-    - nodejs_version: "14.x"
-    - service_description: "Main socket-server for the herbert system"
-    - service_user: root
-    - service_file: dist/socket-server/main.js
-
   tasks:
-    - name: Install System Dependencies
-      become: yes
-      apt:
-        update_cache: yes
-        state: latest
-        name: ["git", "gcc", "g++", "make"]
-
-    - name: Create {{ appDir }}
-      file:
-        path: "{{ appDir }}"
-        state: directory
-
-    - name: Create {{ appDir }}/dist
-      file:
-        path: "{{ appDir }}/dist"
-        state: directory
-
-    - name: Sync herbert dist
+    - name: Sync docker image
       synchronize:
-        src: "{{ distDir }}/socket-server"
-        dest: "{{ appDir }}/dist"
-        recursive: yes
-        delete: yes
+        src: "{{ src_dir }}/herbert_socket_latest.tar.gz"
+        dest: "{{ deploy_dir }}"
 
-    - name: Sync herbert shared
-      synchronize:
-        src: "{{ distDir }}/shared"
-        dest: "{{ appDir }}/dist"
-        recursive: yes
-        delete: yes
+    - name: Load docker image
+      ansible.builtin.shell:
+        cmd: docker load < herbert_socket_latest.tar.gz
+        chdir: "{{ deploy_dir }}"
 
-    - name: Sync herbert config
-      synchronize:
-        src: "{{ srcDir }}/config"
-        dest: "{{ appDir }}"
-        recursive: yes
-        delete: yes
+    - name: Stop running conatiner
+      ansible.builtin.shell:
+        cmd: docker container remove --force socket-1
 
-    - name: Sync herbert package.json
-      synchronize:
-        src: "{{ srcDir }}/package.json"
-        dest: "{{ appDir }}"
-
-    - name: Sync herbert package-lock.json
-      synchronize:
-        src: "{{ srcDir }}/package-lock.json"
-        dest: "{{ appDir }}"
-
-    - name: Install nodejs {{nodejs_version}}
-      include_role:
-        name: geerlingguy.nodejs
-        apply:
-          become: yes
-
-    - name: Install production node_modules
-      command: npm install
-      args:
-        chdir: "{{ appDir }}"
-      environment:
-        NODE_ENV: production
-
-    - name: Install socket-server service
-      become: yes
-      template:
-        src: ./templates/systemd-service.j2
-        dest: /etc/systemd/system/herbert-socket-server.service
-        owner: root
-        group: root
-        mode: "0644"
-
-    - name: Enable and start herbert-socket-server service
-      become: yes
-      systemd:
-        name: herbert-socket-server
-        state: restarted
-        daemon_reload: yes
-        enabled: yes
-
-    - name: Create .bash_aliases
-      copy:
-        dest: /home/{{ ansible_user }}/.bash_aliases
-        content: |
-          alias tail-socket-server='sudo journalctl -u herbert-socket-server -f'
+    - name: Run docker image as container
+      ansible.builtin.shell:
+        cmd: >
+          docker run -d
+          -p {{ wss_port }}:{{ wss_port }}
+          -e "API_URL=http://api-1:{{ api_port }}"
+          -e "WSS_PORT={{ wss_port }}"
+          --network=herbert-net
+          --name=socket-1
+          herbert_socket:latest

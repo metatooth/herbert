@@ -43,6 +43,18 @@ services:
     depends_on:
       - api
 
+  controller:
+    image: controller:latest
+    build:
+      context: .
+      target: controller
+    environment:
+      API_URL: http://api:5000
+      WSS_URL: ws://api:2929
+    depends_on:
+      - api
+      - socket_server
+
   client:
     image: herbert_client:latest
     build:
@@ -60,6 +72,7 @@ services:
 
   worker:
     image: herbert_worker:latest
+    privileged: true
     build:
       context: .
       target: worker
@@ -69,6 +82,10 @@ services:
     volumes:
       - ./src:/app/src
       - ./config:/app/config
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+      - /dev:/dev
+    devices:
+      - /dev/vhci:/dev/vhci
     depends_on:
       - api
       - socket_server

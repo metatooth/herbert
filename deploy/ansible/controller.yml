@@ -1,26 +1,26 @@
-- hosts: servers
+- hosts: controllers
 
   tasks:
     - name: Sync docker image
       synchronize:
-        src: "{{ src_dir }}/herbert_server_latest.tar.gz"
+        src: "{{ src_dir }}/herbert_controller_latest.tar.gz"
         dest: "{{ deploy_dir }}"
 
     - name: Load docker image
       ansible.builtin.shell:
-        cmd: docker load < herbert_server_latest.tar.gz
+        cmd: docker load < herbert_controller_latest.tar.gz
         chdir: "{{ deploy_dir }}"
 
     - name: Stop running conatiner
       ansible.builtin.shell:
-        cmd: docker container remove --force api-1
+        cmd: docker container remove --force controller-1
 
     - name: Run docker image as container
       ansible.builtin.shell:
         cmd: >
           docker run -d
-          -p 5000:5000
-          -e "DATABASE_URL={{ db_url }}"
+          -e "API_URL=http://api-1:{{ api_port }}"
+          -e "WSS_URL=ws://socket-1:{{ wss_port }}"
           --network=herbert-net
-          --name=api-1
-          herbert_server:latest
+          --name=controller-1
+          herbert_controller:latest
