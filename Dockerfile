@@ -21,11 +21,14 @@ COPY tsconfig.json \
 
 RUN npm run build:client
 
-FROM busybox:1.30 AS runner
+FROM nginx:stable-alpine AS runner
 WORKDIR /app
-COPY --from=client /app/src/client/dist .
+COPY --from=client /app/src/client/nginx /etc/nginx/conf.d
+COPY --from=client /app/src/client/dist /usr/share/nginx/html
 
-CMD ["busybox", "httpd", "-f", "-v", "-p", "8080"]
+EXPOSE 8080
+
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
 
 FROM base AS server
 
