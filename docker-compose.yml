@@ -44,7 +44,7 @@ services:
       - api
 
   controller:
-    image: controller:latest
+    image: herbert_controller:latest
     build:
       context: .
       target: controller

@@ -16,8 +16,8 @@ API_HOST=$(cat ${INVENTORY} | grep -C 1 '\[servers\]' | awk 'NR==3')
 API_PORT=$(cat ${INVENTORY} | grep api_port= | awk -F= 'NR==1 { print $2 }')
 WSS_HOST=$(cat ${INVENTORY} | grep -C 1 '\[socket_servers\]' | awk 'NR==3')
 WSS_PORT=$(cat ${INVENTORY} | grep wss_port= | awk -F= 'NR==2 { print $2 }')
-VUE_APP_API_URL=http://${API_HOST}:${API_PORT}
-VUE_APP_WS_URL=ws://${WSS_HOST}:${WSS_PORT}
+APP_API_URL=http://${API_HOST}:${API_PORT}
+APP_WS_URL=ws://${WSS_HOST}:${WSS_PORT}
 
 TMP_DIR=/tmp/herbert
 rm -rf $TMP_DIR
@@ -55,13 +55,14 @@ elif [ "${SERVICE}" = "controller" ]; then
   docker compose build controller
   docker save herbert_controller:latest | gzip > $DEPLOYMENT_DIR/herbert_controller_latest.tar.gz
 elif [ "${SERVICE}" = "client" ]; then
-  docker compose build client
+  docker compose build \
+         --build-arg "API_URL=http://thermos.metatooth.com:5000" \
+         --build-arg "WSS_URL=ws://thermos.metatooth.com:2929" \
+         client
   docker save herbert_client:latest | gzip > $DEPLOYMENT_DIR/herbert_client_latest.tar.gz
 elif [ "${SERVICE}" = "worker" ]; then
   npm install
-  VUE_APP_API_URL=$VUE_APP_API_URL \
-    VUE_APP_WS_URL=$VUE_APP_WS_URL \
-    npm run build:worker
+  npm run build:worker
 
   cp -R dist $DEPLOYMENT_DIR
   cp package.json package-lock.json $DEPLOYMENT_DIR

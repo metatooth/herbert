@@ -19,7 +19,10 @@ COPY tsconfig.json \
   vite.config.mjs \
   ./
 
-RUN npm run build:client
+ARG API_URL
+ARG WSS_URL
+
+RUN VITE_API_URL=$API_URL VITE_WSS_URL=$WSS_URL npm run build:client
 
 FROM nginx:stable-alpine AS runner
 WORKDIR /app

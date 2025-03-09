@@ -76,7 +76,7 @@ export default {
 
   mounted() {
     const ws: Socket<SocketMessageMap> = io(
-      process.env.VUE_APP_WS_URL || "ws://localhost:5000",
+      import.meta.env.VITE_WSS_URL || "ws://localhost:5000",
     );
     ws.emit("join", { room: "clients" });
     ws.on("message", (msg: AnySocketMessage) => {

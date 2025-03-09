@@ -1,5 +1,9 @@
 - hosts: clients
 
+  vars:
+    service_description: "Web Client for the Herbert system"
+    container_name: "client-1"
+
   tasks:
     - name: Sync docker image
       synchronize:
@@ -13,15 +17,30 @@
 
     - name: Stop running conatiner
       ansible.builtin.shell:
-        cmd: docker container remove --force client-1
+        cmd: docker container remove --force {{ container_name }}
 
     - name: Run docker image as container
       ansible.builtin.shell:
         cmd: >
           docker run -d
           -p {{ client_port }}:{{ client_port }}
-          -e "API_URL=http://api-1:{{ api_port }}"
-          -e "WSS_PORT={{ wss_port }}"
           --network=herbert-net
-          --name=client-1
+          --name={{ container_name }}
           herbert_client:latest
+
+    - name: Install client service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/herbert-client.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and start herbert-client service
+      become: yes
+      systemd:
+        name: herbert-client
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

@@ -42,7 +42,7 @@ export default {
 
   methods: {
     refresh() {
-      const url = process.env.VUE_APP_API_URL;
+      const url = import.meta.env.VITE_API_URL;
       const timeZone = this.settings.timezone;
 
       const temp = new XMLHttpRequest();

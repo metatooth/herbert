@@ -1,5 +1,9 @@
 - hosts: socket_servers
 
+  vars:
+    service_description: "Web Socket service for the Herbert system"
+    container_name: "socket-1"
+
   tasks:
     - name: Sync docker image
       synchronize:
@@ -13,7 +17,7 @@
 
     - name: Stop running conatiner
       ansible.builtin.shell:
-        cmd: docker container remove --force socket-1
+        cmd: docker container remove --force {{ container_name }}
 
     - name: Run docker image as container
       ansible.builtin.shell:
@@ -23,5 +27,22 @@
           -e API_URL=http://api-1:{{ api_port }}
           -e WSS_PORT={{ wss_port }}
           --network=herbert-net
-          --name=socket-1
+          --name={{ container_name }}
           herbert_socket:latest
+
+    - name: Install socket server service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/herbert-socket-server.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and start herbert-socket-server service
+      become: yes
+      systemd:
+        name: herbert-socket-server
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

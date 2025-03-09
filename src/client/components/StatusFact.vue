@@ -34,7 +34,7 @@ export default {
   methods: {
     refresh() {
       const xhr = new XMLHttpRequest();
-      const url = process.env.VUE_APP_API_URL;
+      const url = import.meta.env.VITE_API_URL;
 
       xhr.open("GET", `${url}/facts/?meter=${this.device.device}&units=STATUS`);
 
