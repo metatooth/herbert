@@ -3,15 +3,15 @@
 set -eo pipefail
 
 IMAGE_BASE_URL=https://downloads.raspberrypi.org
-IMAGE_URL_PATH=raspios_lite_armhf/images/raspios_lite_armhf-2021-05-28
-IMAGE_NAME_BASE=2021-05-07-raspios-buster-armhf-lite
+IMAGE_URL_PATH=raspios_lite_armhf/images/raspios_lite_armhf-2024-11-19
+IMAGE_NAME_BASE=2024-11-19-raspios-bookworm-armhf-lite.img
 
-IMAGE_ARCHIVE=${IMAGE_NAME_BASE}.zip
+IMAGE_ARCHIVE=${IMAGE_NAME_BASE}.xz
 IMAGE_URL="${IMAGE_BASE_URL}/${IMAGE_URL_PATH}/${IMAGE_ARCHIVE}"
 
 IMAGE_DEST=~/Downloads
 IMAGE_ARCHIVE_LOCATION=${IMAGE_DEST}/${IMAGE_ARCHIVE}
-IMAGE=${IMAGE_NAME_BASE}.img
+IMAGE=${IMAGE_NAME_BASE}
 IMAGE_LOCATION=${IMAGE_DEST}/${IMAGE}
 
 FILESYSTEM_MOUNT=~/Downloads/raspi_mnt
@@ -30,7 +30,7 @@ download_image() {
 
 extract_image() {
   log "Extracting ${IMAGE_ARCHIVE_LOCATION}"
-  unzip -d ${IMAGE_DEST} ${IMAGE_ARCHIVE_LOCATION}
+  xz -d ${IMAGE_ARCHIVE_LOCATION}
 }
 
 clean_up() {
@@ -283,7 +283,7 @@ for i in "$@"; do
   esac
 done
 
-trap "clean_up" EXIT
+#trap "clean_up" EXIT
 
 get_user_input
 log_settings

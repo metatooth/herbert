@@ -1,0 +1,15 @@
+[Unit]
+Description={{ service_description }}
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node {{ service_file }}
+WorkingDirectory={{ app_dir }}
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User={{ service_user }}
+Environment=WSS_URL={{ wss_url }}
+
+[Install]
+WantedBy=multi-user.target

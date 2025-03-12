@@ -98,14 +98,14 @@
 
     - name: Sync herbert dist
       synchronize:
-        src: "{{ distDir }}/worker"
+        src: "{{ dist_dir }}/worker"
         dest: "{{ app_dir }}/dist"
         recursive: yes
         delete: yes
 
     - name: Sync herbert shared
       synchronize:
-        src: "{{ distDir }}/shared"
+        src: "{{ dist_dir }}/shared"
         dest: "{{ app_dir }}/dist"
         recursive: yes
         delete: yes
@@ -143,7 +143,7 @@
     - name: Install worker service
       become: yes
       template:
-        src: ./templates/systemd-service.j2
+        src: ./templates/worker-systemd-service.j2
         dest: /etc/systemd/system/herbert-worker.service
         owner: root
         group: root

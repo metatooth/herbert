@@ -65,6 +65,7 @@ elif [ "${SERVICE}" = "worker" ]; then
   npm run build:worker
 
   cp -R dist $DEPLOYMENT_DIR
+  cp -R config $DEPLOYMENT_DIR
   cp package.json package-lock.json $DEPLOYMENT_DIR
 
   mkdir $DEPLOYMENT_DIR/scripts
