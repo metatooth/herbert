@@ -1,8 +1,10 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../dist/socket-server",
-    "composite": true
+    "outDir": "../../dist/worker",
+    "composite": true,
+    "module": "commonjs",
+    "moduleResolution": "node"
   },
   "include": ["**/*.ts"],
   "exclude": ["**/*.test.ts"],

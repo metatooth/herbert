@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../../dist/worker",
+    "outDir": "../../dist/api",
     "composite": true
   },
   "include": ["**/*.ts"],

@@ -3,7 +3,9 @@
   "compilerOptions": {
     "isolatedModules": true,
     "outDir": "../../dist/shared",
-    "composite": true
+    "composite": true,
+    "module": "commonjs",
+    "moduleResolution": "node"
   },
   "include": ["./**/*.ts"],
   "exclude": ["./**/*.test.ts"]

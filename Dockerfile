@@ -1,72 +1,66 @@
 FROM node:20.18.2-bullseye AS base
 
-WORKDIR /app
+WORKDIR /code
 
+COPY apps/ ./
 COPY package.json package-lock.json ./
 
 RUN npm install --unsafe-perms
 
-FROM base AS client
+FROM base AS shared
 
-COPY src/client ./src/client
-COPY src/shared src/shared
-COPY tsconfig.json \
-  tsconfig.base.json \
-  babel.config.js \
-  eslint.config.js \
-  jest.config.js \
-  vue.config.js \
-  vite.config.mjs \
-  ./
+COPY tsconfig.json tsconfig.base.json ./
+RUN npm run build --workspace=apps/shared
+
+FROM shared AS client
+
+COPY apps/client apps/client
 
 ARG API_URL
 ARG WSS_URL
 
-RUN VITE_API_URL=$API_URL VITE_WSS_URL=$WSS_URL npm run build:client
+RUN VITE_API_URL=$API_URL VITE_WSS_URL=$WSS_URL npm run build --workspace=apps/client
 
 FROM nginx:stable-alpine AS runner
-WORKDIR /app
-COPY --from=client /app/src/client/nginx /etc/nginx/conf.d
-COPY --from=client /app/src/client/dist /usr/share/nginx/html
+WORKDIR /code
+COPY --from=client /code/apps/client/nginx /etc/nginx/conf.d
+COPY --from=client /code/apps/client/dist /usr/share/nginx/html
 
 EXPOSE 8080
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
 
-FROM base AS server
+FROM shared AS api
 
 COPY config ./config
-COPY src/server ./src/server
-COPY src/shared src/shared
-COPY tsconfig.json tsconfig.base.json ./
+COPY apps/api ./apps/api
 
-RUN npm run build:server
+RUN npm run build --workspace=apps/api
 
-CMD ["npm", "run", "serve:server"]
+CMD ["npm", "run", "serve", "--workspace=apps/api"]
 
-FROM base AS socket-server
+FROM shared AS socket
 
 COPY config ./config
-COPY src/socket-server ./src/socket-server
-COPY src/shared src/shared
+COPY apps/socket ./apps/socket
 COPY tsconfig.json tsconfig.base.json ./
 
-RUN npm run build:socket-server
+RUN npm run build --workspace=apps/socket
 
 CMD ["npm", "run", "serve:socket-server"]
 
-FROM base AS controller
+FROM shared AS controller
 
 COPY config ./config
-COPY src/controller ./src/controller
-COPY src/shared src/shared
+COPY apps/controller ./apps/controller
+COPY apps/shared apps/shared
 COPY tsconfig.json tsconfig.base.json ./
 
 RUN npm run build:controller
 
 CMD ["npm", "run", "serve:controller"]
 
-FROM base AS worker
+FROM shared AS worker
 
 RUN apt update \
   && apt install -y \
@@ -76,8 +70,8 @@ RUN apt update \
   libbluetooth-dev \
   libudev-dev
 
-COPY src/worker ./src/worker
-COPY src/shared src/shared
+COPY apps/worker ./apps/worker
+COPY apps/shared apps/shared
 COPY tsconfig.json tsconfig.base.json ./
 
 RUN npm run build:worker

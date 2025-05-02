@@ -1,4 +1,4 @@
-import http from "http";
+import * as http from "http";
 
 const regex = /Content-Length:\s*(\d+)/i;
 const soi = Buffer.from([0xff, 0xd8]);

@@ -1,4 +1,4 @@
-import EventEmitter from "events";
+import { EventEmitter } from "events";
 import MerossCloud from "meross-cloud";
 
 import { MerossSwitch } from "./meross-switch";

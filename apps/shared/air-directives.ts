@@ -1,5 +1,5 @@
-import { Clime } from "./clime";
-import { ClimeControl } from "./clime-control";
+import { Clime } from "./clime.js";
+import { ClimeControl } from "./clime-control.js";
 
 export class AirDirectives {
   controller: ClimeControl;

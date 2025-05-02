@@ -8,6 +8,8 @@ import { MockPlug } from "./mock-plug";
 import { SequentMicrosystems } from "./sequent-microsystems";
 import { ThermoPro } from "./thermo-pro";
 
+import { SwitchBotBLE } from "node-switchbot";
+
 export class DeviceFactory {
   constructor() {}
 
@@ -15,7 +17,7 @@ export class DeviceFactory {
     const devices = [];
 
     config.devices.forEach(async (item) => {
-      const device = this.createDevice(item);
+      const device = await this.createDevice(item);
       if (device) {
         devices.push(device);
       }
@@ -24,7 +26,7 @@ export class DeviceFactory {
     return Promise.resolve(devices);
   }
 
-  private createDevice(config): Device | null {
+  private async createDevice(config): Promise<Device | null> {
     const mac = formatMacAddress(config.id);
     let device = null;
 
@@ -47,6 +49,21 @@ export class DeviceFactory {
         break;
       case "mockplug":
         device = new MockPlug(mac);
+        break;
+      case "switchbot":
+        const switchbot = new SwitchBotBLE();
+        try {
+          switchbot.onadvertisement = (ad) => {
+            console.log("an ad", ad);
+          };
+          switchbot.startScan();
+          switchbot.wait(30000);
+          switchbot.stopScan();
+        } catch (e: any) {
+          console.error(
+            `Failed to start BLE scanning, Error: ${e.message ?? e}`,
+          );
+        }
         break;
       case "thermopro":
         device = new ThermoPro();

@@ -13,10 +13,10 @@ services:
       - "5432:5432"
 
   api:
-    image: herbert_server:latest
+    image: herbert_api:latest
     build:
       context: .
-      target: server
+      target: api
     environment:
       DATABASE_URL: postgresql://postgres:bar@db:5432/herbert?sslmode=disable
       WSS_URL: ws://socket_server:2929
@@ -28,11 +28,11 @@ services:
     depends_on:
       - db
 
-  socket_server:
+  socket:
     image: herbert_socket:latest
     build:
       context: .
-      target: socket-server
+      target: socket
     environment:
       API_URL: http://api:5000
     volumes:
@@ -53,7 +53,7 @@ services:
       WSS_URL: ws://api:2929
     depends_on:
       - api
-      - socket_server
+      - socket
 
   client:
     image: herbert_client:latest
@@ -66,7 +66,7 @@ services:
       - ./config:/app/config
     depends_on:
       - api
-      - socket_server
+      - socket
     ports:
       - "8080:8080"
 
@@ -88,7 +88,7 @@ services:
       - /dev/vhci:/dev/vhci
     depends_on:
       - api
-      - socket_server
+      - socket
 
 volumes:
   pgdata:

@@ -1,4 +1,4 @@
-import noble from "@abandonware/noble";
+import * as noble from "@abandonware/noble";
 
 import { AnySocketMessage, SocketMessageType } from "../shared/types";
 import { makeBroadcastAllMessage } from "../shared/message-creators";

@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import fs from "fs";
+import * as fs from "fs";
 import { networkInterfaces } from "os";
 
 import { Device } from "./device";

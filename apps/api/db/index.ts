@@ -10,7 +10,9 @@ import {
 } from "../../shared/types";
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString:
+    process.env.DATABASE_URL ||
+    "postgres://postgres:bar@localhost:5432/herbert?sslmode=disable",
   max: 30,
   ssl: { rejectUnauthorized: false },
 });

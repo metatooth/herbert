@@ -1,0 +1,13 @@
+{
+  "name": "herbert-socket",
+  "scripts": {
+    "build": "tsc",
+    "serve": "tsc-watch --noClear --onSuccess \"node --enable-source-maps ../../dist/socket/main.js\""
+  },
+  "dependencies": {
+    "ws": "^7.4.3"
+  },
+  "devDependencies": {
+    "@types/ws": "^7.4.4"
+  }
+}
