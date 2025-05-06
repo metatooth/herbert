@@ -1,0 +1,17 @@
+{
+  "name": "herbert-worker",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "start": "node index"
+  },
+  "devDependencies": {
+    "eslint": "^9.26.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-prettier": "^5.4.0",
+    "prettier": "^3.5.3"
+  }
+}

@@ -8,46 +8,25 @@ An environment control system for Raspberry Pi with support for:
 
 ## Getting Started
 
-Using Ubuntu 21.10 or Raspberry Pi OS Lite 5.10 2021-05-07
+Using Ubuntu 24.04 or Raspberry Pi OS Lite 5.10 2021-05-07
 
 ```
 $ sudo apt-get remove npm nodejs
-$ curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+$ curl -sL https://deb.nodesource.com/setup_20.x | sudo bash -
 $ sudo apt-get install -y nodejs
 $ sudo apt-get install -y build-essential
 $ sudo apt-get install -y bluetooth bluez libbluetooth-dev libudev-dev # needed for worker role only
 $ git clone https://github.com/metatooth/herbert.git
 ```
 
-## Build Setup
+## Build and Run Herbert Worker
 
 ```bash
 # install dependencies
 npm install
 
-# compile and watch the server
-npm run serve:server
-
-# compile and watch the worker
-npm run serve:worker
-
-# serve with hot reload at localhost:8080
-npm run serve:client
-
-# build all
-npm run build
-
-# build client
-npm run build:client
-
-# build server
-npm run build:server
-
-# build worker
-npm run build:worker
-
-# run all tests
-npm test
+# run it
+npm run start
 ```
 
 ## Re-imaging script
@@ -86,8 +65,8 @@ The following must be installed in order to run ansible deployments:
 
 We are currently using ansible for deployments. To get started you need to
 create an inventory file. A sample inventory file has been provided in
-`ci/ansible/inventory.sample`. First copy the sample file to
-`ci/ansible/inventory`.
+`deploy/ansible/inventory.sample`. First copy the sample file to
+`deploy/ansible/inventory`.
 
 - Set the SSH user, password, ans herbert_version in the [all:vars] section
 - Add hosts for databases
@@ -95,26 +74,26 @@ create an inventory file. A sample inventory file has been provided in
 
 ## Deployment Version
 
-Deployment is performed using the `ci/Makefile` and `make` command. To choose
+Deployment is performed using the `deploy/Makefile` and `make` command. To choose
 the version of Herbert to deploy, you must set the `HERBERT_BRANCH` var. To
 use an Ansible inventory outside the source tree, you must set the
 `ANSIBLE_INVENTORY` var. See examples below.
 
 ```bash
 # deploy tagged version 0.18.0
-cd ci && make deploy-all HERBERT_BRANCH=0.18.0 ANSIBLE_INVENTORY=~/inventory
+cd deploy && make deploy-all HERBERT_BRANCH=0.18.0 ANSIBLE_INVENTORY=~/inventory
 
 # deploy main branch to only workers
-cd ci && make deploy-workers HERBERT_BRANCH=main
+cd deploy && make deploy-workers HERBERT_BRANCH=main
 
 # deploy local changes in current working directory to only servers
-cd ci && make deploy-servers HERBERT_BRANCH=local
+cd deploy && make deploy-servers HERBERT_BRANCH=local
 
 # deploy develop branch to only clients
-cd ci && make deploy-clients HERBERT_BRANCH=develop
+cd deploy && make deploy-clients HERBERT_BRANCH=develop
 
 # deploy to only databases (No need to set HERBERT_BRANCH here)
-cd ci && make deploy-databases
+cd deploy && make deploy-databases
 ```
 
 ## Database Deployment
@@ -122,36 +101,36 @@ cd ci && make deploy-databases
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image database using `scripts/reimage.sh` script
-- Update `ci/ansible/inventory`
+- Update `deploy/ansible/inventory`
   - Add database hosts under `[databases]` section
   - Set vars under `[databases:vars]` section
 - Run ansible databases deployment
-  - `cd ci && make deploy-databases`
+  - `cd deploy && make deploy-databases`
 
 ## Server Deployment
 
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image server using `scripts/reimage.sh` script
-- Update `ci/ansible/inventory`
+- Update `deploy/ansible/inventory`
   - Add server hosts under `[servers]` section
 - Run ansible servers deployment
-  - `cd ci && make deploy-servers HERBERT_BRANCH=<branch_or_tag>`
+  - `cd deploy && make deploy-servers HERBERT_BRANCH=<branch_or_tag>`
 
 ## Worker Deployment
 
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image worker using `scripts/reimage.sh` script
-- Update `ci/ansible/inventory`
+- Update `deploy/ansible/inventory`
   - Add worker hosts under `[workers]` section
 - Run ansible workers deployment
-  - `cd ci && make deploy-workers HERBERT_BRANCH=<branch_or_tag>`
+  - `cd deploy && make deploy-workers HERBERT_BRANCH=<branch_or_tag>`
 
 Deploying to a single worker via ansible can be accomplished via the following:
 
 ```
-cd ci/ansible
+cd deploy/ansible
 ansible-playbook --limit <target_worker_host_ip> worker.yml
 ```
 
@@ -160,10 +139,10 @@ ansible-playbook --limit <target_worker_host_ip> worker.yml
 Using Raspberry Pi 3 Model A+ & Raspberry Pi OS Lite 5.10 2021-05-07
 
 - Image client using `scripts/reimage.sh` script
-- Update `ci/ansible/inventory`
+- Update `deploy/ansible/inventory`
   - Add client hosts under `[clients]` section
 - Run ansible clients deployment
-  - `cd ci && make deploy-clients HERBERT_BRANCH=<branch_or_tag>`
+  - `cd deploy && make deploy-clients HERBERT_BRANCH=<branch_or_tag>`
 
 ## Deployment Logs
 
@@ -214,4 +193,4 @@ make logs
 
 ## License
 
-Copyright 2022 Metatooth LLC. See the [LICENSE](LICENSE).
+Copyright 2025 Metatooth LLC. See the [LICENSE](LICENSE).
